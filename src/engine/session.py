@@ -28,12 +28,32 @@ class SaveError(Exception):
 
 
 class GameSession:
-    def __init__(self, registry: DataRegistry, state: GameState) -> None:
+    def __init__(self, registry: DataRegistry | None = None, state: GameState | None = None) -> None:
+        if registry is None:
+            registry = DataRegistry()
+        if state is None:
+            fresh = GameSession.new(registry)
+            self.reg = registry
+            self.state = fresh.state
+            self.quest = fresh.quest
+            self.dialog = fresh.dialog
+            self.battle = fresh.battle
+            return
         self.reg = registry
         self.state = state
         self.quest = QuestEngine(registry, state)
         self.dialog = DialogEngine(registry, state, self.quest)
         self.battle = BattleEngine(registry, state, self.quest)
+
+    def new_game(self) -> "GameSession":
+        """Reset state ke permainan baru."""
+        fresh = GameSession.new(self.reg)
+        self.state = fresh.state
+        self.quest = fresh.quest
+        self.dialog = fresh.dialog
+        self.battle = fresh.battle
+        return self
+
 
     # ---------- buat / muat ----------
 

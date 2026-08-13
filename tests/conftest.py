@@ -20,10 +20,30 @@ def session(registry: DataRegistry) -> GameSession:
 
 
 @pytest.fixture
+def dummy_session():
+    """Mengembalikan instance GameSession yang baru diinisialisasi."""
+    registry = DataRegistry()
+    session = GameSession.new(registry)
+    return session
+
+
+@pytest.fixture
+def mock_god_mode(monkeypatch):
+    """Memaksa RNG battle menjadi deterministik (tanpa kritikal, tanpa meleset, damage rata-rata)."""
+    import src.engine.battle as battle
+
+    monkeypatch.setattr(battle, "_is_crit", lambda chance: False, raising=False)
+    monkeypatch.setattr(battle.random, "uniform", lambda a, b: 1.0)
+    monkeypatch.setattr(battle.random, "random", lambda: 1.0)
+    return True
+
+
+@pytest.fixture
 def god_mode(monkeypatch):
     """Battle selalu menang 1 serangan (deterministik untuk test alur)."""
     monkeypatch.setattr(BattleEngine, "_calc_damage", lambda self, attack, defense, ea, ed: (99999, False))
     monkeypatch.setattr(BattleEngine, "_try_flee", lambda self, pc, b: True)
+
 
 
 def finish_dialog(session: GameSession, choices: tuple = ()) -> None:
