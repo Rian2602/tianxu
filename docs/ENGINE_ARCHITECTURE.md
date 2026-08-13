@@ -183,7 +183,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `next` | array | ✓ | Sisi keluar DAG (boleh kosong = quest terakhir arc) |
 | `on_complete` | object | – | `effects` (list, format type-based §5.2), `memory_unlock`, `system_msg`, `rewards` (`exp`/`gold`) |
 | `repeatable` | bool | – | Hanya `kind: "side"` — bisa diambil ulang (grinding) |
-| `repeat_cooldown` | number | – | Jam tunggu sebelum bisa diambil lagi (0 = langsung) |
+| `cooldown` | number | – | Jam tunggu sebelum bisa diambil lagi (0 = langsung); divalidasi §14-8, belum diterapkan engine (§17) |
 | `giver` | string | – | NPC pemberi side quest (opsi `start_quest` hanya tampil lewat giver) |
 | `requires` | object | – | Prasyarat: `flags`, `morality_min/max`, `realm_min` |
 | `available_from` | object | – | Waktu tersedia (hari/jam) — untuk quest sampingan |
@@ -275,7 +275,7 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 | `flag` | `{ "type": "flag", "key": "bantu_petani", "value": true }` | Set flag dunia |
 | `item` | `{ "type": "item", "id": "pil_qi", "count": 2 }` | Beri/kurang item (count negatif = kurangi) |
 | `gold` | `{ "type": "gold", "value": 30 }` | Beri/kurang uang |
-| `start_quest` | `{ "type": "start_quest", "quest": "q_side_x" }` | Mulai side quest — opsi ini **hanya tampil** jika quest dapat ditawarkan (giver, `available_from` terpenuhi, tidak aktif, cooldown selesai) |
+| `start_quest` | `{ "type": "start_quest", "quest": "q_side_x" }` | Mulai side quest — opsi ini **hanya tampil** jika quest dapat ditawarkan (giver, `available_from` terpenuhi, tidak aktif, repeatable) |
 | `branch_select` | `{ "type": "branch_select", "option": "opt_3a" }` | (internal) pilih cabang quest — diisi otomatis oleh engine |
 
 ### 5.3 NPC
@@ -511,8 +511,8 @@ selesaikan_quest(q):
 - `kind: "side"` — boleh aktif bersamaan dengan quest utama dan side lain (selama aturan "tidak bertabrakan" terpenuhi).
 - Selesai side quest → reward + efek, tidak memengaruhi alur utama kecuali efek yang dideklarasikan (reputasi, flag).
 - **Repeatable (disahkan)**: side quest bisa diulang untuk grinding ranah.
-  - Field `repeatable: true` pada quest (hanya untuk `kind: "side"`) + opsional `repeat_cooldown` (jam).
-  - Setelah selesai, quest masuk daftar **tersedia lagi** (langsung atau setelah cooldown); progres objektif direset.
+  - Field `repeatable: true` pada quest (hanya untuk `kind: "side"`) + opsional `cooldown` (jam, divalidasi §14-8).
+  - Setelah selesai, quest masuk daftar **tersedia lagi**; progres objektif direset.
   - Data side quest **terpisah** (`quests_side.json`) dan **dilarang bertabrakan** dengan quest utama (validator §14-10).
 
 ---
@@ -771,7 +771,7 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 | 6 | ID unik (quest/dialog/NPC/item/musuh/lokasi/teknik/ingatan) | `duplikat id 'mem_01' di memories.json` |
 | 7 | `config.json`: starting quest ada, akademi valid, referensi `element_advantage` valid | `config.starting.current_quest tidak ditemukan` |
 | 8 | Setiap quest sampingan punya `available_from {day, hour}`; `cooldown` valid jika ada | `q_side_x: side quest butuh available_from {day, hour}` |
-| 9 | `repeatable: true` hanya untuk quest `kind: "side"`; cooldown (jam) valid jika ada | `q_main_x: repeatable=true tapi kind='main'` |
+| 9 | `repeatable: true` hanya untuk quest `kind: "side"` | `q_main_x: repeatable=true tapi kind='main'` |
 | 10 | Quest repeatable dilarang menuntut NPC/lokasi/objek yang dipakai quest utama | `q_side_berburu & q_akademi_04: konflik lokasi loc_ruang_lonceng` |
 | 11 | Resep alkimia: hasil & bahan valid, bahan ≠ hasil | `rc_pil_qi: bahan 'x' tidak ada di items.csv` |
 | 12 | Toko NPC: item `buy`/`sell` valid | `npc_pedagang: shop.buy[0].item 'x' tidak ada` |
@@ -824,4 +824,5 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
 - **Durasi Fase 1** (disahkan): 1–2 jam per playthrough — volume konten quest disesuaikan target ini.
 - **Ending** (disahkan): 3 tematik; mekanisme penentu final (bobot pilihan kunci + moralitas) dijabarkan lebih rinci saat konten arc final.
 - **Engine adaptif**: arc baru (Sekte/Kekaisaran/Final) = tambah data + field skema bila perlu, bukan rombak engine. Jika mekanik baru butuh field skema baru → wajib update dokumen ini + validator + test.
+- **Cooldown side quest**: field `cooldown` divalidasi validator (§14-8) tetapi **belum diterapkan engine** — quest repeatable langsung tersedia lagi. Terapkan saat quest pertama memakainya (perlu mencatat waktu selesai di state).
 - **GDD.md** sudah dipindah ke `docs/GDD.md` (struktur folder final sesuai GDD §10.3).
