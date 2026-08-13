@@ -228,3 +228,37 @@ def test_grounding_blocked_in_unsafe_zone(dummy_session):
     assert dummy_session.state.grounding_hours_today == 0
 
 
+def test_branch_dialog_included_in_apply_action_view(session, god_mode):
+    """Memastikan view yang dikembalikan apply_action menyertakan dialog cabang saat quest bercabang selesai."""
+    from conftest import finish_dialog, move_path
+
+    session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    finish_dialog(session, [0])
+
+    session.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    finish_dialog(session, [0])
+
+    session.apply_action({"type": "move", "to": "loc_arena"})
+    session.apply_action({"type": "talk", "npc": "npc_hanxiu"})
+    finish_dialog(session, [])
+    session.apply_action({"type": "battle_action", "action": "attack"})
+
+    session.apply_action({"type": "choose", "option": "akademi_elemen"})
+
+    move_path(session, ["loc_aula_ujian", "loc_paviliun"])
+    session.apply_action({"type": "talk", "npc": "npc_suqing"})
+    finish_dialog(session, [0])
+
+    session.apply_action({"type": "move", "to": "loc_perpustakaan"})
+    session.apply_action({"type": "advance_time", "hours": 12})
+
+    # Aksi move ke loc_ruang_lonceng menyelesaikan q_akademi_02 dan memicu dialog percabangan
+    v = session.apply_action({"type": "move", "to": "loc_ruang_lonceng"})
+
+    assert session.state.pending_dialog is not None
+    assert v["dialog"] is not None
+    assert v["mode"] == "dialog"
+
+
+

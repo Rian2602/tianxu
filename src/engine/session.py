@@ -122,7 +122,10 @@ class GameSession:
             res = self.view()
             res["error"] = msg
         self._maybe_start_branch_dialog()
-        return res if res is not None else self.view()
+        out = self.view()
+        if isinstance(res, dict) and "error" in res:
+            out["error"] = res["error"]
+        return out
 
     def _maybe_start_branch_dialog(self) -> None:
         """Saat quest percabangan selesai — mulai dialog pilih cabang."""
