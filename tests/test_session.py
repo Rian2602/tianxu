@@ -170,3 +170,12 @@ def test_load_save_format_salah_menolak(tmp_path, monkeypatch, registry):
     (tmp_path / "save1.json").write_text('{"player": 1}', encoding="utf-8")
     with pytest.raises(session_mod.SaveError):
         session_mod.GameSession.load(registry, "save1")
+
+
+def test_load_save_non_utf8_menolak(tmp_path, monkeypatch, registry):
+    from src.engine import session as session_mod
+
+    monkeypatch.setattr(session_mod, "SAVES_DIR", tmp_path)
+    (tmp_path / "save1.json").write_bytes(b"\xff\xfe")
+    with pytest.raises(session_mod.SaveError):
+        session_mod.GameSession.load(registry, "save1")
