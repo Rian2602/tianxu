@@ -9,7 +9,7 @@ Menjalankan aturan validasi ENGINE_ARCHITECTURE §14:
  5. Tidak ada konflik NPC/lokasi/objek antar quest yang bisa aktif bersamaan
  6. ID unik
  7. config.json valid
- 8. Side quest: repeatable/requires/available_from konsisten
+ 8. Side quest butuh available_from {day, hour}; cooldown valid jika ada
  9. repeatable hanya untuk kind side
 10. Quest repeatable tidak memakai NPC/lokasi/objek quest utama
 11. Resep alkimia valid
