@@ -183,7 +183,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `next` | array | ✓ | Sisi keluar DAG (boleh kosong = quest terakhir arc) |
 | `on_complete` | object | – | `effects` (list, format type-based §5.2), `memory_unlock`, `system_msg`, `rewards` (`exp`/`gold`) |
 | `repeatable` | bool | – | Hanya `kind: "side"` — bisa diambil ulang (grinding) |
-| `cooldown` | number | – | Jam tunggu sebelum bisa diambil lagi (0 = langsung); divalidasi §14-8, belum diterapkan engine (§17) |
+| `cooldown` | number | – | Jam tunggu sebelum bisa diambil lagi; divalidasi §14-8 (harus > 0 jika ada), belum diterapkan engine (§17) |
 | `giver` | string | – | NPC pemberi side quest (opsi `start_quest` hanya tampil lewat giver) |
 | `requires` | object | – | Prasyarat: `flags`, `morality_min/max`, `realm_min` |
 | `available_from` | object | – | Waktu tersedia (hari/jam) — untuk quest sampingan |
@@ -275,7 +275,7 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 | `flag` | `{ "type": "flag", "key": "bantu_petani", "value": true }` | Set flag dunia |
 | `item` | `{ "type": "item", "id": "pil_qi", "count": 2 }` | Beri/kurang item (count negatif = kurangi) |
 | `gold` | `{ "type": "gold", "value": 30 }` | Beri/kurang uang |
-| `start_quest` | `{ "type": "start_quest", "quest": "q_side_x" }` | Mulai side quest — opsi ini **hanya tampil** jika quest dapat ditawarkan (giver, `available_from` terpenuhi, tidak aktif, repeatable) |
+| `start_quest` | `{ "type": "start_quest", "quest": "q_side_x" }` | Mulai side quest — opsi ini **hanya tampil** jika quest dapat ditawarkan (giver, `available_from` terpenuhi, tidak aktif) |
 | `branch_select` | `{ "type": "branch_select", "option": "opt_3a" }` | (internal) pilih cabang quest — diisi otomatis oleh engine |
 
 ### 5.3 NPC
