@@ -23,6 +23,16 @@ from .state import GameState, PlayerState
 SAVES_DIR = Path(__file__).resolve().parent.parent.parent / "saves"
 
 
+def _safe_save_path(save_name: str) -> Path:
+    if not save_name or "/" in save_name or "\\" in save_name or ".." in save_name:
+        raise SaveError(f"nama save tidak valid: '{save_name}'")
+    SAVES_DIR.mkdir(exist_ok=True)
+    path = (SAVES_DIR / f"{save_name}.json").resolve()
+    if path.parent != SAVES_DIR.resolve():
+        raise SaveError(f"nama save tidak valid: '{save_name}'")
+    return path
+
+
 class SaveError(Exception):
     """Save tidak dapat dimuat: file rusak atau format tidak dikenal."""
 
@@ -68,7 +78,7 @@ class GameSession:
 
     @classmethod
     def load(cls, registry: DataRegistry, save_name: str) -> "GameSession":
-        path = SAVES_DIR / f"{save_name}.json"
+        path = _safe_save_path(save_name)
         try:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
@@ -427,8 +437,14 @@ class GameSession:
             res["error"] = msg
             return res
         name = action.get("save_name") or "save1"
-        SAVES_DIR.mkdir(exist_ok=True)
-        path = SAVES_DIR / f"{name}.json"
+        try:
+            path = _safe_save_path(name)
+        except SaveError as e:
+            msg = str(e)
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.state.to_dict(), f, ensure_ascii=False, indent=2)
         add_log(self.state, "narration", f"Permainan disimpan ({name}).")

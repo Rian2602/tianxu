@@ -6,6 +6,7 @@ dilakukan lewat sesi (session.py) yang juga menulis log.
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 
 
@@ -131,7 +132,7 @@ class GameState:
                 "gold": self.player.gold,
                 "roots": self.player.roots,
                 "academy": self.player.academy,
-                "equipment": self.player.equipment,
+                "equipment": copy.deepcopy(self.player.equipment),
                 "exp": self.player.exp,
                 "morality": self.player.morality,
             },
@@ -139,18 +140,18 @@ class GameState:
             "day": self.day,
             "hour": self.hour,
             "current_quest": self.current_quest,
-            "completed_quests": self.completed_quests,
-            "active_side_quests": self.active_side_quests,
-            "inventory": self.inventory,
-            "flags": self.flags,
-            "relations": self.relations,
-            "memories": self.memories,
+            "completed_quests": copy.deepcopy(self.completed_quests),
+            "active_side_quests": copy.deepcopy(self.active_side_quests),
+            "inventory": copy.deepcopy(self.inventory),
+            "flags": copy.deepcopy(self.flags),
+            "relations": copy.deepcopy(self.relations),
+            "memories": copy.deepcopy(self.memories),
             "last_safe_location": self.last_safe_location,
             "grounding_hours_today": self.grounding_hours_today,
             "branch_pending": self.branch_pending,
             "pending_dialog": self.pending_dialog,
-            "pending_battle": self.pending_battle,
-            "companion": self.companion,
+            "pending_battle": copy.deepcopy(self.pending_battle) if self.pending_battle else None,
+            "companion": copy.deepcopy(self.companion) if self.companion else None,
         }
 
     @classmethod
@@ -166,7 +167,7 @@ class GameState:
                 gold=p.get("gold", 0),
                 roots=p.get("roots", "akar_mid"),
                 academy=p.get("academy"),
-                equipment=p.get("equipment", {"weapon": None}),
+                equipment=copy.deepcopy(p.get("equipment", {"weapon": None})),
                 exp=p.get("exp", 0),
                 morality=p.get("morality", 0),
             ),
@@ -174,16 +175,16 @@ class GameState:
             day=d["day"],
             hour=d["hour"],
             current_quest=d.get("current_quest"),
-            completed_quests=d.get("completed_quests", []),
-            active_side_quests=d.get("active_side_quests", {}),
-            inventory=d.get("inventory", {}),
-            flags=d.get("flags", {}),
-            relations=d.get("relations", {}),
-            memories=d.get("memories", []),
+            completed_quests=copy.deepcopy(d.get("completed_quests", [])),
+            active_side_quests=copy.deepcopy(d.get("active_side_quests", {})),
+            inventory=copy.deepcopy(d.get("inventory", {})),
+            flags=copy.deepcopy(d.get("flags", {})),
+            relations=copy.deepcopy(d.get("relations", {})),
+            memories=copy.deepcopy(d.get("memories", [])),
             last_safe_location=d.get("last_safe_location"),
             grounding_hours_today=d.get("grounding_hours_today", 0),
             branch_pending=d.get("branch_pending"),
             pending_dialog=d.get("pending_dialog"),
-            pending_battle=d.get("pending_battle"),
-            companion=d.get("companion"),
+            pending_battle=copy.deepcopy(d.get("pending_battle")),
+            companion=copy.deepcopy(d.get("companion")),
         )
