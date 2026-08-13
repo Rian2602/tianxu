@@ -152,3 +152,21 @@ def test_waktu_maju_dan_hari_berganti(session):
     session.apply_action({"type": "advance_time", "hours": 24})
     assert session.state.day == 3
     assert session.state.hour == 4
+
+
+def test_load_save_rusak_menolak(tmp_path, monkeypatch, registry):
+    from src.engine import session as session_mod
+
+    monkeypatch.setattr(session_mod, "SAVES_DIR", tmp_path)
+    (tmp_path / "save1.json").write_text("{rusak", encoding="utf-8")
+    with pytest.raises(session_mod.SaveError):
+        session_mod.GameSession.load(registry, "save1")
+
+
+def test_load_save_format_salah_menolak(tmp_path, monkeypatch, registry):
+    from src.engine import session as session_mod
+
+    monkeypatch.setattr(session_mod, "SAVES_DIR", tmp_path)
+    (tmp_path / "save1.json").write_text('{"player": 1}', encoding="utf-8")
+    with pytest.raises(session_mod.SaveError):
+        session_mod.GameSession.load(registry, "save1")
