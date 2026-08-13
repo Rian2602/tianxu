@@ -32,10 +32,10 @@ def mock_god_mode(monkeypatch):
     """Memaksa RNG battle menjadi deterministik (tanpa kritikal, tanpa meleset, damage rata-rata)."""
     import src.engine.battle as battle
 
-    monkeypatch.setattr(battle, "_is_crit", lambda chance: False, raising=False)
     monkeypatch.setattr(battle.random, "uniform", lambda a, b: 1.0)
     monkeypatch.setattr(battle.random, "random", lambda: 1.0)
     return True
+
 
 
 @pytest.fixture
