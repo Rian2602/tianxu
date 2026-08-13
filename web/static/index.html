@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>天缘灵 · Tian Xu: Second Life — Arc Akademi</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- ═══ Layar judul ═══ -->
+  <div id="title-screen">
+    <div class="title-box">
+      <h1 class="game-title">天缘灵</h1>
+      <h2 class="game-subtitle">TIAN XU: SECOND LIFE</h2>
+      <p class="game-tagline">Arc Akademi — Bukti Konsep Fase 1</p>
+      <button id="btn-new" class="btn btn-gold">Mulai Baru</button>
+      <div id="save-slots" class="save-slots"></div>
+      <p id="title-msg" class="title-msg"></p>
+    </div>
+  </div>
+
+  <!-- ═══ Layar game ═══ -->
+  <div id="game-screen" class="hidden">
+    <header id="topbar">
+      <div id="header-title" class="header-title"></div>
+      <div class="topbar-right">
+        <button id="btn-tianyuan" class="btn btn-small">天缘灵 · Panel</button>
+      </div>
+    </header>
+
+    <div id="layout">
+      <aside id="col-left" class="col"></aside>
+      <main id="col-center" class="col">
+        <div id="log" class="log"></div>
+        <div id="interact" class="interact"></div>
+      </main>
+      <aside id="col-right" class="col"></aside>
+    </div>
+  </div>
+
+  <!-- ═══ Panel Tianyuan Ling ═══ -->
+  <div id="tianyuan" class="hidden tianyuan"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

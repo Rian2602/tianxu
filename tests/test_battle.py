@@ -5,14 +5,36 @@ from __future__ import annotations
 from src.engine.battle import BattleEngine
 
 
-def test_damage_formula_persen():
+def test_damage_formula_persen(monkeypatch):
+    from src.loader import DataRegistry
+
+    # deterministik: variasi 1.0 (tengah), tanpa kritikal
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
+
+    b = BattleEngine.__new__(BattleEngine)
+    b.reg = DataRegistry()
+    # attack 10 vs defense 90 → 10 * 100/190 ≈ 5.26 → 5
+    dmg, crit = b._calc_damage(10, 90, None, None)
+    assert dmg == round(10 * 100 / 190)
+    assert crit is False
+
+
+def test_damage_variasi_dan_krit_dalam_batas(monkeypatch):
+    """Variasi ±20% & krit ×1.5 tetap dalam batas yang masuk akal (non-flaky)."""
     from src.loader import DataRegistry
 
     b = BattleEngine.__new__(BattleEngine)
     b.reg = DataRegistry()
-    # attack 10 vs defense 90 → 10 * 100/190 ≈ 5
-    dmg, crit = b._calc_damage(10, 90, None, None)
-    assert 3 <= dmg <= 7  # ±20% dari 5.26
+    base = 10 * 100 / 190  # ≈ 5.26
+    seen = []
+    for _ in range(200):
+        dmg, crit = b._calc_damage(10, 90, None, None)
+        lo = base * 0.8 * (1.5 if crit else 1.0)
+        hi = base * 1.2 * (1.5 if crit else 1.0)
+        assert lo - 1 <= dmg <= hi + 1  # toleransi pembulatan
+        seen.append(dmg)
+    assert min(seen) >= 3 and max(seen) <= 10  # tanpa krit: [4,7]; dengan krit: ≤ 10
 
 
 def test_damage_minimal_satu():

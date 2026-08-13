@@ -428,7 +428,8 @@ class GameSession:
                 for sq in self.quest.active_side()
             ],
             "inventory": [
-                {"id": iid, "name": self.reg.item(iid)["name"], "count": c}
+                {"id": iid, "name": self.reg.item(iid)["name"], "count": c,
+                 "type": self.reg.item(iid).get("type", "")}
                 for iid, c in sorted(s.inventory.items())
                 if self.reg.item(iid)
             ],

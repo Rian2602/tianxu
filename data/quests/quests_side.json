@@ -15,7 +15,7 @@
       "next": [],
       "repeatable": true,
       "repeat_cooldown": 0,
-      "available_from": { "day": 2, "hour": 8 },
+      "available_from": { "day": 1, "hour": 8 },
       "giver": "npc_pemburu",
       "on_complete": {
         "effects": [ { "type": "item", "id": "material_tulang", "count": 1 } ],
@@ -38,7 +38,7 @@
       "next": [],
       "repeatable": true,
       "repeat_cooldown": 0,
-      "available_from": { "day": 2, "hour": 8 },
+      "available_from": { "day": 1, "hour": 8 },
       "giver": "npc_suqing",
       "on_complete": {
         "effects": [ { "type": "relation", "npc": "npc_suqing", "value": 2 } ],
@@ -61,7 +61,7 @@
       "next": [],
       "repeatable": true,
       "repeat_cooldown": 0,
-      "available_from": { "day": 2, "hour": 8 },
+      "available_from": { "day": 1, "hour": 8 },
       "giver": "npc_moyun",
       "on_complete": {
         "effects": [ { "type": "relation", "npc": "npc_moyun", "value": 2 } ],

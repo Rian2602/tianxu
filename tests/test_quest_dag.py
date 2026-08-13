@@ -91,6 +91,21 @@ def test_branch_3c_berdiam_diri(session, god_mode):
     assert session.state.flags.get("branch_3c") is True
 
 
+def test_balancing_arc_quest_only_berakhir_lv4_6(session, god_mode):
+    """Pengawal balancing (target GDD §11.1): quest saja (tanpa grinding) harus
+    berakhir di Pengumpul Qi Lv.4–6 — bukan Lv.10/breakthrough (regresi exp)."""
+    play_to_incident(session)
+    finish_dialog(session, [0, 0])  # opt_3aa
+    move_path(session, ["loc_perpustakaan", "loc_paviliun"])
+    session.apply_action({"type": "talk", "npc": "npc_penatua"})
+    finish_dialog(session, [0])
+    _finish_truth(session)
+    _assert_arc_done(session)
+    lvl = session.state.player.realm_level
+    assert 4 <= lvl <= 6, f"quest-only berakhir Lv.{lvl} — target GDD Lv.5-6, was Lv.10 sebelum rebalancing"
+    assert session.state.player.realm == "realm_pengumpul_qi"
+
+
 def test_satu_aktif_invariant(session, god_mode):
     """Quest utama bergerak satu-per-satu, tidak pernah dua sekaligus."""
     seen = []

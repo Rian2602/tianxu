@@ -11,7 +11,7 @@
       "on_complete": {
         "effects": [ { "type": "flag", "key": "met_penjaga", "value": true } ],
         "system_msg": "Quest utama diperbarui: Ujian Masuk.",
-        "rewards": { "exp": 5 }
+        "rewards": { "exp": 3 }
       }
     },
     {
@@ -25,7 +25,7 @@
       "on_complete": {
         "effects": [ { "type": "flag", "key": "ujian_akar_selesai", "value": true } ],
         "system_msg": "Hasil ujian: Akar Menengah (中品).",
-        "rewards": { "exp": 8 }
+        "rewards": { "exp": 5 }
       }
     },
     {
@@ -39,7 +39,7 @@
       "on_complete": {
         "effects": [ { "type": "flag", "key": "spar_ujian_selesai", "value": true } ],
         "system_msg": "Sparing selesai. Han Xiu mengangguk pelan.",
-        "rewards": { "exp": 15, "gold": 10 }
+        "rewards": { "exp": 8, "gold": 10 }
       }
     },
     {
@@ -61,7 +61,7 @@
       "on_complete": {
         "effects": [ { "type": "flag", "key": "akademi_dipilih", "value": true } ],
         "system_msg": "Selamat datang di akademi pilihanmu.",
-        "rewards": { "exp": 10 }
+        "rewards": { "exp": 6 }
       }
     },
     {
@@ -76,7 +76,7 @@
         "effects": [ { "type": "flag", "key": "hari_pertama_selesai", "value": true } ],
         "memory_unlock": "mem_01",
         "system_msg": "[Sistem] ...Sepotong masa lalu telah kembali.",
-        "rewards": { "exp": 10 }
+        "rewards": { "exp": 6 }
       }
     },
     {
@@ -100,7 +100,7 @@
       "on_complete": {
         "effects": [ { "type": "flag", "key": "lihat_moyun_malam", "value": true } ],
         "system_msg": "[Sistem] Pola yang sama. Kau melihatnya, bukan?",
-        "rewards": { "exp": 10 }
+        "rewards": { "exp": 6 }
       }
     },
     {
@@ -121,7 +121,7 @@
         ],
         "memory_unlock": "mem_02",
         "system_msg": "[Sistem] Ingatan baru terbuka: 'Kebaikan yang Terlupakan'.",
-        "rewards": { "exp": 30, "gold": 20 }
+        "rewards": { "exp": 15, "gold": 20 }
       }
     },
     {
@@ -140,7 +140,7 @@
         ],
         "memory_unlock": "mem_02",
         "system_msg": "[Sistem] Ingatan baru terbuka: 'Kebaikan yang Terlupakan'.",
-        "rewards": { "exp": 25, "gold": 15 }
+        "rewards": { "exp": 12, "gold": 15 }
       }
     },
     {
@@ -160,7 +160,7 @@
         ],
         "memory_unlock": "mem_03",
         "system_msg": "[Sistem] Mengambil. Seperti yang lain.",
-        "rewards": { "exp": 15 }
+        "rewards": { "exp": 8 }
       }
     },
     {
@@ -179,7 +179,7 @@
         ],
         "memory_unlock": "mem_04",
         "system_msg": "[Sistem] Diam juga sebuah pilihan.",
-        "rewards": { "exp": 10 }
+        "rewards": { "exp": 5 }
       }
     },
     {
@@ -196,7 +196,7 @@
           { "type": "morality", "value": 2 }
         ],
         "system_msg": "[Sistem] Jalanmu baru dimulai.",
-        "rewards": { "exp": 30, "gold": 20 }
+        "rewards": { "exp": 15, "gold": 20 }
       }
     }
   ]

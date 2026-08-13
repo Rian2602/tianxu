@@ -362,7 +362,7 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
     {
       "id": "mem_01",
       "title": "Istana yang Sunyi",
-      "unlocked_by_quest": "q_akademi_02",
+      "unlocked_by_quest": "q_akademi_05",
       "text": "Kulihat kembali bayangan istana tempatku lahir...",
       "type": "narrative"
     }
@@ -397,11 +397,11 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
     "levels_per_realm": 10,
     "exp_per_level_base": 10,
     "exp_growth_per_level": 1.2,
-    "grounding_exp_per_hour": 4,
+    "grounding_exp_per_hour": 2,
     "grounding_max_hours_per_day": 8,
-    "spar_win_exp": 15,
-    "spar_loss_exp": 5,
-    "hunt_exp_per_kill": 10,
+    "spar_win_exp": 8,
+    "spar_loss_exp": 3,
+    "hunt_exp_per_kill": 6,
     "breakthrough": "auto"
   },
   "currency": { "name": "Koin Emas", "start_gold": 20 },
@@ -575,6 +575,7 @@ player_action(menu):
   - **Sparing NPC** — tantang NPC ber-`can_spar: true` (Han Xiu, Gu Canghai) — **tanpa batas frekuensi** (disahkan) → menang = `spar_win_exp` exp + hubungan naik; kalah = `spar_loss_exp` exp kecil + **penalti KO berlaku** (disahkan, konsisten dengan battle biasa).
 - **Naik tingkat**: `exp_needed(level) = round(exp_per_level_base × exp_growth_per_level^(level-1))` (kurva dari `config.cultivation`, data-driven). Saat exp ≥ ambang → `realm_level` naik, exp tersisa dibawa.
 - **Target balancing Fase 1 (disahkan)**: pemain yang rajin (grinding side quest/berburu) mencapai **Pengumpul Qi tingkat 5–6** di akhir arc.
+  - **Rebalancing (hasil playtest, disahkan)**: exp quest dikurangi ~40% (q1–q07: 3–18) & exp aktivitas diturunkan (`grounding 2/jam`, `spar_win 8`, `hunt 6`) — playtest awal mencapai Lv.10 (maks) di akhir arc, melampaui target; dengan angka ini quest saja ≈ Lv.5, rajin ≈ Lv.6.
 - **Akar spiritual (mekanik ringan, disahkan)**: semua perolehan exp dikali `roots.exp_multiplier` tier akar pemain (akar bagus = exp lebih cepat). Tier ditentukan di ujian masuk — usulan: Chen Xu = **中品 (Akar Menengah)**, cocok premis "bayi kultivator biasa" (GDD §2).
 - **Breakthrough**: `realm_level` mencapai maks (10) → **breakthrough otomatis** (`breakthrough: "auto"`) ke ranah berikutnya (`order+1`), `realm_level` = 1. Ranah membuka slot teknik & batas HP/Qi baru.
 
@@ -738,6 +739,13 @@ player_action(menu):
 - **Desktop dulu (disahkan)**: tidak dioptimalkan untuk layar HP (responsif ditunda).
 - Panel: **Teks utama** (narasi/dialog/log), **Action bar** (kontekstual: Bicara/Pindah/Serang/Item), **Panel statistik** (HP/Qi/ranah/inventori, selalu terlihat), **Panel Tianyuan Ling** (toggle).
 - **Tema (disahkan)**: xianxia **gelap + emas** — latar gelap, aksen emas, font serif untuk narasi.
+
+**Detail implementasi (engine web, disepakati saat pembangunan):**
+- `web/app.py` — server **stdlib-only** (`http.server.ThreadingHTTPServer`), satu sesi aktif per proses (single-player lokal); jalankan `python3 web/app.py [port]`.
+- Endpoint API: `GET /` · `GET /static/*` · `GET /api/state` · `GET /api/saves` · `GET /api/tianyuan` (ingatan + log sistem) · `POST /api/new` · `POST /api/load {name}` · `POST /api/action {action}` · `POST /api/save {name}`.
+- Setiap respons state = `{view, context}`: `view` = output engine `session.view()` (kontrak §12.4); `context` = data UI yang tidak ada di view (NPC di lokasi, teknik akademi, nama tampilan akademi, peta nama item).
+- `view.inventory` menyertakan `type` item (consumable/weapon/material) agar UI bisa memfilter aksi (pakai/racik/pasang).
+- Frontend `web/static/` (index.html + style.css + app.js, vanilla, tanpa build): render ulang penuh per aksi (statis — sesuai keputusan visual); mode explore/dialog/battle/choose dirender dari `view.mode`; panel Tianyuan Ling toggle di kanan.
 
 ---
 

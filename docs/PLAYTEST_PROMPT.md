@@ -11,7 +11,7 @@ Baca dulu SEMUA data game di folder `data/`:
 - `data/items.csv` — efek tiap item. **Perhatikan: `pil_qi` hanya memulihkan Qi (+30), BUKAN HP.** Heal HP = `pil_pemulihan` (+50 HP) atau teknik `heal`.
 - `data/techniques.csv` — 9 teknik (3 per akademi): biaya Qi, power, jenis (attack/defend/heal), elemen.
 - `data/enemies.csv` — musuh, stat, reward exp, drop.
-- `data/quests/quests_akademi.json` + `data/quests/quests_side.json` — alur quest DAG, reward tiap cabang, ketersediaan side quest (hari ke-2).
+- `data/quests/quests_akademi.json` + `data/quests/quests_side.json` — alur quest DAG, reward tiap cabang, ketersediaan side quest (sejak hari 1).
 - `data/npcs.json` — lokasi NPC, siapa bisa `spar`, isi toko (harga beli/jual).
 - `data/recipes.json`, `data/companions.json`, `data/memories.json`, `data/config.json`, `data/realms.csv`.
 
@@ -40,7 +40,7 @@ python3 -m pytest tests/ -q
 - [ ] **Teknik di battle** — `teknik <id>`: coba serangan, `defend` (perisai −60%), `heal` (penyembuh). Pakai saat relevan, jangan spam serang terus.
 - [ ] **Equip senjata** — `pasang <senjata>` begitu dapat senjata (pedang_bambu dari toko / pedang_angin dari reward). Bandingkan damage sebelum/sesudah.
 - [ ] **Crafting** — kumpulkan herba & tulang → `racik rc_pil_qi` / `racik rc_pil_pemulihan`. Catat trade-off: jual material vs racik jadi pil (nilai pakai, bukan jual — toko tidak membeli pil).
-- [ ] **Side quest** — dari hari ke-2 (bicara Pemburu / Su Qing / Mo Yun). Selesaikan minimal 2.
+- [ ] **Side quest** — tersedia sejak hari 1 (bicara Pemburu / Su Qing / Mo Yun). Selesaikan minimal 2.
 - [ ] **Ingatan** — `ingatan <id>`: baca SEMUA yang terbuka (konten naratif inti).
 - [ ] **Kompanion** — pilih **Akademi Summoning** di quest pilih akademi → amati kompanion di battle (auto-attack tiap giliran, musuh bisa menargetnya, KO → pulih dengan `istirahat` di titik aman).
 - [ ] **Sparring + berburu + meditasi** — kombinasi wajar untuk naik level.

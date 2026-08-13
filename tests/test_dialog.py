@@ -59,24 +59,21 @@ def test_start_quest_hanya_jika_bisa_ditawarkan(session, god_mode):
     from conftest import play_to_incident
 
     play_to_incident(session)
-    # Hari 1: side quest belum tersedia (available_from day 2) → opsi start_quest disembunyikan
-    v = session.dialog.view() if session.state.pending_dialog else None
-    # bereskan dialog insiden dulu
+    # side quest tersedia sejak hari 1 (available_from day 1 hour 8) → opsi muncul
     finish_dialog(session, [1])
     # ruang_lonceng → perpustakaan → paviliun
     move_path(session, ["loc_perpustakaan", "loc_paviliun"])
     session.apply_action({"type": "talk", "npc": "npc_suqing"})
     v = session.dialog.view()
     labels = [c["label"] for c in v["choices"]]
-    assert not any("ramuan" in l for l in labels), f"opsi side quest tampil di hari 1: {labels}"
-
-    # lewati waktu ke hari 2 → opsi muncul
-    session.apply_action({"type": "dialog_choice", "choice_index": -1})  # tutup dialog umum
-    session.apply_action({"type": "advance_time", "hours": 24})
+    assert any("ramuan" in l for l in labels), f"opsi side quest tidak muncul: {labels}"
+    # terima tawaran → side quest aktif → tidak ditawarkan lagi
+    session.apply_action({"type": "dialog_choice", "choice_index": 0})
+    assert "q_side_suqing" in session.state.active_side_quests
     session.apply_action({"type": "talk", "npc": "npc_suqing"})
     v = session.dialog.view()
     labels = [c["label"] for c in v["choices"]]
-    assert any("ramuan" in l for l in labels), f"opsi side quest tidak muncul di hari 2: {labels}"
+    assert not any("ramuan" in l for l in labels), f"side quest ditawarkan lagi: {labels}"
 
 
 def test_side_quest_dimulai_dan_selesai(session, god_mode):
