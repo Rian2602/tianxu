@@ -179,3 +179,52 @@ def test_load_save_non_utf8_menolak(tmp_path, monkeypatch, registry):
     (tmp_path / "save1.json").write_bytes(b"\xff\xfe")
     with pytest.raises(session_mod.SaveError):
         session_mod.GameSession.load(registry, "save1")
+
+
+def test_action_blocked_in_battle(dummy_session):
+    # Ubah state secara manual agar terlihat sedang dalam pertarungan
+    dummy_session.state.ui.mode = "battle"
+    dummy_session.state.ui.battle = {"active": True}
+
+    # Mencoba aksi move (pindah lokasi) saat battle
+    response = dummy_session.apply_action({"type": "move", "to": "loc_asrama"})
+
+    # Harus ditolak
+    assert response.get("error") is not None or "blocked" in str(response.get("log_delta", []))
+
+
+def test_crafting_blocked_in_unsafe_zone(dummy_session):
+    # Set lokasi ke area tidak aman
+    dummy_session.state.location = "loc_gerbang_akademi"  # asumsi is_safe: false
+
+    # Coba craft
+    response = dummy_session.apply_action({"type": "craft", "recipe": "rc_pil_qi"})
+
+    # Harus ditolak karena tidak aman
+    assert response.get("error") is not None
+
+
+def test_resting_blocked_in_unsafe_zone(dummy_session):
+    # Set lokasi ke area tidak aman
+    dummy_session.state.location = "loc_gerbang_akademi"  # is_safe: false
+    response = dummy_session.apply_action({"type": "rest"})
+    assert response.get("error") is not None
+
+
+def test_saving_blocked_in_unsafe_zone(dummy_session, tmp_path, monkeypatch):
+    from src.engine import session as session_mod
+
+    monkeypatch.setattr(session_mod, "SAVES_DIR", tmp_path)
+    dummy_session.state.location = "loc_gerbang_akademi"  # is_safe: false
+    response = dummy_session.apply_action({"type": "save", "save_name": "unsafe_save"})
+    assert response.get("error") is not None
+    assert not (tmp_path / "unsafe_save.json").exists()
+
+
+def test_grounding_blocked_in_unsafe_zone(dummy_session):
+    dummy_session.state.location = "loc_gerbang_akademi"  # is_safe: false
+    response = dummy_session.apply_action({"type": "grounding", "hours": 4})
+    assert response.get("error") is not None
+    assert dummy_session.state.grounding_hours_today == 0
+
+

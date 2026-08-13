@@ -352,10 +352,10 @@ class BattleEngine:
             "player": {"hp": pc["hp"], "hp_max": pc["hp_max"], "qi": pc["qi"], "qi_max": pc["qi_max"]},
             "foes": [
                 {"name": f["name"], "hp": f["hp"], "hp_max": f["hp_max"], "element": f.get("element")}
-                for f in b["foes"]
+                for f in b.get("foes", [])
             ],
             "companion": companion_stats(self.state, self.reg),
-            "over": b["over"],
-            "won": b["won"],
+            "over": b.get("over", False),
+            "won": b.get("won", False),
             "fled": b.get("player_fled", False),
         }

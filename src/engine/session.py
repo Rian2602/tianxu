@@ -88,8 +88,11 @@ class GameSession:
         t = action.get("type")
         # battle aktif: hanya aksi battle yang sah (cegah pindah/bicara saat bertarung)
         if self.state.pending_battle and t != "battle_action":
-            add_log(self.state, "system", "Kau sedang bertarung — selesaikan atau kabur dulu.")
-            return self.view()
+            msg = "Kau sedang bertarung — selesaikan atau kabur dulu."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
         handler = {
             "talk": self._talk,
             "dialog_choice": self._dialog_choice,
@@ -110,12 +113,16 @@ class GameSession:
             "save": self._save,
         }
         fn = handler.get(t)
+        res = None
         if fn:
-            fn(action)
+            res = fn(action)
         else:
-            add_log(self.state, "system", f"Aksi tak dikenal: {t}.")
+            msg = f"Aksi tak dikenal: {t}."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
         self._maybe_start_branch_dialog()
-        return self.view()
+        return res if res is not None else self.view()
 
     def _maybe_start_branch_dialog(self) -> None:
         """Saat quest percabangan selesai — mulai dialog pilih cabang."""
@@ -238,8 +245,11 @@ class GameSession:
     def _grounding(self, action: dict) -> dict:
         loc = self.reg.location(self.state.location)
         if not loc or not loc.get("is_safe"):
-            add_log(self.state, "system", "Berkultivasi hanya bisa dilakukan di lokasi aman.")
-            return self.view()
+            msg = "Berkultivasi hanya bisa dilakukan di lokasi aman."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
         hours = max(1, int(action.get("hours", 1)))
         cfg = self.reg.config["cultivation"]
         allowed = cfg.get("grounding_max_hours_per_day", 8) - self.state.grounding_hours_today
@@ -300,8 +310,11 @@ class GameSession:
     def _rest(self, action: dict) -> dict:
         loc = self.reg.location(self.state.location)
         if not loc or not loc.get("is_safe"):
-            add_log(self.state, "system", "Istirahat hanya bisa dilakukan di titik aman.")
-            return self.view()
+            msg = "Istirahat hanya bisa dilakukan di titik aman."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
         hours = max(1, int(action.get("hours", 8)))
         self._pass_time(hours)
         self.state.player.hp = self.state.max_hp(self.reg)
@@ -371,8 +384,11 @@ class GameSession:
     def _craft(self, action: dict) -> dict:
         loc = self.reg.location(self.state.location)
         if not loc or not loc.get("is_safe"):
-            add_log(self.state, "system", "Meracik hanya bisa dilakukan di titik aman.")
-            return self.view()
+            msg = "Meracik hanya bisa dilakukan di titik aman."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
         rid = action.get("recipe")
         recipe = next((r for r in self.reg.recipes if r["id"] == rid), None)
         if not recipe:
@@ -402,8 +418,11 @@ class GameSession:
     def _save(self, action: dict) -> dict:
         loc = self.reg.location(self.state.location)
         if not loc or not loc.get("is_safe"):
-            add_log(self.state, "system", "Kau hanya bisa menyimpan di titik aman.")
-            return self.view()
+            msg = "Kau hanya bisa menyimpan di titik aman."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
         name = action.get("save_name") or "save1"
         SAVES_DIR.mkdir(exist_ok=True)
         path = SAVES_DIR / f"{name}.json"

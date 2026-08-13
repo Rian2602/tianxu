@@ -24,6 +24,43 @@ class PlayerState:
     morality: int = 0
 
 
+class UIState:
+    """Helper proxy agar `state.ui.mode` dan `state.ui.battle` dapat diakses/diubah."""
+
+    def __init__(self, state: "GameState") -> None:
+        self._state = state
+        self._mode: str = "explore"
+        self._battle: dict = {}
+
+    @property
+    def mode(self) -> str:
+        if self._state.pending_battle:
+            return "battle"
+        if self._state.pending_dialog:
+            return "dialog"
+        return self._mode
+
+    @mode.setter
+    def mode(self, val: str) -> None:
+        self._mode = val
+        if val == "battle" and not self._state.pending_battle:
+            self._state.pending_battle = {"active": True}
+
+    @property
+    def battle(self) -> dict:
+        if self._state.pending_battle:
+            return self._state.pending_battle
+        return self._battle
+
+    @battle.setter
+    def battle(self, val: dict) -> None:
+        self._battle = val if isinstance(val, dict) else {}
+        if self._battle and self._battle.get("active"):
+            self._state.pending_battle = self._battle
+        elif not self._battle and self._state.pending_battle:
+            self._state.pending_battle = None
+
+
 @dataclass
 class GameState:
     player: PlayerState
@@ -44,6 +81,13 @@ class GameState:
     pending_dialog: str | None = None
     pending_battle: dict | None = None  # data battle aktif (dict, lihat battle.py)
     companion: dict | None = None  # {"id", "hp", "active"} — jalur Summoning (ENGINE §9.4)
+
+    @property
+    def ui(self) -> UIState:
+        if not hasattr(self, "_ui_proxy"):
+            self._ui_proxy = UIState(self)
+        return self._ui_proxy
+
 
     # ---------- batas stat ----------
 
