@@ -44,13 +44,15 @@ python3 -m pytest -q
 python3 tools/validate_data.py
 ```
 
+> **Pengembangan**: `pytest` adalah satu-satunya dependency dev. Pada sistem dengan Python *externally-managed* (PEP 668 — mis. Ubuntu/Debian), install di virtualenv: `python3 -m venv .venv && source .venv/bin/activate && pip install pytest`. Tanpa itu, `python3 -m pytest` tetap jalan selama `pytest` tersedia.
+
 ## Struktur
 
 ```
 data/            # konten: quest, dialog, NPC, item, musuh, lokasi, ingatan, resep, teknik
 docs/            # GDD · arsitektur engine · alur cerita · ringkasan desain · prompt playtest
 src/             # engine Python: session, battle, dialog, cultivation, morality, memory, quest
-tests/           # 50+ test (pytest)
+tests/           # 50 test (pytest)
 tools/           # validator data
 web/             # server web stdlib + halaman statis (index.html, app.js, style.css)
 saves/           # save game (di-gitignore)
