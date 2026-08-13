@@ -5,7 +5,7 @@ RPG kultivasi (wuxia) berbasis teks — vertical slice Fase 1, Arc Akademi. Pyth
 ## Perintah (jalankan dari root repo)
 
 - `python3 src/cli.py` — jalankan game CLI (`-l <nama>` untuk lanjut dari save)
-- `python3 -m pytest -q` — semua test. Wajib dari root (tidak ada pytest.ini/pyproject; `import src` butuh cwd di sys.path)
+- `python3 -m pytest -q` — semua test, dijalankan dari root repo (pyproject `[tool.pytest.ini_options] pythonpath=["."]` menjaga `import src`).
 - `python3 tools/validate_data.py` — validasi konsistensi data (16 aturan = ENGINE_ARCHITECTURE §14). Exit non-zero jika error. **WAJIB** jalan dan exit 0 setelah menyentuh `data/`.
 
 ## Arsitektur
@@ -23,4 +23,4 @@ RPG kultivasi (wuxia) berbasis teks — vertical slice Fase 1, Arc Akademi. Pyth
 - Elemen 五行: peta siklus (`element_advantage`) di `data/config.json`; multiplier 1.5× / 0.67× hardcoded di `src/engine/battle.py::_calc_damage`. Kritikal (`crit_chance`/`crit_multiplier`) bisa diatur di `data/config.json` → `battle` (default kode 0.08 / 1.5).
 - Mengubah skema field data harus disertai pembaruan validator `tools/validate_data.py`, dan sebaliknya.
 - Dokumen resmi: `docs/GDD.md` (desain) · `docs/ENGINE_ARCHITECTURE.md` (§14 = aturan validasi) · `docs/STORY_FASE1.md` (alur cerita) · `docs/DESIGN_SUMMARY.md` (keputusan yang sudah disahkan).
-- Tidak ada config lint/typecheck; tidak ada dependency selain pytest.
+- Tidak ada config lint/typecheck; satu-satunya dependency dev adalah pytest (via `pyproject.toml`).

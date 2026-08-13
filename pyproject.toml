@@ -1,0 +1,21 @@
+[project]
+name = "tian-xu-second-life"
+version = "0.1.0"
+description = "RPG kultivasi xianxia berbasis teks — vertical slice Fase 1 (Arc Akademi)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Rian2602" }]
+keywords = ["rpg", "xianxia", "wuxia", "text-game", "cultivation"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Games/Entertainment",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
