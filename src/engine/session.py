@@ -72,7 +72,7 @@ class GameSession:
                 data = json.load(f)
         except FileNotFoundError:
             raise
-        except (OSError, json.JSONDecodeError) as e:
+        except (OSError, ValueError) as e:
             raise SaveError(f"save '{save_name}' rusak: {e}") from e
         try:
             state = GameState.from_dict(data)
