@@ -128,3 +128,22 @@ def test_aksi_tanpa_sesi_ditolak() -> None:
     finally:
         srv.shutdown()
         app.session = None
+
+
+def test_aksi_format_salah_ditolak_400(base_url: str) -> None:
+    """Payload action bukan objek → respons JSON 400 (bukan koneksi mati diam-diam)."""
+    post(base_url, "/api/new")
+    req = urllib.request.Request(
+        base_url + "/api/action",
+        data=json.dumps({"action": "racik"}).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        urllib.request.urlopen(req)
+        assert False, "harusnya ditolak dengan 400"
+    except urllib.error.HTTPError as e:
+        assert e.code == 400
+        data = json.loads(e.read())
+        assert data["ok"] is False
+        assert "Format aksi" in data["error"]

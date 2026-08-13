@@ -148,7 +148,15 @@ class Handler(BaseHTTPRequestHandler):
             if session is None:
                 self._send_json({"ok": False, "error": "Belum ada permainan. Mulai baru atau lanjut save."}, 400)
                 return
-            session.apply_action(body.get("action", {}))
+            action = body.get("action")
+            if not isinstance(action, dict):
+                self._send_json({"ok": False, "error": "Format aksi tidak valid — butuh objek {type, ...}."}, 400)
+                return
+            try:
+                session.apply_action(action)
+            except Exception as exc:  # engine error → respons JSON, bukan koneksi mati diam-diam
+                self._send_json({"ok": False, "error": f"Terjadi kesalahan: {exc}"}, 500)
+                return
             self._send_json({"ok": True, **_payload()})
         elif self.path == "/api/save":
             if session is None:

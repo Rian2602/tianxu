@@ -218,9 +218,9 @@ function renderExplore(v, c, box) {
             `<button class="btn" onclick='act({type:"use_item",item:$("sel-use").value})'>Pakai</button></div>`;
   }
 
-  // racik
+  // racik (hanya di lokasi aman)
   const herb = (v.inventory || []).find((i) => i.id === "material_herba");
-  if (herb && herb.count >= 2) {
+  if (loc.is_safe && herb && herb.count >= 2) {
     html += `<div class="action-row"><button class="btn" onclick='act({type:"craft",recipe:"rc_pil_qi"})'>Racik Pil Qi (2 Herba)</button>` +
             `<button class="btn" onclick='act({type:"craft",recipe:"rc_pil_pemulihan"})'>Racik Pil Pemulihan (2 Tulang)</button></div>`;
   }
