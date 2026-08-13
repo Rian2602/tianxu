@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from src.engine.quest import QuestEngine
 from src.engine.session import GameSession
 
 from conftest import finish_dialog, move_path, play_to_incident  # noqa: F401
+
 
 
 def _assert_arc_done(session: GameSession) -> None:
@@ -171,3 +173,21 @@ def test_konvergensi_semua_cabang(session, god_mode):
         _finish_truth(s)
         assert "q_akademi_07" in s.state.completed_quests
         assert s.state.flags.get("arc_akademi_selesai") is True
+
+
+def test_single_active_main_quest(dummy_session):
+    state = dummy_session.state
+    # Asumsikan 'q_akademi_01' adalah quest awal dari data nyata
+    state.current_quest = "q_akademi_01"
+    
+    # Selesaikan objektif (misalnya bicara dengan penjaga)
+    dummy_session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    finish_dialog(dummy_session)
+    
+    # Verifikasi bahwa current quest berpindah ke next (misal q_akademi_02)
+    assert state.current_quest != "q_akademi_01"
+    assert state.current_quest == "q_akademi_02"
+    # Pastikan tidak ada 2 quest utama yang tercatat
+    assert isinstance(state.current_quest, str)
+
+
