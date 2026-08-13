@@ -85,10 +85,19 @@ def test_pakai_item(session):
     assert session.state.inventory.get("pil_qi", 0) == 1
 
 
-def test_racik_pil_dari_bahan(session):
+def test_racik_hanya_di_titik_aman(session):
+    """Kontrak §9.3: craft hanya di lokasi aman."""
     session.state.inventory["material_herba"] = 2
+    pil_before = session.state.inventory.get("pil_qi", 0)  # mulai dengan 3
+    # gerbang bukan titik aman → ditolak
+    v = session.apply_action({"type": "craft", "recipe": "rc_pil_qi"})
+    assert session.state.inventory.get("pil_qi", 0) == pil_before  # tidak bertambah
+    assert session.state.inventory.get("material_herba", 0) == 2
+    assert "titik aman" in v["log"][-1]["text"]
+    # pasar (titik aman) → berhasil
+    session.apply_action({"type": "move", "to": "loc_pasar"})
     session.apply_action({"type": "craft", "recipe": "rc_pil_qi"})
-    assert session.state.inventory.get("pil_qi", 0) >= 1
+    assert session.state.inventory.get("pil_qi", 0) == pil_before + 1
     assert session.state.inventory.get("material_herba", 0) == 0
     # bahan tidak cukup → ditolak
     session.state.inventory["material_tulang"] = 1

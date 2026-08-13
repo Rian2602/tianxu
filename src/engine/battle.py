@@ -147,6 +147,11 @@ class BattleEngine:
         if not tek:
             add_log(self.state, "battle", "Teknik tidak dikenal.")
             return
+        # validasi kepemilikan akademi (skill_pool) — ENGINE_ARCHITECTURE §5.6/§8
+        allowed = [t["id"] for t in self.reg.player_techniques(self.state.player.academy or "")]
+        if tid not in allowed:
+            add_log(self.state, "battle", "Kau belum menguasai teknik itu.")
+            return
         cost = int(tek["qi_cost"])
         if pc["qi"] < cost:
             add_log(self.state, "battle", "Qi tidak cukup untuk teknik itu!")

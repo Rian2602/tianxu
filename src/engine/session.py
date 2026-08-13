@@ -354,6 +354,10 @@ class GameSession:
         return self.view()
 
     def _craft(self, action: dict) -> dict:
+        loc = self.reg.location(self.state.location)
+        if not loc or not loc.get("is_safe"):
+            add_log(self.state, "system", "Meracik hanya bisa dilakukan di titik aman.")
+            return self.view()
         rid = action.get("recipe")
         recipe = next((r for r in self.reg.recipes if r["id"] == rid), None)
         if not recipe:

@@ -119,6 +119,23 @@ def test_teknik_serang_di_battle(session, god_mode):
     assert session.state.player.qi < session.state.max_qi(session.reg)  # qi_cost terpotong
 
 
+def test_teknik_lintas_akademi_ditolak(session):
+    """Bug playtest: teknik akademi lain tidak boleh dipakai (skill_pool §5.6)."""
+    # tanpa god_mode: musuh lemah, serangannya minimal — battle tetap berlanjut
+    session.state.player.academy = "akademi_elemen"
+    teks_senjata = session.reg.player_techniques("akademi_senjata")
+    assert teks_senjata, "akademi senjata harus punya teknik"
+    foe = {"id": "eno_x", "name": "X", "hp": 9999, "qi": 0, "attack": 0, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    session.battle.start([foe], "hunt")
+    qi_before = session.state.player.qi
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": teks_senjata[0]["id"]})
+    assert session.state.pending_battle  # battle belum selesai — teknik ditolak
+    assert session.state.player.qi == qi_before  # Qi tidak terpotong
+    assert any("belum menguasai" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+
 def test_regen_qi_per_giliran(session, monkeypatch):
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)

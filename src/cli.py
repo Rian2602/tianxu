@@ -99,7 +99,7 @@ def explore_menu(session: GameSession) -> None:
     for n in npcs:
         if n.get("can_spar"):
             print(f"  {GREEN}[spar]{RESET} latihan vs {n['name']}")
-    if any(i["id"] == "material_herba" and i["count"] >= 2 for i in v["inventory"]):
+    if v["location"]["is_safe"] and any(i["id"] == "material_herba" and i["count"] >= 2 for i in v["inventory"]):
         print(f"  {GREEN}[racik]{RESET} pil dari bahan (rc_pil_qi / rc_pil_pemulihan)")
     if any((session.reg.item(i["id"]) or {}).get("type") == "weapon" for i in v["inventory"]):
         print(f"  {GREEN}[pasang]{RESET} <senjata> — pasang ke slot senjata")
@@ -221,6 +221,8 @@ def main() -> None:
                 action = {"type": "battle_action", "action": "guard"}
             elif parts[0] == "5" or parts[0] == "kabur":
                 action = {"type": "battle_action", "action": "flee"}
+            else:
+                print("Perintah battle: serang · teknik <id> · item <id> · bertahan · kabur")
         elif mode == "choose":
             opts = v["choose"]["options"]
             if raw.isdigit():

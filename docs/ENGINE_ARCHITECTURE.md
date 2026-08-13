@@ -605,6 +605,7 @@ player_action(menu):
 **Detail implementasi (engine, disepakati saat pembangunan):**
 - **Pemberian data-driven**: akademi dengan field `companion` di `config.json` (mis. `akademi_summoning.companion = "komp_roh_awan"`) memberi binatang roh saat quest `choose` akademi selesai — tidak ada hardcode ID akademi di engine.
 - **Urutan battle**: kompanion menyerang otomatis **setelah aksi pemain** (sebelum giliran musuh) tiap ronde; AI = serangan dasar (`attack × 100/(100+defense)` + elemen, sama dengan formula pemain). Teknik kompanion ditunda (data belum punya teknik kompanion).
+- **Validasi kepemilikan teknik**: aksi `technique` **menolak teknik di luar `skill_pool` akademi pemain** (dan sebelum akademi dipilih, semua teknik ditolak) — diperbaiki dari temuan playtest (teknik lintas akademi).
 - **Target musuh**: tiap musuh **50% peluang** menarget kompanion saat kompanion aktif & HP > 0; `guard` pemain tidak melindungi kompanion.
 - **Gate battle**: saat battle aktif, semua aksi non-battle ditolak session (pesan sistem) — mencegah korupsi alur dari klien web/terskrip.
 - **HP persisten**: HP kompanion tersimpan di `GameState.companion` dan **tidak pulih otomatis** setelah battle menang — hanya aksi `rest` di titik aman yang membangkitkan (KO) & memulihkan penuh.
@@ -698,7 +699,7 @@ player_action(menu):
 | `spar` | `{"npc": "<id>"}` | Tantang NPC sparing → masuk battle; menang/kalah memberi exp (§9.1) |
 | `shop_buy` | `{"item": "<id>", "count": 1}` | Beli item di toko NPC (cek uang & stok) |
 | `shop_sell` | `{"item": "<id>", "count": 1}` | Jual item ke toko (dapat uang) |
-| `craft` | `{"recipe": "<id>"}` | Racik item dari resep (konsumsi material) |
+| `craft` | `{"recipe": "<id>"}` | Racik item dari resep (konsumsi material) — **hanya di titik aman** (lokasi `is_safe`) |
 | `rest` | `{"hours": 8}` | Istirahat di **titik aman**: pulihkan HP/Qi penuh, bangkitkan kompanion, waktu maju |
 | `open_tianyuan` / `close_tianyuan` | – | Buka/tutup panel |
 
