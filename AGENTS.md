@@ -14,7 +14,7 @@ RPG kultivasi (wuxia) berbasis teks — vertical slice Fase 1, Arc Akademi. Pyth
 - **Alur aksi**: `src/cli.py` memetakan input teks → dict aksi → `GameSession.apply_action()` (`src/engine/session.py`). Fitur baru lewat engine, jangan langsung menulis ke state.
 - **Engine** (`src/engine/`): session (orchestrator) · state · battle · dialog · cultivation · morality · memory · quest · events · effects.
 - **Quest**: satu quest utama aktif; percabangan lewat pilihan dialog (`choice_id`/options → dialog). Graf quest harus DAG — ditegakkan `tests/test_quest_dag.py` + validator. Side quest (repeatable) data terpisah dan tak boleh memakai NPC/lokasi/objek quest utama.
-- **web/** cuma stub (`.gitkeep`) — UI web belum dibangun; v1 = CLI saja.
+- **web/** = server stdlib-only (`python3 web/app.py` → `http://localhost:8000`) + halaman statis. Satu sesi aktif per proses; v1 tersedia lewat CLI & web.
 - **Save**: `saves/*.json`, hanya di lokasi aman, di-gitignore. Path `__file__`-relative → cwd-independen.
 
 ## Konvensi & gotchas

@@ -82,8 +82,16 @@ python3 -m pytest tests/ -q
 
 ---
 
-## 6. Bukti wajib disertakan di akhir laporan
+## 6. Verifikasi khusus playtest final (balancing baru)
+
+- **Target GDD**: selesai arc di **Pengumpul Qi Lv.4–6** (quest saja ≈ Lv.5; rajin ≈ Lv.6–7). **JANGAN Lv.10/breakthrough** — jika terjadi, laporkan sebagai regresi balancing.
+- **Side quest tersedia sejak hari 1** (bukan hari 2) — verifikasi penawaran muncul di hari 1 dari Pemburu/Su Qing/Mo Yun.
+- **Equip** (`pasang <senjata>`) & **gate battle** (aksi non-battle ditolak saat battle) harus berfungsi.
+- **Kompanion** (jalur Summoning): auto-attack, musuh bisa menarget, KO → `istirahat` di titik aman.
+- Web UI: `python3 web/app.py` → `http://127.0.0.1:8000` — verifikasi menu Mulai Baru/Lanjut, layout 3 kolom, panel Tianyuan Ling, battle.
+
+## 7. Bukti wajib disertakan di akhir laporan
 
 1. Output `python3 tools/validate_data.py`.
 2. Output `python3 -m pytest tests/ -q`.
-3. Isi `saves/save_arc1.json` (stat pemain, quest selesai, inventori, ingatan) — **bukti playthrough nyata**.
+3. Isi `saves/save_arc1.json` (stat pemain, quest selesai, inventori, ingatan) — **bukti playthrough nyata** — termasuk **level akhir** (harus 4–6).
