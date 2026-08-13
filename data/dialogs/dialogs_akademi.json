@@ -1,0 +1,418 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_penjaga",
+      "npc": "npc_penjaga",
+      "start": "node_greet",
+      "nodes": {
+        "node_greet": {
+          "speaker": "npc:npc_penjaga",
+          "text": "Berhenti. Siapa yang datang ke gerbang Akademi Changfeng?",
+          "choices": [
+            { "label": "Aku Chen Xu, dari Desa Yunxi Cun. Aku datang untuk ujian masuk.", "next": "node_welcome" },
+            { "label": "(Diam saja)", "next": "node_welcome2" }
+          ]
+        },
+        "node_welcome": {
+          "speaker": "npc:npc_penjaga",
+          "text": "Hmm. Banyak yang datang ke kota ini bermimpi menjadi kultivator. Gerbang ini tidak menolak siapa pun — tapi Aula Ujian yang memutuskan.",
+          "next": "node_direct"
+        },
+        "node_welcome2": {
+          "speaker": "npc:npc_penjaga",
+          "text": "Diam? Bagus. Lebih baik sedikit bicara daripada banyak janji.",
+          "next": "node_direct"
+        },
+        "node_direct": {
+          "speaker": "npc:npc_penjaga",
+          "text": "Masuklah ke Aula Ujian. Gu Canghai yang akan mengujimu. Dan jangan buat masalah di dalam.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_gucanghai_ujian",
+      "npc": "npc_gucanghai",
+      "start": "node_umum",
+      "nodes": {
+        "node_ujian": {
+          "condition": { "flag": { "key": "ujian_akar_selesai", "value": false } },
+          "speaker": "npc:npc_gucanghai",
+          "text": "Chen Xu, dari Yunxi Cun. Tidak ada nama besar di belakangmu. Bagus — nama besar sering kali membuat orang lupa cara melatih tangan.",
+          "next": "node_uji"
+        },
+        "node_uji": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Hamparkan tanganmu di atas Batu Akar ini. Ia akan membaca bakat yang kau bawa sejak lahir.",
+          "choices": [
+            { "label": "Aku melakukannya.", "next": "node_hasil" },
+            { "label": "(Menarik napas, lalu melakukannya)", "next": "node_hasil" }
+          ]
+        },
+        "node_hasil": {
+          "speaker": "narration",
+          "text": "Batu itu menyala redup — jernih, tapi tidak menyilaukan. Warna biru tua yang tenang, seperti danau di pagi hari.",
+          "next": "node_komentar"
+        },
+        "node_komentar": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Akar Menengah. 中品. Tidak luar biasa, tidak buruk — seperti kebanyakan anak di kota ini. Banyak yang menyerah di sini, mengira bakat adalah segalanya.",
+          "next": "node_komentar2"
+        },
+        "node_komentar2": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Mereka salah. Di akademi ini, yang menentukan bukan bakat, tapi ketekunan. Besok kau berhadapan dengan Han Xiu di arena. Menang atau kalah — yang penting kau berdiri lagi.",
+          "end": true
+        },
+        "node_umum": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Kultivasi itu seperti laut: tenang di permukaan, tak kenal lelah di dasar. Apa yang mengganggu pikiranku, murid baru?",
+          "choices": [
+            { "label": "Bagaimana cara naik ranah dengan cepat?", "next": "node_nasihat" },
+            { "label": "Aku hanya ingin mendengar nasihatmu.", "next": "node_nasihat" }
+          ]
+        },
+        "node_nasihat": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Berkultivasi tiap hari, tak peduli sedikit. Berburu dan bertarung untuk mengasah. Sparring dengan yang lebih kuat untuk mengukur diri. Lakukan itu, dan ranahmu akan naik dengan sendirinya — seperti air yang tak pernah berhenti mengalir.",
+          "end": true
+        },
+        "node_akhir": {
+          "condition": { "flag": { "key": "arc_akademi_selesai", "value": true } },
+          "speaker": "npc:npc_gucanghai",
+          "text": "Kau sudah melihat bagaimana dunia ini bekerja, Chen Xu. Yang kuat memutuskan, yang lemah menanggung. Banyak yang diam setelah melihat itu. Kau — aku tidak yakin kau termasuk mereka. Pergilah. Jalanmu masih panjang.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_hanxiu",
+      "npc": "npc_hanxiu",
+      "start": "node_banter",
+      "nodes": {
+        "node_spar": {
+          "condition": { "flag": { "key": "spar_ujian_selesai", "value": false } },
+          "speaker": "npc:npc_hanxiu",
+          "text": "Jadi kau murid baru yang katanya datang dari desa? Ujianmu hanya satu: kalahkan aku di arena ini. Jangan mengecewakan aku.",
+          "next": "node_spar2"
+        },
+        "node_spar2": {
+          "speaker": "narration",
+          "text": "Han Xiu mencabut pedang latihannya. Matanya tajam — bukan marah, tapi menilai. Sparring ujian dimulai.",
+          "end": true
+        },
+        "node_respect": {
+          "condition": { "flag": { "key": "branch_3aa", "value": true } },
+          "speaker": "npc:npc_hanxiu",
+          "text": "Kau berdiri di depan Penatua An dan menuntut jawaban. Di akademi ini, itu seperti menantang batu untuk jatuh. ... Aku mengakuinya, Chen Xu. Kau punya tulang. Lain kali kita sparring — dan aku tak akan menahan diri.",
+          "end": true
+        },
+        "node_banter": {
+          "speaker": "npc:npc_hanxiu",
+          "text": "Hei. Masih hidup, murid desa? Kalau kau mau mengasah kemampuan, aku selalu ada di arena. Menang lawan aku — itu cara tercepat untuk tumbuh.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_suqing",
+      "npc": "npc_suqing",
+      "start": "node_umum",
+      "nodes": {
+        "node_intro": {
+          "condition": { "flag": { "key": "hari_pertama_selesai", "value": false } },
+          "speaker": "npc:npc_suqing",
+          "text": "Hei! Kau yang tadi di ujian, kan? Aku Su Qing! Aku dari keluarga pedagang di sisi kota lain. Senang bertemu calon teman sekelas!",
+          "choices": [
+            { "label": "Aku Chen Xu. Senang bertemu, Su Qing.", "next": "node_intro2" },
+            { "label": "(Mengangguk pelan)", "next": "node_intro2" }
+          ]
+        },
+        "node_intro2": {
+          "speaker": "npc:npc_suqing",
+          "text": "Akademi ini besar sekali, ya? Aku belum hafal setengahnya. Kalau kau juga bingung, kita bisa tersesat bersama-sama. Itu lebih menyenangkan daripada tersesat sendiri.",
+          "end": true
+        },
+        "node_kecewa_3b": {
+          "condition": { "flag": { "key": "branch_3b", "value": true } },
+          "speaker": "npc:npc_suqing",
+          "text": "Aku dengar kau 'menawarkan bantuan' pada Zhou Yan. Dengan harga. ... Aku kira kau berbeda, Chen Xu. Ternyata kota ini mengajarimu lebih cepat dari yang kuduga.",
+          "end": true
+        },
+        "node_kecewa_3c": {
+          "condition": { "flag": { "key": "branch_3c", "value": true } },
+          "speaker": "npc:npc_suqing",
+          "text": "Zhou Yan diusir kemarin pagi. Tidak ada yang membelanya. ... Kau tahu, kadang diam itu sama kejamnya dengan menikam.",
+          "end": true
+        },
+        "node_hangat_3a": {
+          "condition": { "flag": { "key": "branch_3aa", "value": true } },
+          "speaker": "npc:npc_suqing",
+          "text": "Kau... kau benar-benar melakukannya. Berdiri di depan Penatua demi orang yang bahkan tidak kau kenal. Aku bangga mengenalmu, Chen Xu. Sungguh.",
+          "end": true
+        },
+        "node_offer_side": {
+          "condition": { "quest_not_active": "q_side_suqing" },
+          "speaker": "npc:npc_suqing",
+          "text": "Chen Xu! Aku butuh Herba Awan — tiga ikat, untuk persediaan ramuan ibuku. Mau bantu kumpulkan? Aku traktir nanti! Kalau sudah selesai, tugas begini selalu ada, kok.",
+          "choices": [
+            { "label": "Aku bantu kumpulkan ramuannya.", "next": "node_offer_ok", "effects": [ { "type": "start_quest", "quest": "q_side_suqing" } ] },
+            { "label": "Lain kali saja, ya.", "next": "node_offer_nanti" }
+          ]
+        },
+        "node_offer_ok": {
+          "speaker": "npc:npc_suqing",
+          "text": "Terima kasih! Kau memang teman yang baik.",
+          "end": true
+        },
+        "node_offer_nanti": {
+          "speaker": "npc:npc_suqing",
+          "text": "Tak apa! Tawaran tetap berlaku.",
+          "end": true
+        },
+        "node_umum": {
+          "speaker": "npc:npc_suqing",
+          "text": "Chen Xu! Oh, dan satu hal: kadang kau terlihat seperti orang yang sudah hidup seratus tahun. Mata itu. Tapi tak apa. Aku suka orang yang aneh.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_moyun",
+      "npc": "npc_moyun",
+      "start": "node_umum",
+      "nodes": {
+        "node_truth_3aa": {
+          "condition": { "flag": { "key": "branch_3aa", "value": true } },
+          "speaker": "npc:npc_moyun",
+          "text": "Kau berdiri di depan Penatua dan masih hidup. Itu lebih dari yang bisa dilakukan kebanyakan orang. ... Kebenarannya: Lonceng itu diambil Penatua An untuk keperluan yang tak boleh kusebutkan. Zhou Yan dikorbankan agar akademi tenang. Aku tahu sejak awal — dan aku diam, karena aku berhutang nyawa padanya.",
+          "next": "node_penutup"
+        },
+        "node_truth_3ab": {
+          "condition": { "flag": { "key": "branch_3ab", "value": true } },
+          "speaker": "npc:npc_moyun",
+          "text": "Kau memilih diam-diam, mengumpulkan kepingan demi kepingan. Itu cara yang kupahami. ... Kebenarannya: Penatua An yang mengambil Lonceng itu, untuk tujuan yang tak boleh kusebutkan. Zhou Yan jadi kambing hitam. Aku tahu sejak awal, dan aku diam — karena aku berhutang nyawa padanya.",
+          "next": "node_penutup"
+        },
+        "node_truth_3b": {
+          "condition": { "flag": { "key": "branch_3b", "value": true } },
+          "speaker": "npc:npc_moyun",
+          "text": "Kau memilih uang, bukan kebenaran. Mungkin kau pikir itu lebih aman. ... Lonceng itu diambil Penatua An. Zhou Yan dikorbankan. Itu saja yang perlu kau tahu — dan itu saja yang kau dapatkan.",
+          "end": true
+        },
+        "node_truth_3c": {
+          "condition": { "flag": { "key": "branch_3c", "value": true } },
+          "speaker": "npc:npc_moyun",
+          "text": "Kau berdiam diri. Dan karena tidak ada yang membela, Zhou Yan diusir kemarin pagi. ... Kebenarannya: Penatua An mengambil Lonceng itu sendiri. Yang lemah dikorbankan agar yang kuat tetap tenang. Kau melihatnya sekarang — tapi sudah terlambat untuknya.",
+          "next": "node_penutup"
+        },
+        "node_bukti": {
+          "condition": { "flag": { "key": "jalur_3a", "value": true } },
+          "speaker": "npc:npc_moyun",
+          "text": "Kau melihatku malam itu, bukan? Membawa benda terbungkus dari Ruang Lonceng. ... Ya. Lonceng Angin Panjang diambil oleh Penatua An sendiri — bukan dicuri. Aku yang diminta melakukannya.",
+          "next": "node_bukti2"
+        },
+        "node_bukti2": {
+          "speaker": "npc:npc_moyun",
+          "text": "Zhou Yan? Hanya kambing hitam. Akademi butuh ketenangan, dan ketenangan butuh korban. ... Mengapa aku menurut? Aku berhutang nyawa pada Penatua, sejak lama. Hutang macam itu tidak bisa dilunasi dengan alasan.",
+          "end": true
+        },
+        "node_penutup": {
+          "speaker": "narration",
+          "text": "Kebenaran itu sederhana — dan menyakitkan. Pola yang sama seperti yang kau kenali dari dalam dirimu: yang lemah dikorbankan untuk yang kuat.\n\nKau berdiri di perpustakaan yang sunyi, dan untuk pertama kalinya, kau merasakan tekad yang tenang — bukan amarah, tapi kepastian. Sesuatu di dadamu berdenyut pelan. Tianyuan Ling.",
+          "end": true
+        },
+        "node_offer_side": {
+          "condition": { "quest_not_active": "q_side_moyun" },
+          "speaker": "npc:npc_moyun",
+          "text": "Perpustakaan ini butuh Herba Awan untuk persediaan tinta dan dupa. Bawakan dua ikat — kau kubayar. Pekerjaan kecil, tapi dunia dibangun dari pekerjaan kecil.",
+          "choices": [
+            { "label": "Aku bawakan herba itu.", "next": "node_offer_ok", "effects": [ { "type": "start_quest", "quest": "q_side_moyun" } ] },
+            { "label": "Lain kali saja.", "next": "node_offer_nanti" }
+          ]
+        },
+        "node_offer_ok": {
+          "speaker": "npc:npc_moyun",
+          "text": "Bagus. Perpustakaan berterima kasih.",
+          "end": true
+        },
+        "node_offer_nanti": {
+          "speaker": "npc:npc_moyun",
+          "text": "Sesukamu. Rak-rak ini tidak ke mana-mana.",
+          "end": true
+        },
+        "node_umum": {
+          "speaker": "npc:npc_moyun",
+          "text": "Buku yang belum dibaca adalah musuh yang belum dikenal. ... Ada yang bisa kubantu, murid baru? Baca, belajar, dan jangan terlalu percaya pada apa yang kau dengar di akademi ini.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_zhouyan",
+      "npc": "npc_zhouyan",
+      "start": "node_umum",
+      "nodes": {
+        "node_keuntungan": {
+          "condition": { "flag": { "key": "jalur_3b", "value": true } },
+          "speaker": "npc:npc_zhouyan",
+          "text": "Kau... kau murid baru yang duduk di sebelahku waktu ujian, kan? Aku dengar rumor tentangku. Aku tidak mengambil Lonceng itu. Aku bersumpah. Tapi tidak ada yang percaya.",
+          "choices": [
+            { "label": "Aku bisa 'menghilangkan' sebagian bukti yang memberatkanmu... untuk sebuah imbalan.", "next": "node_imbalan", "effects": [ { "type": "morality", "value": -3 } ] },
+            { "label": "(Tidak menjawab)", "next": "node_umum" }
+          ]
+        },
+        "node_imbalan": {
+          "speaker": "npc:npc_zhouyan",
+          "text": "Kau... kau serius? Aku tidak punya banyak. Tapi kalau itu bisa menyelamatkanku... ambil saja. Ambil semua yang kupunya.",
+          "next": "node_imbalan2"
+        },
+        "node_imbalan2": {
+          "speaker": "narration",
+          "text": "Zhou Yan menyerahkan isi kantongnya — beberapa koin dan sebotol kecil. Ia menatapmu dengan harapan yang memilukan.\n\nKau menyimpan uang itu. Kau tidak berjanji apa pun.",
+          "end": true
+        },
+        "node_bersyukur": {
+          "condition": { "flag": { "key": "branch_3aa", "value": true } },
+          "speaker": "npc:npc_zhouyan",
+          "text": "Chen Xu... aku tidak tahu harus berkata apa. Kau satu-satunya yang percaya padaku. Aku tidak akan melupakan ini. Selama aku hidup, jika kau butuh sesuatu — aku ada.",
+          "end": true
+        },
+        "node_pahit_3b": {
+          "condition": { "flag": { "key": "branch_3b", "value": true } },
+          "speaker": "npc:npc_zhouyan",
+          "text": "Aku diusir besok pagi. ... Kau mendapat apa yang kau mau dari kantongku. Semoga cukup untuk membeli tidurmu yang tenang.",
+          "end": true
+        },
+        "node_pahit_3c": {
+          "condition": { "flag": { "key": "branch_3c", "value": true } },
+          "speaker": "npc:npc_zhouyan",
+          "text": "Aku diusir kemarin. Tidak ada satu pun yang membela. ... Kadang aku berharap ada orang yang hanya duduk di sampingku dan berkata 'aku percaya padamu'. Tapi dunia ini tidak seperti itu, ya?",
+          "end": true
+        },
+        "node_umum": {
+          "speaker": "npc:npc_zhouyan",
+          "text": "Kau... murid baru juga, ya? Aku Zhou Yan. Maaf, aku tidak pandai bicara. Kalau kau butuh teman diam, aku cukup pandai dalam hal itu.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_penatua",
+      "npc": "npc_penatua",
+      "start": "node_umum",
+      "nodes": {
+        "node_konfrontasi": {
+          "condition": { "flag": { "key": "jalur_3a", "value": true } },
+          "speaker": "npc:npc_penatua",
+          "text": "Kau berdiri di depanku tanpa undangan. Murid baru, aku dengar kau mencari-cari soal Lonceng Angin Panjang. Pikirkan baik-baik langkah berikutnya.",
+          "choices": [
+            { "label": "Zhou Yan tidak bersalah. Aku melihat siapa yang membawa Lonceng itu — malam itu.", "next": "node_konfrontasi2" },
+            { "label": "(Diam, menahan amarah)", "next": "node_konfrontasi2" }
+          ]
+        },
+        "node_konfrontasi2": {
+          "speaker": "npc:npc_penatua",
+          "text": "Kau melihat sesuatu. Aku juga melihat banyak hal, murid baru — termasuk murid yang terlalu banyak bertanya. ... Lonceng itu sudah kembali. Masalah selesai. Zhou Yan akan dibebaskan dari tuduhan. Itu cukup bagimu. Jangan menggali lebih dalam.",
+          "next": "node_konfrontasi3"
+        },
+        "node_konfrontasi3": {
+          "speaker": "narration",
+          "text": "Penatua An menatapmu lama. Di matanya tidak ada marah — hanya ketenangan yang lebih menakutkan dari amarah. Kau tahu kebenarannya. Dan kau tahu kau belum cukup kuat untuk melawannya.\n\nTapi kau juga tahu sesuatu yang tidak ia ketahui: kau tidak akan berhenti di sini.",
+          "end": true
+        },
+        "node_umum": {
+          "speaker": "npc:npc_penatua",
+          "text": "Murid baru. Pelajari aturan akademi, hormati yang lebih tua, dan jangan membuat masalah. Di dunia kultivasi, mereka yang membuat masalah biasanya tidak bertahan lama.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_3_pilih_sikap",
+      "npc": "",
+      "start": "node_scene",
+      "nodes": {
+        "node_scene": {
+          "speaker": "narration",
+          "text": "Malam itu, kau berdiri di bayang-bayang dekat Ruang Lonceng.\n\nDerap langkah pelan. Mo Yun keluar dari ruang penyimpanan, membawa benda panjang yang terbungkus kain gelap — dan kau tahu, dari bentuknya, itu Lonceng Angin Panjang. Ia berjalan cepat, lalu menghilang di balik perpustakaan.\n\nKau memegang bukti yang bisa menyelamatkan Zhou Yan — atau kau bisa menyimpannya untuk dirimu sendiri.",
+          "next": "node_pilih"
+        },
+        "node_pilih": {
+          "speaker": "narration",
+          "text": "Apa yang kau lakukan?",
+          "choices": [
+            { "label": "Membongkar ketidakadilan — selamatkan Zhou Yan.", "option": "opt_3a", "next": "node_cara", "effects": [ { "type": "flag", "key": "jalur_3a", "value": true } ] },
+            { "label": "Manfaatkan situasi ini.", "option": "opt_3b", "next": "node_b", "effects": [ { "type": "flag", "key": "jalur_3b", "value": true } ] },
+            { "label": "Berdiam diri. Ini bukan urusanmu.", "option": "opt_3c", "next": "node_c", "effects": [ { "type": "flag", "key": "jalur_3c", "value": true } ] }
+          ]
+        },
+        "node_cara": {
+          "speaker": "narration",
+          "text": "Kau memilih untuk membongkar ketidakadilan. Ada dua jalan: satu berisik, satu sunyi.",
+          "choices": [
+            { "label": "Konfrontasi langsung — hadapi Penatua An.", "option": "opt_3aa", "next": "node_aa" },
+            { "label": "Kumpulkan bukti diam-diam — selidiki Mo Yun.", "option": "opt_3ab", "next": "node_ab" }
+          ]
+        },
+        "node_aa": {
+          "speaker": "narration",
+          "text": "Kau memilih jalan yang berisik. Langkahmu tegak menuju Paviliun.",
+          "end": true
+        },
+        "node_ab": {
+          "speaker": "narration",
+          "text": "Kau memilih jalan yang sunyi. Perpustakaan menantimu.",
+          "end": true
+        },
+        "node_b": {
+          "speaker": "narration",
+          "text": "Kau menggenggam informasi itu erat-erat. Informasi, di dunia ini, adalah mata uang yang paling licin.",
+          "end": true
+        },
+        "node_c": {
+          "speaker": "narration",
+          "text": "Kau berpaling dari Ruang Lonceng dan kembali ke asrama. Besok adalah hari lain. Bukan urusanmu.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang",
+      "npc": "npc_pedagang",
+      "start": "node_sapa",
+      "nodes": {
+        "node_sapa": {
+          "speaker": "npc:npc_pedagang",
+          "text": "Pil, herba, senjata — semua ada di kiosku! Mau beli, mau jual, sama-sama kami layani. Uang tidak tidur, murid muda.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_pemburu",
+      "npc": "npc_pemburu",
+      "start": "node_tawaran",
+      "nodes": {
+        "node_tawaran": {
+          "speaker": "npc:npc_pemburu",
+          "text": "Hei, murid. Di hutan itu ada serigala Qi dan babi hutan yang merusak ladang. Kalahkan dua ekor untukku, bawa buktinya — aku bayar. Dan kalau sudah selesai, tugas serupa selalu ada. Hutan tidak pernah sepi.",
+          "choices": [
+            { "label": "Aku ambil tugasnya.", "next": "node_terima", "effects": [ { "type": "start_quest", "quest": "q_side_berburu" } ] },
+            { "label": "Mungkin lain kali.", "next": "node_tolak" }
+          ]
+        },
+        "node_terima": {
+          "speaker": "npc:npc_pemburu",
+          "text": "Bagus. Hutan tidak menunggu siapa pun.",
+          "end": true
+        },
+        "node_tolak": {
+          "speaker": "npc:npc_pemburu",
+          "text": "Sesukamu. Kalau berubah pikiran, aku di sini.",
+          "end": true
+        }
+      }
+    }
+  ]
+}

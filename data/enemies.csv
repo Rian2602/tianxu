@@ -1,0 +1,4 @@
+id,name,realm,hp,qi,attack,defense,speed,element,exp_reward,drop_item,drop_chance
+eno_serigala_qi,Serigala Qi (气狼 Qì Láng),realm_pengumpul_qi,40,10,8,3,10,tanah,15,material_tulang,0.4
+eno_babi_hutan,Babi Hutan Liar (野猪 Yězhū),realm_pengumpul_qi,55,8,10,5,6,tanah,18,material_tulang,0.5
+eno_raja_serigala,Raja Serigala Qi (气狼王 Qì Láng Wáng),realm_pengumpul_qi,120,25,14,6,12,tanah,60,material_tulang,1.0

@@ -1,0 +1,32 @@
+{
+  "memories": [
+    {
+      "id": "mem_01",
+      "title": "Istana yang Sunyi",
+      "unlocked_by_quest": "q_akademi_05",
+      "text": "Aula itu kosong, tapi bukan karena sepi — karena terlalu megah untuk diisi suara.\n\nAku kecil, lima atau enam tahun. Tanganku memegang lengan seorang ibu yang wajahnya sudah kabur, dan di kejauhan seorang anak perempuan tersenyum padaku dari balik tiang marmer. Namanya... namanya hilang seperti asap.\n\nSesuatu yang hangat menempel di dadaku. Aku menoleh — tapi aula itu berubah menjadi gelap, dan langkah kaki mendekat dari arah singgasana, membawa bau manis yang salah.\n\n...Aku terbangun dengan air mata yang tidak kupahami.",
+      "type": "narrative"
+    },
+    {
+      "id": "mem_02",
+      "title": "Kebaikan yang Terlupakan",
+      "unlocked_by_quest": ["q_akademi_3aa", "q_akademi_3ab"],
+      "text": "Hujan turun deras di jalan pegunungan. Seorang pria berjubah compang-camping duduk di bawah pohon, menggigil — bukan karena dingin, tapi karena kehilangan.\n\nAku masih muda, dan dunia belum mengajarkanku untuk curiga. Aku memberinya jubahku, membaginya dengan bekalku, dan duduk di sampingnya sampai hujan reda.\n\nIa menatapku lama sekali. Lalu dari balik jubahnya ia mengulurkan sebuah benda kecil yang memancarkan cahaya redup — seperti bintang yang jatuh ke telapak tangan.\n\n\"Simpan ini,\" katanya. \"Bukan karena kau memberiku bekal. Tapi karena kau melakukannya tanpa menghitung harga.\"\n\nAku tidak tahu itu dewa yang tersesat. Aku hanya ingat benda itu terasa hangat — dan bahwa kebaikan, ternyata, bisa berbuah.",
+      "type": "narrative"
+    },
+    {
+      "id": "mem_03",
+      "title": "Racun di Balik Senyum",
+      "unlocked_by_quest": "q_akademi_3b",
+      "text": "Selir ayahku tersenyum saat menyodorkan secangkir teh. \"Yang Mulia tampak lelah. Minumlah, biar hangat.\"\n\nAku minum. Aku selalu minum — karena di istana, menolak hadiah adalah penghinaan.\n\nMalam itu meridianku terbakar seperti kawat yang direntangkan lalu diputus satu per satu. Aku ingat teriakanku, dan aku ingat senyum itu masih tersungging di wajahnya saat para tabib berlarian.\n\nPengkhianatan tidak pernah datang dengan wajah marah. Ia datang dengan cangkir hangat, dengan kata-kata manis, dan dengan orang yang kau panggil 'keluarga'.",
+      "type": "narrative"
+    },
+    {
+      "id": "mem_04",
+      "title": "Pengasingan",
+      "unlocked_by_quest": "q_akademi_3c",
+      "text": "Gerbang istana tertutup di belakangku dengan suara yang menggema terlalu lama.\n\nAku berdiri di jalan berdebu, sendirian, dengan meridian rusak dan nama yang sudah tak berarti. Tidak ada yang menoleh. Tidak ada yang bertanya ke mana pangeran kecil pergi.\n\nAku berjalan sampai kakiku berdarah, dan tidak berhenti — karena berhenti berarti mengakui bahwa tidak ada yang akan datang menjemput.\n\nDi malam pertama pengasingan, aku belajar satu hal yang tidak akan pernah kulupakan: dunia tidak berhutang apa pun padamu. Bahkan untuk sekadar menatap.",
+      "type": "narrative"
+    }
+  ]
+}

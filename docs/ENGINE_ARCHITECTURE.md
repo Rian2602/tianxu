@@ -184,7 +184,10 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `summary` | string | – | Ringkasan 1-2 kalimat (untuk log/UI) |
 | `objective` | object | ✓ | Lihat tabel objektif di bawah |
 | `next` | array | ✓ | Sisi keluar DAG (boleh kosong = quest terakhir arc) |
-| `on_complete` | object | – | `effects`, `memory_unlock`, `system_msg`, `rewards` |
+| `on_complete` | object | – | `effects` (list, format type-based §5.2), `memory_unlock`, `system_msg`, `rewards` (`exp`/`gold`) |
+| `repeatable` | bool | – | Hanya `kind: "side"` — bisa diambil ulang (grinding) |
+| `repeat_cooldown` | number | – | Jam tunggu sebelum bisa diambil lagi (0 = langsung) |
+| `giver` | string | – | NPC pemberi side quest (opsi `start_quest` hanya tampil lewat giver) |
 | `requires` | object | – | Prasyarat: `flags`, `morality_min/max`, `realm_min` |
 | `available_from` | object | – | Waktu tersedia (hari/jam) — untuk quest sampingan |
 
@@ -195,9 +198,10 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `talk` | `npc` | Buka dialog NPC; selesai saat dialog berakhir (atau setelah `target` kali) |
 | `defeat` | `enemies` (list id), `target` | Kalahkan N musuh (dari data) |
 | `gather` | `item`, `target` | Kumpulkan N item |
-| `reach` | `location` | Tiba di lokasi |
+| `reach` | `location` (+ opsional `time_window`) | Tiba di lokasi; jika `time_window` (`hour_start`/`hour_end`) ada, hanya sah pada waktu itu — **event terjadwal** |
 | `choose` | `options` (list) | Pilihan eksplisit (mis. pilih akademi, pilih jalur) |
-| `advance_time` | `day`/`hour` | Tunggu hingga waktu tertentu |
+| `spar` | `npc` | Sparring wajib: bicara NPC ber-`combat` → battle; **menang = objektif selesai** (dipakai sparing ujian) |
+| `advance_time` | `hour` (+ opsional `day_offset`) | Tunggu hingga jam tertentu; `day_offset` = maju N hari |
 
 **Aturan sisi `next`**:
 
@@ -243,24 +247,39 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 
 | Field | Tipe | Keterangan |
 |---|---|---|
-| `speaker` | string | `npc:<id>` atau `player` atau `system` (Tianyuan Ling) |
+| `speaker` | string | `npc:<id>` atau `player` atau `system` (Tianyuan Ling) atau `narration` (narasi) |
 | `text` | string | Teks yang ditampilkan |
 | `choices` | array | Opsi pemain; tiap opsi: `label`, opsional `option`, `effects`, `condition`, `next` |
-| `condition` | object | Syarat tampil: `flags`, `morality_min/max`, `has_item`, `realm_min` |
+| `condition` | object | Syarat tampil (lihat daftar kondisi di bawah) |
 | `next` | string | Node berikutnya |
 | `end` | bool | Akhiri dialog |
-| `effects` | object | Diterapkan saat opsi dipilih (lihat tabel efek) |
+| `effects` | array | Diterapkan saat node/opsi dijalankan (lihat tabel efek) |
 
-**Jenis efek** (`effects`):
+**Entri kondisional**: node ber-`condition` di level atas dialog = *entri alternatif* — engine memilih **entri pertama (urutan JSON) yang kondisinya benar**, jika tidak ada yang cocok memakai `start`. Pola ini memungkinkan satu dialog melayani banyak situasi (mis. reaksi NPC per cabang quest).
+
+**Kondisi** (`condition`):
+
+| Kunci | Contoh | Keterangan |
+|---|---|---|
+| `flag` | `{ "flag": { "key": "branch_3aa", "value": true } }` | Flag dunia bernilai tertentu |
+| `morality_min` / `morality_max` | `{ "morality_min": 10 }` | Batas skala moralitas |
+| `has_item` | `{ "has_item": "pil_qi" }` | Punya item (count ≥ 1) |
+| `realm_min` | `{ "realm_min": "realm_pengumpul_qi" }` | Ranah minimum |
+| `academy` | `{ "academy": "akademi_elemen" }` | Akademi pilihan pemain |
+| `quest_active` / `quest_not_active` | `{ "quest_not_active": "q_side_suqing" }` | Status quest (dipakai penawaran side quest) |
+
+**Jenis efek** (`effects`, format type-based):
 
 | Efek | Contoh | Keterangan |
 |---|---|---|
-| `morality` | `{ "morality": -5 }` | Ubah skala moralitas (baik→jahat) |
-| `reputation` | `{ "reputation": { "faksi_x": 2 } }` | Ubah reputasi faksi/NPC |
-| `relation` | `{ "relation": { "npc_mentor": 5 } }` | Ubah hubungan NPC |
-| `flag` | `{ "flag": { "key": "bantu_petani", "value": true } }` | Set flag dunia |
-| `item` | `{ "item": { "id": "pil_qi", "count": 2 } }` | Beri/kurang item (count negatif = kurangi) |
-| `branch_select` | `{ "branch_select": "opt_3a" }` | (internal) pilih cabang quest — diisi otomatis oleh engine |
+| `morality` | `{ "type": "morality", "value": -8 }` | Ubah skala moralitas (baik→jahat) |
+| `reputation` | `{ "type": "reputation", "faksi": "x", "value": 2 }` | Ubah reputasi faksi/NPC |
+| `relation` | `{ "type": "relation", "npc": "npc_mentor", "value": 5 }` | Ubah hubungan NPC |
+| `flag` | `{ "type": "flag", "key": "bantu_petani", "value": true }` | Set flag dunia |
+| `item` | `{ "type": "item", "id": "pil_qi", "count": 2 }` | Beri/kurang item (count negatif = kurangi) |
+| `gold` | `{ "type": "gold", "value": 30 }` | Beri/kurang uang |
+| `start_quest` | `{ "type": "start_quest", "quest": "q_side_x" }` | Mulai side quest — opsi ini **hanya tampil** jika quest dapat ditawarkan (giver, `available_from` terpenuhi, tidak aktif, cooldown selesai) |
+| `branch_select` | `{ "type": "branch_select", "option": "opt_3a" }` | (internal) pilih cabang quest — diisi otomatis oleh engine |
 
 ### 5.3 NPC
 
@@ -273,11 +292,17 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
       "location": "loc_gerbang_akademi",
       "role": "gate_guard",
       "default_dialog": "dlg_penjaga",
-      "schedule": [ { "day": 1, "hour_start": 6, "hour_end": 18, "location": "loc_gerbang_akademi" } ]
+      "schedule": [ { "day": 1, "hour_start": 6, "hour_end": 18, "location": "loc_gerbang_akademi" } ],
+      "shop": { "buy": [ { "item": "pil_qi", "price": 50 } ], "sell": [ { "item": "material_herba", "price": 8 } ] },
+      "can_spar": true
     }
   ]
 }
 ```
+
+- Opsional `shop`: NPC pedagang — `buy` (item yang dijual toko) & `sell` (item yang dibeli toko dari pemain) dengan harga tetap; tanpa `shop` = NPC biasa (ekonomi sederhana Fase 1, disahkan).
+- Opsional `can_spar: true`: NPC bisa diajak sparing **tanpa batas frekuensi** (disahkan) — mis. Han Xiu & Gu Canghai.
+- Opsional `combat`: stat battle NPC (`hp`/`qi`/`attack`/`defense`/`speed`/`element`) — dipakai untuk sparing & objektif `spar`.
 
 ### 5.4 CSV Balancing
 
@@ -286,7 +311,11 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 ```
 id,name,type,description,price,hp_restore,qi_restore,power,rarity,usable
 pil_qi,Pil Qi,consumable,Pulihkan 30 Qi.,50,0,30,0,common,true
+material_herba,Herba Awan,material,Bahan alkimia umum.,8,0,0,0,common,false
+pedang_bambu,Pedang Bambu,weapon,Pedang latihan ringan (+3 serangan).,100,0,0,3,common,false
 ```
+
+- `type` = `consumable` (dipakai) / `material` (bahan) / `weapon` (senjata — `power` = tambahan attack, dipasang di slot senjata).
 
 **enemies.csv**:
 
@@ -298,16 +327,30 @@ eno_serigala_qi,Serigala Qi,pengumpul_qi_1,40,10,8,3,10,tanah,15,pil_qi,0.3
 **realms.csv**:
 
 ```
-id,name_pinyin,name_id,order,base_hp,base_qi,technique_slots
-realm_pq1,Pengumpul Qi Tahap 1,pengumpul_qi_1,1,80,40,1
+id,name_pinyin,name_id,order,levels,base_hp,base_qi,hp_per_level,qi_per_level,technique_slots
+realm_pengumpul_qi,Pengumpul Qi (炼气 Liànqì),pengumpul_qi,1,10,80,40,5,3,1
+realm_pembangun_fondasi,Pembangun Fondasi (筑基 Zhùjī),pembangun_fondasi,2,10,150,80,8,5,2
+realm_pembentuk_inti,Pembentuk Inti (金丹 Jīndān),pembentuk_inti,3,10,250,140,12,8,3
+realm_jiwa_baru_lahir,Jiwa Baru Lahir (元婴 Yuányīng),jiwa_baru_lahir,4,10,400,240,18,12,4
+realm_transformasi_roh,Transformasi Roh (化神 Huàshén),transformasi_roh,5,10,600,380,25,16,5
+realm_pemurni_kehampaan,Pemurni Kehampaan (炼虚 Liànxū),pemurni_kehampaan,6,10,900,600,35,22,6
+realm_penyatu,Penyatu (合体 Hétǐ),penyatu,7,10,1300,900,50,30,7
+realm_mahayana,Mahayana (大乘 Dàchéng),mahayana,8,10,1800,1300,70,40,8
+realm_penantang_surga,Penantang Surga (渡劫 Dùjié),penantang_surga,9,10,2500,1800,100,55,9
 ```
+
+- **`levels`** = jumlah tingkat dalam ranah (**10 tingkat per ranah**, disahkan). Status pemain = `realm` + `realm_level` (1..10).
+- **HP/Qi maks** = `base + (realm_level−1) × per_level` (mis. Pengumpul Qi lvl 5 → HP 80+4×5=100, Qi 40+4×3=52).
+- **Tangga 9 ranah penuh** didefinisikan sekarang (keputusan penulis) — engine membaca urutan dari `order`; **Fase 1 hanya memakai Pengumpul Qi** (dan Pembangun Fondasi sebagai ranah berikutnya).
 
 **techniques.csv**:
 
 ```
 id,name,academy,element,realm_required,qi_cost,power,kind,description
-tek_elemen_bola_api,Bola Api,elemen,api,realm_pq1,8,15,attack,Serangan api dasar.
+tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan api dasar.
 ```
+
+- `kind` = `attack` (`power` = damage) / `defend` (`power` = persen pengurangan damage, mis. 60) / `heal` (`power` = HP pulih).
 
 **konvensi**: CSV wajib punya baris header persis sesuai contoh; id unik; referensi (mis. `academy`, `realm_required`, `element`) wajib valid.
 
@@ -327,16 +370,15 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pq1,8,15,attack,Serangan api dasar
 }
 ```
 
-**Aturan kunci**: ingatan **tidak pernah** memberikan power mekanik (GDD §2.1). `memory_unlock` pada quest hanya membuka entri naratif di panel Tianyuan Ling.
+**Aturan kunci**: ingatan **tidak pernah** memberikan power mekanik (GDD §2.1). `memory_unlock` pada quest hanya membuka entri naratif di panel Tianyuan Ling. `unlocked_by_quest` bisa berupa string atau list (jika dibuka lebih dari satu quest — mis. mem_02 via 3aa/3ab); dokumentatif — mekanisme aktual tetap `on_complete.memory_unlock` di quest.
 
 ### 5.6 config.json — State Awal & Konfigurasi
 
 ```json
 {
-  "game_title": "Tian Xu: Second Life",
-  "starting": {
+  "game_title": "Tian Xu: Second Life",    "starting": {
     "location": "loc_gerbang_akademi",
-    "player": { "name": "Chen Xu", "hp": 80, "qi": 40, "realm": "realm_pq1" },
+    "player": { "name": "Chen Xu", "hp": 80, "qi": 40, "realm": "realm_pengumpul_qi", "realm_level": 1 },
     "inventory": [ { "id": "pil_qi", "count": 3 } ],
     "morality": 0,
     "current_quest": "q_akademi_01",
@@ -350,12 +392,87 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pq1,8,15,attack,Serangan api dasar
   "time": { "day_length_hours": 24, "start_day": 1, "start_hour": 8 },
   "elements_cycle": ["logam", "kayu", "tanah", "air", "api"],
   "element_advantage": { "logam": "kayu", "kayu": "tanah", "tanah": "air", "air": "api", "api": "logam" },
-  "morality": { "min": -100, "max": 100 }
+  "morality": { "min": -100, "max": 100 },
+  "cultivation": {
+    "levels_per_realm": 10,
+    "exp_per_level_base": 10,
+    "exp_growth_per_level": 1.2,
+    "grounding_exp_per_hour": 4,
+    "grounding_max_hours_per_day": 8,
+    "spar_win_exp": 15,
+    "spar_loss_exp": 5,
+    "hunt_exp_per_kill": 10,
+    "breakthrough": "auto"
+  },
+  "currency": { "name": "Koin Emas", "start_gold": 20 },
+  "roots": {
+    "tiers": [
+      { "id": "akar_low",  "name": "Akar Bawah (下品)",    "exp_multiplier": 0.8 },
+      { "id": "akar_mid",  "name": "Akar Menengah (中品)", "exp_multiplier": 1.0 },
+      { "id": "akar_high", "name": "Akar Atas (上品)",     "exp_multiplier": 1.25 },
+      { "id": "akar_peak", "name": "Akar Puncak (极品)",   "exp_multiplier": 1.5 }
+    ],
+    "default": "akar_mid"
+  },
+  "ko_penalty": { "exp_loss_ratio": 0.1 },
+  "companion": { "hp_per_level": 12, "attack_per_level": 2, "defense_per_level": 1, "speed_per_level": 0.5 },
+  "world": { "monster_respawn_hours": 5 },
+  "battle": {
+    "damage_formula": "percent",
+    "qi_regen_percent_per_turn": 5,
+    "crit_chance": 0.08,
+    "crit_multiplier": 1.5,
+    "turn_order": "fixed_alternate"
+  }
 }
 ```
 
 - **Akademi = data**, bukan hardcode: engine membaca `academies` dari config. Pilihan akademi (quest `choose`) hanya membuka `skill_pool` akademi itu (GDD §5.2 — sejajar DAG, tidak berpotongan naratif).
 - `element_advantage` = siklus 五行 (克制): logam克kayu, kayu克tanah, tanah克air, air克api, api克logam — dipakai battle engine dengan multiplier.
+- `roots.tiers` = tier akar spiritual + `exp_multiplier`; `ko_penalty.exp_loss_ratio` = penalti KO ringan (10% exp progres tingkat).
+
+### 5.7 Resep Alkimia (recipes.json)
+
+```json
+{
+  "recipes": [
+    { "id": "rc_pil_qi", "result": "pil_qi", "count": 1,
+      "ingredients": [ { "item": "material_herba", "count": 2 } ],
+      "description": "Meracik Pil Qi dari 2 Herba Awan." }
+  ]
+}
+```
+
+- Alkimia dasar Fase 1 (disahkan): 2 resep (Pil Qi, Pil Pemulihan). `craft` mengonsumsi bahan & menghasilkan item.
+
+### 5.8 Lokasi (locations.json)
+
+```json
+{
+  "locations": [
+    { "id": "loc_gerbang_akademi", "name": "Gerbang Akademi", "is_safe": false, "connections": ["loc_aula_ujian"] },
+    { "id": "loc_asrama", "name": "Asrama Murid", "is_safe": true, "connections": ["loc_aula_ujian"] }
+  ]
+}
+```
+
+- `is_safe: true` = **titik aman**: tempat respawn saat KO, tempat **simpan game** (disahkan), & tempat aksi `rest`.
+- `connections` = peta pergerakan pemain (pindah lokasi lewat aksi `move`).
+
+### 5.9 Kompanion (companions.json) — jalur Summoning
+
+```json
+{
+  "companions": [
+    { "id": "komp_roh_awan", "name": "Roh Awan", "element": "kayu",
+      "base_hp": 20, "base_attack": 5, "base_defense": 2, "base_speed": 9,
+      "description": "Binatang roh kecil pemberian Akademi Summoning." }
+  ]
+}
+```
+
+- Hanya jalur **Summoning** yang mendapat kompanion (disahkan): diberikan saat memilih akademi (event/quest).
+- Statistik akhir = base + `level × scale` (`config.companion`); `level` = level ranah pemain.
 
 ---
 
@@ -396,6 +513,10 @@ selesaikan_quest(q):
 
 - `kind: "side"` — boleh aktif bersamaan dengan quest utama dan side lain (selama aturan "tidak bertabrakan" terpenuhi).
 - Selesai side quest → reward + efek, tidak memengaruhi alur utama kecuali efek yang dideklarasikan (reputasi, flag).
+- **Repeatable (disahkan)**: side quest bisa diulang untuk grinding ranah.
+  - Field `repeatable: true` pada quest (hanya untuk `kind: "side"`) + opsional `repeat_cooldown` (jam).
+  - Setelah selesai, quest masuk daftar **tersedia lagi** (langsung atau setelah cooldown); progres objektif direset.
+  - Data side quest **terpisah** (`quests_side.json`) dan **dilarang bertabrakan** dengan quest utama (validator §14-10).
 
 ---
 
@@ -415,14 +536,18 @@ selesaikan_quest(q):
 
 ```
 battle_start(enemy_ids, context)
-  → giliran: player → musuh (bergantian berdasarkan speed)
+  → giliran: **tetap bergantian** (disahkan): pemain → musuh, berulang
 player_action(menu):
-  - serang        : damage dasar (attack - defense musuh), minimal 1
-  - teknik        : pilih teknik; cost Qi; multiplier elemen jika jalur elemen
+  - serang        : damage = attack × (100 / (100 + defense musuh)), minimal 1
+  - teknik        : pilih teknik; cost Qi; multiplier elemen (§8.2)
   - item          : gunakan item HP/Qi dari inventori
   - bertahan      : kurangi damage 50% giliran ini
   - kabur         : peluang sukses berdasarkan speed; gagal = giliran musuh
 ```
+
+- **RNG (disahkan)**: damage dasar bervariasi **±10–20%**; **kritikal** peluang `crit_chance` (8%) damage ×`crit_multiplier` (1.5); drop item mengikuti `drop_chance` musuh (acak); peluang kabur berdasarkan speed.
+- **Regen Qi (disahkan)**: pemain & musuh memulihkan `qi_regen_percent_per_turn` (5%) Qi maks di awal giliran masing-masing.
+- **Sparing (disahkan)**: mekanik sama seperti battle biasa — kalah = penalti KO berlaku (respawn di titik aman + kehilangan 10% exp).
 
 ### 8.2 Elemen (五行)
 
@@ -441,10 +566,50 @@ player_action(menu):
 
 ## 9. Kultivasi, Item & Simulasi Waktu
 
-- **Ranah**: urutan dari `realms.csv`; naik ranah membutuhkan EXP/event cerita; membuka slot teknik & batas HP/Qi.
+### 9.1 Ranah & 10 Tingkat (disahkan)
+
+- Tiap ranah (dari `realms.csv`) punya **`levels` = 10 tingkat** (`realm_level` 1..10).
+- Progresi via **Pengalaman Kultivasi (exp)** dari **aktivitas** (keputusan penulis: rajin beraktivitas = makin cepat naik tingkat):
+  - **Berkultivasi / grounding (打坐 dǎzuò)** — aksi berulang di lokasi aman: habiskan waktu (jam) → dapat `grounding_exp_per_hour` exp + pulih Qi pelan; **maks `grounding_max_hours_per_day` (8) jam per hari** (disahkan).
+  - **Berburu monster** — kalahkan musuh liar di wilayah berburu → `hunt_exp_per_kill` exp + material/drop.
+  - **Sparing NPC** — tantang NPC ber-`can_spar: true` (Han Xiu, Gu Canghai) — **tanpa batas frekuensi** (disahkan) → menang = `spar_win_exp` exp + hubungan naik; kalah = `spar_loss_exp` exp kecil + **penalti KO berlaku** (disahkan, konsisten dengan battle biasa).
+- **Naik tingkat**: `exp_needed(level) = round(exp_per_level_base × exp_growth_per_level^(level-1))` (kurva dari `config.cultivation`, data-driven). Saat exp ≥ ambang → `realm_level` naik, exp tersisa dibawa.
+- **Target balancing Fase 1 (disahkan)**: pemain yang rajin (grinding side quest/berburu) mencapai **Pengumpul Qi tingkat 5–6** di akhir arc.
+- **Akar spiritual (mekanik ringan, disahkan)**: semua perolehan exp dikali `roots.exp_multiplier` tier akar pemain (akar bagus = exp lebih cepat). Tier ditentukan di ujian masuk — usulan: Chen Xu = **中品 (Akar Menengah)**, cocok premis "bayi kultivator biasa" (GDD §2).
+- **Breakthrough**: `realm_level` mencapai maks (10) → **breakthrough otomatis** (`breakthrough: "auto"`) ke ranah berikutnya (`order+1`), `realm_level` = 1. Ranah membuka slot teknik & batas HP/Qi baru.
+
+### 9.2 Teknik, Item & Waktu
+
 - **Teknik**: `techniques.csv`, terkunci ke akademi (`academy`), dibatasi ranah (`realm_required`), biaya Qi (`qi_cost`).
 - **Inventori**: map item→count; item consumable (`usable=true`) bisa dipakai di luar/dalam battle.
-- **Waktu**: `world.py` memajukan waktu (hari/jam). Quest sampingan & NPC dengan `schedule` hanya tersedia pada waktu tertentu. Fase 1: ringan (1 kota, beberapa NPC, tanpa siklus hidup penuh).
+- **Grinding loop Fase 1**: side quest repeatable (berburu / bantu Su Qing / tugas Mo Yun) + aktivitas grounding & sparing = sumber exp untuk menaikkan ranah tanpa mengganggu alur main quest.
+- **Mini-boss (disahkan)**: 1 binatang liar kuat / penjaga wilayah di area berburu — opsional, respawn, reward lebih besar; puncak tantangan Fase 1.
+- **Respawn monster (disahkan)**: monster area berburu muncul kembali setelah `world.monster_respawn_hours` (5) jam in-game — grinding butuh menunggu.
+- **Waktu**: `world.py` memajukan waktu (hari/jam). Quest sampingan & NPC dengan `schedule` hanya tersedia pada waktu tertentu. **Event terjadwal (disahkan)**: beberapa momen hanya muncul pada waktu tertentu — mis. bukti malam Act 2 memakai objektif `reach` + `time_window` (malam) atau `advance_time` ke malam hari. Fase 1: ringan (1 kota, beberapa NPC, tanpa siklus hidup penuh).
+
+### 9.3 Ekonomi, Alkimia & Senjata (disahkan Fase 1)
+
+- **Ekonomi sederhana**: pemain punya uang (`gold`); **1 toko pedagang** (NPC dengan field `shop`): beli item & jual material buruan, harga tetap (bukan pasar dinamis). **Isi toko (disahkan)**: Pil Qi, material alkimia, dan **1 senjata dasar**. Uang didapat dari reward quest (`rewards.gold`) & jual material.
+- **Alkimia dasar**: resep di `recipes.json` — kumpulkan material → aksi `craft` di menu (lokasi aman) → hasil pil. Fase 1: 2 resep.
+- **Senjata dasar**: item `type: weapon` (`power` = tambahan attack) dipasang di slot `equipment.weapon`; didapat dari reward quest (mis. sparing Han Xiu / ujian masuk) atau dibeli di toko.
+- **Penalti KO ringan (disahkan)**: saat KO, kehilangan `ko_penalty.exp_loss_ratio` (10%) dari exp progres tingkat saat ini — item & progress quest tidak hilang.
+
+### 9.4 Kompanion — jalur Summoning (disahkan)
+
+- Pemain jalur **Summoning** mendapat **1 binatang roh** (dari `companions.json`) saat memilih akademi; pemain jalur lain tanpa kompanion.
+- **Di battle**: kompanion bertindak **otomatis** tiap giliran (AI: serangan dasar, atau teknik saat Qi cukup), punya HP sendiri & bisa diserang musuh.
+- **KO**: kompanion KO → tidak aktif sampai **istirahat di titik aman** (aksi `rest`).
+- **Leveling**: `level` kompanion = level ranah pemain; statistik = base + `level × scale` (`config.companion`).
+
+**Detail implementasi (engine, disepakati saat pembangunan):**
+- **Pemberian data-driven**: akademi dengan field `companion` di `config.json` (mis. `akademi_summoning.companion = "komp_roh_awan"`) memberi binatang roh saat quest `choose` akademi selesai — tidak ada hardcode ID akademi di engine.
+- **Urutan battle**: kompanion menyerang otomatis **setelah aksi pemain** (sebelum giliran musuh) tiap ronde; AI = serangan dasar (`attack × 100/(100+defense)` + elemen, sama dengan formula pemain). Teknik kompanion ditunda (data belum punya teknik kompanion).
+- **Target musuh**: tiap musuh **50% peluang** menarget kompanion saat kompanion aktif & HP > 0; `guard` pemain tidak melindungi kompanion.
+- **Gate battle**: saat battle aktif, semua aksi non-battle ditolak session (pesan sistem) — mencegah korupsi alur dari klien web/terskrip.
+- **HP persisten**: HP kompanion tersimpan di `GameState.companion` dan **tidak pulih otomatis** setelah battle menang — hanya aksi `rest` di titik aman yang membangkitkan (KO) & memulihkan penuh.
+- **Gate battle (session)**: saat battle aktif, hanya aksi `battle_action` yang diterima — aksi lain (pindah, bicara, dll.) ditolak dengan pesan, mencegah state korup dari klien web/terskrip.
+- **Stat**: `base + level × scale` (`config.companion`: hp/attack/defense/speed_per_level); `level` = level ranah pemain saat ini (naik otomatis mengikuti breakthrough pemain).
+- **Save**: `companion` diserialisasi di save (id, hp, active).
 
 ---
 
@@ -511,6 +676,7 @@ player_action(menu):
 |---|---|---|
 | `GET /api/health` | – | `{"ok": true}` |
 | `POST /api/game/new` | – | `{"game_id": "..."}` |
+| `GET /api/saves` | – | Daftar slot save (untuk menu utama "Lanjut") |
 | `POST /api/game/load` | `{"save_name": "..."}` | `{"game_id": "..."}` |
 | `POST /api/game/{id}/save` | `{"save_name": "..."}` | `{"ok": true}` |
 | `GET /api/game/{id}/state` | – | `StateJSON` (kontrak §12.4) |
@@ -524,16 +690,24 @@ player_action(menu):
 | `dialog_choice` | `{"choice_index": 0}` | Pilih opsi dialog |
 | `battle_action` | `{"action": "attack"\|"guard"\|"flee"}` atau `{"action": "technique", "technique": "<id>"}` / `{"action": "item", "item": "<id>"}` | Giliran battle |
 | `use_item` | `{"item": "<id>"}` | Pakai item di luar battle |
+| `equip` | `{"item": "<id>"}` | Pasang senjata (`type: weapon`) ke slot `equipment.weapon`; menambah attack di battle |
 | `move` | `{"to": "<location_id>"}` | Pindah lokasi |
 | `advance_time` | `{"hours": 8}` | Majukan waktu (kemungkinan memicu event) |
+| `grounding` | `{"hours": 4}` | Berkultivasi di lokasi aman: waktu maju, dapat exp (sesuai `cultivation.grounding_exp_per_hour`) + pulih Qi pelan |
+| `spar` | `{"npc": "<id>"}` | Tantang NPC sparing → masuk battle; menang/kalah memberi exp (§9.1) |
+| `shop_buy` | `{"item": "<id>", "count": 1}` | Beli item di toko NPC (cek uang & stok) |
+| `shop_sell` | `{"item": "<id>", "count": 1}` | Jual item ke toko (dapat uang) |
+| `craft` | `{"recipe": "<id>"}` | Racik item dari resep (konsumsi material) |
+| `rest` | `{"hours": 8}` | Istirahat di **titik aman**: pulihkan HP/Qi penuh, bangkitkan kompanion, waktu maju |
 | `open_tianyuan` / `close_tianyuan` | – | Buka/tutup panel |
 
 ### 12.4 Kontrak State (potongan utama `StateJSON`)
 
 ```json
 {
-  "player": { "name": "Chen Xu", "realm": "Pengumpul Qi Tahap 1", "hp": 80, "hp_max": 80,
-              "qi": 40, "qi_max": 40, "academy": null, "morality": 0 },
+  "player": { "name": "Chen Xu", "realm": "Pengumpul Qi", "realm_level": 3, "exp": 45, "exp_next": 60,
+              "roots": "akar_mid", "gold": 20, "equipment": { "weapon": "pedang_bambu" },
+              "hp": 80, "hp_max": 80, "qi": 40, "qi_max": 40, "academy": null, "morality": 0 },
   "location": "loc_gerbang_akademi",
   "time": { "day": 1, "hour": 8 },
   "quest": { "current": "q_akademi_01", "objective_text": "Bicaralah dengan Penjaga Gerbang.",
@@ -543,6 +717,8 @@ player_action(menu):
   "log": [ { "type": "narration|npc|system|battle", "text": "...", "day": 1, "hour": 8 } ],
   "tianyuan": { "open": false, "memories": [ { "id": "mem_01", "title": "Istana yang Sunyi", "unlocked": true } ],
                 "system_log": [ "...", "..." ] },
+  "companion": { "id": "komp_roh_awan", "name": "Roh Awan", "hp": 30, "hp_max": 30,
+                 "level": 1, "active": true } | null,
   "ui": { "mode": "explore|dialog|battle|tianyuan",
           "dialog": null, "battle": null, "options": [] }
 }
@@ -554,15 +730,22 @@ player_action(menu):
 ### 12.5 Frontend (Fase 1 — tanpa build step)
 
 - `index.html` + `app.js` (vanilla JS + `fetch`) + `style.css`.
+- **Menu utama sederhana** (disahkan): layar judul dengan **Mulai Baru / Lanjut** (daftar slot dari `GET /api/saves`).
+- **Layout 3 kolom (disahkan)**: teks utama di tengah · panel statistik di kiri (HP/Qi/ranah/inventori) · panel inventori/quest di kanan.
+- **Tampilan teks polos (disahkan)**: tanpa ikon emoji — nama item/lokasi ditulis teks; **HP/Qi = angka saja** (mis. `HP 80/100`), tanpa bar.
+- **Statis (disahkan)**: tanpa animasi — fade/glow/efek gerak ditiadakan; tema gelap + emas tetap lewat warna & tipografi.
+- **Lokasi (disahkan)**: nama lokasi + deskripsi teks + tombol daftar tempat tujuan (`connections`); tanpa mini-peta.
+- **Desktop dulu (disahkan)**: tidak dioptimalkan untuk layar HP (responsif ditunda).
 - Panel: **Teks utama** (narasi/dialog/log), **Action bar** (kontekstual: Bicara/Pindah/Serang/Item), **Panel statistik** (HP/Qi/ranah/inventori, selalu terlihat), **Panel Tianyuan Ling** (toggle).
-- Tema xianxia: latar gelap, aksen emas/tinta, font serif untuk narasi.
+- **Tema (disahkan)**: xianxia **gelap + emas** — latar gelap, aksen emas, font serif untuk narasi.
 
 ---
 
 ## 13. Save / Load
 
+- **Simpan hanya di titik aman** (disahkan): lokasi dengan `is_safe: true` (asrama/kota). Aksi `save` **ditolak** di luar titik aman dengan pesan jelas; pemain harus kembali ke titik aman.
 - Format: **JSON** per playthrough di `saves/` (gitignored).
-- Isi save = `GameState` lengkap (player, quest, dialog aktif, battle aktif, inventori, waktu, moralitas, reputasi, flag, memories, tianyuan log).
+- Isi save = `GameState` lengkap (player, quest, dialog aktif, battle aktif, inventori, waktu, moralitas, reputasi, flag, memories, tianyuan log, kompanion).
 - `src/engine/save.py`: `to_dict()` / `from_dict()` + validasi minimal saat load (reject save rusak → pesan jelas, bukan crash).
 - Multi-slot: nama save bebas; `POST /api/game/load` membaca daftar save.
 
@@ -582,6 +765,14 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 | 6 | ID unik (quest/dialog/NPC/item/musuh/lokasi/teknik/ingatan) | `duplikat id 'mem_01' di memories.json` |
 | 7 | `config.json`: starting quest ada, akademi valid, referensi `element_advantage` valid | `config.starting.current_quest tidak ditemukan` |
 | 8 | Setiap quest sampingan punya `requires`/`available_from` yang konsisten | `q_side_03 menuntut item 'x' yang tidak ada di items.csv` |
+| 9 | `repeatable: true` hanya untuk quest `kind: "side"`; cooldown (jam) valid jika ada | `q_main_x: repeatable=true tapi kind='main'` |
+| 10 | Quest repeatable dilarang menuntut NPC/lokasi/objek yang dipakai quest utama | `q_side_berburu & q_akademi_04: konflik lokasi loc_ruang_lonceng` |
+| 11 | Resep alkimia: hasil & bahan valid, bahan ≠ hasil | `rc_pil_qi: bahan 'x' tidak ada di items.csv` |
+| 12 | Toko NPC: item `buy`/`sell` valid | `npc_pedagang: shop.buy[0].item 'x' tidak ada` |
+| 13 | Item `weapon` punya `power`; `config.roots.tiers` valid & `default` ada | `items.csv: weapon tanpa power` |
+| 14 | Lokasi: `is_safe` bool; `connections` merujuk lokasi yang ada | `loc_x: connections[0] 'loc_y' tidak ditemukan` |
+| 15 | Kompanion: id unik, base stat valid, referensi elemen valid | `companions.json: id duplikat` |
+| 16 | `config.battle`: `crit_chance` 0–1, `turn_order` valid, `damage_formula` valid | `config.battle.crit_chance: harus 0–1` |
 
 ---
 
@@ -591,10 +782,19 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 |---|---|
 | `test_quest_dag.py` | Satu-aktif invariant; urutan ketat; konvergensi (q3a/q3b/q3c → q5); percabangan via dialog; branch tak terpilih tercatat; 3 playthrough akademi bisa selesai |
 | `test_dialog.py` | Traversal node, efek diterapkan, `condition` menyembunyikan opsi, `option` memilih cabang |
-| `test_battle.py` | Giliran, damage elemen (1.5×/0.67×), KO → respawn titik aman, kabur |
+| `test_battle.py` | Urutan giliran tetap; damage persentase (attack × 100/(100+defense)); elemen (1.5×/0.67×); regen Qi per giliran; kritikal; KO → respawn titik aman + penalti exp 10%; kabur; sparing kalah = penalti KO |
 | `test_validator.py` | Setiap aturan §14 menolak data yang sengaja dirusak |
-| `test_save.py` | round-trip save/load identik; save rusak ditolak |
-| `test_cultivation.py` | Ranah naik, teknik terkunci akademi & ranah |
+| `test_save.py` | round-trip save/load identik; save rusak ditolak; **save di luar titik aman ditolak** |
+| `test_cultivation.py` | Exp dari grounding/berburu/sparing (menang & kalah); naik tingkat; kurva ambang; **multiplier akar spiritual**; breakthrough level 10 → ranah berikutnya; teknik terkunci akademi & ranah |
+| `test_side_quests.py` | Side quest repeatable bisa diambil ulang setelah selesai (progres direset); tidak bertabrakan dengan quest utama; cooldown dipatuhi |
+| `test_economy.py` | Beli/jual di toko (uang bertambah/berkurang); uang tak cukup ditolak |
+| `test_crafting.py` | Resep mengonsumsi material & menghasilkan item; bahan kurang ditolak |
+| `test_equipment.py` | Senjata menambah attack di battle |
+| `test_time_events.py` | Event terjadwal hanya muncul pada waktu yang benar (bukti malam Act 2) |
+| `test_dialog_entries.py` | Entri kondisional dialog: pilih entri pertama yang cocok (reaksi NPC per cabang); opsi `start_quest` hanya tampil saat quest dapat ditawarkan |
+| `test_companion.py` | Kompanion jalur Summoning ikut battle otomatis; KO → istirahat di titik aman; scaling level |
+| `test_session.py` (equip) | Pasang senjata ke slot weapon → attack naik; item non-senjata & senjata tak dimiliki ditolak |
+| `test_world.py` | Pergerakan via `connections`; lokasi tidak aman menolak save/rest; mini-boss ada di area berburu |
 
 Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data Fase 1; minimal 1 pertarungan nyata melawan musuh dari data; panel statistik menampilkan HP/Qi/ranah/inventori.
 
@@ -624,4 +824,4 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
 - **Durasi Fase 1** (disahkan): 1–2 jam per playthrough — volume konten quest disesuaikan target ini.
 - **Ending** (disahkan): 3 tematik; mekanisme penentu final (bobot pilihan kunci + moralitas) dijabarkan lebih rinci saat konten arc final.
 - **Engine adaptif**: arc baru (Sekte/Kekaisaran/Final) = tambah data + field skema bila perlu, bukan rombak engine. Jika mekanik baru butuh field skema baru → wajib update dokumen ini + validator + test.
-- **GDD.md** saat ini di root; saat struktur folder dirapikan, dipindah ke `docs/GDD.md`.
+- **GDD.md** sudah dipindah ke `docs/GDD.md` (struktur folder final sesuai GDD §10.3).

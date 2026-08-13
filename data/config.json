@@ -1,0 +1,60 @@
+{
+  "game_title": "Tian Xu: Second Life",
+  "starting": {
+    "location": "loc_gerbang_akademi",
+    "player": {
+      "name": "Chen Xu",
+      "hp": 80,
+      "qi": 40,
+      "realm": "realm_pengumpul_qi",
+      "realm_level": 1,
+      "gold": 20,
+      "roots": "akar_mid",
+      "equipment": { "weapon": null }
+    },
+    "inventory": [ { "id": "pil_qi", "count": 3 } ],
+    "morality": 0,
+    "current_quest": "q_akademi_01",
+    "flags": { "hari_pertama": true }
+  },
+  "academies": [
+    { "id": "akademi_elemen",    "name": "Akademi Elemen",    "hanzi": "五行阁", "pinyin": "Wǔxíng Gé",    "skill_pool": ["tek_elemen_*"] },
+    { "id": "akademi_senjata",   "name": "Akademi Senjata",   "hanzi": "兵锋院", "pinyin": "Bīngfēng Yuàn", "skill_pool": ["tek_senjata_*"] },
+    { "id": "akademi_summoning", "name": "Akademi Summoning", "hanzi": "御灵宗", "pinyin": "Yùlíng Zōng",   "skill_pool": ["tek_summoning_*"], "companion": "komp_roh_awan" }
+  ],
+  "time": { "day_length_hours": 24, "start_day": 1, "start_hour": 8 },
+  "elements_cycle": ["logam", "kayu", "tanah", "air", "api"],
+  "element_advantage": { "logam": "kayu", "kayu": "tanah", "tanah": "air", "air": "api", "api": "logam" },
+  "morality": { "min": -100, "max": 100 },
+  "cultivation": {
+    "levels_per_realm": 10,
+    "exp_per_level_base": 10,
+    "exp_growth_per_level": 1.2,
+    "grounding_exp_per_hour": 4,
+    "grounding_max_hours_per_day": 8,
+    "spar_win_exp": 15,
+    "spar_loss_exp": 5,
+    "hunt_exp_per_kill": 10,
+    "breakthrough": "auto"
+  },
+  "currency": { "name": "Koin Emas", "start_gold": 20 },
+  "roots": {
+    "tiers": [
+      { "id": "akar_low",  "name": "Akar Bawah (下品)",    "exp_multiplier": 0.8 },
+      { "id": "akar_mid",  "name": "Akar Menengah (中品)", "exp_multiplier": 1.0 },
+      { "id": "akar_high", "name": "Akar Atas (上品)",     "exp_multiplier": 1.25 },
+      { "id": "akar_peak", "name": "Akar Puncak (极品)",   "exp_multiplier": 1.5 }
+    ],
+    "default": "akar_mid"
+  },
+  "ko_penalty": { "exp_loss_ratio": 0.1 },
+  "companion": { "hp_per_level": 12, "attack_per_level": 2, "defense_per_level": 1, "speed_per_level": 0.5 },
+  "world": { "monster_respawn_hours": 5 },
+  "battle": {
+    "damage_formula": "percent",
+    "qi_regen_percent_per_turn": 5,
+    "crit_chance": 0.08,
+    "crit_multiplier": 1.5,
+    "turn_order": "fixed_alternate"
+  }
+}

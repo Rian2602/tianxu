@@ -67,6 +67,7 @@ Satu-satunya yang tersisa: **Tianyuan Ling** (天缘灵) — item pemberian dewa
 - Ingatan kehidupan pertama (Long Tianxu) didapat **berangsur-angsur lewat penyelesaian quest**.
 - **Arc 1 = arc pengumpulan ingatan** — pemain (dan Chen Xu) baru tahu detail pengkhianatan secara bertahap, sama seperti tokohnya.
 - Ingatan bersifat **naratif murni** — tidak membuka skill/power secara mekanik (pemisahan sehat: reveal cerita tidak jadi bottleneck kekuatan, dan grinding power tidak jadi bottleneck cerita).
+- **Sikap Chen Xu berubah bertahap** seiring ingatan yang pulih — ingatan membuka opsi dialog tertentu (gating ingatan), tetap **tanpa kekuatan mekanik** (detail: docs/STORY_FASE1.md §3.1).
 
 ### 3.2 Rahasia Identitas
 
@@ -176,7 +177,8 @@ Pemain **memilih 1 dari 3 akademi di dalam cerita**, setelah quest pengenalan aw
 
 Mengikuti kedalaman simulasi (konsep fitur dari 4thfever/cultivation-world-simulator + pola Chronicle of the Past):
 
-- **Ranah kultivasi** — tingkatan kekuatan berjenjang (Pengumpul Qi → … → Penantang Surga).
+- **Ranah kultivasi** — tingkatan kekuatan berjenjang, **9 ranah** *(disahkan)*: Pengumpul Qi (炼气) → Pembangun Fondasi (筑基) → Pembentuk Inti (金丹) → Jiwa Baru Lahir (元婴) → Transformasi Roh (化神) → Pemurni Kehampaan (炼虚) → Penyatu (合体) → Mahayana (大乘) → Penantang Surga (渡劫); **tiap ranah dibagi 10 tingkat** *(disahkan)*.
+- **Progresi berbasis aktivitas** *(disahkan)* — pemain mengumpulkan qi/exp lewat **berkultivasi (grounding)**, **berburu monster**, dan **menang sparing**; rajin beraktivitas = makin cepat naik tingkat; side quest sampingan **bisa diulang** untuk grinding (detail: ENGINE_ARCHITECTURE §9.1).
 - **Akar spiritual** — bakat bawaan yang menentukan potensi (konsep dari referensi).
 - **Teknik** — skill yang dipelajari & ditingkatkan, dibatasi ranah.
 - **Item** — pil, ramuan, material, artefak, senjata, alat.
@@ -266,7 +268,16 @@ tian-xu-second-life/
   - Item & inventori dasar ✓
   - Dialog bercabang (beberapa NPC kunci) ✓
   - Simulasi hidup ringan (waktu, 1 kota, beberapa NPC) ✓
-- **Sengaja ditunda**: kehidupan kedua penuh, arc di luar akademi, alkimia penuh, ekonomi penuh, visual grafis.
+  - Ekonomi sederhana (uang + 1 toko: jual material, beli Pil Qi) ✓ *(disahkan)*
+  - Alkimia dasar (racik 1–2 pil dari material) ✓ *(disahkan)*
+  - Senjata dasar (1–2 senjata penambah serangan) ✓ *(disahkan)*
+  - Akar spiritual mekanik ringan (bakat memengaruhi kecepatan exp) ✓ *(disahkan)*
+  - Penalti KO ringan (kehilangan sebagian kecil exp) ✓ *(disahkan)*
+  - Event terjadwal (beberapa momen hanya muncul di waktu tertentu) ✓ *(disahkan)*
+  - Kompanion dasar (jalur Summoning: binatang roh ikut bertarung otomatis) ✓ *(disahkan)*
+  - Mini-boss opsional (1 di area berburu, reward besar) ✓ *(disahkan)*
+  - Simpan game hanya di titik aman ✓ *(disahkan)*
+- **Sengaja ditunda**: kehidupan kedua penuh, arc di luar akademi, alkimia penuh, ekonomi penuh (pasar & harga per lokasi), visual grafis.
 
 ### 11.2 Kriteria Selesai Fase 1 (DoD)
 

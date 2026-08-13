@@ -1,0 +1,10 @@
+id,name,academy,element,realm_required,qi_cost,power,kind,description
+tek_elemen_bola_api,Bola Api (火球 Huǒqiú),elemen,api,realm_pengumpul_qi,8,15,attack,Serangan api dasar — kuat melawan elemen logam.
+tek_elemen_perisai_tanah,Perisai Tanah (土盾 Tǔdùn),elemen,tanah,realm_pengumpul_qi,6,60,defend,Mengurangi 60% damage pada giliran ini.
+tek_elemen_embun_air,Embun Air (水露 Shuǐlù),elemen,air,realm_pengumpul_qi,10,20,heal,Memulihkan 20 HP.
+tek_senjata_tebasan_angin,Tebasan Angin (风斩 Fēngzhǎn),senjata,logam,realm_pengumpul_qi,8,16,attack,Tebasan pedang cepat — kuat melawan elemen kayu.
+tek_senjata_serangan_ganda,Serangan Ganda (连击 Liánjī),senjata,logam,realm_pengumpul_qi,12,22,attack,Serangan dua tebasan berturut-turut.
+tek_senjata_kuda_kokoh,Kuda-kuda Kokoh (稳桩 Wěnzhuāng),senjata,tanah,realm_pengumpul_qi,6,60,defend,Mengurangi 60% damage pada giliran ini.
+tek_summoning_roh_api,Panggil Roh Api (火灵 Huǒlíng),summoning,api,realm_pengumpul_qi,8,14,attack,Roh api menyerang musuh.
+tek_summoning_roh_perisai,Panggil Roh Perisai (盾灵 Dùnlíng),summoning,tanah,realm_pengumpul_qi,6,60,defend,Roh perisai mengurangi 60% damage giliran ini.
+tek_summoning_roh_penyembuh,Panggil Roh Penyembuh (愈灵 Yùlíng),summoning,air,realm_pengumpul_qi,10,18,heal,Roh penyembuh memulihkan 18 HP.

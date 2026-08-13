@@ -1,0 +1,7 @@
+{
+  "companions": [
+    { "id": "komp_roh_awan", "name": "Roh Awan", "element": "kayu",
+      "base_hp": 20, "base_attack": 5, "base_defense": 2, "base_speed": 9,
+      "description": "Binatang roh kecil pemberian Akademi Summoning. Lembut, tapi setia menyerang saat kau diserang." }
+  ]
+}

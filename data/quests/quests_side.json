@@ -1,0 +1,73 @@
+{
+  "quests": [
+    {
+      "id": "q_side_berburu",
+      "title": "Tugas Berburu",
+      "arc": "akademi",
+      "kind": "side",
+      "summary": "Pemburu Tua meminta bantuan mengalahkan binatang buas di Wilayah Berburu.",
+      "objective": {
+        "kind": "defeat",
+        "enemies": ["eno_serigala_qi", "eno_babi_hutan"],
+        "target": 2,
+        "hint": "Kalahkan 2 binatang liar di Wilayah Berburu."
+      },
+      "next": [],
+      "repeatable": true,
+      "repeat_cooldown": 0,
+      "available_from": { "day": 2, "hour": 8 },
+      "giver": "npc_pemburu",
+      "on_complete": {
+        "effects": [ { "type": "item", "id": "material_tulang", "count": 1 } ],
+        "system_msg": "Tugas Berburu selesai.",
+        "rewards": { "exp": 20, "gold": 15 }
+      }
+    },
+    {
+      "id": "q_side_suqing",
+      "title": "Belanja Ramuan Su Qing",
+      "arc": "akademi",
+      "kind": "side",
+      "summary": "Su Qing meminta bantuan mengumpulkan Herba Awan untuk persediaannya.",
+      "objective": {
+        "kind": "gather",
+        "item": "material_herba",
+        "target": 3,
+        "hint": "Kumpulkan 3 Herba Awan (bisa diburu atau dibeli di pasar)."
+      },
+      "next": [],
+      "repeatable": true,
+      "repeat_cooldown": 0,
+      "available_from": { "day": 2, "hour": 8 },
+      "giver": "npc_suqing",
+      "on_complete": {
+        "effects": [ { "type": "relation", "npc": "npc_suqing", "value": 2 } ],
+        "system_msg": "Su Qing berterima kasih atas ramuannya.",
+        "rewards": { "exp": 15, "gold": 10 }
+      }
+    },
+    {
+      "id": "q_side_moyun",
+      "title": "Tugas Perpustakaan",
+      "arc": "akademi",
+      "kind": "side",
+      "summary": "Mo Yun meminta Herba Awan untuk persediaan perpustakaan.",
+      "objective": {
+        "kind": "gather",
+        "item": "material_herba",
+        "target": 2,
+        "hint": "Kumpulkan 2 Herba Awan untuk perpustakaan."
+      },
+      "next": [],
+      "repeatable": true,
+      "repeat_cooldown": 0,
+      "available_from": { "day": 2, "hour": 8 },
+      "giver": "npc_moyun",
+      "on_complete": {
+        "effects": [ { "type": "relation", "npc": "npc_moyun", "value": 2 } ],
+        "system_msg": "Mo Yun mengangguk pelan. Tugas Perpustakaan selesai.",
+        "rewards": { "exp": 12, "gold": 8 }
+      }
+    }
+  ]
+}

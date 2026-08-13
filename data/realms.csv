@@ -1,0 +1,10 @@
+id,name_pinyin,name_id,order,levels,base_hp,base_qi,hp_per_level,qi_per_level,technique_slots
+realm_pengumpul_qi,Pengumpul Qi (炼气 Liànqì),pengumpul_qi,1,10,80,40,5,3,1
+realm_pembangun_fondasi,Pembangun Fondasi (筑基 Zhùjī),pembangun_fondasi,2,10,150,80,8,5,2
+realm_pembentuk_inti,Pembentuk Inti (金丹 Jīndān),pembentuk_inti,3,10,250,140,12,8,3
+realm_jiwa_baru_lahir,Jiwa Baru Lahir (元婴 Yuányīng),jiwa_baru_lahir,4,10,400,240,18,12,4
+realm_transformasi_roh,Transformasi Roh (化神 Huàshén),transformasi_roh,5,10,600,380,25,16,5
+realm_pemurni_kehampaan,Pemurni Kehampaan (炼虚 Liànxū),pemurni_kehampaan,6,10,900,600,35,22,6
+realm_penyatu,Penyatu (合体 Hétǐ),penyatu,7,10,1300,900,50,30,7
+realm_mahayana,Mahayana (大乘 Dàchéng),mahayana,8,10,1800,1300,70,40,8
+realm_penantang_surga,Penantang Surga (渡劫 Dùjié),penantang_surga,9,10,2500,1800,100,55,9

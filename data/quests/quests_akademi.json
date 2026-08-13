@@ -1,0 +1,203 @@
+{
+  "quests": [
+    {
+      "id": "q_akademi_01",
+      "title": "Pintu Gerbang Akademi",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Chen Xu tiba di gerbang Akademi Changfeng dan disambut Penjaga Gerbang.",
+      "objective": { "kind": "talk", "npc": "npc_penjaga", "target": 1, "hint": "Bicaralah dengan Penjaga Gerbang di depan akademi." },
+      "next": [ { "quest": "q_akademi_02", "branch": "b1", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "met_penjaga", "value": true } ],
+        "system_msg": "Quest utama diperbarui: Ujian Masuk.",
+        "rewards": { "exp": 5 }
+      }
+    },
+    {
+      "id": "q_akademi_02",
+      "title": "Ujian Masuk: Akar Spiritual",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Gu Canghai menguji akar spiritual Chen Xu di Aula Ujian.",
+      "objective": { "kind": "talk", "npc": "npc_gucanghai", "target": 1, "hint": "Temui Gu Canghai di Aula Ujian." },
+      "next": [ { "quest": "q_akademi_03", "branch": "b2", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "ujian_akar_selesai", "value": true } ],
+        "system_msg": "Hasil ujian: Akar Menengah (中品).",
+        "rewards": { "exp": 8 }
+      }
+    },
+    {
+      "id": "q_akademi_03",
+      "title": "Ujian Masuk: Sparing",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Han Xiu menantang Chen Xu sparing sebagai bagian ujian masuk.",
+      "objective": { "kind": "spar", "npc": "npc_hanxiu", "hint": "Kalahkan Han Xiu di sparing ujian." },
+      "next": [ { "quest": "q_akademi_04", "branch": "b3", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "spar_ujian_selesai", "value": true } ],
+        "system_msg": "Sparing selesai. Han Xiu mengangguk pelan.",
+        "rewards": { "exp": 15, "gold": 10 }
+      }
+    },
+    {
+      "id": "q_akademi_04",
+      "title": "Pilih Akademi",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Gu Canghai mempersilakan Chen Xu memilih salah satu dari tiga akademi.",
+      "objective": {
+        "kind": "choose",
+        "options": [
+          { "label": "Akademi Elemen (五行阁 Wǔxíng Gé)", "value": "akademi_elemen" },
+          { "label": "Akademi Senjata (兵锋院 Bīngfēng Yuàn)", "value": "akademi_senjata" },
+          { "label": "Akademi Summoning (御灵宗 Yùlíng Zōng)", "value": "akademi_summoning" }
+        ],
+        "hint": "Pilih satu akademi. Pilihan ini menentukan teknik yang bisa kau pelajari."
+      },
+      "next": [ { "quest": "q_akademi_05", "branch": "b4", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "akademi_dipilih", "value": true } ],
+        "system_msg": "Selamat datang di akademi pilihanmu.",
+        "rewards": { "exp": 10 }
+      }
+    },
+    {
+      "id": "q_akademi_05",
+      "title": "Hari-Hari Pertama",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Chen Xu mulai terbiasa dengan kehidupan akademi; Su Qing menyapanya lebih dulu.",
+      "objective": { "kind": "talk", "npc": "npc_suqing", "target": 1, "hint": "Bicaralah dengan Su Qing." },
+      "next": [ { "quest": "q_akademi_06", "branch": "b5", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "hari_pertama_selesai", "value": true } ],
+        "memory_unlock": "mem_01",
+        "system_msg": "[Sistem] ...Sepotong masa lalu telah kembali.",
+        "rewards": { "exp": 10 }
+      }
+    },
+    {
+      "id": "q_akademi_06",
+      "title": "Insiden: Lonceng Angin Panjang",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Lonceng Angin Panjang hilang dan Zhou Yan dituduh. Chen Xu menyaksikan sesuatu di malam hari.",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_ruang_lonceng",
+        "time_window": { "hour_start": 19, "hour_end": 6 },
+        "hint": "Datanglah ke Ruang Lonceng pada malam hari — ada sesuatu yang harus kau lihat."
+      },
+      "next": [
+        { "quest": "q_akademi_3aa", "branch": "b_3aa", "choice_id": "dlg_3_pilih_sikap", "option": "opt_3aa", "label": "Membongkar — konfrontasi langsung" },
+        { "quest": "q_akademi_3ab", "branch": "b_3ab", "choice_id": "dlg_3_pilih_sikap", "option": "opt_3ab", "label": "Membongkar — kumpulkan bukti diam-diam" },
+        { "quest": "q_akademi_3b", "branch": "b_3b", "choice_id": "dlg_3_pilih_sikap", "option": "opt_3b", "label": "Mengambil keuntungan" },
+        { "quest": "q_akademi_3c", "branch": "b_3c", "choice_id": "dlg_3_pilih_sikap", "option": "opt_3c", "label": "Berdiam diri" }
+      ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "lihat_moyun_malam", "value": true } ],
+        "system_msg": "[Sistem] Pola yang sama. Kau melihatnya, bukan?",
+        "rewards": { "exp": 10 }
+      }
+    },
+    {
+      "id": "q_akademi_3aa",
+      "title": "Konfrontasi Langsung",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Chen Xu menghadapi Penatua An dan menuntut jawaban atas tuduhan Zhou Yan.",
+      "objective": { "kind": "talk", "npc": "npc_penatua", "target": 1, "hint": "Hadapi Penatua An." },
+      "next": [ { "quest": "q_akademi_07", "branch": "b_3aa_conv", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "branch_3aa", "value": true },
+          { "type": "morality", "value": 8 },
+          { "type": "relation", "npc": "npc_hanxiu", "value": 5 },
+          { "type": "relation", "npc": "npc_suqing", "value": 5 },
+          { "type": "item", "id": "pedang_angin", "count": 1 }
+        ],
+        "memory_unlock": "mem_02",
+        "system_msg": "[Sistem] Ingatan baru terbuka: 'Kebaikan yang Terlupakan'.",
+        "rewards": { "exp": 30, "gold": 20 }
+      }
+    },
+    {
+      "id": "q_akademi_3ab",
+      "title": "Bukti Diam-Diam",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Chen Xu memancing informasi dari Mo Yun tanpa membuat gaduh.",
+      "objective": { "kind": "talk", "npc": "npc_moyun", "target": 1, "hint": "Selidiki Mo Yun secara diam-diam di perpustakaan." },
+      "next": [ { "quest": "q_akademi_07", "branch": "b_3ab_conv", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "branch_3ab", "value": true },
+          { "type": "morality", "value": 5 },
+          { "type": "relation", "npc": "npc_moyun", "value": 5 }
+        ],
+        "memory_unlock": "mem_02",
+        "system_msg": "[Sistem] Ingatan baru terbuka: 'Kebaikan yang Terlupakan'.",
+        "rewards": { "exp": 25, "gold": 15 }
+      }
+    },
+    {
+      "id": "q_akademi_3b",
+      "title": "Ambil Keuntungan",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Chen Xu menawarkan 'bantuan' kepada Zhou Yan dengan imbalan.",
+      "objective": { "kind": "talk", "npc": "npc_zhouyan", "target": 1, "hint": "Temui Zhou Yan dan tawarkan bantuan berbayar." },
+      "next": [ { "quest": "q_akademi_07", "branch": "b_3b_conv", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "branch_3b", "value": true },
+          { "type": "morality", "value": -8 },
+          { "type": "relation", "npc": "npc_suqing", "value": -5 },
+          { "type": "gold", "value": 30 }
+        ],
+        "memory_unlock": "mem_03",
+        "system_msg": "[Sistem] Mengambil. Seperti yang lain.",
+        "rewards": { "exp": 15 }
+      }
+    },
+    {
+      "id": "q_akademi_3c",
+      "title": "Berdiam Diri",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Chen Xu memilih tidak terlibat dan membiarkan kasus berjalan.",
+      "objective": { "kind": "advance_time", "hour": 20, "day_offset": 1, "hint": "Biarkan waktu berlalu tanpa mencampuri kasus." },
+      "next": [ { "quest": "q_akademi_07", "branch": "b_3c_conv", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "branch_3c", "value": true },
+          { "type": "morality", "value": -2 },
+          { "type": "relation", "npc": "npc_suqing", "value": -3 }
+        ],
+        "memory_unlock": "mem_04",
+        "system_msg": "[Sistem] Diam juga sebuah pilihan.",
+        "rewards": { "exp": 10 }
+      }
+    },
+    {
+      "id": "q_akademi_07",
+      "title": "Kebenaran",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Kebenaran tentang Lonceng Angin Panjang akhirnya terungkap.",
+      "objective": { "kind": "talk", "npc": "npc_moyun", "target": 1, "hint": "Temui Mo Yun untuk mengetahui kebenaran." },
+      "next": [],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "arc_akademi_selesai", "value": true },
+          { "type": "morality", "value": 2 }
+        ],
+        "system_msg": "[Sistem] Jalanmu baru dimulai.",
+        "rewards": { "exp": 30, "gold": 20 }
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "recipes": [
+    { "id": "rc_pil_qi", "result": "pil_qi", "count": 1,
+      "ingredients": [ { "item": "material_herba", "count": 2 } ],
+      "description": "Meracik Pil Qi dari 2 Herba Awan." },
+    { "id": "rc_pil_pemulihan", "result": "pil_pemulihan", "count": 1,
+      "ingredients": [ { "item": "material_tulang", "count": 2 } ],
+      "description": "Meracik Pil Pemulihan dari 2 Tulang Serigala." }
+  ]
+}
