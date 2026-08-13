@@ -6,9 +6,9 @@ satu bagian agar error yang muncul persis menunjuk aturan yang diuji.
 
 from __future__ import annotations
 
-import json
+import shutil
 
-import pytest
+import tools.validate_data as vd
 
 from tools.validate_data import Validator
 
@@ -51,21 +51,19 @@ def test_data_baik_lolos():
 
 # ---------- aturan 1: JSON/CSV well-formed ----------
 
-def test_aturan1_json_rusak():
-    v = Validator()
+def test_aturan1_json_rusak(tmp_path, monkeypatch):
+    # salin data nyata → jalur parsing asli (read_json) yang benar-benar diuji
+    clean = tmp_path / "data"
+    shutil.copytree(vd.ROOT / "data", clean)
+    monkeypatch.setattr(vd, "DATA", clean)
 
-    def bad_read_json(rel: str):
-        try:
-            raise json.JSONDecodeError("rusak", "doc", 0)
-        except json.JSONDecodeError as e:
-            v.error(f"{rel}: JSON rusak — {e}")
-        return None
+    assert vd.Validator().validate()  # sanity: data bersih lolos
 
-    v.read_json = bad_read_json
-    v.read_csv_rows = lambda rel: []
-    ok = v.validate()
-    assert not ok
-    assert any("JSON rusak" in e for e in v.errors)
+    broken = clean / "npcs.json"
+    broken.write_text('{"npcs": [', encoding="utf-8")
+    v = vd.Validator()
+    assert not v.validate()
+    assert any("npcs.json" in e and "JSON rusak" in e for e in v.errors)
 
 
 # ---------- aturan 2: referensi valid ----------
@@ -264,7 +262,3 @@ def test_aturan16_crit_chance_di_luar_rentang():
     v, ok = make(d)
     assert not ok
     assert any("crit_chance" in e for e in v.errors)
-
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
