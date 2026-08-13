@@ -38,7 +38,7 @@ Aturan emas: **setiap perubahan skema data wajib disertai pembaruan dokumen ini 
 ```
 ┌──────────────┐  HTTP/JSON   ┌──────────────────┐  memakai   ┌─────────────────────┐
 │  Web UI      │◄────────────►│  web/app.py      │◄──────────►│  src/engine/*       │
-│  (browser)   │              │  (Flask + API)   │            │  (logika murni)     │
+│  (browser)   │              │  (http.server + API)│          │  (logika murni)     │
 └──────────────┘              └──────────────────┘            └──────────┬──────────┘
                                                                          │ membaca
                                                                          ▼
@@ -66,8 +66,7 @@ tian-xu-second-life/
 │   │   ├── quests_akademi.json # quest utama DAG Arc Akademi
 │   │   └── quests_side.json    # quest sampingan (boleh paralel)
 │   ├── dialogs/
-│   │   ├── dialogs_akademi.json
-│   │   └── dialogs_side.json
+│   │   └── dialogs_akademi.json
 │   ├── npcs.json
 │   ├── locations.json
 │   ├── memories.json           # ingatan naratif (Tianyuan Ling)
@@ -79,24 +78,20 @@ tian-xu-second-life/
 ├── src/
 │   ├── engine/                 # logika game murni (stdlib only)
 │   │   ├── __init__.py
-│   │   ├── session.py          # GameSession: orkestrasi state+aksi
-│   │   ├── state.py            # dataclass GameState / PlayerState / SaveData
+│   │   ├── session.py          # GameSession: orkestrasi state+aksi (item/NPC/world inline)
+│   │   ├── state.py            # dataclass GameState / PlayerState + to_dict/from_dict
 │   │   ├── quest.py            # QuestEngine (DAG)
 │   │   ├── dialog.py           # DialogEngine
 │   │   ├── battle.py           # BattleEngine (giliran menu)
 │   │   ├── cultivation.py      # ranah, teknik, akar spiritual
-│   │   ├── items.py            # inventori, pemakaian item
-│   │   ├── npc.py              # NPC, hubungan, reputasi faksi
-│   │   ├── world.py            # lokasi, waktu, event terjadwal
 │   │   ├── morality.py         # skala moralitas (baik→jahat)
 │   │   ├── memory.py           # ingatan naratif (Tianyuan Ling)
-│   │   ├── save.py             # serialisasi save/load (JSON)
-│   │   └── events.py           # log peristiwa / notifikasi Sistem
-│   ├── loader.py               # baca JSON/CSV → objek bertipe
-│   ├── validator.py            # validasi startup (dipakai tools & engine)
-│   └── cli.py                  # CLI debug/main tanpa web (opsional)
+│   │   ├── events.py           # log peristiwa / notifikasi Sistem
+│   │   └── effects.py          # penerapan efek aksi (quest/dialog)
+│   ├── loader.py               # baca JSON/CSV → dict (DataRegistry)
+│   └── cli.py                  # CLI main tanpa web
 ├── web/
-│   ├── app.py                  # Flask: serve static + API JSON
+│   ├── app.py                  # http.server stdlib: serve static + API JSON
 │   └── static/
 │       ├── index.html
 │       ├── app.js              # render state → DOM, kirim aksi
@@ -105,17 +100,19 @@ tian-xu-second-life/
 │   ├── test_quest_dag.py       # invariant DAG, satu-aktif, konvergensi
 │   ├── test_dialog.py
 │   ├── test_battle.py
+│   ├── test_cultivation.py
 │   ├── test_validator.py
-│   └── test_save.py
+│   ├── test_session.py
+│   ├── test_companion.py
+│   ├── test_cli.py
+│   └── test_web.py
 ├── tools/
-│   ├── validate_data.py        # CLI: jalankan validasi penuh pada data/
-│   └── check_quest_dag.py      # CLI: visualisasi/analisis DAG utk penulis konten
+│   └── validate_data.py        # CLI: validasi penuh 16 aturan pada data/
 └── saves/                      # file save JSON (runtime, gitignored)
 ```
 
 **Konvensi kode**:
-- Python **3.10+**, `dataclasses`, **stdlib only** di `src/engine/`.
-- Satu-satunya dependensi eksternal: **Flask** (lapisan `web/`). Pengujian: **pytest** (dev-only).
+- Python **3.12**, `dataclasses`, **stdlib only** (tanpa dependensi runtime). Pengujian: **pytest** (dev-only).
 - ID global unik (quest, dialog, NPC, item, musuh, lokasi, teknik, ingatan) — dipakai untuk semua referensi.
 - Tidak ada akses file langsung dari engine selain lewat loader/validator.
 
@@ -668,7 +665,7 @@ player_action(menu):
 
 ### 12.1 Komunikasi
 
-- `web/app.py` (Flask) menyajikan `web/static/` + endpoint JSON.
+- `web/app.py` (http.server stdlib) menyajikan `web/static/` + endpoint JSON.
 - Satu sesi = satu `GameSession` di server (in-memory) + save ke `saves/`.
 - UI render ulang penuh dari state (tidak ada state DOM yang kompleks — Fase 1).
 
@@ -755,7 +752,7 @@ player_action(menu):
 - **Simpan hanya di titik aman** (disahkan): lokasi dengan `is_safe: true` (asrama/kota). Aksi `save` **ditolak** di luar titik aman dengan pesan jelas; pemain harus kembali ke titik aman.
 - Format: **JSON** per playthrough di `saves/` (gitignored).
 - Isi save = `GameState` lengkap (player, quest, dialog aktif, battle aktif, inventori, waktu, moralitas, reputasi, flag, memories, tianyuan log, kompanion).
-- `src/engine/save.py`: `to_dict()` / `from_dict()` + validasi minimal saat load (reject save rusak → pesan jelas, bukan crash).
+- `src/engine/state.py`: `GameState.to_dict()` / `from_dict()` + validasi minimal saat load (reject save rusak → pesan jelas, bukan crash). Entrypoint save/load ada di `src/engine/session.py` (`GameSession.load` & aksi `save`).
 - Multi-slot: nama save bebas; `POST /api/game/load` membaca daftar save.
 
 ---
@@ -773,7 +770,7 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 | 5 | Tidak ada konflik NPC/lokasi/objek antar quest yang bisa aktif bersamaan | `quest q_side_02 & q_side_05 sama-sama butuh npc_pedagang` |
 | 6 | ID unik (quest/dialog/NPC/item/musuh/lokasi/teknik/ingatan) | `duplikat id 'mem_01' di memories.json` |
 | 7 | `config.json`: starting quest ada, akademi valid, referensi `element_advantage` valid | `config.starting.current_quest tidak ditemukan` |
-| 8 | Setiap quest sampingan punya `requires`/`available_from` yang konsisten | `q_side_03 menuntut item 'x' yang tidak ada di items.csv` |
+| 8 | Setiap quest sampingan punya `available_from {day, hour}`; `cooldown` valid jika ada | `q_side_x: side quest butuh available_from {day, hour}` |
 | 9 | `repeatable: true` hanya untuk quest `kind: "side"`; cooldown (jam) valid jika ada | `q_main_x: repeatable=true tapi kind='main'` |
 | 10 | Quest repeatable dilarang menuntut NPC/lokasi/objek yang dipakai quest utama | `q_side_berburu & q_akademi_04: konflik lokasi loc_ruang_lonceng` |
 | 11 | Resep alkimia: hasil & bahan valid, bahan ≠ hasil | `rc_pil_qi: bahan 'x' tidak ada di items.csv` |
@@ -789,21 +786,15 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 
 | Test | Memverifikasi |
 |---|---|
-| `test_quest_dag.py` | Satu-aktif invariant; urutan ketat; konvergensi (q3a/q3b/q3c → q5); percabangan via dialog; branch tak terpilih tercatat; 3 playthrough akademi bisa selesai |
-| `test_dialog.py` | Traversal node, efek diterapkan, `condition` menyembunyikan opsi, `option` memilih cabang |
-| `test_battle.py` | Urutan giliran tetap; damage persentase (attack × 100/(100+defense)); elemen (1.5×/0.67×); regen Qi per giliran; kritikal; KO → respawn titik aman + penalti exp 10%; kabur; sparing kalah = penalti KO |
-| `test_validator.py` | Setiap aturan §14 menolak data yang sengaja dirusak |
-| `test_save.py` | round-trip save/load identik; save rusak ditolak; **save di luar titik aman ditolak** |
-| `test_cultivation.py` | Exp dari grounding/berburu/sparing (menang & kalah); naik tingkat; kurva ambang; **multiplier akar spiritual**; breakthrough level 10 → ranah berikutnya; teknik terkunci akademi & ranah |
-| `test_side_quests.py` | Side quest repeatable bisa diambil ulang setelah selesai (progres direset); tidak bertabrakan dengan quest utama; cooldown dipatuhi |
-| `test_economy.py` | Beli/jual di toko (uang bertambah/berkurang); uang tak cukup ditolak |
-| `test_crafting.py` | Resep mengonsumsi material & menghasilkan item; bahan kurang ditolak |
-| `test_equipment.py` | Senjata menambah attack di battle |
-| `test_time_events.py` | Event terjadwal hanya muncul pada waktu yang benar (bukti malam Act 2) |
-| `test_dialog_entries.py` | Entri kondisional dialog: pilih entri pertama yang cocok (reaksi NPC per cabang); opsi `start_quest` hanya tampil saat quest dapat ditawarkan |
-| `test_companion.py` | Kompanion jalur Summoning ikut battle otomatis; KO → istirahat di titik aman; scaling level |
-| `test_session.py` (equip) | Pasang senjata ke slot weapon → attack naik; item non-senjata & senjata tak dimiliki ditolak |
-| `test_world.py` | Pergerakan via `connections`; lokasi tidak aman menolak save/rest; mini-boss ada di area berburu |
+| `test_quest_dag.py` | Satu-aktif invariant; urutan ketat; konvergensi (q3a/q3b/q3c → q5); percabangan via dialog; branch tak terpilih tercatat; 3 playthrough akademi bisa selesai; side quest repeatable & event malam (Act 2) |
+| `test_dialog.py` | Traversal node, efek diterapkan, `condition` menyembunyikan opsi, `option` memilih cabang, entri kondisional, `start_quest` hanya saat bisa ditawarkan, side quest mulai & selesai |
+| `test_battle.py` | Urutan giliran tetap; damage persentase (attack × 100/(100+defense)); elemen (1.5×/0.67×); regen Qi per giliran; kritikal; KO → respawn titik aman + penalti exp 10%; kabur; sparing kalah = penalti KO; teknik terkunci akademi |
+| `test_validator.py` | Setiap aturan §14 (16 aturan) menolak data yang sengaja dirusak |
+| `test_cultivation.py` | **multiplier akar spiritual**; breakthrough level 10 → ranah berikutnya; ranah tertinggi tidak breakthrough |
+| `test_session.py` | Pergerakan via `connections`; grounding/save/rest/craft hanya di titik aman; ekonomi toko (beli/jual, uang tak cukup ditolak); round-trip save/load; pakai item; racik; gate battle; equip senjata; waktu maju |
+| `test_companion.py` | Kompanion jalur Summoning ikut battle otomatis; KO → istirahat di titik aman; scaling level; musuh bisa menyerang kompanion |
+| `test_cli.py` | Playthrough CLI penuh cabang 3aa dari awal sampai selesai |
+| `test_web.py` | Endpoint API: new/load/action/save/tianyuan; aksi tanpa sesi & format salah ditolak (400); save di luar titik aman ditolak |
 
 Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data Fase 1; minimal 1 pertarungan nyata melawan musuh dari data; panel statistik menampilkan HP/Qi/ranah/inventori.
 
@@ -811,19 +802,19 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
 
 ## 16. Roadmap Implementasi (urutan kerja)
 
-| Langkah | Deliverable | Bergantung pada |
-|---|---|---|
-| 1 | Dokumen ini + skema data final | – |
-| 2 | `data/` contoh lengkap Arc Akademi (quest DAG 3 jalur, dialog, NPC, item, musuh, ranah, teknik, config, memories) + `tools/validate_data.py` | 1 |
-| 3 | `src/loader.py` + `src/validator.py` | 2 |
-| 4 | `src/engine/state.py`, `events.py`, `morality.py`, `memory.py` | 3 |
-| 5 | `src/engine/quest.py` (DAG) + `dialog.py` | 4 |
-| 6 | `src/engine/battle.py` + `cultivation.py` + `items.py` + `npc.py` + `world.py` | 5 |
-| 7 | `src/engine/save.py` + `session.py` (orkestrasi aksi) | 6 |
-| 8 | `src/cli.py` (debug tanpa web) | 7 |
-| 9 | `web/app.py` + `web/static/*` (UI + panel Tianyuan Ling) | 7 |
-| 10 | `tests/` (semua §15) + penyesuaian | 8-9 |
-| 11 | Playtest Arc Akademi (3 jalur), perbaikan konten, validasi DoD | 10 |
+| Langkah | Deliverable | Bergantung pada | Status |
+|---|---|---|---|
+| 1 | Dokumen ini + skema data final | – | ✅ selesai |
+| 2 | `data/` contoh lengkap Arc Akademi (quest DAG 3 jalur, dialog, NPC, item, musuh, ranah, teknik, config, memories) + `tools/validate_data.py` | 1 | ✅ selesai |
+| 3 | `src/loader.py` + validasi startup (`tools/validate_data.py`) | 2 | ✅ selesai |
+| 4 | `src/engine/state.py`, `events.py`, `morality.py`, `memory.py` | 3 | ✅ selesai |
+| 5 | `src/engine/quest.py` (DAG) + `dialog.py` | 4 | ✅ selesai |
+| 6 | `src/engine/battle.py` + `cultivation.py` (item/NPC/world inline di `session.py`) | 5 | ✅ selesai |
+| 7 | `src/engine/session.py` (orkestrasi aksi + save/load lewat `state.py`) | 6 | ✅ selesai |
+| 8 | `src/cli.py` (debug tanpa web) | 7 | ✅ selesai |
+| 9 | `web/app.py` + `web/static/*` (UI + panel Tianyuan Ling) | 7 | ✅ selesai |
+| 10 | `tests/` (semua §15) + penyesuaian | 8-9 | ✅ selesai |
+| 11 | Playtest Arc Akademi (3 jalur), perbaikan konten, validasi DoD | 10 | ✅ selesai (rebalancing v0.1.0-alpha) |
 
 ---
 

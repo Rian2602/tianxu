@@ -12,7 +12,7 @@ RPG kultivasi (wuxia) berbasis teks — vertical slice Fase 1, Arc Akademi. Pyth
 
 - **Data-driven**: semua konten di `data/` (JSON untuk struktur, CSV untuk tabel datar lewat `csv.DictReader`). Tambah konten = edit data, bukan kode. `src/loader.py::DataRegistry` memuat semua dan membuat index lookup sekali saat startup.
 - **Alur aksi**: `src/cli.py` memetakan input teks → dict aksi → `GameSession.apply_action()` (`src/engine/session.py`). Fitur baru lewat engine, jangan langsung menulis ke state.
-- **Engine** (`src/engine/`): session (orchestrator) · state · battle · dialog · cultivation · morality · memory · quest · events · effects.
+- **Engine** (`src/engine/`): session (orchestrator) · state · battle · dialog · cultivation · morality · memory · quest · events · effects. Catatan: ENGINE_ARCHITECTURE menyebut `save.py`/`items.py`/`npc.py`/`world.py` yang **tidak ada** di kode — save/load di `session.py` (`GameSession.load`/`_save`) + `state.py` (`to_dict`/`from_dict`); item/NPC/world inline di `session.py`.
 - **Quest**: satu quest utama aktif; percabangan lewat pilihan dialog (`choice_id`/options → dialog). Graf quest harus DAG — ditegakkan `tests/test_quest_dag.py` + validator. Side quest (repeatable) data terpisah dan tak boleh memakai NPC/lokasi/objek quest utama.
 - **web/** = server stdlib-only (`python3 web/app.py` → `http://localhost:8000`) + halaman statis. Satu sesi aktif per proses; v1 tersedia lewat CLI & web.
 - **Save**: `saves/*.json`, hanya di lokasi aman, di-gitignore. Path `__file__`-relative → cwd-independen.
@@ -20,6 +20,7 @@ RPG kultivasi (wuxia) berbasis teks — vertical slice Fase 1, Arc Akademi. Pyth
 ## Konvensi & gotchas
 
 - Uji alur pakai helper `tests/conftest.py`: `finish_dialog`, `move_path`, `play_to_incident`, `god_mode` (battle deterministik).
+- Aksi baru: daftarkan di handler-map `session.py::apply_action`. Saat `pending_battle`, hanya `battle_action` yang diterima — aksi lain ditolak diam-diam. Aksi yang butuh keamanan ikuti pola gating `is_safe` (save/rest/grounding/craft menolak di luar titik aman).
 - Elemen 五行: peta siklus (`element_advantage`) di `data/config.json`; multiplier 1.5× / 0.67× hardcoded di `src/engine/battle.py::_calc_damage`. Kritikal (`crit_chance`/`crit_multiplier`) bisa diatur di `data/config.json` → `battle` (default kode 0.08 / 1.5).
 - Mengubah skema field data harus disertai pembaruan validator `tools/validate_data.py`, dan sebaliknya.
 - Dokumen resmi: `docs/GDD.md` (desain) · `docs/ENGINE_ARCHITECTURE.md` (§14 = aturan validasi) · `docs/STORY_FASE1.md` (alur cerita) · `docs/DESIGN_SUMMARY.md` (keputusan yang sudah disahkan).
