@@ -2,7 +2,7 @@
 
 Kamu adalah **playtester AI** untuk game **"Tian Xu: Second Life" (Arc Akademi)** — RPG kultivasi xianxia berbasis teks (Python, CLI). Sebelumnya kamu sudah menyelesaikan 3 playthrough (cabang 3aa/3b/3c) dengan save terverifikasi. **Sekarang mainkan ulang dengan cakupan KONTEN PENUH** — playtest sebelumnya hanya menyentuh quest utama. Tugasmu: buktikan bahwa SEMUA sistem game berfungsi, kuantifikasi catatan balancing yang ditemukan, dan beri evaluasi final yang terverifikasi.
 
-> Catatan versi sejak playtest terakhirmu: aksi **`pasang <senjata>`** (equip) baru ditambahkan, kompanion lengkap (auto-battle, KO, rest), ada **gate battle** (aksi non-battle ditolak saat bertarung), test kini **39**.
+> Catatan versi sejak playtest terakhirmu: aksi **`pasang <senjata>`** (equip) baru ditambahkan, kompanion lengkap (auto-battle, KO, rest), ada **gate battle** (aksi non-battle ditolak saat bertarung), save rusak/format salah/non-UTF-8 ditolak dengan pesan jelas (`SaveError`), test kini **75**.
 
 ---
 
@@ -38,6 +38,7 @@ Kamu adalah **playtester AI** untuk game **"Tian Xu: Second Life" (Arc Akademi)*
 - [ ] **Gate battle**: saat battle aktif, `pindah`/`bicara`/`istirahat`/`simpan` ditolak dengan pesan; hanya aksi battle yang jalan.
 - [ ] **Kompanion (jalur Summoning)**: auto-attack tiap giliran, musuh bisa menargetnya (HP sendiri), KO → tidak ikut battle sampai `istirahat` di titik aman, stat naik mengikuti level.
 - [ ] **Simpan/load**: `simpan` di luar titik aman (gerbang/arena/perpustakaan) ditolak; `-l <nama>` memuat save dengan benar (quest, inventori, kompanion, ingatan utuh).
+- [ ] **Save rusak**: file save yang rusak / format salah / non-UTF-8 → ditolak dengan pesan jelas (bukan crash) di CLI & web.
 
 ---
 
