@@ -3,6 +3,14 @@
 from __future__ import annotations
 
 from conftest import finish_dialog, move_path
+from src.engine.dialog import DialogEngine
+
+
+def test_dialog_condition_morality(dummy_session):
+    dummy_session.state.player.morality = -50
+    condition = {"morality_min": 10}
+    result = DialogEngine._eval_condition(dummy_session.state, condition)
+    assert result is False
 
 
 def test_penjaga_dialog_flow(session):

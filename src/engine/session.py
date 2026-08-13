@@ -24,10 +24,13 @@ SAVES_DIR = Path(__file__).resolve().parent.parent.parent / "saves"
 
 
 def _safe_save_path(save_name: str) -> Path:
-    if not save_name or "/" in save_name or "\\" in save_name or ".." in save_name:
+    if not save_name or "/" in save_name or "\\" in save_name or ".." in save_name or "\x00" in save_name:
         raise SaveError(f"nama save tidak valid: '{save_name}'")
     SAVES_DIR.mkdir(exist_ok=True)
-    path = (SAVES_DIR / f"{save_name}.json").resolve()
+    try:
+        path = (SAVES_DIR / f"{save_name}.json").resolve()
+    except (ValueError, OSError) as e:
+        raise SaveError(f"nama save tidak valid: '{save_name}'") from e
     if path.parent != SAVES_DIR.resolve():
         raise SaveError(f"nama save tidak valid: '{save_name}'")
     return path
@@ -439,8 +442,8 @@ class GameSession:
         name = action.get("save_name") or "save1"
         try:
             path = _safe_save_path(name)
-        except SaveError as e:
-            msg = str(e)
+        except (SaveError, ValueError, OSError) as e:
+            msg = str(e) if isinstance(e, SaveError) else f"nama save tidak valid: '{name}'"
             add_log(self.state, "system", msg)
             res = self.view()
             res["error"] = msg

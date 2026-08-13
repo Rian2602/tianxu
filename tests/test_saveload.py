@@ -114,3 +114,10 @@ def test_load_path_traversal_rejected(tmp_path, monkeypatch, registry):
     with pytest.raises(SaveError, match="nama save tidak valid"):
         GameSession.load(registry, "../secret")
 
+
+def test_save_null_byte_rejected(dummy_session):
+    dummy_session.state.location = "loc_asrama"
+    res = dummy_session.apply_action({"type": "save", "save_name": "test\x00slot"})
+    assert res.get("error") is not None
+
+

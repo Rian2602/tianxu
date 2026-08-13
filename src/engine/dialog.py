@@ -115,8 +115,9 @@ class DialogEngine:
 
     # ---------- kondisi ----------
 
-    def _eval(self, cond: dict[str, Any]) -> bool:
-        s = self.state
+    @staticmethod
+    def _eval_condition(state: GameState, cond: dict[str, Any], registry: DataRegistry | None = None) -> bool:
+        s = state
         if "flag" in cond:
             f = cond["flag"]
             # flag yang tidak pernah diset dianggap False (bukan None)
@@ -131,8 +132,10 @@ class DialogEngine:
             if s.inventory.get(cond["has_item"], 0) < 1:
                 return False
         if "realm_min" in cond:
-            order_cur = int(self.reg.realms[s.player.realm]["order"])
-            order_min = int(self.reg.realms[cond["realm_min"]]["order"])
+            if registry is None:
+                return False
+            order_cur = int(registry.realms[s.player.realm]["order"])
+            order_min = int(registry.realms[cond["realm_min"]]["order"])
             if order_cur < order_min:
                 return False
         if "academy" in cond:
@@ -147,3 +150,6 @@ class DialogEngine:
             if qid == s.current_quest or qid in s.active_side_quests:
                 return False
         return True
+
+    def _eval(self, cond: dict[str, Any]) -> bool:
+        return DialogEngine._eval_condition(self.state, cond, self.reg)
