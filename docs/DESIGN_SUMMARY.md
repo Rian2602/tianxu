@@ -91,7 +91,7 @@ Satu quest utama aktif; percabangan lewat pilihan dialog; cabang yang tak dipili
 | Nama Zhou Yan (korban) | "Zhou Yan (周炎)" | Ya |
 | Akar spiritual Chen Xu | 中品 (Akar Menengah) | Ya (atas/bawah) |
 | Angka balancing | exp, harga toko, stat musuh | Ya |
-| Detail dialog & teks ingatan | belum ditulis | Ya — Anda review setelah saya tulis |
+| Detail dialog & teks ingatan | sudah ditulis (`data/dialogs`, `data/memories.json`) | Ya |
 
 ---
 
