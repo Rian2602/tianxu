@@ -255,6 +255,15 @@ class Validator:
             if q.get("giver") and not self.has("npc", q["giver"]):
                 self.error(f"quest {qid}: giver '{q['giver']}' tidak ada")
 
+            # aturan 8: side quest butuh available_from {day, hour} & cooldown valid
+            if q.get("kind") == "side":
+                af = q.get("available_from")
+                if not (isinstance(af, dict) and isinstance(af.get("day"), int) and isinstance(af.get("hour"), int)):
+                    self.error(f"quest {qid}: side quest butuh available_from {{day, hour}} (aturan 8)")
+                cd = q.get("cooldown")
+                if cd is not None and (not isinstance(cd, (int, float)) or cd <= 0):
+                    self.error(f"quest {qid}: cooldown harus > 0 (aturan 8)")
+
             # aturan 9: repeatable hanya side
             if q.get("repeatable") and q.get("kind") != "side":
                 self.error(f"quest {qid}: repeatable=true tapi kind='{q.get('kind')}' (aturan 9)")
