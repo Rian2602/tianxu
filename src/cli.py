@@ -174,6 +174,7 @@ def main() -> None:
     print(f"{GOLD}{BOLD}═══ 天缘灵 · TIAN XU: SECOND LIFE — Arc Akademi ═══{RESET}")
     print("Ketik 'bantuan' untuk daftar perintah, 'keluar' untuk berhenti.\n")
 
+    arc_ended = False
     while True:
         v = session.view()
         print_header(session)
@@ -308,15 +309,13 @@ def main() -> None:
 
         if action:
             session.apply_action(action)
-        # cek selesai arc
-        v = session.view()
-        if v["mode"] == "explore" and not v["current_quest"] and not v["side_quests"]:
-            if "arc_akademi_selesai" in session.state.flags:
-                print()
-                print(GOLD + "═══ AKHIR ARC AKADEMI ═══" + RESET)
-                print("Terima kasih sudah memainkan bukti konsep Fase 1!")
-                print("Lanjutan: Arc Sekte (Fase 2). Simpan progressmu di titik aman.")
-                break
+        # cek selesai arc (tampilkan sekali; lanjutkan loop agar pemain bisa simpan)
+        if not arc_ended and "arc_akademi_selesai" in session.state.flags:
+            arc_ended = True
+            print()
+            print(GOLD + "═══ AKHIR ARC AKADEMI ═══" + RESET)
+            print("Terima kasih sudah memainkan bukti konsep Fase 1!")
+            print("Lanjutan: Arc Sekte (Fase 2). Simpan progressmu di titik aman.")
 
 
 if __name__ == "__main__":

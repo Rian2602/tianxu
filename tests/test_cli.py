@@ -7,7 +7,12 @@ quest-dialog-battle-choose, dan deteksi akhir arc bekerja end-to-end.
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 from src.engine.battle import BattleEngine
+
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_cli_playthrough_3aa(monkeypatch, capsys):
@@ -30,6 +35,9 @@ def test_cli_playthrough_3aa(monkeypatch, capsys):
         "talk npc_penatua", "1", "lanjut", "lanjut",
         "pindah loc_perpustakaan",
         "talk npc_moyun", "lanjut", "lanjut",
+        # pasca arc: CLI tidak boleh langsung berhenti — pemain bisa pindah & simpan
+        "pindah loc_paviliun", "pindah loc_aula_ujian", "pindah loc_asrama",
+        "simpan test_arc_end",
     ]
     inputs = iter(script + ["keluar"])
     monkeypatch.setattr("builtins.input", lambda prompt="": next(inputs))
@@ -41,3 +49,6 @@ def test_cli_playthrough_3aa(monkeypatch, capsys):
     assert "AKHIR ARC AKADEMI" in out, "arc tidak selesai di CLI"
     assert "Ingatan" in out, "ingatan tidak ditampilkan di CLI"
     assert "Moral" in out
+    save_path = ROOT / "saves" / "test_arc_end.json"
+    assert save_path.exists(), "loop CLI berhenti sebelum pemain bisa menyimpan"
+    os.remove(save_path)
