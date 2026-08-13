@@ -159,10 +159,12 @@ def test_regen_qi_per_giliran(session, monkeypatch):
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
     session.state.player.qi = 10
-    foe = {"id": "eno_x", "name": "X", "hp": 9999, "qi": 0, "attack": 0, "defense": 0,
+    foe = {"id": "eno_x", "name": "X", "hp": 9999, "qi": 10, "qi_max": 100, "attack": 0, "defense": 0,
            "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
     session.battle.start([foe], "hunt")
     session.apply_action({"type": "battle_action", "action": "guard"})
-    # setelah 1 giliran: regen 5% qi max
+    # setelah 1 giliran: regen 5% qi max (pemain & musuh)
     qi_max = session.state.max_qi(session.reg)
     assert session.state.player.qi == min(qi_max, 10 + round(qi_max * 0.05))
+    assert session.state.pending_battle["foes"][0]["qi"] == 15
+

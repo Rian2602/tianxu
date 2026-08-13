@@ -121,8 +121,8 @@ class BattleEngine:
             f["attack"] = int(f.get("attack", 1))
             f["defense"] = int(f.get("defense", 0))
             f["speed"] = int(f.get("speed", 5))
-            f["hp_max"] = f["hp"]
-            f["qi_max"] = f["qi"]
+            f["hp_max"] = int(f.get("hp_max") or f["hp"])
+            f["qi_max"] = int(f.get("qi_max") or f["qi"])
         add_log(self.state, "battle", f"⚔️  Pertarungan dimulai melawan {self._foe_names(b)}!")
         return self.view()
 
@@ -271,6 +271,9 @@ class BattleEngine:
 
     def _regen_foes(self, b: dict) -> None:
         pct = self.reg.config.get("battle", {}).get("qi_regen_percent_per_turn", 5)
+        for f in b["foes"]:
+            f["qi"] = min(f["qi_max"], f.get("qi", 0) + round(f["qi_max"] * pct / 100))
+
     # ---------- perhitungan damage ----------
 
     def _calc_damage(self, attack: int, defense: int, elem_att, elem_def) -> tuple[int, bool]:
