@@ -825,4 +825,9 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
 - **Ending** (disahkan): 3 tematik; mekanisme penentu final (bobot pilihan kunci + moralitas) dijabarkan lebih rinci saat konten arc final.
 - **Engine adaptif**: arc baru (Sekte/Kekaisaran/Final) = tambah data + field skema bila perlu, bukan rombak engine. Jika mekanik baru butuh field skema baru → wajib update dokumen ini + validator + test.
 - **Cooldown side quest**: field `cooldown` divalidasi validator (§14-8) tetapi **belum diterapkan engine** — quest repeatable langsung tersedia lagi. Terapkan saat quest pertama memakainya (perlu mencatat waktu selesai di state).
+- **Playtest putaran 2 — observasi (open, keputusan desain Fase 2, belum diubah data)**:
+  - Han Xiu undertuned: menang ≥85% di Lv1 (full HP), 100% Lv2+; `speed` tak berfungsi karena `turn_order: fixed_alternate` (pemain selalu duluan). Naikkan stat bila gate ujian (q3) ingin lebih menantang — hati-hati tidak menyumbat jalur utama.
+  - Reward ganda spar saat q3: `spar_win_exp` 8 + reward quest +8 exp/+10 koin = 16 exp sekali menang → Lv1→Lv2 + sisa 6/12 (bukan loncat 2 level). Overlap by-design (spar selalu kasih exp + reward quest); terima atau turunkan salah satu.
+  - Over-leveling via grind (Lv1→Lv8) disengaja — side quest untuk grinding; jalur utama berakhir Lv6 (target GDD Lv4–6).
+  - Side quest objektif "kalahkan" selesai otomatis tanpa lapor NPC (minor). Save tak ditemukan TIDAK diam-diam — pesan jelas di CLI (`cli.py:165`).
 - **GDD.md** sudah dipindah ke `docs/GDD.md` (struktur folder final sesuai GDD §10.3).
