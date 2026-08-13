@@ -28,7 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))  # agar `src` bisa diimpor dari mana saja
 
-from src.engine.session import GameSession  # noqa: E402
+from src.engine.session import GameSession, SaveError  # noqa: E402
 from src.loader import DataRegistry  # noqa: E402
 
 STATIC_DIR = ROOT / "web" / "static"
@@ -144,6 +144,8 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json({"ok": True, **_payload()})
             except FileNotFoundError:
                 self._send_json({"ok": False, "error": f"Save '{name}' tidak ditemukan."}, 404)
+            except SaveError as e:
+                self._send_json({"ok": False, "error": f"Save '{name}' rusak: {e}"}, 400)
         elif self.path == "/api/action":
             if session is None:
                 self._send_json({"ok": False, "error": "Belum ada permainan. Mulai baru atau lanjut save."}, 400)

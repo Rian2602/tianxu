@@ -23,6 +23,10 @@ from .state import GameState, PlayerState
 SAVES_DIR = Path(__file__).resolve().parent.parent.parent / "saves"
 
 
+class SaveError(Exception):
+    """Save tidak dapat dimuat: file rusak atau format tidak dikenal."""
+
+
 class GameSession:
     def __init__(self, registry: DataRegistry, state: GameState) -> None:
         self.reg = registry
@@ -63,9 +67,18 @@ class GameSession:
     @classmethod
     def load(cls, registry: DataRegistry, save_name: str) -> "GameSession":
         path = SAVES_DIR / f"{save_name}.json"
-        with open(path, encoding="utf-8") as f:
-            data = json.load(f)
-        return cls(registry, GameState.from_dict(data))
+        try:
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            raise
+        except (OSError, json.JSONDecodeError) as e:
+            raise SaveError(f"save '{save_name}' rusak: {e}") from e
+        try:
+            state = GameState.from_dict(data)
+        except (KeyError, TypeError, ValueError) as e:
+            raise SaveError(f"save '{save_name}' format tidak dikenal: {e}") from e
+        return cls(registry, state)
 
     # ---------- aksi utama ----------
 

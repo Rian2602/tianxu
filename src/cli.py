@@ -17,7 +17,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.loader import DataRegistry
-from src.engine.session import GameSession
+from src.engine.session import GameSession, SaveError
 
 RESET = "\033[0m"
 GOLD = "\033[33m"
@@ -164,6 +164,9 @@ def main() -> None:
         except FileNotFoundError:
             print(f"Save '{save_name}' tidak ditemukan. Memulai baru.")
             session = GameSession.new(registry)
+        except SaveError as e:
+            print(f"Gagal memuat save '{save_name}': {e}")
+            return
     else:
         session = GameSession.new(registry)
 
