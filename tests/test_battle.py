@@ -2,7 +2,26 @@
 
 from __future__ import annotations
 
-from src.engine.battle import BattleEngine
+from src.engine.battle import BattleEngine, _calc_damage
+
+
+def test_damage_calculation(mock_god_mode):
+    # Base formula: attack * (100 / (100+defense))
+    attack = 10
+    defense = 100  # modifier 100/200 = 0.5
+    # Hitung damage tanpa elemen (elemen netral)
+    damage, _ = _calc_damage(attack, defense, "tanah", "tanah")
+    # Base damage harusnya 5. Karena god_mode (no RNG var), expect tepat 5
+    assert damage == 5
+
+
+def test_element_advantage(mock_god_mode):
+    # Air vs Api = 1.5x (karena Air mematikan Api dalam wuxing config)
+    attack = 10
+    defense = 100
+    damage, _ = _calc_damage(attack, defense, "air", "api")
+    assert damage == 8  # 5 * 1.5 = 7.5, round(7.5) = 8
+
 
 
 def test_damage_formula_persen(monkeypatch):

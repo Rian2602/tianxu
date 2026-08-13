@@ -61,6 +61,39 @@ def player_combat(state: GameState, registry: DataRegistry) -> dict:
     }
 
 
+DEFAULT_ELEMENT_ADVANTAGE = {
+    "logam": "kayu",
+    "kayu": "tanah",
+    "tanah": "air",
+    "air": "api",
+    "api": "logam",
+}
+
+
+def _calc_damage(
+    attack: int,
+    defense: int,
+    elem_att: str | None = None,
+    elem_def: str | None = None,
+    registry: DataRegistry | None = None,
+    config: dict | None = None,
+) -> tuple[int, bool]:
+    cfg = config if config is not None else (registry.config.get("battle", {}) if registry else {})
+    mult = 1.0
+    if elem_att and elem_def:
+        adv = registry.element_advantage if registry else DEFAULT_ELEMENT_ADVANTAGE
+        if adv.get(elem_att) == elem_def:
+            mult = 1.5
+        elif adv.get(elem_def) == elem_att:
+            mult = 0.67
+    base = attack * (100 / (100 + defense)) * mult
+    base *= random.uniform(0.8, 1.2)
+    crit = random.random() < cfg.get("crit_chance", 0.08)
+    if crit:
+        base *= cfg.get("crit_multiplier", 1.5)
+    return max(1, round(base)), crit
+
+
 class BattleEngine:
     def __init__(self, registry: DataRegistry, state: GameState, quest_engine) -> None:
         self.reg = registry
@@ -238,26 +271,12 @@ class BattleEngine:
 
     def _regen_foes(self, b: dict) -> None:
         pct = self.reg.config.get("battle", {}).get("qi_regen_percent_per_turn", 5)
-        for f in b["foes"]:
-            f["qi"] = min(f["qi_max"], f.get("qi", 0) + round(f["qi_max"] * pct / 100))
-
     # ---------- perhitungan damage ----------
 
     def _calc_damage(self, attack: int, defense: int, elem_att, elem_def) -> tuple[int, bool]:
-        cfg = self.reg.config.get("battle", {})
-        mult = 1.0
-        if elem_att and elem_def:
-            adv = self.reg.element_advantage
-            if adv.get(elem_att) == elem_def:
-                mult = 1.5
-            elif adv.get(elem_def) == elem_att:
-                mult = 0.67
-        base = attack * (100 / (100 + defense)) * mult
-        base *= random.uniform(0.8, 1.2)
-        crit = random.random() < cfg.get("crit_chance", 0.08)
-        if crit:
-            base *= cfg.get("crit_multiplier", 1.5)
-        return max(1, round(base)), crit
+        return _calc_damage(attack, defense, elem_att, elem_def, registry=self.reg)
+
+
 
     # ---------- akhir battle ----------
 
