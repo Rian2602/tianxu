@@ -36,27 +36,29 @@
 | 11 | 4 Memori Tianyuan Ling | Narrative | GDD §2.1, STORY §4 | `src/engine/memory.py`, `data/memories.json` | DONE (Verified) |
 | 12 | Safe Zone Gating (Save/Rest/Craft) | Engine | DESIGN §3, ENGINE §12.3 | `src/engine/session.py:26-36` | DONE (Verified) |
 | 13 | Save/Load Path Traversal Protection | Security | ENGINE §13, reviews | `src/engine/session.py:434-454` | DONE (Verified) |
-| 14 | Web UI Toko Pedagang (Beli/Jual) | Web/Economy | GDD §11.1, ENGINE §12.3 | `web/static/app.js`, `web/app.py` | GAP (P0 Missing in Web UI) |
-| 15 | Web UI Dynamic Alchemy Recipes | Web/Craft | GDD §7, ENGINE §5.7 | `web/static/app.js:221-226` | GAP (P0 Hardcoded in Web UI) |
-| 16 | Tianyuan Ling 3-Section UI Panel | UI/Design | GDD §2.1, ENGINE §11.1 | `web/static/app.js:324-347` | GAP (P1 Missing Mission/Locked slots) |
-| 17 | Side Quest Cooldown Schema & Logic | Quest/Data | ENGINE §5.1, §6.4 | `data/quests/quests_side.json` | GAP (P1 Key mismatch `repeat_cooldown`) |
-| 18 | Monster Respawn & NPC Schedule | World Sim | GDD §7, ENGINE §9.2 | `src/engine/session.py:299-313` | GAP (P1 Not enforced in session) |
-| 19 | Arc 1 Completion Summary / Screen | Story/UI | GDD §11.2, DoD | `src/cli.py`, `web/static/app.js` | GAP (P1 Missing formal closure) |
-| 20 | Edge Case Unit Test Coverage | Testing | QA Review §5.1 | `tests/` | GAP (P2 Missing 231 edge lines) |
-| 21 | Architecture Doc Sync | Docs | ENGINE §12, §16 | `docs/ENGINE_ARCHITECTURE.md` | GAP (P2 Doc cleanup) |
+| 14 | Web UI Toko Pedagang (Beli/Jual) | Web/Economy | GDD §11.1, ENGINE §12.3 | `web/static/app.js`, `web/app.py::_context` (merchant_shop) | DONE (Verified) |
+| 15 | Web UI Dynamic Alchemy Recipes | Web/Craft | GDD §7, ENGINE §5.7 | `web/static/app.js` (render dari `context.recipes`) | DONE (Verified) |
+| 16 | Tianyuan Ling 3-Section UI Panel | UI/Design | GDD §2.1, ENGINE §11.1 | `web/app.py::_tianyuan_payload`, `web/static/app.js` | DONE (Verified) |
+| 17 | Side Quest Cooldown Schema & Logic | Quest/Data | ENGINE §5.1, §6.4 | `data/quests/quests_side.json`, `src/engine/quest.py`, `src/engine/state.py` (`side_quest_cooldowns`) | DONE (Verified) |
+| 18 | Monster Respawn & NPC Schedule | World Sim | GDD §7, ENGINE §9.2 | `src/engine/session.py::_hunt`, `_is_npc_available` | DONE (Verified) |
+| 19 | Arc 1 Completion Summary / Screen | Story/UI | GDD §11.2, DoD | `src/engine/session.py::view` (`arc_summary`), `src/cli.py`, `web/static/app.js` | DONE (Verified) |
+| 20 | Edge Case Unit Test Coverage | Testing | QA Review §5.1 | `tests/` (192 test, coverage src ≈ 99,9%) | DONE (Verified) |
+| 21 | Architecture Doc Sync | Docs | ENGINE §12, §16 | `docs/ENGINE_ARCHITECTURE.md` (EP3-T2, 2026-08-14) | DONE (Verified) |
 
 ## Identified Gaps and Subagent-Driven Development (SDD) Roadmap
 
+> **Status 2026-08-14**: seluruh gap di bawah telah **dieksekusi dan diverifikasi** (lihat matriks fitur di atas — semua DONE Verified). Roadmap historis.
+
 ### Milestone Structure for Roadmap
-- **Epic 1: Web UI Feature Parity & Context API (Priority: P0)**
+- **Epic 1: Web UI Feature Parity & Context API (Priority: P0)** — SELESAI
   - `EP1-T1`: Web UI Merchant Shop Modal & Buy/Sell Transaction System
   - `EP1-T2`: Dynamic Recipe Rendering in Web UI Crafting Panel
   - `EP1-T3`: 3-Section Tianyuan Ling UI Modal Alignment
-- **Epic 2: Engine Simulation & Data Integrity (Priority: P1)**
+- **Epic 2: Engine Simulation & Data Integrity (Priority: P1)** — SELESAI
   - `EP2-T1`: Side Quest Schema Alignment (`cooldown`) & QuestEngine Enforcement
   - `EP2-T2`: World Simulation: Monster Respawn Timer (5h) & NPC Schedule Check
   - `EP2-T3`: Arc 1 Completion Summary & Statistics Modal (Closure after `q_akademi_07`)
-- **Epic 3: Test Hardening & Documentation Synchronization (Priority: P2)**
+- **Epic 3: Test Hardening & Documentation Synchronization (Priority: P2)** — SELESAI
   - `EP3-T1`: Engine Edge-Case Test Hardening (>95% Branch Coverage)
   - `EP3-T2`: Architecture & GDD Document Drift Remediation
 

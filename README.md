@@ -52,7 +52,7 @@ python3 tools/validate_data.py
 data/            # konten: quest, dialog, NPC, item, musuh, lokasi, ingatan, resep, teknik
 docs/            # GDD · arsitektur engine · alur cerita · ringkasan desain · prompt playtest
 src/             # engine Python: session, battle, dialog, cultivation, morality, memory, quest
-tests/           # 50 test (pytest)
+tests/           # 192 test (pytest)
 tools/           # validator data
 web/             # server web stdlib + halaman statis (index.html, app.js, style.css)
 saves/           # save game (di-gitignore)
