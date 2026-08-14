@@ -24,6 +24,8 @@ def test_gamestate_to_dict_from_dict_roundtrip(dummy_session):
     state.player.equipment = {"weapon": "pedang_bambu"}
     state.player.exp = 120
     state.player.morality = 15
+    state.player.techniques = ["tek_elemen_bola_api"]
+    state.player.technique_levels = {"tek_elemen_bola_api": 3}
 
     state.location = "loc_asrama"
     state.day = 5

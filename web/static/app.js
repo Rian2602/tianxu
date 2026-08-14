@@ -233,6 +233,12 @@ function renderExplore(v, c, box) {
             `<input type="number" id="inp-ground" min="1" max="8" value="4">` +
             `<button class="btn" onclick='act({type:"grounding",hours:Number($("inp-ground").value)})'>Meditasi</button>` +
             `<button class="btn" onclick='act({type:"rest"})'>Istirahat</button></div>`;
+    // C1: tingkatkan teknik yang dimiliki
+    if (c.techniques && c.techniques.length) {
+      html += `<div class="action-row"><span class="action-label">Tingkatkan teknik:</span>` +
+              `<select id="sel-upgrade">${c.techniques.map((t) => `<option value="${t.id}">${esc(t.name)} (Lv.${t.level})</option>`).join("")}</select>` +
+              `<button class="btn" onclick='act({type:"upgrade_technique",technique:$("sel-upgrade").value})'>Tingkatkan</button></div>`;
+    }
     html += `<div class="action-row"><span class="action-label">Simpan (nama):</span>` +
             `<input type="text" id="inp-save" value="save1">` +
             `<button class="btn" onclick='act({type:"save",save_name:$("inp-save").value})'>Simpan</button></div>`;

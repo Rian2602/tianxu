@@ -195,10 +195,11 @@ class BattleEngine:
             if req_r and cur_r and int(req_r["order"]) > int(cur_r["order"]):
                 add_log(self.state, "battle", "Ranahmu belum cukup untuk teknik itu.")
                 return
-        # validasi kepemilikan akademi (skill_pool) — ENGINE_ARCHITECTURE §5.6/§8
+        # validasi kepemilikan (skill_pool + unlock_arc + teknik reward C1) — ENGINE §5.6/§8
         allowed = [t["id"] for t in self.reg.player_techniques(
             self.state.player.academy or "", self.state.player.realm,
-            frozenset(self.state.completed_quests))]
+            frozenset(self.state.completed_quests),
+            owned=tuple(self.state.player.techniques))]
         if tid not in allowed:
             add_log(self.state, "battle", "Kau belum menguasai teknik itu.")
             return
@@ -208,7 +209,10 @@ class BattleEngine:
             return
         pc["qi"] -= cost
         kind = tek["kind"]
-        power = int(tek["power"])
+        # C1: power naik sesuai level teknik (power × (1 + (level−1) × growth))
+        lvl = int(self.state.player.technique_levels.get(tid, 1))
+        growth = float(self.reg.config.get("cultivation", {}).get("technique_power_growth_per_level", 0.0))
+        power = int(int(tek["power"]) * (1 + (lvl - 1) * growth))
         if kind == "attack":
             dmg, crit = self._calc_damage(pc["attack"] + power, b["foes"][0]["defense"], tek.get("element"), b["foes"][0].get("element"))
             b["foes"][0]["hp"] -= dmg

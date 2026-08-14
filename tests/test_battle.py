@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.engine.battle import BattleEngine, _calc_damage
+from src.engine.battle import BattleEngine, _calc_damage, player_combat
 
 
 def test_damage_calculation(mock_god_mode):
@@ -177,6 +177,33 @@ def test_teknik_serang_di_battle(session, god_mode):
     session.apply_action({"type": "battle_action", "action": "technique", "technique": teks[0]["id"]})
     assert session.state.pending_battle is None  # god mode: 1 teknik menang
     assert session.state.player.qi < session.state.max_qi(session.reg)  # qi_cost terpotong
+
+
+def test_teknik_power_scaling_per_level(session, monkeypatch):
+    """C1: power teknik naik sesuai level (power × (1 + (level-1) × growth))."""
+    session.state.player.academy = "akademi_elemen"
+    s = session.state
+    s.player.techniques = ["tek_elemen_bola_api"]
+    s.player.technique_levels["tek_elemen_bola_api"] = 3
+    growth = float(session.reg.config["cultivation"]["technique_power_growth_per_level"])
+    tek = session.reg.technique("tek_elemen_bola_api")
+    base_attack = player_combat(s, session.reg)["attack"]
+    expected_power = int(int(tek["power"]) * (1 + (3 - 1) * growth))
+
+    captured = []
+    def fake_calc(attack, defense, ea, ed):
+        captured.append(attack)
+        return (1, False)
+    monkeypatch.setattr(session.battle, "_calc_damage", fake_calc)
+
+    foe = {"id": "eno_x", "name": "X", "hp": 999, "qi": 0, "attack": 0, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    session.battle.start([foe], "hunt")
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_elemen_bola_api"})
+    # giliran musuh juga memanggil _calc_damage (attack musuh) — cek keanggotaan, bukan panggilan terakhir
+    assert base_attack + expected_power in captured, \
+        f"power Lv.3 harus {expected_power} (attack {base_attack}+{expected_power}), panggilan: {captured}"
+    session.state.pending_battle = None
 
 
 def test_teknik_lintas_akademi_ditolak(session):

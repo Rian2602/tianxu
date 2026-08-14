@@ -214,9 +214,12 @@ def main() -> None:
                 else:
                     teks = session.reg.player_techniques(
                         session.state.player.academy or "", None,
-                        frozenset(session.state.completed_quests))
+                        frozenset(session.state.completed_quests),
+                        owned=tuple(session.state.player.techniques))
                     if teks:
-                        print("Teknik: " + ", ".join(t["id"] for t in teks))
+                        lv = session.state.player.technique_levels
+                        print("Teknik: " + ", ".join(
+                            f"{t['id']} (Lv.{lv.get(t['id'], 1)})" for t in teks))
                         action = {"type": "battle_action", "action": "guard"}  # fallback aman
                     else:
                         action = {"type": "battle_action", "action": "attack"}
@@ -265,6 +268,8 @@ def main() -> None:
                 action = {"type": "rest", "hours": int(parts[1]) if len(parts) > 1 else 8}
             elif cmd == "simpan":
                 action = {"type": "save", "save_name": parts[1] if len(parts) > 1 else "save1"}
+            elif cmd in {"tingkatkan", "upgrade"}:
+                action = {"type": "upgrade_technique", "technique": parts[1] if len(parts) > 1 else None}
             elif cmd == "berburu":
                 action = {"type": "hunt"}
             elif cmd == "cari":
@@ -304,7 +309,7 @@ def main() -> None:
             elif cmd == "bantuan":
                 print("Perintah: bicara <npc> · pindah <lokasi> · tunggu <jam> · meditasi <jam> · istirahat"
                       " · berburu · cari · spar <npc> · pakai <item> · beli <item> · jual <item> · racik <resep>"
-                      " · simpan <nama> · ingatan <id> · bantuan · keluar")
+                      " · tingkatkan <teknik> · simpan <nama> · ingatan <id> · bantuan · keluar")
             elif cmd in {"keluar", "quit", "exit"}:
                 break
 

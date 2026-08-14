@@ -130,6 +130,7 @@ class GameSession:
             "shop_buy": self._shop_buy,
             "shop_sell": self._shop_sell,
             "craft": self._craft,
+            "upgrade_technique": self._upgrade_technique,
             "save": self._save,
         }
         fn = handler.get(t)
@@ -487,6 +488,48 @@ class GameSession:
         it = self.reg.item(result)
         add_log(self.state, "narration", f"Meracik {recipe.get('count', 1)}× {it['name']}!")
         self.quest.notify_gather()
+        return self.view()
+
+    def _upgrade_technique(self, action: dict) -> dict:
+        """C1 (GDD §7): naikkan level teknik di titik aman — biaya gold, batas
+        `order` ranah + 1 (realms.csv; verifikasi eksekusi: `technique_slots` ranah
+        awal = 1 sehingga slots tak memberi ruang upgrade — order+1 memberi 1×
+        upgrade di ranah awal & naik per ranah). Hanya teknik yang dimiliki."""
+        loc = self.reg.location(self.state.location)
+        if not loc or not loc.get("is_safe"):
+            msg = "Meningkatkan teknik hanya bisa dilakukan di titik aman."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
+        tid = action.get("technique")
+        tek = self.reg.technique(tid)
+        if not tek:
+            add_log(self.state, "system", "Teknik tidak dikenal.")
+            return self.view()
+        owned = set(self.state.player.techniques) | {
+            t["id"] for t in self.reg.player_techniques(
+                self.state.player.academy or "", None,
+                frozenset(self.state.completed_quests))
+        }
+        if tid not in owned:
+            add_log(self.state, "system", "Kau belum menguasai teknik itu.")
+            return self.view()
+        cur = int(self.state.player.technique_levels.get(tid, 1))
+        realm = self.reg.realm_by_id(self.state.player.realm)
+        max_lvl = (int(realm.get("order", 1)) + 1) if realm else 2
+        if cur >= max_lvl:
+            add_log(self.state, "system", f"{tek['name']} sudah maksimal (Lv.{cur}) untuk ranahmu.")
+            return self.view()
+        cfg = self.reg.config.get("cultivation", {})
+        base = int(cfg.get("technique_upgrade_cost_base", 20))
+        cost = base * cur
+        if self.state.player.gold < cost:
+            add_log(self.state, "system", f"Koin tidak cukup (butuh {cost}).")
+            return self.view()
+        self.state.player.gold -= cost
+        self.state.player.technique_levels[tid] = cur + 1
+        add_log(self.state, "narration", f"{tek['name']} naik ke Lv.{cur + 1} (−{cost} koin).")
         return self.view()
 
     def _merchant_here(self) -> dict | None:

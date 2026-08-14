@@ -36,6 +36,8 @@
     "spar_win_relation": 5,
     "spar_loss_exp": 3,
     "hunt_exp_per_kill": 6,
+    "technique_upgrade_cost_base": 20,
+    "technique_power_growth_per_level": 0.15,
     "daily_grind_exp_cap": 60,
     "breakthrough": "auto"
   },

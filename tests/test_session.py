@@ -644,6 +644,41 @@ def test_is_npc_available_without_schedule(session):
     assert session._is_npc_available({"name": "Orang Tanpa Jadwal"}) is True
 
 
+def test_upgrade_technique_hanya_di_titik_aman_dan_batas_slots(session):
+    """C1: upgrade teknik di titik aman — biaya gold × level, batas technique_slots ranah."""
+    s = session.state
+    s.player.academy = "akademi_elemen"
+    s.player.techniques = ["tek_elemen_bola_api"]
+    s.player.gold = 500
+
+    # (a) di luar titik aman → ditolak
+    s.location = "loc_aula_ujian"  # is_safe: false
+    v = session.apply_action({"type": "upgrade_technique", "technique": "tek_elemen_bola_api"})
+    assert s.player.technique_levels.get("tek_elemen_bola_api", 1) == 1
+    assert any("titik aman" in e["text"] for e in s.log)
+
+    # (b) di titik aman → level naik, gold terpotong base × level_sekarang
+    s.location = "loc_asrama"
+    gold_before = s.player.gold
+    base = int(session.reg.config["cultivation"]["technique_upgrade_cost_base"])
+    session.apply_action({"type": "upgrade_technique", "technique": "tek_elemen_bola_api"})
+    assert s.player.technique_levels.get("tek_elemen_bola_api") == 2
+    assert s.player.gold == gold_before - base  # base × 1 (level lama)
+    assert any("Lv.2" in e["text"] for e in s.log)
+
+    # (c) batas order ranah + 1 (realm_pengumpul_qi order 1 → max Lv.2) — level tidak lewat
+    session.apply_action({"type": "upgrade_technique", "technique": "tek_elemen_bola_api"})
+    assert s.player.technique_levels.get("tek_elemen_bola_api") == 2  # tetap (max ranah awal)
+    assert any("maksimal" in e["text"] for e in s.log[-1:])
+
+    # (d) teknik di luar kepemilikan (akademi lain, bukan skill_pool & bukan reward) → ditolak
+    gold_before = s.player.gold
+    session.apply_action({"type": "upgrade_technique", "technique": "tek_senjata_tebasan_angin"})
+    assert s.player.technique_levels.get("tek_senjata_tebasan_angin", 1) == 1
+    assert s.player.gold == gold_before
+    assert any("belum menguasai" in e["text"] for e in s.log[-1:])
+
+
 def test_talk_returns_view_during_battle(session):
     session.state.pending_battle = {"active": True}
     session._talk({"npc": "npc_penjaga"})

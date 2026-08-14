@@ -1,7 +1,8 @@
 """Penerapan efek — format type-based (ENGINE_ARCHITECTURE §5.2).
 
-Jenis efek: morality, relation, reputation, flag, item, gold, start_quest.
+Jenis efek: morality, relation, reputation, flag, item, gold, start_quest, technique.
 `start_quest` hanya valid di konteks dialog (mengaktifkan side quest).
+`technique` (C1) memberi teknik baru ke pemain (reward quest/dialog).
 """
 
 from __future__ import annotations
@@ -37,6 +38,11 @@ def apply(state: GameState, registry: DataRegistry, effects: list | None) -> Non
             state.player.gold += fx.get("value", 0)
             if state.player.gold < 0:
                 state.player.gold = 0
+        elif t == "technique":
+            ids = fx.get("id")
+            for tid in (ids if isinstance(ids, list) else [ids]):
+                if tid and tid not in state.player.techniques:
+                    state.player.techniques.append(tid)
         elif t == "start_quest":
             pass  # ditangani khusus oleh dialog/session
         else:

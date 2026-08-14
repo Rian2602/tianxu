@@ -283,6 +283,7 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 | `item` | `{ "type": "item", "id": "pil_qi", "count": 2 }` | Beri/kurang item (count negatif = kurangi) |
 | `gold` | `{ "type": "gold", "value": 30 }` | Beri/kurang uang |
 | `start_quest` | `{ "type": "start_quest", "quest": "q_side_x" }` | Mulai side quest — opsi ini **hanya tampil** jika quest dapat ditawarkan (giver, `available_from` terpenuhi, tidak aktif) |
+| `technique` | `{ "type": "technique", "id": "tek_x" }` atau `"id": ["tek_x", "tek_y"]` | **C1 (GDD §7, 2026-08-14)**: beri teknik baru ke pemain (reward quest/dialog) — ditambahkan ke `player.techniques` (dedup); arc berikutnya reward teknik tanpa ubah engine |
 | `branch_select` | `{ "type": "branch_select", "option": "opt_3a" }` | (internal) pilih cabang quest — diisi otomatis oleh engine |
 
 ### 5.3 NPC
@@ -350,11 +351,12 @@ realm_penantang_surga,Penantang Surga (渡劫 Dùjié),penantang_surga,9,10,2500
 **techniques.csv**:
 
 ```
-id,name,academy,element,realm_required,qi_cost,power,kind,description
+id,name,academy,element,realm_required,qi_cost,power,kind,description,unlock_arc
 tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan api dasar.
 ```
 
 - `kind` = `attack` (`power` = damage) / `defend` (`power` = persen pengurangan damage, mis. 60) / `heal` (`power` = HP pulih).
+- **Dipelajari & ditingkatkan (C1, GDD §7, 2026-08-14)**: teknik bukan hanya dari `skill_pool` akademi — efek `technique` (quest/dialog) memberi teknik baru; pemain punya daftar `player.techniques` + `player.technique_levels` (default Lv.1, diserialisasi di save). Aksi `upgrade_technique` di titik aman menaikkan level (biaya `cultivation.technique_upgrade_cost_base` × level sekarang); batas level = `order` ranah + 1 dari `realms.csv` (ranah awal max Lv.2 — `technique_slots` ranah awal = 1 tidak memberi ruang upgrade, jadi batas memakai `order+1`; deviasi tercatat). Power battle naik: `power × (1 + (level−1) × cultivation.technique_power_growth_per_level)`.
 
 **konvensi**: CSV wajib punya baris header persis sesuai contoh; id unik; referensi (mis. `academy`, `realm_required`, `element`) wajib valid.
 
@@ -610,10 +612,11 @@ player_action(menu):
   - **Rebalancing (hasil playtest, disahkan)**: exp quest dikurangi ~40% (q1–q07: 3–18) & exp aktivitas diturunkan (`grounding 2/jam`, `spar_win 8`, `hunt 6`) — playtest awal mencapai Lv.10 (maks) di akhir arc, melampaui target; dengan angka ini quest saja ≈ Lv.5, rajin ≈ Lv.6.
 - **Akar spiritual (mekanik ringan, disahkan)**: semua perolehan exp dikali `roots.exp_multiplier` tier akar pemain (akar bagus = exp lebih cepat). Tier ditentukan di ujian masuk — usulan: Chen Xu = **中品 (Akar Menengah)**, cocok premis "bayi kultivator biasa" (GDD §2).
 - **Breakthrough**: `realm_level` mencapai maks (10) → **breakthrough otomatis** (`breakthrough: "auto"`) ke ranah berikutnya (`order+1`), `realm_level` = 1. Ranah membuka slot teknik & batas HP/Qi baru.
+- **Teknik dipelajari & ditingkatkan (C1, GDD §7, 2026-08-14)**: reward teknik lewat efek `technique` (quest/dialog); `upgrade_technique` di titik aman (biaya gold, batas `order` ranah + 1); battle memakai power bertingkat per level — arc berikutnya cukup isi data (efek/reward teknik) tanpa ubah engine.
 
 ### 9.2 Teknik, Item & Waktu
 
-- **Teknik**: `techniques.csv`, terkunci ke akademi (`academy`), dibatasi ranah (`realm_required`), biaya Qi (`qi_cost`). **Enforcement (H4, 2026-08-14)**: `battle.py::_technique` menolak teknik dengan `realm_required` lebih tinggi dari ranah pemain (bandingkan `order` realm, pola sama `dialog.py`); `loader.player_techniques(academy, realm)` menyaring ranah sehingga UI web hanya menampilkan teknik yang bisa dipakai.
+- **Teknik**: `techniques.csv`, terkunci ke akademi (`academy`), dibatasi ranah (`realm_required`), biaya Qi (`qi_cost`). **Enforcement (H4, 2026-08-14)**: `battle.py::_technique` menolak teknik dengan `realm_required` lebih tinggi dari ranah pemain (bandingkan `order` realm, pola sama `dialog.py`); `loader.player_techniques(academy, realm)` menyaring ranah sehingga UI web hanya menampilkan teknik yang bisa dipakai. **Kepemilikan (C1, 2026-08-14)**: `player_techniques(..., owned=())` menerima `player.techniques` (reward) — union skill_pool + unlock_arc (B4) + owned; battle `_technique` & upgrade hanya untuk teknik yang dimiliki.
 - **Inventori**: map item→count; item consumable (`usable=true`) bisa dipakai di luar/dalam battle.
 - **Grinding loop Fase 1**: side quest repeatable (berburu / bantu Su Qing / tugas Mo Yun) + aktivitas grounding & sparing = sumber exp untuk menaikkan ranah tanpa mengganggu alur main quest.
 - **Mini-boss (disahkan)**: 1 binatang liar kuat / penjaga wilayah di area berburu — opsional, respawn, reward lebih besar; puncak tantangan Fase 1.
@@ -886,6 +889,7 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
   - **Jadwal Harian NPC**: `_is_npc_available(npc)` membatasi `_talk`/`_spar` pada `schedule.hour_start..hour_end` — NPC aktif tiap hari, tanpa softlock. (A1, 2026-08-14): pola diseragamkan dengan `quest._in_window` — mendukung jadwal lintas tengah malam (19 → 6) dan batas `hour_end` eksklusif. **Verifikasi 2026-08-14**: seluruh 9 schedule di `data/npcs.json` memenuhi `hour_start < hour_end` (6–22, 6–20, 8–18, 7–19, 9–17, …) — perubahan batas eksklusif tidak berdampak playthrough saat ini.
   - **Layar Penutup Arc**: `view().arc_summary` saat quest final suatu arc (`config.arcs[].final_quest`) selesai → banner ANSI emas di CLI + modal penutup di web (`modal-arc-summary`). **Batasan (G3d)**: sekali-dismiss per save disimpan di `localStorage` frontend (`arc-seen:<nama-save>`) — **tidak ikut antar perangkat/browser** (keputusan K2; Fase 1 = lokal single-player, diterima). Opsi backend (flag di save) ditunda.
 - **Tahap B — engine adaptif (selesai 2026-08-14, plan `2026-08-14-rampungkan-arc-akademi-tahap-b.md`)**: 0 hardcode arc-1 di `src/` — (B1) `arc_summary` data-driven via `config.arcs` (arc terakhir selesai yang ditampilkan); (B2) respawn KO via `world.safe_fallback_location` → lokasi `is_safe` pertama data; (B3) banner CLI dipicu `arc_summary` (bukan flag literal); (B4) teknik lintas akademi via `unlock_arc` opsional (GDD §5.2). Arc berikutnya = data saja.
+- **Tahap C — Task C1 (selesai 2026-08-14, plan `2026-08-14-rampungkan-arc-akademi-tahap-c.md`)**: teknik **dipelajari & ditingkatkan** (GDD §7) — efek `technique` (quest/dialog reward), `player.techniques`/`technique_levels` (save round-trip), aksi `upgrade_technique` (titik aman, biaya `technique_upgrade_cost_base` × level, batas `order` ranah + 1), power scaling `× (1 + (level−1) × technique_power_growth_per_level)`, CLI `tingkatkan <teknik>` + panel web. Validator: `EFFECT_TYPES` + `technique` (aturan 13) & config upgrade (aturan 7); jumlah aturan tetap 16. C2 (bulan) & C3 (moralitas → ending) menyusul di plan yang sama.
 - **Playtest putaran 2 — observasi → KEPUTUSAN (disahkan 2026-08-14, Tahap A plan `2026-08-14-rampungkan-arc-akademi-tahap-a.md`)** — tidak ada lagi item "open":
   - **Han Xiu undertuned → `turn_order: "speed"`** (keputusan: dukung urutan giliran berbasis `speed`, bukan naikkan stat): `battle.turn_order` kini `"speed"` — yang lebih cepat bertindak dulu tiap ronde (`battle.py::player_action`, `foe_speed > pc.speed` → `_enemy_turn` dulu). Han Xiu (speed 11) & serigala (10) kini menyerang duluan — gate ujian q3 jadi menantang (pemain bisa kalah; jalur kalah aman via G4a). `fixed_alternate` tetap didukung (validator aturan 16 menerima keduanya). Guard: god_mode test mematikan `_enemy_turn` (deterministik).
   - **Reward ganda spar q3 → reward quest q3 diturunkan** `exp 8 → 4` (total spar ujian = `spar_win_exp` 8 + 4 = 12 exp + 10 koin — tidak dobel penuh).

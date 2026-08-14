@@ -91,8 +91,10 @@ class DataRegistry:
     # ---------- pemain ----------
 
     def player_techniques(self, academy: str, realm: str | None = None,
-                          completed_quests: frozenset = frozenset()) -> list[dict]:
-        """Teknik yang tersedia untuk akademi pilihan pemain (skill_pool), dibatasi ranah.
+                          completed_quests: frozenset = frozenset(),
+                          owned: tuple = ()) -> list[dict]:
+        """Teknik yang tersedia untuk pemain: skill_pool akademi + unlock_arc (B4) +
+        teknik yang dimiliki (`owned`, C1 — reward quest/dialog), dibatasi ranah.
 
         Bila `realm` diberikan, teknik dengan `realm_required` lebih tinggi disembunyikan
         (H4) — pola sama seperti `dialog.py` membandingkan `order` ranah.
@@ -100,6 +102,7 @@ class DataRegistry:
         B4 (GDD §5.2): teknik dengan `unlock_arc` terisi ikut tampil untuk akademi mana
         pun bila quest final arc itu sudah selesai (arc selesai = data arc berikutnya
         bisa membuka teknik akademi lain tanpa mengubah engine).
+        C1 (GDD §7): `owned` = id teknik milik pemain (dari efek `technique`).
         """
         pool = ""
         for a in self.config.get("academies", []):
@@ -120,6 +123,11 @@ class DataRegistry:
             if t.get("unlock_arc") and t["unlock_arc"] in done_arcs
             and t not in out
         ]
+        # teknik yang dimiliki (reward quest/dialog) — C1
+        for tid in owned:
+            t = self.techniques.get(tid)
+            if t and t not in out:
+                out.append(t)
         if realm:
             cur_r = self.realms.get(realm)
             if cur_r:

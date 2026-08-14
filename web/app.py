@@ -49,7 +49,8 @@ def _context() -> dict:
     ]
     techniques = registry.player_techniques(
         session.state.player.academy or "", session.state.player.realm,
-        frozenset(session.state.completed_quests))
+        frozenset(session.state.completed_quests),
+        owned=tuple(session.state.player.techniques))
     academy = next(
         (a["name"] for a in registry.config.get("academies", []) if a["id"] == session.state.player.academy),
         session.state.player.academy,
@@ -97,7 +98,8 @@ def _context() -> dict:
         "npc_names": {n["id"]: n["name"] for n in registry.npcs},
         "techniques": [
             {"id": t["id"], "name": t["name"], "qi_cost": int(t.get("qi_cost", 0)),
-             "kind": t.get("kind"), "description": t.get("description", "")}
+             "kind": t.get("kind"), "description": t.get("description", ""),
+             "level": session.state.player.technique_levels.get(t["id"], 1)}
             for t in techniques
         ],
         "academy": academy,

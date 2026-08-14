@@ -34,7 +34,7 @@ DATA = ROOT / "data"
 
 ELEMENTS = {"logam", "kayu", "tanah", "air", "api"}
 OBJECTIVE_KINDS = {"talk", "defeat", "gather", "reach", "choose", "spar", "advance_time"}
-EFFECT_TYPES = {"morality", "reputation", "relation", "flag", "item", "gold", "start_quest", "branch_select"}
+EFFECT_TYPES = {"morality", "reputation", "relation", "flag", "item", "gold", "start_quest", "branch_select", "technique"}
 
 
 class Validator:
@@ -198,6 +198,14 @@ class Validator:
         if roots.get("default") not in tier_ids:
             self.error(f"config.roots.default '{roots.get('default')}' tidak ada di tiers (aturan 13)")
 
+        cult = cfg.get("cultivation", {})
+        tub = cult.get("technique_upgrade_cost_base")
+        if tub is not None and (not isinstance(tub, (int, float)) or tub <= 0):
+            self.error(f"config.cultivation.technique_upgrade_cost_base: harus > 0 (aturan 7)")
+        tg = cult.get("technique_power_growth_per_level")
+        if tg is not None and (not isinstance(tg, (int, float)) or tg < 0):
+            self.error(f"config.cultivation.technique_power_growth_per_level: harus ≥ 0 (aturan 7)")
+
         battle = cfg.get("battle", {})
         crit = battle.get("crit_chance")
         if crit is not None and not (isinstance(crit, (int, float)) and 0 <= crit <= 1):
@@ -314,6 +322,10 @@ class Validator:
                     self.error(f"quest {qid}: efek item '{fx.get('id')}' tidak ada")
                 if fx.get("type") == "relation" and not self.has("npc", fx.get("npc", "")):
                     self.error(f"quest {qid}: efek relation npc '{fx.get('npc')}' tidak ada")
+                if fx.get("type") == "technique":
+                    for tid in (fx.get("id") if isinstance(fx.get("id"), list) else [fx.get("id")]):
+                        if tid and not self.has("technique", tid):
+                            self.error(f"quest {qid}: efek technique '{tid}' tidak ada di techniques.csv (aturan 13)")
 
             # giver (aturan 2)
             if q.get("giver") and not self.has("npc", q["giver"]):
@@ -364,6 +376,10 @@ class Validator:
                         self._check_effect(fx, f"dialog {did} node {nid}")
                         if fx.get("type") == "start_quest" and not self.has("quest", fx.get("quest", "")):
                             self.error(f"dialog {did}: start_quest '{fx.get('quest')}' tidak ada")
+                        if fx.get("type") == "technique":
+                            for tid in (fx.get("id") if isinstance(fx.get("id"), list) else [fx.get("id")]):
+                                if tid and not self.has("technique", tid):
+                                    self.error(f"dialog {did}: efek technique '{tid}' tidak ada di techniques.csv (aturan 13)")
 
     def _check_dialog_condition(self, did: str, nid: str, cond: dict | None, where: str) -> None:
         """Validasi referensi kondisi dialog (P1-2 relation, P1-1 memory)."""

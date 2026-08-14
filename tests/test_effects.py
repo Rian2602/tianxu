@@ -114,6 +114,21 @@ def test_apply_start_quest(dummy_session, registry):
     assert not any("Efek tak dikenal" in e["text"] for e in state.log)
 
 
+def test_apply_technique_single_dan_list(dummy_session, registry):
+    """C1: efek technique menambah teknik ke player.techniques (single & list, dedup)."""
+    state = dummy_session.state
+    apply(state, registry, [{"type": "technique", "id": "tek_senjata_tebasan_angin"}])
+    assert "tek_senjata_tebasan_angin" in state.player.techniques
+    apply(state, registry, [{"type": "technique", "id": ["tek_senjata_serangan_ganda", "tek_senjata_kuda_kokoh"]}])
+    assert "tek_senjata_serangan_ganda" in state.player.techniques
+    assert "tek_senjata_kuda_kokoh" in state.player.techniques
+    # dedup: pemberian ulang tidak dobel
+    apply(state, registry, [{"type": "technique", "id": "tek_senjata_tebasan_angin"}])
+    assert state.player.techniques.count("tek_senjata_tebasan_angin") == 1
+    # tanpa id → diabaikan aman (tidak crash)
+    apply(state, registry, [{"type": "technique"}])
+
+
 def test_apply_unknown_type(dummy_session, registry):
     state = dummy_session.state
     apply(state, registry, [{"type": "efek_gaib_tidak_dikenal"}])

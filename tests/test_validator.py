@@ -157,6 +157,30 @@ def test_aturan7_safe_fallback_location_bukan_aman():
     assert any("safe_fallback_location" in e for e in v.errors)
 
 
+def test_aturan13_efek_technique_tidak_dikenal():
+    """C1: efek technique harus merujuk teknik yang ada di techniques.csv (aturan 13)."""
+    d = _good()
+    d["techniques.csv"] = [{"id": "t1", "academy": "elemen", "kind": "attack"}]
+    d["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main",
+        "objective": {"kind": "reach"},
+        "next": [],
+        "on_complete": {"effects": [{"type": "technique", "id": "tek_tidak_ada"}]},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("technique" in e for e in v.errors)
+
+
+def test_aturan7_teknik_upgrade_config_tidak_valid():
+    """C1: config.cultivation.technique_upgrade_cost_base harus > 0 (aturan 7)."""
+    d = _good()
+    d["config.json"]["cultivation"] = {"technique_upgrade_cost_base": 0}
+    v, ok = make(d)
+    assert not ok
+    assert any("technique_upgrade_cost_base" in e for e in v.errors)
+
+
 def test_aturan13_unlock_arc_tidak_dikenal():
     """B4: techniques.csv unlock_arc harus merujuk config.arcs[].id (aturan 13)."""
     d = _good()

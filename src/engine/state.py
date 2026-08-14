@@ -23,6 +23,8 @@ class PlayerState:
     equipment: dict = field(default_factory=lambda: {"weapon": None})
     exp: int = 0
     morality: int = 0
+    techniques: list[str] = field(default_factory=list)  # C1: teknik yang dimiliki (reward quest/dialog)
+    technique_levels: dict[str, int] = field(default_factory=dict)  # C1: level per teknik (default 1)
 
 
 class UIState:
@@ -148,6 +150,8 @@ class GameState:
                 "equipment": copy.deepcopy(self.player.equipment),
                 "exp": self.player.exp,
                 "morality": self.player.morality,
+                "techniques": copy.deepcopy(self.player.techniques),
+                "technique_levels": copy.deepcopy(self.player.technique_levels),
             },
             "location": self.location,
             "day": self.day,
@@ -185,6 +189,8 @@ class GameState:
                 equipment=copy.deepcopy(p.get("equipment", {"weapon": None})),
                 exp=p.get("exp", 0),
                 morality=p.get("morality", 0),
+                techniques=copy.deepcopy(p.get("techniques", [])),
+                technique_levels=copy.deepcopy(p.get("technique_levels", {})),
             ),
             location=d["location"],
             day=d["day"],
