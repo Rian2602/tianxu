@@ -148,16 +148,16 @@ Pemain **memilih 1 dari 3 akademi di dalam cerita**, setelah quest pengenalan aw
 
 | Akademi | Hanzi | Pinyin | Makna Harfiah | Fokus Skill |
 |---|---|---|---|---|
-| Akademi Elemen | 五行阁 | Wǔxíng Gé | "Paviliun Lima Elemen" | Penguasaan 5 elemen (logam-kayu-air-api-tanah) |
-| Akademi Senjata | 兵锋院 | Bīngfēng Yuàn | "Institut Mata Pedang Prajurit" | Senjata & teknik bela diri |
-| Akademi Summoning | 御灵宗 | Yùlíng Zōng | "Mazhab Pengendali Roh" | Roh/binatang roh & pemanggilan |
+| Paviliun Elemen | 五行阁 | Wǔxíng Gé | "Paviliun Lima Elemen" | Penguasaan 5 elemen (logam-kayu-air-api-tanah) |
+| Paviliun Senjata | 兵锋院 | Bīngfēng Yuàn | "Institut Mata Pedang Prajurit" | Senjata & teknik bela diri |
+| Paviliun Summoning | 御灵宗 | Yùlíng Zōng | "Mazhab Pengendali Roh" | Roh/binatang roh & pemanggilan |
 
 *Akhiran sengaja divariasikan (阁/院/宗) agar ketiganya terasa institusi berbeda gaya, tapi tetap satu dunia koheren.*
 
 ### 5.2 Posisi dalam Struktur Game
 
 - Pemilihan akademi **bukan node di DAG quest utama** — ia lapisan setup/konfigurasi awal yang menentukan pool skill, **sejajar dengan DAG cerita** tapi tidak berpotongan secara naratif.
-- **Akses skill terkunci** ke akademi pilihan selama Arc Akademi (skill akademi lain terbuka di arc berikutnya / lewat cara lain).
+- **Akses skill terkunci** ke paviliun pilihan selama Arc Akademi (skill paviliun lain terbuka di arc berikutnya / lewat cara lain).
 
 ---
 

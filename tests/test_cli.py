@@ -24,9 +24,9 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # Tahap A (DoD §11.2 #1): playthrough end-to-end 3 akademi — satu body, 3 varian
 PLAYTHROUGH_AKADEMI = [
-    pytest.param("akademi_elemen", "Akademi Elemen", False, id="elemen"),
-    pytest.param("akademi_senjata", "Akademi Senjata", False, id="senjata"),
-    pytest.param("akademi_summoning", "Akademi Summoning", True, id="summoning"),
+    pytest.param("akademi_elemen", "Paviliun Elemen", False, id="elemen"),
+    pytest.param("akademi_senjata", "Paviliun Senjata", False, id="senjata"),
+    pytest.param("akademi_summoning", "Paviliun Summoning", True, id="summoning"),
 ]
 
 
@@ -267,5 +267,5 @@ def test_cli_choose_digit_and_spar_arg(monkeypatch, capsys):
 
     main()
     out = capsys.readouterr().out
-    assert "Akademi Elemen" in out   # choose_view merender opsi
+    assert "Paviliun Elemen" in out   # choose_view merender opsi
     assert out.count("Aksi:") >= 2   # dua battle: spar ujian + spar hanxiu

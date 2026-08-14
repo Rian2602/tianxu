@@ -181,7 +181,7 @@ function renderLeft(v) {
   html += statRow(ic("orbit") + "Koin Emas", p.gold, "gold");
   html += statRow(ic("target") + "Moral", p.morality);
   html += statRow("Akar", p.roots);
-  html += statRow("Akademi", (ctx && ctx.academy) || "—");
+  html += statRow("Paviliun", (ctx && ctx.academy) || "—");
   html += statRow(ic("sword") + "Senjata", w);
   if (comp) {
     html += `<h3 class="stat-title" style="margin-top:18px">✦ Roh</h3>`;
@@ -554,7 +554,7 @@ function openArcSummaryModal(s) {
   html += `<div style="margin-bottom: 20px;">
     ${statRow("Kultivator", s.player_name)}
     ${statRow("Ranah", `${s.realm} Lv.${s.realm_level}`)}
-    ${statRow("Akademi", s.academy || "—")}
+    ${statRow("Paviliun", s.academy || "—")}
     ${statRow("Moralitas", s.morality)}
     ${statRow("Ingatan Terbuka", s.memories_unlocked)}
     ${statRow("Waktu Berlalu", `Hari ${s.day}`)}

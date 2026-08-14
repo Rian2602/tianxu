@@ -284,7 +284,7 @@ Test baru batch ini: `test_ranah_tertinggi_exp_dicap_tidak_hang`, `test_ranah_te
 
 ### H2. `choose` opsi invalid tetap menuntaskan quest — BENAR (baru)
 - `resolve_choose` (`quest.py:132-144`): pencocokan opsi `for ... break`, lalu `_grant_companion(option)` + `_complete_main(q["id"])` dipanggil **tak bersyarat**.
-- Kirim `option="not_real"` → quest selesai, `player.academy` tetap `None` (untuk `q_akademi_04` = pilih akademi). Jalur nyata via payload API/web.
+- Kirim `option="not_real"` → quest selesai, `player.academy` tetap `None` (untuk `q_akademi_04` = pilih paviliun). Jalur nyata via payload API/web.
 - Fix yang disarankan: tandai kecocokan; hanya `_grant_companion` + `_complete_main` bila cocok; tolak + log bila tidak.
 
 ### H3. Save/load saat dialog aktif dapat crash — BENAR struktur, DORMANT

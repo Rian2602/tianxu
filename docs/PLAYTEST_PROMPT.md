@@ -42,7 +42,7 @@ python3 -m pytest tests/ -q
 - [ ] **Crafting** — kumpulkan herba & tulang → `racik rc_pil_qi` / `racik rc_pil_pemulihan`. Catat trade-off: jual material vs racik jadi pil (nilai pakai, bukan jual — toko tidak membeli pil).
 - [ ] **Side quest** — tersedia sejak hari 1 (bicara Pemburu / Su Qing / Mo Yun). Selesaikan minimal 2.
 - [ ] **Ingatan** — `ingatan <id>`: baca SEMUA yang terbuka (konten naratif inti).
-- [ ] **Kompanion** — pilih **Akademi Summoning** di quest pilih akademi → amati kompanion di battle (auto-attack tiap giliran, musuh bisa menargetnya, KO → pulih dengan `istirahat` di titik aman).
+- [ ] **Kompanion** — pilih **Paviliun Summoning** di quest pilih paviliun → amati kompanion di battle (auto-attack tiap giliran, musuh bisa menargetnya, KO → pulih dengan `istirahat` di titik aman).
 - [ ] **Sparring + berburu + meditasi** — kombinasi wajar untuk naik level.
 - [ ] **Simpan di titik aman** — `simpan save_arc1` (hanya bisa di asrama/pasar). **JANGAN hapus file save ini** — itu bukti playthrough.
 - [ ] **Cabang** — pilih 1 sikap di percabangan (3aa konfrontasi / 3ab bukti diam-diam / 3b ambil untung / 3c berdiam diri). Catat reward & reaksi NPC.

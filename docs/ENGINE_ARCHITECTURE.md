@@ -200,7 +200,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `defeat` | `enemies` (list id), `target` | Kalahkan N musuh (dari data). **A7 (2026-08-14)**: main quest ikut memfilter `enemies` (hanya musuh dari daftar yang memenuhi) — tanpa `enemies` perilaku lama |
 | `gather` | `item`, `target` (+ opsional `report_to`) | Kumpulkan N item. **Tanpa `report_to`** selesai otomatis saat item cukup. **Dengan `report_to`**: item tidak "dimakan" saat dikumpul — quest selesai hanya saat **lapor ke NPC pemberi** (`quest.py::notify_dialog_ended` memeriksa `gather + report_to` → mengambil `target` item dari inventori lalu selesai), sehingga dua quest memakai item yang sama (mis. herba Su Qing & Mo Yun) tidak saling menyelesaikan sekaligus; dialog pemberi menyediakan node lapor (`quest_active` + pilihan bersyarat `has_items`) |
 | `reach` | `location` (+ opsional `time_window`) | Tiba di lokasi; jika `time_window` (`hour_start`/`hour_end`) ada, hanya sah pada waktu itu — **event terjadwal** |
-| `choose` | `options` (list) | Pilihan eksplisit (mis. pilih akademi, pilih jalur) |
+| `choose` | `options` (list) | Pilihan eksplisit (mis. pilih paviliun, pilih jalur) |
 | `spar` | `npc` | Sparring wajib: bicara NPC ber-`combat` → battle; **menang = objektif selesai** (dipakai sparing ujian) |
 | `defeat` (+opsional `report_to`) | `enemies`, `target`, `report_to` | Side quest: kalahkan `target` musuh dari `enemies`. **A2 (2026-08-14)**: dengan `report_to`, quest hanya selesai setelah **lapor ke NPC pemberi** (`npc`) — `quest.py::notify_dialog_ended` memeriksa `defeat + report_to`; validator aturan 2 memeriksa referensi npc. **Catatan 2026-08-14**: `enemies` boleh mencakup musuh dari pool malam (`world.hunt.night_pool` — mis. ular bayangan); dialog pemberi memakai node lapor (`quest_active`) + pilihan serah bersyarat `defeated_min` agar lapor = dialog penyerahan, dan offer baru muncul setelah quest selesai/cooldown |
 | `advance_time` | `hour` (+ opsional `day_offset`) | Tunggu hingga jam tertentu; `day_offset` = maju N hari. **A5 (2026-08-14)**: selesai saat waktu absolut `day*24+hour` ≥ target `(start_day+day_offset)*24+hour` — overshoot (menunggu terlalu lama) otomatis memenuhi, tidak molor |
@@ -396,10 +396,9 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
     "current_quest": "q_akademi_01",
     "flags": { "hari_pertama": true }
   },
-  "academies": [
-    { "id": "akademi_elemen",   "name": "Akademi Elemen",    "hanzi": "五行阁", "pinyin": "Wǔxíng Gé", "skill_pool": ["tek_elemen_*"] },
-    { "id": "akademi_senjata",  "name": "Akademi Senjata",   "hanzi": "兵锋院", "pinyin": "Bīngfēng Yuàn", "skill_pool": ["tek_senjata_*"] },
-    { "id": "akademi_summoning","name": "Akademi Summoning", "hanzi": "御灵宗", "pinyin": "Yùlíng Zōng", "skill_pool": ["tek_summoning_*"] }
+  "academies": [    { "id": "akademi_elemen",   "name": "Paviliun Elemen",    "hanzi": "五行阁", "pinyin": "Wǔxíng Gé", "skill_pool": ["tek_elemen_*"] },
+    { "id": "akademi_senjata",  "name": "Paviliun Senjata",   "hanzi": "兵锋院", "pinyin": "Bīngfēng Yuàn", "skill_pool": ["tek_senjata_*"] },
+    { "id": "akademi_summoning","name": "Paviliun Summoning", "hanzi": "御灵宗", "pinyin": "Yùlíng Zōng",   "skill_pool": ["tek_summoning_*"] }
   ],
   "time": { "day_length_hours": 24, "start_day": 1, "start_hour": 8, "month_length_days": 30, "month_names": ["Bulan Pertama", … 12 nama] },
   "elements_cycle": ["logam", "kayu", "tanah", "air", "api"],
@@ -507,7 +506,7 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
   "companions": [
     { "id": "komp_roh_awan", "name": "Roh Awan", "element": "kayu",
       "base_hp": 20, "base_attack": 5, "base_defense": 2, "base_speed": 9,
-      "description": "Binatang roh kecil pemberian Akademi Summoning." }
+      "description": "Binatang roh kecil pemberian Paviliun Summoning." }
   ]
 }
 ```
@@ -746,7 +745,7 @@ player_action(menu):
 | `spar` | `{"npc": "<id>"}` | Tantang NPC sparing → masuk battle; menang/kalah memberi exp (§9.1) |
 | `hunt` | – | Berburu monster di wilayah berburu; ditolak selama cooldown respawn (§9.2) |
 | `search` | – | Cari herba material di lokasi berburu |
-| `choose` | `{"value": "<option_value>"}` | Pilih opsi objektif `choose` (mis. pilih akademi) |
+| `choose` | `{"value": "<option_value>"}` | Pilih opsi objektif `choose` (mis. pilih paviliun) |
 | `shop_buy` | `{"item": "<id>", "count": 1}` | Beli item di toko NPC (cek uang & stok) |
 | `shop_sell` | `{"item": "<id>", "count": 1}` | Jual item ke toko (dapat uang) |
 | `craft` | `{"recipe": "<id>"}` | Racik item dari resep (konsumsi material) — **hanya di titik aman** (lokasi `is_safe`) |
@@ -784,7 +783,7 @@ player_action(menu):
 }
 ```
 
-- `mode` menentukan panel yang dirender: `dialog` → render `dialog` (node aktif + opsi); `battle` → render `battle` (menu battle + status musuh); `choose` → render `choose` (objektif pilih, mis. pilih akademi). Panel Tianyuan Ling memakai `GET /api/tianyuan`, bukan `view()`.
+- `mode` menentukan panel yang dirender: `dialog` → render `dialog` (node aktif + opsi); `battle` → render `battle` (menu battle + status musuh); `choose` → render `choose` (objektif pilih, mis. pilih paviliun). Panel Tianyuan Ling memakai `GET /api/tianyuan`, bukan `view()`.
 - `companion` = `null` untuk non-Summoning atau kompanion KO; `arc_summary` terisi saat quest final suatu arc (`config.arcs[].final_quest`) selesai — layar penutup arc (B1, data-driven).
 - `view.log` memuat seluruh log; UI merender ulang penuh per aksi — tidak ada `log_delta` terpisah.
 

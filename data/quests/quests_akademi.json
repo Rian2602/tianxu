@@ -42,25 +42,45 @@
         "rewards": { "exp": 4, "gold": 10 }
       }
     },
-    {
-      "id": "q_akademi_04",
-      "title": "Pilih Akademi",
-      "arc": "akademi",
-      "kind": "main",
-      "summary": "Gu Canghai mempersilakan Chen Xu memilih salah satu dari tiga akademi.",
-      "objective": {
-        "kind": "choose",
-        "options": [
-          { "label": "Akademi Elemen (五行阁 Wǔxíng Gé)", "value": "akademi_elemen" },
-          { "label": "Akademi Senjata (兵锋院 Bīngfēng Yuàn)", "value": "akademi_senjata" },
-          { "label": "Akademi Summoning (御灵宗 Yùlíng Zōng)", "value": "akademi_summoning" }
-        ],
-        "hint": "Pilih satu akademi. Pilihan ini menentukan teknik yang bisa kau pelajari."
-      },
-      "next": [ { "quest": "q_akademi_05", "branch": "b4", "label": "Lanjut" } ],
-      "on_complete": {
-        "effects": [ { "type": "flag", "key": "akademi_dipilih", "value": true } ],
-        "system_msg": "Selamat datang di akademi pilihanmu.",
+    { "id": "q_akademi_04",
+ "title": "Pilih Paviliun",
+ "arc": "akademi",
+ "kind": "main",
+ "summary": "Gu Canghai mempersilakan Chen Xu memilih salah satu dari tiga paviliun Akademi Changfeng.",
+ "objective": {
+  "kind": "choose",
+  "options": [
+   {
+    "label": "Paviliun Elemen (五行阁 Wǔxíng Gé)",
+    "value": "akademi_elemen"
+   },
+   {
+    "label": "Paviliun Senjata (兵锋院 Bīngfēng Yuàn)",
+    "value": "akademi_senjata"
+   },
+   {
+    "label": "Paviliun Summoning (御灵宗 Yùlíng Zōng)",
+    "value": "akademi_summoning"
+   }
+  ],
+  "hint": "Pilih satu paviliun. Pilihan ini menentukan teknik yang bisa kau pelajari."
+ },
+ "next": [
+  {
+   "quest": "q_akademi_05",
+   "branch": "b4",
+   "label": "Lanjut"
+  }
+ ],
+ "on_complete": {
+  "effects": [
+   {
+    "type": "flag",
+    "key": "akademi_dipilih",
+    "value": true
+   }
+  ],
+  "system_msg": "Selamat datang di paviliun pilihanmu.",
         "rewards": { "exp": 6 }
       }
     },

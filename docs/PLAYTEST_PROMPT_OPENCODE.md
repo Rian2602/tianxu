@@ -18,7 +18,7 @@ Kamu adalah **playtester AI** untuk game **"Tian Xu: Second Life" (Arc Akademi)*
 
 **Playthrough A — jalur Summoning (konten penuh), minimal 2 side quest + crafting + equip:**
 - Mulai baru `python3 src/cli.py`. Ketik `bantuan` untuk daftar perintah.
-- Pilih **Akademi Summoning** di quest pilih akademi → dapat kompanion Roh Awan.
+- Pilih **Paviliun Summoning** di quest pilih paviliun → dapat kompanion Roh Awan.
 - **WAJIB coba semua:** `spar <npc>` · `berburu` · `cari` (herba) · `meditasi <jam>` · `racik rc_pil_qi` / `rc_pil_pemulihan` · `pasang <senjata>` (begitu dapat senjata — bandingkan damage sebelum/sesudah) · `pakai <item>` · `ingatan <id>` (baca SEMUA yang terbuka).
 - **Teknik di battle:** `teknik <id>` — coba `attack` (roh api), `defend` (roh perisai −60%), `heal` (roh penyembuh +18). Jangan spam serang.
 - **Side quest** (tersedia sejak hari 1): selesaikan minimal 2 dari 3 (berburu / belanja Su Qing / tugas Mo Yun).

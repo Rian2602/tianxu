@@ -35,7 +35,7 @@ Kebenaran: Lonceng diambil **Penatua** untuk keperluan rahasia; Zhou Yan kambing
 ## 2. Alur Quest Utama
 
 ```
-q1 (gerbang) → q2 (ujian + sparing + pilih akademi) → q3 (insiden)
+q1 (gerbang) → q2 (ujian + sparing + pilih paviliun) → q3 (insiden)
    → [ 3aa / 3ab ]  → q5 (kebenaran)
    →   3b           → q5
    →   3c           → q5

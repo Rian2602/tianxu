@@ -18,9 +18,9 @@
     "flags": { "hari_pertama": true }
   },
   "academies": [
-    { "id": "akademi_elemen",    "name": "Akademi Elemen",    "hanzi": "五行阁", "pinyin": "Wǔxíng Gé",    "skill_pool": ["tek_elemen_*"] },
-    { "id": "akademi_senjata",   "name": "Akademi Senjata",   "hanzi": "兵锋院", "pinyin": "Bīngfēng Yuàn", "skill_pool": ["tek_senjata_*"] },
-    { "id": "akademi_summoning", "name": "Akademi Summoning", "hanzi": "御灵宗", "pinyin": "Yùlíng Zōng",   "skill_pool": ["tek_summoning_*"], "companion": "komp_roh_awan" }
+    { "id": "akademi_elemen",    "name": "Paviliun Elemen",    "hanzi": "五行阁", "pinyin": "Wǔxíng Gé",    "skill_pool": ["tek_elemen_*"] },
+    { "id": "akademi_senjata",   "name": "Paviliun Senjata",   "hanzi": "兵锋院", "pinyin": "Bīngfēng Yuàn", "skill_pool": ["tek_senjata_*"] },
+    { "id": "akademi_summoning", "name": "Paviliun Summoning", "hanzi": "御灵宗", "pinyin": "Yùlíng Zōng",   "skill_pool": ["tek_summoning_*"], "companion": "komp_roh_awan" }
   ],
   "time": { "day_length_hours": 24, "start_day": 1, "start_hour": 8, "month_length_days": 30, "month_names": ["Bulan Pertama", "Bulan Kedua", "Bulan Ketiga", "Bulan Keempat", "Bulan Kelima", "Bulan Keenam", "Bulan Ketujuh", "Bulan Kedelapan", "Bulan Kesembilan", "Bulan Kesepuluh", "Bulan Kesebelas", "Bulan Keduabelas"] },
   "elements_cycle": ["logam", "kayu", "tanah", "air", "api"],
