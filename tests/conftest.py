@@ -86,8 +86,13 @@ def play_to_incident(session: GameSession, academy: str = "akademi_elemen") -> N
 
     session.apply_action({"type": "choose", "option": academy})
 
-    # arena → aula ujian → paviliun
-    move_path(session, ["loc_aula_ujian", "loc_paviliun"])
+    # arena → aula ujian (q_akademi_04b: pelajaran pertama dengan Gu Canghai)
+    session.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    finish_dialog(session, [0])
+
+    # aula ujian → paviliun (q_akademi_05: hari-hari pertama dengan Su Qing)
+    session.apply_action({"type": "move", "to": "loc_paviliun"})
     session.apply_action({"type": "talk", "npc": "npc_suqing"})
     finish_dialog(session, [0])
 

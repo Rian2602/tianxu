@@ -12,12 +12,13 @@ Repo ini berisi **vertical slice Fase 1: Arc Akademi** — bukti konsep yang dap
 
 ## Fitur
 
-- **3 akademi pilihan** — Elemen (五行阁), Senjata (兵锋院), Summoning (御灵宗) — tiap jalur punya `skill_pool` teknik tersendiri
-- **Sistem pertarungan berbasis giliran** — elemen 五行 (1.5× / 0.67×), kritikal, kompanion auto-attack dengan HP persisten
-- **Kultivasi** — ranah, teknik, eksp (Qi), pil & ramuan, moralitas (3 sikap akhir cerita)
-- **Quest & dialog bercabang** — satu quest utama (DAG), side quest repeatable sejak hari 1
-- **Ingatan** — 4 ingatan naratif dari kehidupan pertama
-- **Dua antarmuka** — CLI terminal & Web UI gelap-emas
+- **3 paviliun pilihan** (di dalam Akademi Changfeng) — Elemen (五行阁), Senjata (兵锋院), Summoning (御灵宗) — tiap jalur punya **kurikulum 3 teknik + starter kit** (teknik dipelajari via dialog mentor, bukan langsung dimiliki)
+- **Sistem pertarungan berbasis giliran** — elemen 五行 (1.5× / 0.67×), kritikal, kompanion auto-attack dengan HP persisten, hanya teknik yang sudah dipelajari yang bisa dipakai
+- **Kultivasi** — ranah, teknik (bisa ditingkatkan), eksp (Qi), pil & ramuan, moralitas (3 sikap akhir cerita)
+- **Quest & dialog bercabang** — satu quest utama (DAG), objective presisi (node dialog wajib), side quest repeatable dengan **penyerahan via dialog** (herba/buruan tidak auto-selesai)
+- **Hubungan NPC** — skor hubungan (relation) tiap NPC memengaruhi dialog; sparring terbuka sesuai syarat (quest/ranah)
+- **Ingatan → dialog** — 4 ingatan naratif dari kehidupan pertama; ingatan yang terbuka membuka pilihan dialog rahasia
+- **Dua antarmuka** — CLI terminal & Web UI gelap-emas (font Noto self-host, ikon Lucide, tekstur, avatar, audio ambient, panel hubungan & kurikulum)
 
 ## Teknologi
 
@@ -76,12 +77,14 @@ Baca [CONTRIBUTING.md](CONTRIBUTING.md) untuk panduan setup, konvensi commit, da
 data/            # konten: quest, dialog, NPC, item, musuh, lokasi, ingatan, resep, teknik
 docs/            # GDD · arsitektur engine · alur cerita · ringkasan desain · audit bug
 src/             # engine Python: session, battle, dialog, cultivation, morality, memory, quest
-tests/           # 266 test (pytest)
-tools/           # validator data
-web/             # server web stdlib + halaman statis (index.html, app.js, style.css)
+tests/           # 330 test (pytest)
+tools/           # validator data + optimasi aset (optimize_png.py)
+web/             # server web stdlib + halaman statis (index.html, app.js, style.css, assets/)
 saves/           # save game (di-gitignore)
 ```
 
 ## Lisensi
 
 [MIT](LICENSE) © 2026 Rian2602
+
+Aset web (font Noto OFL-1.1, ikon Lucide ISC, tekstur/avatar/audio milik proyek) berlisensi terpisah — lihat `web/static/assets/LICENSE.md`.

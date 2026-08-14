@@ -84,6 +84,45 @@
       "npc": "npc_gucanghai",
       "start": "node_umum",
       "nodes": {
+        "node_pelajaran_elemen": {
+          "condition": { "quest_active": "q_akademi_04b", "academy": "akademi_elemen" },
+          "speaker": "npc:npc_gucanghai",
+          "text": "Paviliun Elemen — pilihan yang selaras dengan aliran alam. Lima elemen saling menghidupkan dan mengendalikan. Pusatkan Qi api di telapak tanganmu dan rasakan panas yang terkendali. Ini adalah teknik dasarmu: Bola Api (火球 Huǒqiú).",
+          "choices": [
+            { "label": "(Mempelajari teknik Bola Api)", "next": "node_pelajaran_elemen_selesai", "effects": [ { "type": "technique", "id": "tek_elemen_bola_api" } ] }
+          ]
+        },
+        "node_pelajaran_elemen_selesai": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Bagus. Api membutuhkan keteguhan hati. Latihlah teknik ini sampai menyatu dengan napasmu. Pergilah ke paviliun dan temui rekan-rekan barumu.",
+          "end": true
+        },
+        "node_pelajaran_senjata": {
+          "condition": { "quest_active": "q_akademi_04b", "academy": "akademi_senjata" },
+          "speaker": "npc:npc_gucanghai",
+          "text": "Paviliun Senjata — jalan ketajaman dan disiplin baja. Senjata adalah perpanjangan dari tekadmu. Alirkan Qi logam ke bilah pedangmu. Ini adalah teknik dasarmu: Tebasan Angin (风斩 Fēngzhǎn).",
+          "choices": [
+            { "label": "(Mempelajari teknik Tebasan Angin)", "next": "node_pelajaran_senjata_selesai", "effects": [ { "type": "technique", "id": "tek_senjata_tebasan_angin" } ] }
+          ]
+        },
+        "node_pelajaran_senjata_selesai": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Bagus. Pedang yang tajam lahir dari seribu tebasan. Latihlah sampai angin pun terbelah. Pergilah ke paviliun dan temui rekan-rekan barumu.",
+          "end": true
+        },
+        "node_pelajaran_summoning": {
+          "condition": { "quest_active": "q_akademi_04b", "academy": "akademi_summoning" },
+          "speaker": "npc:npc_gucanghai",
+          "text": "Paviliun Summoning — jalan resonansi roh dan keselarasan jiwa. Panggilanmu harus tulus agar roh alam merespons. Bentuk segel Qi untuk memanggil roh pembantumu. Ini adalah teknik dasarmu: Panggil Roh Api (火灵 Huǒlíng).",
+          "choices": [
+            { "label": "(Mempelajari teknik Panggil Roh Api)", "next": "node_pelajaran_summoning_selesai", "effects": [ { "type": "technique", "id": "tek_summoning_roh_api" } ] }
+          ]
+        },
+        "node_pelajaran_summoning_selesai": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Bagus. Roh adalah kawan seperjalanan, bukan sekadar alat. Rawatlah ikatan itu. Pergilah ke paviliun dan temui rekan-rekan barumu.",
+          "end": true
+        },
         "node_kalah": {
           "condition": { "flag": { "key": "spar_kalah", "value": true } },
           "speaker": "npc:npc_gucanghai",
@@ -203,7 +242,7 @@
           "speaker": "npc:npc_suqing",
           "text": "Hei! Kau yang tadi di ujian, kan? Aku Su Qing! Aku dari keluarga pedagang di sisi kota lain. Senang bertemu calon teman sekelas!",
           "choices": [
-            { "label": "Aku Chen Xu. Senang bertemu, Su Qing.", "next": "node_intro2" },
+            { "label": "Aku Chen Xu. Senang bertemu, Su Qing.", "next": "node_intro2", "effects": [ { "type": "relation", "npc": "npc_suqing", "value": 5 } ] },
             { "label": "(Mengangguk pelan)", "next": "node_intro2" }
           ]
         },
@@ -279,6 +318,7 @@
           "text": "Chen Xu! Aku butuh Herba Awan — tiga ikat, untuk persediaan ramuan ibuku. Mau bantu kumpulkan? Aku traktir nanti! Kalau sudah selesai, tugas begini selalu ada, kok.",
           "choices": [
             { "label": "Aku bantu kumpulkan ramuannya.", "next": "node_offer_ok", "effects": [ { "type": "start_quest", "quest": "q_side_suqing" } ] },
+            { "label": "(Menyentuh liontin) Aku pernah bermimpi tentang istana yang sangat megah dan sunyi...", "next": "node_suqing_memori", "condition": { "memory": "mem_01" } },
             { "label": "Lain kali saja, ya.", "next": "node_offer_nanti" }
           ]
         },
@@ -295,6 +335,25 @@
         "node_umum": {
           "speaker": "npc:npc_suqing",
           "text": "Chen Xu! Oh, dan satu hal: kadang kau terlihat seperti orang yang sudah hidup seratus tahun. Mata itu. Tapi tak apa. Aku suka orang yang aneh.",
+          "choices": [
+            { "label": "Mungkin aku memang pernah hidup sebelumnya.", "next": "node_suqing_canda" },
+            { "label": "(Menyentuh liontin) Aku pernah bermimpi tentang istana yang sangat megah dan sunyi...", "next": "node_suqing_memori", "condition": { "memory": "mem_01" } },
+            { "label": "Hanya kurang tidur saja.", "next": "node_suqing_tidur" }
+          ]
+        },
+        "node_suqing_canda": {
+          "speaker": "npc:npc_suqing",
+          "text": "Hahaha! Kalau begitu kau harus mengajariku beberapa rahasia kultivasi masa lalu!",
+          "end": true
+        },
+        "node_suqing_memori": {
+          "speaker": "npc:npc_suqing",
+          "text": "Su Qing memandangmu dengan mata membesar. \n\n\"Istana yang megah dan sunyi? ...Ayahku sering bercerita tentang ibukota kekaisaran di timur, tapi tempat seperti itu terdengar berbahaya. Jangan terlalu memikirkan mimpi aneh, Chen Xu. Sekarang kau punya kami di akademi.\"",
+          "end": true
+        },
+        "node_suqing_tidur": {
+          "speaker": "npc:npc_suqing",
+          "text": "Istirahatlah yang cukup! Kultivasi butuh tubuh yang bugar.",
           "end": true
         }
       }

@@ -47,6 +47,7 @@ class GameSession:
         self.quest = QuestEngine(registry, state)
         self.dialog = DialogEngine(registry, state, self.quest)
         self.battle = BattleEngine(registry, state, self.quest)
+        self._maybe_start_branch_dialog()
 
 
 
@@ -119,7 +120,7 @@ class GameSession:
             "move": self._move,
             "advance_time": self._advance_time,
             "choose": self._choose,
-            "battle_action": self.battle.player_action,
+            "battle_action": self._battle_action,
             "use_item": self._use_item,
             "equip": self._equip,
             "grounding": self._grounding,
@@ -134,24 +135,25 @@ class GameSession:
             "save": self._save,
         }
         fn = handler.get(t)
-        res = None
         if fn:
-            res = fn(action)
-        else:
-            msg = f"Aksi tak dikenal: {t}."
-            add_log(self.state, "system", msg)
-            res = self.view()
-            res["error"] = msg
+            return fn(action)
+        msg = f"Aksi tak dikenal: {t}."
+        add_log(self.state, "system", msg)
+        res = self.view()
+        res["error"] = msg
+        return res
+
+    def _battle_action(self, action: dict) -> dict:
+        self.battle.player_action(action)
         self._maybe_start_branch_dialog()
-        out = self.view()
-        if isinstance(res, dict) and "error" in res:
-            out["error"] = res["error"]
-        return out
+        return self.view()
 
     def _maybe_start_branch_dialog(self) -> None:
         """Saat quest percabangan selesai — mulai dialog pilih cabang."""
         if self.state.branch_pending and not self.state.pending_dialog and not self.state.pending_battle:
-            self.dialog.start(self.state.branch_pending)
+            res = self.dialog.start(self.state.branch_pending)
+            if not res:
+                self.state.branch_pending = None
 
     def _is_npc_available(self, npc: dict) -> bool:
         """Jadwal NPC — pola sama dengan quest._in_window (A1): dukung lintas tengah
@@ -221,8 +223,11 @@ class GameSession:
                 self.state.pending_battle["spar_npc"] = npc_id
                 return
         # pilihan cabang quest (dialog percabangan)
-        if self.state.branch_pending and self.dialog.chosen_option:
-            self.quest.select_branch(self.dialog.chosen_option)
+        if self.state.branch_pending:
+            if getattr(self.dialog, "last_dialog_id", None) == self.state.branch_pending:
+                self.quest.select_branch(self.dialog.chosen_option or "")
+            else:
+                self._maybe_start_branch_dialog()
 
     def _move(self, action: dict) -> dict:
         to = action.get("to")
@@ -239,6 +244,7 @@ class GameSession:
         if loc.get("is_safe"):
             self.state.last_safe_location = to
         self.quest.notify_move()
+        self._maybe_start_branch_dialog()
         return self.view()
 
     def _advance_time(self, action: dict) -> dict:
@@ -255,9 +261,11 @@ class GameSession:
             self.state.exp_grind_today = 0
         self.quest.notify_move()
         self.quest.advance_time_target_met()
+        self._maybe_start_branch_dialog()
 
     def _choose(self, action: dict) -> dict:
         self.quest.resolve_choose(action.get("option", ""))
+        self._maybe_start_branch_dialog()
         return self.view()
 
     def _equip(self, action: dict) -> dict:
@@ -598,6 +606,7 @@ class GameSession:
     # ---------- tampilan UI ----------
 
     def view(self) -> dict:
+        self._maybe_start_branch_dialog()
         s = self.state
         loc = self.reg.location(s.location)
         q = self.quest.current_main()

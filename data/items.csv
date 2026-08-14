@@ -5,3 +5,5 @@ material_herba,Herba Awan (云草 Yúncǎo),material,Bahan alkimia umum yang tum
 material_tulang,Tulang Serigala (狼骨 Lánggǔ),material,Tulang keras serigala Qi — bahan alkimia.,12,0,0,0,common,false
 pedang_bambu,Pedang Bambu (竹剑 Zhújiàn),weapon,Pedang latihan ringan dari bambu keras (+3 serangan).,100,0,0,3,common,false
 pedang_angin,Pedang Angin (风剑 Fēngjiàn),weapon,Pedang ringan bermotif angin — hadiah atas keberanian (+5 serangan).,250,0,0,5,uncommon,false
+talisman_elemen,Talisman Elemen (五行符 Wǔxíngfú),weapon,Talisman dasar penyalur Qi lima elemen (+3 serangan).,100,0,0,3,common,false
+kontrak_roh,Kontrak Roh (灵契 Língqì),weapon,Kertas segel kontrak pemanggil roh dasar (+3 serangan).,100,0,0,3,common,false

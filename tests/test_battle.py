@@ -169,7 +169,8 @@ def test_ko_respawn_fallback_config_dan_data(session):
 
 def test_teknik_serang_di_battle(session, god_mode):
     session.state.player.academy = "akademi_elemen"
-    teks = session.reg.player_techniques("akademi_elemen")
+    session.state.player.techniques = ["tek_elemen_bola_api"]
+    teks = session.reg.player_techniques("akademi_elemen", owned=tuple(session.state.player.techniques))
     assert teks, "akademi elemen harus punya teknik"
     foe = {"id": "eno_x", "name": "X", "hp": 999, "qi": 0, "attack": 0, "defense": 0,
            "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
@@ -210,13 +211,12 @@ def test_teknik_lintas_akademi_ditolak(session):
     """Bug playtest: teknik akademi lain tidak boleh dipakai (skill_pool §5.6)."""
     # tanpa god_mode: musuh lemah, serangannya minimal — battle tetap berlanjut
     session.state.player.academy = "akademi_elemen"
-    teks_senjata = session.reg.player_techniques("akademi_senjata")
-    assert teks_senjata, "akademi senjata harus punya teknik"
+    session.state.player.techniques = ["tek_elemen_bola_api"]
     foe = {"id": "eno_x", "name": "X", "hp": 9999, "qi": 0, "attack": 0, "defense": 0,
            "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
     session.battle.start([foe], "hunt")
     qi_before = session.state.player.qi
-    session.apply_action({"type": "battle_action", "action": "technique", "technique": teks_senjata[0]["id"]})
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_senjata_tebasan_angin"})
     assert session.state.pending_battle  # battle belum selesai — teknik ditolak
     assert session.state.player.qi == qi_before  # Qi tidak terpotong
     assert any("belum menguasai" in e["text"] for e in session.state.log)
@@ -255,28 +255,20 @@ def test_player_techniques_unlock_arc_lintas_akademi(session):
 
 
 def test_player_techniques_skill_pool_banyak_elemen(session, monkeypatch):
-    """A6: `skill_pool` dengan lebih dari satu elemen — semua prefix diproses,
-    bukan hanya elemen pertama (bug: `a.get("skill_pool", [""])[0]`)."""
+    """A6: player_techniques mengembalikan semua teknik owned yang valid + dedup."""
     reg = session.reg
-    # dua teknik dummy: satu di pool pertama, satu di pool kedua
     reg.techniques["tek_uji_a1"] = {"id": "tek_uji_a1", "name": "Uji A1", "academy": "elemen",
                                     "element": None, "realm_required": "realm_pengumpul_qi",
                                     "qi_cost": 5, "power": 10, "kind": "attack",
-                                    "description": "Dummy pool 1."}
+                                    "description": "Dummy 1."}
     reg.techniques["tek_uji_b1"] = {"id": "tek_uji_b1", "name": "Uji B1", "academy": "universal",
                                     "element": None, "realm_required": "realm_pengumpul_qi",
                                     "qi_cost": 5, "power": 10, "kind": "attack",
-                                    "description": "Dummy pool 2."}
-    # akademi sintetis dengan 2 pool
-    orig = reg.config.get("academies", [])
-    reg.config["academies"] = orig + [{"id": "akademi_uji", "name": "Uji",
-                                       "skill_pool": ["tek_uji_a*", "tek_uji_b*"]}]
-    try:
-        ids = [t["id"] for t in reg.player_techniques("akademi_uji", "realm_pengumpul_qi")]
-    finally:
-        reg.config["academies"] = orig
+                                    "description": "Dummy 2."}
+    ids = [t["id"] for t in reg.player_techniques("akademi_elemen", "realm_pengumpul_qi",
+                                                  owned=("tek_uji_a1", "tek_uji_b1"))]
     assert "tek_uji_a1" in ids
-    assert "tek_uji_b1" in ids, "elemen pool kedua harus diproses (A6)"
+    assert "tek_uji_b1" in ids, "semua teknik owned harus diproses"
 
 
 def test_teknik_ranah_tinggi_ditolak(session, monkeypatch):
@@ -286,7 +278,7 @@ def test_teknik_ranah_tinggi_ditolak(session, monkeypatch):
             "element": None, "realm_required": "realm_pembangun_fondasi", "qi_cost": 5,
             "power": 99, "kind": "attack", "description": "Dummy ranah tinggi."}
     monkeypatch.setattr(session.reg, "technique", lambda tid: fake if tid == fake["id"] else None)
-    monkeypatch.setattr(session.reg, "player_techniques", lambda acad, realm=None: [fake])
+    monkeypatch.setattr(session.reg, "player_techniques", lambda acad, realm=None, **kw: [fake])
     foe = {"id": "eno_x", "name": "X", "hp": 9999, "qi": 0, "attack": 0, "defense": 0,
            "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
     session.battle.start([foe], "hunt")
@@ -304,9 +296,9 @@ def test_player_techniques_filter_ranah(session):
     fake = {"id": "tek_elemen_palsu_tinggi", "name": "X", "academy": "elemen",
             "realm_required": "realm_pembangun_fondasi", "qi_cost": 1, "power": 1, "kind": "attack"}
     reg.techniques[fake["id"]] = fake
-    ids_pengumpul = [t["id"] for t in reg.player_techniques("akademi_elemen", "realm_pengumpul_qi")]
+    ids_pengumpul = [t["id"] for t in reg.player_techniques("akademi_elemen", "realm_pengumpul_qi", owned=(fake["id"],))]
     assert fake["id"] not in ids_pengumpul  # order 2 > order 1 → disembunyikan
-    ids_fondasi = [t["id"] for t in reg.player_techniques("akademi_elemen", "realm_pembangun_fondasi")]
+    ids_fondasi = [t["id"] for t in reg.player_techniques("akademi_elemen", "realm_pembangun_fondasi", owned=(fake["id"],))]
     assert fake["id"] in ids_fondasi  # order 2 <= order 2 → tampil
 
 
@@ -329,6 +321,7 @@ def test_teknik_defend(session, monkeypatch):
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit
     session.state.player.academy = "akademi_elemen"
+    session.state.player.techniques = ["tek_elemen_perisai_tanah"]
     session.state.player.hp = 80
     session.state.player.qi = 40
 
@@ -349,6 +342,7 @@ def test_teknik_heal_clamped_and_unclamped(session, monkeypatch):
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
     session.state.player.academy = "akademi_elemen"
+    session.state.player.techniques = ["tek_elemen_embun_air"]
     hp_max = session.state.max_hp(session.reg)
 
     # Kasus A: Clamped ke hp_max (hanya kurang 5 HP, heal power 20, musuh balas dealt 1 min dmg)
@@ -450,6 +444,7 @@ def test_battle_spar_loss_exp(session):
 
 def test_battle_unknown_technique_and_low_qi(session):
     session.state.player.academy = "akademi_elemen"
+    session.state.player.techniques = ["tek_elemen_bola_api"]
     foe = {"id": "eno_x", "name": "X", "hp": 500, "qi": 0, "attack": 0, "defense": 0, "speed": 1}
     session.battle.start([foe], "hunt")
 
@@ -560,6 +555,7 @@ def test_teknik_akademi_dipakai_di_battle(session, monkeypatch, akademi, teknik_
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit
     session.state.player.academy = akademi
+    session.state.player.techniques = [teknik_id]
     session.state.player.qi = 50  # cukup untuk biaya teknik apa pun
     session.state.location = "loc_wilayah_berburu"
     session.state.last_hunt_time = None

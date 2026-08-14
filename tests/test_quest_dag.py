@@ -112,7 +112,7 @@ def test_satu_aktif_invariant(session, god_mode):
     seen = []
     play_to_incident(session)
     # telusuri quest utama yang terselesaikan dalam urutan
-    for qid in ["q_akademi_01", "q_akademi_02", "q_akademi_03", "q_akademi_04", "q_akademi_05", "q_akademi_06"]:
+    for qid in ["q_akademi_01", "q_akademi_02", "q_akademi_03", "q_akademi_04", "q_akademi_04b", "q_akademi_05", "q_akademi_06"]:
         assert qid in session.state.completed_quests
     assert session.state.current_quest is None or session.state.current_quest.startswith("q_akademi_3")
     # hanya satu quest aktif per waktu (field tunggal) — pastikan tidak ada side quest ganda main

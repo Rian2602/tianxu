@@ -666,6 +666,56 @@ player_action(menu):
 - **World-facts (G4b/#10, 2026-08-14)**: konsekuensi cabang quest disimpan sebagai `flags` eksplisit (nilai string/bool apa pun didukung `effects.py`) — `zhouyan_status` (`bebas`/`diusir`), `elder_exposed`, `academy_knows_truth`, `bell_status` — sehingga konten Arc 2 bisa menanyakan kondisi dunia ("apakah Zhou Yan bebas?") tanpa field state baru.
 - **Ending (disahkan §13)**: 3 tematik — Reformer / Destroyer / Ascetic — ditentukan kombinasi **pilihan kunci di quest percabangan + skala moralitas akhir**. Semua ending valid secara naratif.
 
+### 10.1 Konvensi Penamaan World State Flags (Phase 2 & Seterusnya)
+
+Untuk mencegah *flag sprawl* (penumpukan boolean flag tak terstruktur) saat ekspansi ke Phase 2 (Arc Sekte, kota, faksi, dan dunia terbuka), diberlakukan konvensi penamaan baku untuk seluruh world-state flags di `GameState.flags`:
+
+1. **Format Hierarki Baku**:
+   `world.<entity_atau_domain>.<state_atau_aspect>`
+   - Namespace diawali dengan awalan `world.` untuk membedakan flag dunia/fakta naratif jangka panjang dari flag temporal/lokal quest.
+   - `<entity_atau_domain>`: identitas entitas (NPC, lokasi, faksi, objek dunia) dalam format snake_case tanpa spasi.
+   - `<state_atau_aspect>`: properti atau status yang dicatat.
+
+2. **Kategori Standar & Contoh Penamaan**:
+   - **Status NPC**: `world.<npc_id>.<aspek>`
+     - Contoh: `world.npc_zhouyan.status` (`"bebas"` | `"diusir"` | `"eksekusi"`)
+     - Contoh: `world.npc_suqing.knows_secret` (`true` | `false`)
+   - **Status Lokasi / Lingkungan**: `world.<location_id>.<aspek>`
+     - Contoh: `world.loc_gerbang.sealed` (`true` | `false`)
+     - Contoh: `world.loc_ruang_lonceng.bell_status` (`"utuh"` | `"hilang"` | `"dipulihkan"`)
+   - **Status Faksi & Reputasi Naratif**: `world.faksi.<faction_id>.<aspek>`
+     - Contoh: `world.faksi.akademi.elder_exposed` (`true` | `false`)
+     - Contoh: `world.faksi.akademi.knows_truth` (`true` | `false`)
+     - Contoh: `world.faksi.sekte_pedang.stance` (`"netral"` | `"aliansi"` | `"perang"`)
+   - **Status Global / Plot Arc**: `world.arc.<arc_id>.<milestone>`
+     - Contoh: `world.arc.akademi.completed` (`true` | `false`)
+     - Contoh: `world.arc.sekte.investigation_stage` (`1`, `2`, `3`)
+
+3. **Tipe Data Nilai Flag**:
+   - `boolean` (`true` / `false`): untuk status biner (mis. pintu terbuka, rahasia terungkap, saksi dibungkam).
+   - `string`: untuk status diskrit multi-kondisi (mis. pilihan jalur, nasib karakter, relasi diplomasi).
+   - `integer` / `number`: untuk progress counter atau tahapan berjenjang.
+
+4. **Penggunaan dalam Kontrak Data (JSON)**:
+   - **Efek (`effects`)**:
+     ```json
+     { "type": "flag", "key": "world.npc_zhouyan.status", "value": "bebas" }
+     ```
+   - **Kondisi Dialog (`condition`)**:
+     ```json
+     { "flag": { "key": "world.npc_zhouyan.status", "value": "bebas" } }
+     ```
+   - **Prasyarat Quest (`requires`)**:
+     ```json
+     "requires": {
+       "flags": { "world.faksi.akademi.knows_truth": true }
+     }
+     ```
+
+5. **Kompatibilitas Mundur (Fase 1 vs Fase 2)**:
+   - Flag warisan Fase 1 (seperti `hari_pertama_selesai`, `spar_ujian_selesai`, `branch_3aa`, `zhouyan_status`) tetap didukung dan dipelihara demi stabilitas backward-compatibility save data Phase 1.
+   - Mulai Fase 2 dan seluruh konten baru, pembuatan flag baru **WAJIB** mematuhi format namespace `world.<entity>.<state>`.
+
 ---
 
 ## 11. Tianyuan Ling — Panel UI & Log (Desain Disahkan)

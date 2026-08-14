@@ -65,22 +65,46 @@
   ],
   "hint": "Pilih satu paviliun. Pilihan ini menentukan teknik yang bisa kau pelajari."
  },
- "next": [
-  {
-   "quest": "q_akademi_05",
-   "branch": "b4",
-   "label": "Lanjut"
-  }
- ],
- "on_complete": {
-  "effects": [
+  "next": [
    {
-    "type": "flag",
-    "key": "akademi_dipilih",
-    "value": true
+    "quest": "q_akademi_04b",
+    "branch": "b4",
+    "label": "Lanjut"
    }
   ],
-  "system_msg": "Selamat datang di paviliun pilihanmu.",
+  "on_complete": {
+   "effects": [
+    {
+     "type": "flag",
+     "key": "akademi_dipilih",
+     "value": true
+    }
+   ],
+   "system_msg": "Selamat datang di paviliun pilihanmu.",
+        "rewards": { "exp": 6 }
+      }
+    },
+    {
+      "id": "q_akademi_04b",
+      "title": "Pelajaran Pertama",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Gu Canghai mengajarkan teknik dasar pertama sesuai paviliun pilihan Chen Xu.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_gucanghai",
+        "nodes": [
+          "node_pelajaran_elemen_selesai",
+          "node_pelajaran_senjata_selesai",
+          "node_pelajaran_summoning_selesai"
+        ],
+        "target": 1,
+        "hint": "Bicaralah dengan Gu Canghai di Aula Ujian untuk menerima teknik pertamamu."
+      },
+      "next": [ { "quest": "q_akademi_05", "branch": "b4b", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "pelajaran_pertama_selesai", "value": true } ],
+        "system_msg": "Kau telah mempelajari teknik kultivasi pertamamu.",
         "rewards": { "exp": 6 }
       }
     },
@@ -90,7 +114,7 @@
       "arc": "akademi",
       "kind": "main",
       "summary": "Chen Xu mulai terbiasa dengan kehidupan akademi; Su Qing menyapanya lebih dulu.",
-      "objective": { "kind": "talk", "npc": "npc_suqing", "target": 1, "hint": "Bicaralah dengan Su Qing." },
+      "objective": { "kind": "talk", "npc": "npc_suqing", "node": "node_intro2", "target": 1, "hint": "Bicaralah dengan Su Qing di Paviliun." },
       "next": [ { "quest": "q_akademi_06", "branch": "b5", "label": "Lanjut" } ],
       "on_complete": {
         "effects": [ { "type": "flag", "key": "hari_pertama_selesai", "value": true } ],

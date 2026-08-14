@@ -2,6 +2,178 @@
 
 "use strict";
 
+// ═══ Audio Manager ═══
+// Single HTMLAudioElement for main theme, loop, volume, mute, persistence
+const AudioManager = (() => {
+  const STORAGE_KEY_ENABLED = "tian_xu_audio_enabled";
+  const STORAGE_KEY_VOLUME = "tian_xu_audio_volume";
+  const DEFAULT_VOLUME = 0.3;
+  const AUDIO_PATH = "/static/assets/audio/dawn-over-tian-xu.mp3";
+
+  let audio = null;
+  let enabled = true;
+  let volume = DEFAULT_VOLUME;
+  let started = false; // track if user gesture has initiated playback
+  let pendingPlay = false;
+
+  function init() {
+    // Load preferences from localStorage
+    try {
+      const storedEnabled = localStorage.getItem(STORAGE_KEY_ENABLED);
+      const storedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
+      if (storedEnabled !== null) enabled = storedEnabled === "true";
+      if (storedVolume !== null) volume = Math.max(0, Math.min(1, parseFloat(storedVolume)));
+    } catch (e) {
+      // localStorage unavailable — use defaults
+    }
+
+    // Create audio element
+    audio = new Audio(AUDIO_PATH);
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.volume = enabled ? volume : 0;
+
+    // Error handling — graceful degradation
+    audio.addEventListener("error", (e) => {
+      console.warn("[AudioManager] Audio load error:", e);
+      audio = null; // prevent further attempts
+    });
+
+    // Update UI after init
+    updateUI();
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY_ENABLED, String(enabled));
+      localStorage.setItem(STORAGE_KEY_VOLUME, String(volume));
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  function updateUI() {
+    const muteBtn = document.getElementById("btn-audio-mute");
+    const volumeSlider = document.getElementById("audio-volume");
+    const volumeLabel = document.getElementById("audio-volume-label");
+    const muteBtnTopbar = document.getElementById("btn-audio-mute-topbar");
+    const volumeSliderTopbar = document.getElementById("audio-volume-topbar");
+    const volumeLabelTopbar = document.getElementById("audio-volume-label-topbar");
+
+    [muteBtn, muteBtnTopbar].forEach((btn) => {
+      if (btn) {
+        btn.textContent = enabled ? "♫" : "🔇";
+        btn.setAttribute("aria-label", enabled ? "Matikan musik" : "Nyalakan musik");
+        btn.classList.toggle("muted", !enabled);
+      }
+    });
+    [volumeSlider, volumeSliderTopbar].forEach((slider) => {
+      if (slider) {
+        slider.value = volume;
+        slider.disabled = !enabled;
+      }
+    });
+    [volumeLabel, volumeLabelTopbar].forEach((label) => {
+      if (label) {
+        label.textContent = Math.round(volume * 100) + "%";
+      }
+    });
+  }
+
+  function ensureAudio() {
+    if (!audio) return false;
+    return true;
+  }
+
+  async function start() {
+    if (!ensureAudio()) return;
+    if (started) return;
+    started = true;
+    if (enabled) {
+      try {
+        await audio.play();
+      } catch (e) {
+        // Autoplay rejected — wait for user gesture via pendingPlay
+        pendingPlay = true;
+      }
+    }
+  }
+
+  function play() {
+    if (!ensureAudio()) return;
+    if (!enabled) return;
+    audio.play().catch((e) => {
+      console.warn("[AudioManager] Play rejected:", e);
+    });
+  }
+
+  function pause() {
+    if (!ensureAudio()) return;
+    audio.pause();
+  }
+
+  function resume() {
+    play();
+  }
+
+  function stop() {
+    if (!ensureAudio()) return;
+    audio.pause();
+    audio.currentTime = 0;
+  }
+
+  function setVolume(v) {
+    volume = Math.max(0, Math.min(1, v));
+    if (audio) audio.volume = enabled ? volume : 0;
+    persist();
+    updateUI();
+  }
+
+  function toggleMute() {
+    enabled = !enabled;
+    if (audio) audio.volume = enabled ? volume : 0;
+    persist();
+    updateUI();
+  }
+
+  function isPlaying() {
+    return audio && !audio.paused && !audio.ended;
+  }
+
+  function getVolume() {
+    return volume;
+  }
+
+  function isEnabled() {
+    return enabled;
+  }
+
+  // Initialize on module load
+  if (typeof document !== "undefined") {
+    // Defer init until DOM ready to avoid blocking
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  }
+
+  return {
+    init,
+    start,
+    play,
+    pause,
+    resume,
+    stop,
+    setVolume,
+    toggleMute,
+    isPlaying,
+    getVolume,
+    isEnabled,
+    updateUI,
+  };
+})();
+
 let currentSave = "save1";
 
 // B8: focus trap sederhana untuk modal — simpan fokus sebelum buka, restore saat tutup
@@ -102,7 +274,7 @@ async function refreshSaveSlots() {
     const b = document.createElement("button");
     b.className = "save-slot";
     b.textContent = "Lanjut — " + name;
-    b.onclick = () => loadGame(name);
+    b.onclick = () => { AudioManager.start(); loadGame(name); };
     box.appendChild(b);
   });
 }
@@ -167,7 +339,10 @@ function renderLeft(v) {
   const wid = p.equipment && p.equipment.weapon;
   const w = wid ? (names[wid] || wid) : "—";
   const comp = v.companion;
-  let html = `<h3 class="stat-title">✦ ${esc(p.name)}</h3>`;
+  let html = `<div style="text-align: center; margin-bottom: 16px;">
+    <img src="/static/assets/img/avatar.jpg" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);">
+  </div>`;
+  html += `<h3 class="stat-title" style="text-align: center; border-bottom: none;">✦ ${esc(p.name)} ✦</h3>`;
   const pct = p.exp_next > 0 ? Math.min(100, Math.round((p.exp / p.exp_next) * 100)) : 0;
   const ic = icon;
   html += `<div class="realm-hero">`;
@@ -190,6 +365,17 @@ function renderLeft(v) {
   $("col-left").innerHTML = html;
 }
 
+function getRelationTier(score) {
+  const num = Number(score) || 0;
+  if (num > 0) {
+    return { label: "Bersahabat", cls: "friendly" };
+  } else if (num < 0) {
+    return { label: "Bermusuhan", cls: "hostile" };
+  } else {
+    return { label: "Netral", cls: "neutral" };
+  }
+}
+
 function renderRight(v) {
   let html = "";
   // quest utama
@@ -210,6 +396,39 @@ function renderRight(v) {
     });
     html += `</div>`;
   }
+  // kurikulum paviliun
+  if (ctx && ctx.curriculum && ctx.curriculum.length) {
+    html += `<div class="section"><h3 class="stat-title">${icon("sparkles")}Kurikulum Paviliun</h3>`;
+    ctx.curriculum.forEach((t) => {
+      let badge = "";
+      if (t.status === "learned") {
+        badge = `<span class="badge badge-learned">Dikuasai${t.level ? ` (Lv.${t.level})` : ""}</span>`;
+      } else if (t.status === "available") {
+        badge = `<span class="badge badge-available">Tersedia</span>`;
+      } else {
+        badge = `<span class="badge badge-locked">Terkunci</span>`;
+      }
+      html += `<div class="curriculum-row ${esc(t.status)}"><span class="item-name">${esc(t.name)}</span>` +
+              `<span class="item-status">${badge}</span></div>`;
+    });
+    html += `</div>`;
+  }
+  // hubungan NPC
+  html += `<div class="section"><h3 class="stat-title">${icon("heart")}Hubungan</h3>`;
+  const relEntries = (ctx && ctx.relations) ? Object.entries(ctx.relations) : [];
+  if (relEntries.length > 0) {
+    relEntries.forEach(([nid, score]) => {
+      const name = (ctx.npc_names && ctx.npc_names[nid]) || nid;
+      const tier = getRelationTier(score);
+      const num = Number(score) || 0;
+      const sign = num > 0 ? `+${num}` : `${num}`;
+      html += `<div class="relation-row"><span class="item-name">${esc(name)}</span>` +
+              `<span class="badge badge-${esc(tier.cls)}">${esc(tier.label)} (${sign})</span></div>`;
+    });
+  } else {
+    html += `<div class="quest-done">Belum ada catatan hubungan khusus.</div>`;
+  }
+  html += `</div>`;
   // inventori
   html += `<div class="section"><h3 class="stat-title">${icon("backpack")}Inventori</h3>`;
   if (v.inventory && v.inventory.length) {
@@ -651,7 +870,58 @@ function closeTianyuan() { $("tianyuan").classList.add("hidden"); }
 
 // ---------- inisialisasi ----------
 
-$("btn-new").onclick = startNew;
+$("btn-new").onclick = () => { AudioManager.start(); startNew(); };
 $("btn-tianyuan").onclick = openTianyuan;
 refreshSaveSlots();
 loadIcons();  // C2: icon Lucide self-host — dimuat async, re-render bila sudah masuk
+
+// ---------- Audio Controls Event Handlers ----------
+
+function setupAudioControls() {
+  // Title screen controls
+  const muteBtn = $("btn-audio-mute");
+  const volumeSlider = $("audio-volume");
+  
+  // Topbar controls
+  const muteBtnTopbar = $("btn-audio-mute-topbar");
+  const volumeSliderTopbar = $("audio-volume-topbar");
+
+  function onMuteClick() {
+    AudioManager.toggleMute();
+  }
+
+  function onVolumeChange(e) {
+    const v = parseFloat(e.target.value);
+    AudioManager.setVolume(v);
+    // Sync both sliders
+    if (volumeSlider) volumeSlider.value = v;
+    if (volumeSliderTopbar) volumeSliderTopbar.value = v;
+    const label = $("audio-volume-label");
+    const labelTopbar = $("audio-volume-label-topbar");
+    if (label) label.textContent = Math.round(v * 100) + "%";
+    if (labelTopbar) labelTopbar.textContent = Math.round(v * 100) + "%";
+  }
+
+  if (muteBtn) muteBtn.addEventListener("click", onMuteClick);
+  if (muteBtnTopbar) muteBtnTopbar.addEventListener("click", onMuteClick);
+  if (volumeSlider) volumeSlider.addEventListener("input", onVolumeChange);
+  if (volumeSliderTopbar) volumeSliderTopbar.addEventListener("input", onVolumeChange);
+
+  // Keyboard accessibility: Enter/Space on mute button
+  [muteBtn, muteBtnTopbar].forEach((btn) => {
+    if (!btn) return;
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onMuteClick();
+      }
+    });
+  });
+}
+
+// Initialize audio controls after DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", setupAudioControls);
+} else {
+  setupAudioControls();
+}

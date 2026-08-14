@@ -85,7 +85,15 @@ class QuestEngine:
             if required:
                 if isinstance(required, str):
                     required = [required]
-                visited = node_ids if isinstance(node_ids, (list, set)) else ([] if node_ids is None else [node_ids])
+                if isinstance(node_ids, str):
+                    visited = [node_ids]
+                elif node_ids is not None:
+                    try:
+                        visited = list(node_ids)
+                    except TypeError:
+                        visited = [node_ids]
+                else:
+                    visited = []
                 if not any(n in visited for n in required):
                     return  # node wajib belum dimainkan — quest belum selesai
             qid = q["id"]
@@ -207,9 +215,33 @@ class QuestEngine:
                     break
         if matched:
             self._grant_companion(option)
+            self._grant_starter_kit(option)
             self._complete_main(q["id"])
         else:
             add_log(self.state, "system", "Pilihan tidak valid.")
+
+    def _grant_starter_kit(self, academy: str) -> None:
+        """Akademi dengan field `starter_kit` di config (data-driven) memberi perlengkapan pemula."""
+        items = []
+        for a in self.reg.config.get("academies", []):
+            if a.get("id") == academy:
+                items = a.get("starter_kit") or []
+                break
+        for it in items:
+            if isinstance(it, dict):
+                iid = it.get("id")
+                cnt = it.get("count", 1)
+            elif isinstance(it, str):
+                iid = it
+                cnt = 1
+            else:
+                continue
+            if iid:
+                self.state.inventory[iid] = self.state.inventory.get(iid, 0) + cnt
+                item_obj = self.reg.item(iid)
+                iname = item_obj["name"] if item_obj else iid
+                add_log(self.state, "system", f"Menerima perlengkapan pemula: {iname} ×{cnt}.")
+
 
     def _grant_companion(self, academy: str) -> None:
         """Akademi dengan field `companion` di config (data-driven) memberi binatang roh."""
@@ -286,7 +318,12 @@ class QuestEngine:
 
     def select_branch(self, option: str) -> None:
         """Setelah dialog percabangan selesai — pilih cabang berdasarkan opsi."""
-        q = self.reg.quest(self.state.completed_quests[-1]) if self.state.completed_quests else None
+        q = None
+        for qid in reversed(self.state.completed_quests):
+            candidate = self.reg.quest(qid)
+            if candidate and candidate.get("kind") == "main" and candidate.get("next"):
+                q = candidate
+                break
         if not q:
             return
         for edge in q.get("next", []):

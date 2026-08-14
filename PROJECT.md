@@ -50,6 +50,7 @@
 | 25 | Teknik Dipelajari & Ditingkatkan (C1) | Combat/Progression | GDD §7, ENGINE §9.1 | efek `technique` (effects.py), `player.techniques`/`technique_levels` (state.py), `upgrade_technique` (session.py), power scaling (battle.py) | DONE (Verified) |
 | 26 | Siklus Waktu: Bulan (C2) | World Sim | GDD §7, ENGINE §5.6 | `state.month`/`month_name` (derived), kondisi dialog `month_min/max`, `view().month`, header CLI/web | DONE (Verified) |
 | 27 | Moralitas → Ending (C3) | Narrative | GDD §3.4/§9, ENGINE §10 | `config.arcs[].endings` (first-match AND), `arc_summary.ending`, CLI/web tampil ending | DONE (Verified) |
+| 28 | Sistem Pembelajaran Teknik & Starter Kit | Progression/Combat | GDD §5.2, R1-R4 | `config.json` (`curriculum`, `starter_kit`), `q_akademi_04b`, `dlg_gucanghai_ujian`, `loader.py`, `quest.py`, `web/app.py`, `tests/test_learning.py` | DONE (Verified) |
 
 ## Identified Gaps and Subagent-Driven Development (SDD) Roadmap
 

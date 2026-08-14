@@ -542,3 +542,95 @@ def test_aturan16_crit_chance_di_luar_rentang():
     v, ok = make(d)
     assert not ok
     assert any("crit_chance" in e for e in v.errors)
+
+
+# ---------- validasi efek & kondisi baru (Phase 1.5) ----------
+
+def test_aturan2_efek_relation_npc_tidak_ada():
+    """Efek relation harus merujuk NPC yang valid."""
+    d = _good()
+    d["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_rel", "npc": "", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x", "end": True,
+                         "choices": [{"label": "A", "effects": [{"type": "relation", "npc": "npc_fiktif", "value": 5}]}]}},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("efek relation npc 'npc_fiktif' tidak ada" in e for e in v.errors)
+
+
+def test_aturan2_efek_relation_value_bukan_angka():
+    """Efek relation value harus bertipe angka."""
+    d = _good()
+    d["npcs.json"] = {"npcs": [{"id": "n1"}]}
+    d["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_rel", "npc": "n1", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x", "end": True,
+                         "choices": [{"label": "A", "effects": [{"type": "relation", "npc": "n1", "value": "lima"}]}]}},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("efek relation value harus angka" in e for e in v.errors)
+
+
+def test_aturan7_kondisi_memory_tidak_ada():
+    """Kondisi memory pada dialog harus merujuk ingatan di memories.json."""
+    d = _good()
+    d["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_mem", "npc": "", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x", "end": True,
+                         "condition": {"memory": "mem_tidak_ada"}}},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("kondisi memory 'mem_tidak_ada' tidak ada" in e for e in v.errors)
+
+
+def test_aturan7_kondisi_relation_npc_tidak_ada():
+    """Kondisi relation_min/relation_max harus merujuk NPC yang terdaftar."""
+    d = _good()
+    d["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_rel_cond", "npc": "", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x", "end": True,
+                         "condition": {"relation_min": {"npc": "npc_alien", "value": 10}}}},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("kondisi relation_min npc 'npc_alien' tidak ada" in e for e in v.errors)
+
+
+def test_aturan2_efek_morality_gold_reputation_validation():
+    """Efek morality, gold, dan reputation harus tervalidasi tipe & nilainya."""
+    # morality non-numeric value
+    d1 = _good()
+    d1["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_mor", "npc": "", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x", "end": True,
+                         "choices": [{"label": "A", "effects": [{"type": "morality", "value": "tinggi"}]}]}},
+    }]}
+    v1, ok1 = make(d1)
+    assert not ok1
+    assert any("efek morality value harus angka" in e for e in v1.errors)
+
+    # gold non-numeric value
+    d2 = _good()
+    d2["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_gld", "npc": "", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x", "end": True,
+                         "choices": [{"label": "A", "effects": [{"type": "gold", "value": "banyak"}]}]}},
+    }]}
+    v2, ok2 = make(d2)
+    assert not ok2
+    assert any("efek gold value harus angka" in e for e in v2.errors)
+
+    # reputation missing faksi
+    d3 = _good()
+    d3["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_rep", "npc": "", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x", "end": True,
+                         "choices": [{"label": "A", "effects": [{"type": "reputation", "value": 5}]}]}},
+    }]}
+    v3, ok3 = make(d3)
+    assert not ok3
+    assert any("efek reputation butuh faksi string" in e for e in v3.errors)
+

@@ -310,3 +310,112 @@ def test_static_no_cache(base_url: str) -> None:
         with urllib.request.urlopen(req) as r:
             assert r.status == 200
             assert r.headers.get("Cache-Control") == "no-cache"
+
+
+def test_head_method_static_file(base_url: str) -> None:
+    """Metode HEAD untuk file statis mengembalikan header 200 tanpa body (RFC 9110)."""
+    req = urllib.request.Request(f"{base_url}/static/app.js", method="HEAD")
+    with urllib.request.urlopen(req) as r:
+        assert r.status == 200
+        assert r.headers.get("Content-Type") is not None
+        assert int(r.headers.get("Content-Length", 0)) > 0
+        assert len(r.read()) == 0
+
+
+def test_head_method_non_static_501(base_url: str) -> None:
+    """Metode HEAD untuk endpoint non-statis mengembalikan 501 Unsupported method."""
+    import urllib.error
+    req = urllib.request.Request(f"{base_url}/", method="HEAD")
+    with pytest.raises(urllib.error.HTTPError) as exc_info:
+        urllib.request.urlopen(req)
+    assert exc_info.value.code == 501
+
+
+def test_concurrent_web_actions(base_url: str) -> None:
+    """Pengaksesan endpoint web konkuren aman di bawah perlindungan _session_lock."""
+    post(base_url, "/api/new")
+    errors = []
+
+    def worker(i: int) -> None:
+        try:
+            if i % 2 == 0:
+                _, status = get(base_url, "/api/state")
+                assert status == 200
+            else:
+                data = post(base_url, "/api/action", {"action": {"type": "advance_time", "hours": 1}})
+                assert data["ok"] is True
+        except Exception as e:
+            errors.append(e)
+
+    threads = [threading.Thread(target=worker, args=(i,)) for i in range(16)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert len(errors) == 0
+
+
+def test_context_relations(base_url: str) -> None:
+    """Konteks web menyertakan state.relations untuk rendering UI Hubungan."""
+    post(base_url, "/api/new")
+    app.session.state.relations["npc_suqing"] = 5
+    app.session.state.relations["npc_hanxiu"] = 20
+    body, status = get(base_url, "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["context"]["relations"]["npc_suqing"] == 5
+    assert data["context"]["relations"]["npc_hanxiu"] == 20
+
+
+def test_context_relations_tiers_and_session_none(base_url: str) -> None:
+    """Konteks relations mencakup nilai positif, netral, negatif, dan dict kosong saat session None."""
+    post(base_url, "/api/new")
+    app.session.state.relations["npc_suqing"] = 10    # Bersahabat (friendly)
+    app.session.state.relations["npc_penjaga"] = 0    # Netral (neutral)
+    app.session.state.relations["npc_penatua"] = -15  # Bermusuhan (hostile)
+    body, status = get(base_url, "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    rel = data["context"]["relations"]
+    assert rel["npc_suqing"] == 10
+    assert rel["npc_penjaga"] == 0
+    assert rel["npc_penatua"] == -15
+
+    # Saat session di-reset ke None
+    app.session = None
+    body, status = get(base_url, "/api/state")
+    assert status == 200
+    data_none = json.loads(body)
+    assert data_none["context"]["relations"] == {}
+
+
+def test_web_suqing_dialog_relation_flow(base_url: str) -> None:
+    """Alur penuh HTTP API: bicara Su Qing, pilih opsi ramah -> relation +5 di respons /api/action."""
+    post(base_url, "/api/new")
+    app.session.state.location = "loc_paviliun"
+    app.session.state.flags["met_penjaga"] = True
+    app.session.state.flags["ujian_akar_selesai"] = True
+    app.session.state.flags["spar_ujian_selesai"] = True
+    app.session.state.flags["akademi_dipilih"] = True
+    app.session.state.player.academy = "akademi_elemen"
+    app.session.state.current_quest = "q_akademi_05"
+
+    # Bicara dengan Su Qing
+    data = post(base_url, "/api/action", {"action": {"type": "talk", "npc": "npc_suqing"}})
+    assert data["ok"] is True
+    assert data["view"]["mode"] == "dialog"
+    assert len(data["view"]["dialog"]["choices"]) == 2
+
+    # Pilih opsi ramah (indeks 0) -> efek relation npc_suqing +5
+    data_choice = post(base_url, "/api/action", {"action": {"type": "dialog_choice", "choice_index": 0}})
+    assert data_choice["ok"] is True
+    assert data_choice["context"]["relations"].get("npc_suqing") == 5
+
+    # Lanjut hingga dialog selesai -> q_akademi_05 selesai karena node_intro2 tercapai
+    data_end = post(base_url, "/api/action", {"action": {"type": "dialog_choice", "choice_index": -1}})
+    assert data_end["ok"] is True
+    assert data_end["view"]["mode"] == "explore"
+    assert "mem_01" in [m["id"] for m in data_end["view"]["memories"]]
+
+

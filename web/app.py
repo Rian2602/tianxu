@@ -39,9 +39,21 @@ _session_lock = threading.Lock()  # K4: defense-in-depth — satu mutasi sesi pe
 
 
 def _context() -> dict:
-    """Konteks UI yang tidak ada di view engine: NPC di lokasi & teknik akademi."""
+    """Konteks UI yang tidak ada di view engine: NPC di lokasi, teknik akademi & kurikulum."""
     if session is None:
-        return {"npcs": [], "techniques": [], "merchant_shop": None, "recipes": []}
+        return {
+            "npcs": [],
+            "techniques": [],
+            "merchant_shop": None,
+            "recipes": [],
+            "curriculum": [],
+            "academy_curriculum": [],
+            "relations": {},
+            "npc_names": {n["id"]: n["name"] for n in registry.npcs},
+            "loc_names": {l["id"]: l["name"] for l in registry.locations},
+            "item_names": {i["id"]: i["name"] for i in registry.items.values()},
+            "academy": None,
+        }
     loc = session.state.location
     npcs = [
         {"id": n["id"], "name": n["name"], "can_spar": session.can_spar(n), "shop": bool(n.get("shop"))}
@@ -55,6 +67,36 @@ def _context() -> dict:
         (a["name"] for a in registry.config.get("academies", []) if a["id"] == session.state.player.academy),
         session.state.player.academy,
     )
+    curriculum = []
+    if session.state.player.academy:
+        cur_realm = registry.realms.get(session.state.player.realm)
+        player_order = int(cur_realm["order"]) if cur_realm else 1
+        learned_ids = set(session.state.player.techniques)
+        all_prev_learned = True
+        for tek in registry.academy_curriculum(session.state.player.academy):
+            tid = tek["id"]
+            if tid in learned_ids:
+                status = "learned"
+            else:
+                tek_realm = registry.realms.get(tek.get("realm_required", ""), cur_realm)
+                tek_order = int(tek_realm["order"]) if tek_realm else 1
+                if all_prev_learned and tek_order <= player_order:
+                    status = "available"
+                else:
+                    status = "locked"
+                all_prev_learned = False
+            curriculum.append({
+                "id": tid,
+                "name": tek["name"],
+                "element": tek.get("element", ""),
+                "kind": tek.get("kind", ""),
+                "power": int(tek.get("power", 0)),
+                "qi_cost": int(tek.get("qi_cost", 0)),
+                "realm_required": tek.get("realm_required", ""),
+                "description": tek.get("description", ""),
+                "status": status,
+                "level": session.state.player.technique_levels.get(tid, 1) if status == "learned" else None,
+            })
     merchant_shop = None
     for n in registry.npcs:
         if n.get("shop") and n.get("location") == loc:
@@ -96,12 +138,15 @@ def _context() -> dict:
         "merchant_shop": merchant_shop,
         "recipes": recipes,
         "npc_names": {n["id"]: n["name"] for n in registry.npcs},
+        "relations": dict(session.state.relations),
         "techniques": [
             {"id": t["id"], "name": t["name"], "qi_cost": int(t.get("qi_cost", 0)),
              "kind": t.get("kind"), "description": t.get("description", ""),
              "level": session.state.player.technique_levels.get(t["id"], 1)}
             for t in techniques
         ],
+        "curriculum": curriculum,
+        "academy_curriculum": curriculum,
         "academy": academy,
         "loc_names": {l["id"]: l["name"] for l in registry.locations},
         "item_names": {i["id"]: i["name"] for i in registry.items.values()},
@@ -200,7 +245,7 @@ class Handler(BaseHTTPRequestHandler):
             return {}
         return data if isinstance(data, dict) else {}
 
-    # ---------- GET ----------
+    # ---------- GET / HEAD ----------
 
     def do_HEAD(self) -> None:
         """HEAD: header saja tanpa body (RFC 9110). Untuk file statis dipakai

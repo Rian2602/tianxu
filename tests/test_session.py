@@ -198,8 +198,7 @@ def test_load_save_non_utf8_menolak(tmp_path, monkeypatch, registry):
 
 def test_action_blocked_in_battle(dummy_session):
     # Ubah state secara manual agar terlihat sedang dalam pertarungan
-    dummy_session.state.ui.mode = "battle"
-    dummy_session.state.ui.battle = {"active": True}
+    dummy_session.state.pending_battle = {"active": True}
 
     # Mencoba aksi move (pindah lokasi) saat battle
     response = dummy_session.apply_action({"type": "move", "to": "loc_asrama"})
@@ -208,16 +207,17 @@ def test_action_blocked_in_battle(dummy_session):
     assert response.get("error") is not None or "blocked" in str(response.get("log_delta", []))
 
 
-def test_ui_mode_transition_clears_pending_battle(dummy_session):
-    state = dummy_session.state
-    state.ui.mode = "battle"
-    assert state.pending_battle is not None
-    assert state.ui.mode == "battle"
+def test_session_mode_transition(dummy_session):
+    session = dummy_session
+    assert session.view()["mode"] == "explore"
 
-    # Setting mode back to explore clears pending_battle
-    state.ui.mode = "explore"
-    assert state.pending_battle is None
-    assert state.ui.mode == "explore"
+    # Pending battle -> mode battle
+    session.state.pending_battle = {"active": True}
+    assert session.view()["mode"] == "battle"
+
+    # Pending battle selesai -> mode explore
+    session.state.pending_battle = None
+    assert session.view()["mode"] == "explore"
 
 
 def test_crafting_blocked_in_unsafe_zone(dummy_session):
@@ -273,7 +273,11 @@ def test_branch_dialog_included_in_apply_action_view(session, god_mode):
 
     session.apply_action({"type": "choose", "option": "akademi_elemen"})
 
-    move_path(session, ["loc_aula_ujian", "loc_paviliun"])
+    session.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    finish_dialog(session, [0])
+
+    session.apply_action({"type": "move", "to": "loc_paviliun"})
     session.apply_action({"type": "talk", "npc": "npc_suqing"})
     finish_dialog(session, [0])
 
@@ -796,4 +800,214 @@ def test_talk_returns_view_during_battle(session):
     assert session.state.pending_dialog is None  # dialog tidak boleh mulai saat bertarung
     assert session.state.pending_battle == {"active": True}  # battle tetap berjalan
 
+
+def test_moyun_schedule_hour_end_19(session):
+    moyun = session.reg.npc("npc_moyun")
+    assert moyun is not None
+    # Jam 6 sampai 18: tersedia
+    session.state.hour = 6
+    assert session._is_npc_available(moyun) is True
+    session.state.hour = 12
+    assert session._is_npc_available(moyun) is True
+    session.state.hour = 18
+    assert session._is_npc_available(moyun) is True
+    # Jam 19 ke atas (malam): tidak tersedia di perpustakaan
+    session.state.hour = 19
+    assert session._is_npc_available(moyun) is False
+    session.state.hour = 20
+    assert session._is_npc_available(moyun) is False
+    session.state.hour = 22
+    assert session._is_npc_available(moyun) is False
+
+
+def test_branch_dialog_triggers_on_quest_completion(dummy_session):
+    s = dummy_session
+    s.state.current_quest = "q_akademi_06"
+    s.state.location = "loc_perpustakaan"
+    s.state.hour = 20  # Waktu malam (19..6)
+    # Pindah dari perpustakaan ke loc_ruang_lonceng menyelesaikan q_akademi_06 dan langsung memicu dialog cabang
+    res = s.apply_action({"type": "move", "to": "loc_ruang_lonceng"})
+    assert s.state.branch_pending == "dlg_3_pilih_sikap"
+    assert s.state.pending_dialog == "dlg_3_pilih_sikap"
+    assert res["mode"] == "dialog"
+    assert res["dialog"]["dialog_id"] == "dlg_3_pilih_sikap"
+
+
+def test_talk_moyun_schedule_availability(dummy_session):
+    s = dummy_session
+    s.state.location = "loc_perpustakaan"
+    # Jam 18 (buka): bisa diajak bicara
+    s.state.hour = 18
+    res = s.apply_action({"type": "talk", "npc": "npc_moyun"})
+    assert res["mode"] == "dialog"
+    assert s.state.pending_dialog == "dlg_moyun"
+    # Tutup dialog
+    s.dialog._end()
+
+    # Jam 19 (tutup): ditolak dengan pesan istirahat
+    s.state.hour = 19
+    res = s.apply_action({"type": "talk", "npc": "npc_moyun"})
+    assert res["mode"] == "explore"
+    assert s.state.pending_dialog is None
+    assert any("sedang beristirahat" in log["text"] for log in s.state.log)
+
+
+def test_battle_action_returns_full_session_view(dummy_session):
+    s = dummy_session
+    foe = {"id": "eno_dummy", "name": "Dummy", "hp": 50, "hp_max": 50, "qi": 0, "attack": 1, "defense": 1,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    s.battle.start([foe], "spar")
+    res = s.apply_action({"type": "battle_action", "action": "guard"})
+    # Verifikasi seluruh properti view sesi lengkap hadir pada hasil battle_action
+    assert res["mode"] == "battle"
+    assert "location" in res
+    assert "player" in res
+    assert "inventory" in res
+    assert "log" in res
+    assert "day" in res
+    assert "hour" in res
+    assert "battle" in res
+    assert res["battle"]["mode"] == "battle"
+
+
+def test_battle_victory_triggers_branch_dialog_in_view(dummy_session):
+    s = dummy_session
+    fake_quest = {
+        "id": "q_spar_branch",
+        "title": "Spar Bercabang",
+        "kind": "main",
+        "objective": {"kind": "spar", "npc": "npc_hanxiu"},
+        "next": [
+            {"quest": "q_akademi_3aa", "branch": "b_3aa", "choice_id": "dlg_3_pilih_sikap", "option": "opt_3aa"},
+            {"quest": "q_akademi_3ab", "branch": "b_3ab", "choice_id": "dlg_3_pilih_sikap", "option": "opt_3ab"},
+        ],
+        "on_complete": {},
+    }
+    s.reg.quest_by_id["q_spar_branch"] = fake_quest
+    s.state.current_quest = "q_spar_branch"
+
+    foe = {"id": "eno_hanxiu", "name": "Han Xiu", "hp": 1, "hp_max": 100, "qi": 0, "attack": 1, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 10, "drop_item": None, "drop_chance": 0}
+    s.battle.start([foe], "spar")
+    s.state.pending_battle["spar_npc"] = "npc_hanxiu"
+
+    # Satu serangan mengalahkan lawan dan memicu branch dialog
+    res = s.apply_action({"type": "battle_action", "action": "attack"})
+    assert s.state.pending_battle is None
+    assert s.state.branch_pending == "dlg_3_pilih_sikap"
+    assert s.state.pending_dialog == "dlg_3_pilih_sikap"
+    assert res["mode"] == "dialog"
+    assert res["dialog"]["dialog_id"] == "dlg_3_pilih_sikap"
+
+    del s.reg.quest_by_id["q_spar_branch"]
+
+
+def test_dialog_with_choices_completing_quest_into_branch(dummy_session):
+    s = dummy_session
+    fake_quest = {
+        "id": "q_talk_branch",
+        "title": "Talk Bercabang",
+        "kind": "main",
+        "objective": {"kind": "talk", "npc": "npc_penjaga", "target": 1},
+        "next": [
+            {"quest": "q_akademi_3aa", "branch": "b_3aa", "choice_id": "dlg_3_pilih_sikap", "option": "opt_3aa"},
+            {"quest": "q_akademi_3ab", "branch": "b_3ab", "choice_id": "dlg_3_pilih_sikap", "option": "opt_3ab"},
+        ],
+        "on_complete": {},
+    }
+    s.reg.quest_by_id["q_talk_branch"] = fake_quest
+    s.state.current_quest = "q_talk_branch"
+    s.state.location = "loc_gerbang_akademi"
+
+    # Bicara dengan penjaga (dialog memiliki opsi pilihan)
+    s.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    # Pilih opsi pertama pada node_greet
+    s.apply_action({"type": "dialog_choice", "choice_index": 0})
+    # Lanjut pada node_welcome (advance)
+    s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    # Lanjut pada node_direct yang merupakan akhir dialog
+    res = s.apply_action({"type": "dialog_choice", "choice_index": -1})
+
+    # Dialog penjaga selesai -> quest q_talk_branch selesai -> memicu dlg_3_pilih_sikap
+    assert s.state.branch_pending == "dlg_3_pilih_sikap"
+    assert s.state.pending_dialog == "dlg_3_pilih_sikap"
+    assert res["mode"] == "dialog"
+    assert res["dialog"]["dialog_id"] == "dlg_3_pilih_sikap"
+
+    del s.reg.quest_by_id["q_talk_branch"]
+
+
+def test_branch_dialog_full_selection_resolves_quest(dummy_session):
+    s = dummy_session
+    s.state.completed_quests.append("q_akademi_06")
+    s.state.branch_pending = "dlg_3_pilih_sikap"
+    
+    # 1. Start / view branch dialog
+    v = s.view()
+    assert v["mode"] == "dialog"
+    assert v["dialog"]["dialog_id"] == "dlg_3_pilih_sikap"
+
+    # 2. Advance dari node_scene ke node_pilih
+    v = s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    assert v["mode"] == "dialog"
+    assert len(v["dialog"]["choices"]) == 3
+
+    # 3. Pilih opsi opt_3a (index 0) -> node_cara
+    v = s.apply_action({"type": "dialog_choice", "choice_index": 0})
+    assert v["mode"] == "dialog"
+    assert len(v["dialog"]["choices"]) == 2
+
+    # 4. Pilih opsi opt_3aa (index 0) -> node_aa (end: true)
+    v = s.apply_action({"type": "dialog_choice", "choice_index": 0})
+    assert v["mode"] == "dialog"
+
+    # 5. Advance penutup dialog -> selesai -> quest cabang terpilih
+    res = s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    assert res["mode"] == "explore"
+    assert s.state.branch_pending is None
+    assert s.state.pending_dialog is None
+    assert s.state.current_quest == "q_akademi_3aa"
+
+
+def test_external_quest_trigger_updates_session_view(dummy_session):
+    s = dummy_session
+    s.state.current_quest = "q_akademi_06"
+    s.state.location = "loc_ruang_lonceng"
+    s.state.hour = 20
+
+    # Panggil notify_move langsung tanpa lewat apply_action
+    s.quest.notify_move()
+    assert s.state.branch_pending == "dlg_3_pilih_sikap"
+
+    # Session view otomatis memicu _maybe_start_branch_dialog
+    v = s.view()
+    assert v["mode"] == "dialog"
+    assert v["dialog"]["dialog_id"] == "dlg_3_pilih_sikap"
+    assert s.state.pending_dialog == "dlg_3_pilih_sikap"
+
+
+def test_branch_selection_with_interleaved_side_quest(dummy_session):
+    """Bila side quest selesai diselipkan ke completed_quests, select_branch tetap
+    menemukan main quest yang bercabang dari daftar riwayat terbalik."""
+    s = dummy_session
+    s.state.completed_quests.append("q_akademi_06")
+    # Selipkan side quest setelah main quest
+    s.state.completed_quests.append("q_side_moyun")
+    s.state.branch_pending = "dlg_3_pilih_sikap"
+
+    s.quest.select_branch("opt_3aa")
+    assert s.state.current_quest == "q_akademi_3aa"
+    assert s.state.branch_pending is None
+
+
+def test_maybe_start_branch_dialog_invalid_dialog_cleans_up(dummy_session):
+    """Jika branch_pending berisi dialog ID yang tidak ada, start gagal dan
+    branch_pending dibersihkan agar tidak loop tanpa henti."""
+    s = dummy_session
+    s.state.branch_pending = "dlg_tidak_ada_sama_sekali"
+
+    v = s.view()
+    assert v["mode"] == "explore"
+    assert s.state.branch_pending is None
+    assert s.state.pending_dialog is None
 

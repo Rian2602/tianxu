@@ -47,7 +47,9 @@ def test_cli_playthrough_3aa(monkeypatch, capsys, akademi, nama_akademi, pakai_r
         "talk npc_hanxiu", "lanjut", "lanjut",
         "serang",                       # menang spar
         "pilih " + akademi,
-        "pindah loc_aula_ujian", "pindah loc_paviliun",
+        "pindah loc_aula_ujian",
+        "talk npc_gucanghai", "1", "lanjut",
+        "pindah loc_paviliun",
         "talk npc_suqing", "1", "lanjut",
         "pindah loc_perpustakaan", "tunggu 12", "pindah loc_ruang_lonceng",
         "lanjut", "1", "1", "lanjut",   # cabang 3aa (node_scene → pilih → cara → aa)
@@ -119,7 +121,9 @@ def test_cli_full_playthrough_commands(monkeypatch, capsys):
         "talk npc_hanxiu", "lanjut", "lanjut",
         "teknik", "serang",               # teknik tanpa akademi → attack → menang spar
         "pilih akademi_elemen",
-        "pindah loc_aula_ujian", "pindah loc_paviliun",
+        "pindah loc_aula_ujian",
+        "talk npc_gucanghai", "1", "lanjut",
+        "pindah loc_paviliun",
         "talk npc_suqing", "1", "lanjut",
         "pindah loc_perpustakaan", "tunggu 12", "pindah loc_ruang_lonceng",
         "lanjut", "1", "1", "lanjut",   # cabang 3aa

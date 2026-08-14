@@ -18,6 +18,7 @@ graphify-out/
 
 # Proses pengembangan (artefak orchestration, tidak dipublikasikan)
 .agents/
+ORIGINAL_REQUEST.md
 .superpowers/
 
 # Coverage HTML

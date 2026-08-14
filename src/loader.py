@@ -88,35 +88,28 @@ class DataRegistry:
     def technique(self, tid: str) -> dict | None:
         return self.techniques.get(tid)
 
+    def academy_curriculum(self, academy: str) -> list[dict]:
+        """Daftar teknik kurikulum untuk suatu akademi/paviliun (berurutan)."""
+        for a in self.config.get("academies", []):
+            if a.get("id") == academy:
+                curr = a.get("curriculum", [])
+                return [self.techniques[tid] for tid in curr if tid in self.techniques]
+        return []
+
     # ---------- pemain ----------
 
     def player_techniques(self, academy: str, realm: str | None = None,
                           completed_quests: frozenset = frozenset(),
                           owned: tuple = ()) -> list[dict]:
-        """Teknik yang tersedia untuk pemain: skill_pool akademi + unlock_arc (B4) +
-        teknik yang dimiliki (`owned`, C1 — reward quest/dialog), dibatasi ranah.
-
-        Bila `realm` diberikan, teknik dengan `realm_required` lebih tinggi disembunyikan
-        (H4) — pola sama seperti `dialog.py` membandingkan `order` ranah.
-
-        B4 (GDD §5.2): teknik dengan `unlock_arc` terisi ikut tampil untuk akademi mana
-        pun bila quest final arc itu sudah selesai (arc selesai = data arc berikutnya
-        bisa membuka teknik akademi lain tanpa mengubah engine).
-        C1 (GDD §7): `owned` = id teknik milik pemain (dari efek `technique`).
-        """
-        pools: list[str] = []
-        for a in self.config.get("academies", []):
-            if a["id"] == academy:
-                pools = list(a.get("skill_pool") or [])
-                break
+        """Teknik yang tersedia untuk pemain: hanya teknik yang benar-benar telah
+        dipelajari (`owned` / `state.player.techniques`) dan teknik lintas-arc yang terbuka (`unlock_arc`),
+        dibatasi oleh ranah pemain (H4)."""
         out: list[dict] = []
-        # A6: semua elemen skill_pool diproses (bukan hanya [0]) — pool 2+ (mis.
-        # ["tek_elemen_*", "tek_universal_*"]); dedup via `t not in out`.
-        for pool in pools:
-            prefix = pool.rstrip("*")
-            for t in self.techniques.values():
-                if t["id"].startswith(prefix) and t not in out:
-                    out.append(t)
+        # teknik yang dimiliki / dipelajari (C1 / Skill Learning System)
+        for tid in owned:
+            t = self.techniques.get(tid)
+            if t and t not in out:
+                out.append(t)
         # teknik lintas akademi: unlock_arc → arc selesai bila final_quest-nya di completed_quests
         done_arcs = {
             a["id"] for a in self.config.get("arcs", [])
@@ -127,11 +120,6 @@ class DataRegistry:
             if t.get("unlock_arc") and t["unlock_arc"] in done_arcs
             and t not in out
         ]
-        # teknik yang dimiliki (reward quest/dialog) — C1
-        for tid in owned:
-            t = self.techniques.get(tid)
-            if t and t not in out:
-                out.append(t)
         if realm:
             cur_r = self.realms.get(realm)
             if cur_r:
@@ -141,3 +129,4 @@ class DataRegistry:
                     if int(self.realms.get(t.get("realm_required", realm), cur_r)["order"]) <= order_cur
                 ]
         return out
+

@@ -23,9 +23,14 @@ class DialogEngine:
         self.quest_engine = quest_engine
         self.current: dict | None = None
         self.node_id: str | None = None
+        self.last_node: str | None = None
+        self.last_nodes: set[str] = set()  # A3: semua node yang dimainkan
         self.last_npc: str | None = None
         self.chosen_option: str | None = None
         self.visited: set[str] = set()  # A3: semua node yang dimainkan
+        self.last_dialog_id: str | None = None
+        if self.state.pending_dialog:
+            self.start(self.state.pending_dialog)
 
     # ---------- mulai / lanjut ----------
 
@@ -34,6 +39,7 @@ class DialogEngine:
         bila node itu ada di dialog; jika tidak ada → fallback `_resolve_entry`."""
         dlg = self.reg.dialog(dialog_id)
         if not dlg:
+            self.state.pending_dialog = None
             return None
         self.current = dlg
         self.last_npc = dlg.get("npc") or None
@@ -44,6 +50,11 @@ class DialogEngine:
             self.node_id = forced_node
         else:
             self.node_id = self._resolve_entry(dlg)
+        if not self.node_id or self.node_id not in nodes:
+            self.current = None
+            self.node_id = None
+            self.state.pending_dialog = None
+            return None
         self.visited.add(self.node_id)
         self.state.pending_dialog = dialog_id
         return self.view()
@@ -107,6 +118,7 @@ class DialogEngine:
         return out
 
     def _end(self) -> dict | None:
+        self.last_dialog_id = self.current["id"] if self.current else None
         self.last_node = self.node_id
         self.last_nodes = set(self.visited)  # A3: snapshot semua node yang dimainkan
         self.node_id = None
@@ -114,8 +126,17 @@ class DialogEngine:
         self.state.pending_dialog = None
         return {"ended": True}
 
-    def view(self) -> dict:
-        node = self.current["nodes"][self.node_id]
+    def view(self) -> dict | None:
+        if not self.current or not self.node_id:
+            if self.state.pending_dialog:
+                if self.start(self.state.pending_dialog):
+                    return self.view()
+                self.state.pending_dialog = None
+            return None
+        nodes = self.current.get("nodes", {})
+        node = nodes.get(self.node_id)
+        if not node:
+            return None
         choices = self._visible_choices(node)
         return {
             "dialog_id": self.current["id"],

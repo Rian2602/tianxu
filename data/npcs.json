@@ -25,7 +25,7 @@
       "schedule": [ { "day": 1, "hour_start": 7, "hour_end": 19, "location": "loc_paviliun" } ] },
     { "id": "npc_moyun", "name": "Mo Yun", "location": "loc_perpustakaan", "role": "librarian",
       "default_dialog": "dlg_moyun",
-      "schedule": [ { "day": 1, "hour_start": 6, "hour_end": 22, "location": "loc_perpustakaan" } ] },
+      "schedule": [ { "day": 1, "hour_start": 6, "hour_end": 19, "location": "loc_perpustakaan" } ] },
     { "id": "npc_zhouyan", "name": "Zhou Yan", "location": "loc_aula_ujian", "role": "victim",
       "default_dialog": "dlg_zhouyan",
       "schedule": [ { "day": 1, "hour_start": 8, "hour_end": 20, "location": "loc_aula_ujian" } ] },

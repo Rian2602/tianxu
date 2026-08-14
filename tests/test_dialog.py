@@ -687,3 +687,53 @@ def test_3aa_konfrontasi_saat_quest_aktif(session, god_mode):
     assert session.state.flags.get("branch_3aa") is True
 
 
+def test_suqing_intro_friendly_choice_relation(session):
+    """Pilihan ramah saat perkenalan Su Qing memberi efek relation +5."""
+    session.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    session.apply_action({"type": "move", "to": "loc_paviliun"})
+    session.apply_action({"type": "talk", "npc": "npc_suqing"})
+    assert session.state.pending_dialog is not None
+    assert session.state.relations.get("npc_suqing", 0) == 0
+    # Pilih opsi ramah (indeks 0: "Aku Chen Xu. Senang bertemu, Su Qing.")
+    session.apply_action({"type": "dialog_choice", "choice_index": 0})
+    assert session.state.relations.get("npc_suqing") == 5
+
+
+def test_suqing_dialog_memory_branch(session):
+    """Cabang dialog ingatan (mem_01) pada Su Qing hanya muncul saat ingatan terbuka."""
+    from conftest import finish_dialog
+    session.state.flags["hari_pertama_selesai"] = True
+    session.state.location = "loc_paviliun"
+    # Tanpa ingatan mem_01
+    session.apply_action({"type": "talk", "npc": "npc_suqing"})
+    v = session.dialog.view()
+    labels = [c["label"] for c in v["choices"]]
+    assert not any("istana" in l.lower() for l in labels)
+    finish_dialog(session, [1])
+
+    # Dengan ingatan mem_01
+    session.state.memories.append("mem_01")
+    session.apply_action({"type": "talk", "npc": "npc_suqing"})
+    v = session.dialog.view()
+    labels = [c["label"] for c in v["choices"]]
+    assert any("istana" in l.lower() for l in labels)
+    # Pilih cabang ingatan
+    mem_idx = next(i for i, c in enumerate(v["choices"]) if "istana" in c["label"].lower())
+    session.apply_action({"type": "dialog_choice", "choice_index": mem_idx})
+    v2 = session.dialog.view()
+    assert "istana yang megah" in v2["text"].lower() or "berbahaya" in v2["text"].lower()
+
+
+def test_q05_requires_specific_node(session):
+    """q_akademi_05 membutuhkan node_intro2 untuk selesai."""
+    session.state.current_quest = "q_akademi_05"
+    # Dialog Su Qing berakhir di node selain node_intro2 (misal node_umum) -> belum selesai
+    session.quest.notify_dialog_ended("npc_suqing", "node_umum")
+    assert session.state.current_quest == "q_akademi_05"
+    assert "q_akademi_05" not in session.state.completed_quests
+
+    # Dialog mencapai node_intro2 -> quest selesai
+    session.quest.notify_dialog_ended("npc_suqing", ["node_intro", "node_intro2"])
+    assert "q_akademi_05" in session.state.completed_quests
+
+

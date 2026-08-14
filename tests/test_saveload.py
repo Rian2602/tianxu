@@ -217,3 +217,31 @@ def test_pending_dialog_tidak_diserialisasi(dummy_session):
     assert restored.pending_dialog is None
 
 
+def test_branch_pending_serialized_and_resumed_on_load(registry):
+    state = GameSession.new(registry).state
+    state.completed_quests.append("q_akademi_06")
+    state.branch_pending = "dlg_3_pilih_sikap"
+
+    d = state.to_dict()
+    assert d["branch_pending"] == "dlg_3_pilih_sikap"
+
+    restored_state = GameState.from_dict(d)
+    assert restored_state.branch_pending == "dlg_3_pilih_sikap"
+
+    session = GameSession(registry, restored_state)
+    v = session.view()
+    assert v["mode"] == "dialog"
+    assert v["dialog"]["dialog_id"] == "dlg_3_pilih_sikap"
+
+
+def test_dialog_engine_handles_invalid_or_uninitialized_pending_dialog(registry):
+    state = GameSession.new(registry).state
+    state.pending_dialog = "dlg_tidak_ada_di_registry"
+
+    session = GameSession(registry, state)
+    v = session.view()
+    assert v["mode"] == "explore"
+    assert v["dialog"] is None
+    assert state.pending_dialog is None
+
+

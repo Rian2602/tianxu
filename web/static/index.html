@@ -27,6 +27,11 @@
       <button id="btn-new" class="btn btn-gold">Mulai Baru</button>
       <div id="save-slots" class="save-slots"></div>
       <p id="title-msg" class="title-msg"></p>
+      <div id="title-audio" class="title-audio" aria-label="Kontrol musik">
+        <button id="btn-audio-mute" class="btn-audio-btn" type="button" aria-label="Matikan musik">♫</button>
+        <input type="range" id="audio-volume" class="audio-volume" min="0" max="1" step="0.05" value="0.3" aria-label="Volume musik">
+        <span id="audio-volume-label" class="audio-volume-label">30%</span>
+      </div>
     </div>
   </div>
 
@@ -37,6 +42,11 @@
       <div class="topbar-right">
         <button id="btn-toggle-right" class="btn btn-small" onclick="toggleRightDrawer()">Quest · Inventori</button>
         <button id="btn-tianyuan" class="btn btn-small">天缘灵 · Panel</button>
+        <div id="topbar-audio" class="topbar-audio" aria-label="Kontrol musik">
+          <button id="btn-audio-mute-topbar" class="btn-audio-btn" type="button" aria-label="Matikan musik">♫</button>
+          <input type="range" id="audio-volume-topbar" class="audio-volume" min="0" max="1" step="0.05" value="0.3" aria-label="Volume musik">
+          <span id="audio-volume-label-topbar" class="audio-volume-label">30%</span>
+        </div>
       </div>
     </header>
 

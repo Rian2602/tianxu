@@ -232,8 +232,23 @@ class Validator:
             self.error(f"config.battle.damage_formula tidak valid (aturan 16)")
 
         for a in cfg.get("academies", []):
-            if not a.get("skill_pool"):
-                self.error(f"config.academies: '{a.get('id')}' tanpa skill_pool")
+            aid = a.get("id", "?")
+            curr = a.get("curriculum")
+            if not curr or not isinstance(curr, list):
+                self.error(f"config.academies: '{aid}' tanpa curriculum")
+            else:
+                for tid in curr:
+                    if not self.has("technique", tid):
+                        self.error(f"config.academies: '{aid}' curriculum teknik '{tid}' tidak ada di techniques.csv")
+            sk = a.get("starter_kit")
+            if sk is not None:
+                if not isinstance(sk, list):
+                    self.error(f"config.academies: '{aid}' starter_kit bukan list")
+                else:
+                    for it in sk:
+                        iid = it.get("id") if isinstance(it, dict) else it
+                        if not iid or not self.has("item", iid):
+                            self.error(f"config.academies: '{aid}' starter_kit item '{iid}' tidak ada di items.csv")
 
         # B1: arcs — final_quest harus ada, title/teaser non-kosong, memories_total > 0, branches non-kosong
         seen_arcs: set[str] = set()
@@ -363,14 +378,6 @@ class Validator:
                         self.error(f"quest {qid}: memory_unlock '{m}' tidak ada")
             for fx in oc.get("effects", []):
                 self._check_effect(fx, f"quest {qid} on_complete")
-                if fx.get("type") == "item" and not self.has("item", fx.get("id", "")):
-                    self.error(f"quest {qid}: efek item '{fx.get('id')}' tidak ada")
-                if fx.get("type") == "relation" and not self.has("npc", fx.get("npc", "")):
-                    self.error(f"quest {qid}: efek relation npc '{fx.get('npc')}' tidak ada")
-                if fx.get("type") == "technique":
-                    for tid in (fx.get("id") if isinstance(fx.get("id"), list) else [fx.get("id")]):
-                        if tid and not self.has("technique", tid):
-                            self.error(f"quest {qid}: efek technique '{tid}' tidak ada di techniques.csv (aturan 13)")
 
             # giver (aturan 2)
             if q.get("giver") and not self.has("npc", q["giver"]):
@@ -392,6 +399,41 @@ class Validator:
     def _check_effect(self, fx, where) -> None:
         if not isinstance(fx, dict) or fx.get("type") not in EFFECT_TYPES:
             self.error(f"{where}: efek tidak valid: {fx}")
+            return
+        t = fx.get("type")
+        if t == "relation":
+            nid = fx.get("npc")
+            if not nid or not self.has("npc", nid):
+                self.error(f"{where}: efek relation npc '{nid}' tidak ada")
+            if "value" in fx and not isinstance(fx["value"], (int, float)):
+                self.error(f"{where}: efek relation value harus angka")
+        elif t == "item":
+            iid = fx.get("id")
+            if not iid or not self.has("item", iid):
+                self.error(f"{where}: efek item '{iid}' tidak ada")
+        elif t == "technique":
+            ids = fx.get("id")
+            for tid in (ids if isinstance(ids, list) else [ids]):
+                if tid and not self.has("technique", tid):
+                    self.error(f"{where}: efek technique '{tid}' tidak ada di techniques.csv (aturan 13)")
+        elif t == "start_quest":
+            qid = fx.get("quest")
+            if not qid or not self.has("quest", qid):
+                self.error(f"{where}: start_quest '{qid}' tidak ada")
+        elif t == "flag":
+            if not fx.get("key") or not isinstance(fx.get("key"), str):
+                self.error(f"{where}: efek flag butuh key string")
+        elif t == "morality":
+            if "value" in fx and not isinstance(fx["value"], (int, float)):
+                self.error(f"{where}: efek morality value harus angka")
+        elif t == "gold":
+            if "value" in fx and not isinstance(fx["value"], (int, float)):
+                self.error(f"{where}: efek gold value harus angka")
+        elif t == "reputation":
+            if not fx.get("faksi") or not isinstance(fx.get("faksi"), str):
+                self.error(f"{where}: efek reputation butuh faksi string")
+            if "value" in fx and not isinstance(fx["value"], (int, float)):
+                self.error(f"{where}: efek reputation value harus angka")
 
     def _check_dialogs(self) -> None:
         for d in self.dialogs:
@@ -419,12 +461,6 @@ class Validator:
                     self._check_dialog_condition(did, nid, c.get("condition"), "choice")
                     for fx in c.get("effects", []):
                         self._check_effect(fx, f"dialog {did} node {nid}")
-                        if fx.get("type") == "start_quest" and not self.has("quest", fx.get("quest", "")):
-                            self.error(f"dialog {did}: start_quest '{fx.get('quest')}' tidak ada")
-                        if fx.get("type") == "technique":
-                            for tid in (fx.get("id") if isinstance(fx.get("id"), list) else [fx.get("id")]):
-                                if tid and not self.has("technique", tid):
-                                    self.error(f"dialog {did}: efek technique '{tid}' tidak ada di techniques.csv (aturan 13)")
 
     def _check_dialog_condition(self, did: str, nid: str, cond: dict | None, where: str) -> None:
         """Validasi referensi kondisi dialog (P1-2 relation, P1-1 memory, C2 month).
