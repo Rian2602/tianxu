@@ -592,9 +592,11 @@ class GameSession:
                 "gold": s.player.gold,
                 "day": s.day,
                 "teaser": arc.get("teaser", ""),
+                # C3: ending data-driven (GDD §3.4/§9) — None untuk arc tanpa `endings`
+                "ending": self._pick_ending(s, arc),
             }
             break
-            
+
         return {
             "location": {
                 "id": loc["id"], "name": loc["name"], "description": loc["description"],
@@ -641,6 +643,17 @@ class GameSession:
             "log": s.log,
             "arc_summary": arc_summary,
         }
+
+    def _pick_ending(self, s, arc: dict) -> dict | None:
+        """C3 (GDD §3.4/§9): pilih ending dari `config.arcs[].endings` — ending
+        pertama yang kondisinya cocok (first-match, AND — pola `_eval_condition`
+        dipakai ulang apa adanya). Tanpa `endings` → None (kontrak view lama).
+        Arc berikutnya (mis. final) cukup isi data endings tematik."""
+        for end in arc.get("endings") or []:
+            cond = end.get("condition") or {}
+            if DialogEngine._eval_condition(s, cond, self.reg):
+                return {"id": end["id"], "title": end.get("title", ""), "desc": end.get("desc", "")}
+        return None
 
     def _mode(self) -> str:
         if self.state.pending_battle:

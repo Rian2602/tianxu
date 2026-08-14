@@ -331,6 +331,11 @@ def main() -> None:
                 print(f"Moralitas: {s['morality']}")
                 print(f"Pilihan Akhir: {s['branch']}")
                 print(f"Ingatan Terbuka: {s['memories_unlocked']}")
+                # C3: ending data-driven (None untuk arc tanpa endings)
+                end = s.get("ending")
+                if end:
+                    print(f"Ending: {end['title']}")
+                    print(DIM + end.get("desc", "") + RESET)
                 print(DIM + f"\"{s['teaser']}\"" + RESET)
                 print(f"{GOLD}════════════════════════════════{RESET}\n")
 

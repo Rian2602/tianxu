@@ -245,6 +245,23 @@ class Validator:
                 self.error(f"config.arcs: memories_total arc '{aid}' harus int > 0 (aturan 7)")
             if not arc.get("branches") or not isinstance(arc["branches"], dict):
                 self.error(f"config.arcs: branches arc '{aid}' kosong/bukan dict (aturan 7)")
+            # C3: endings opsional — id unik, title/desc string, condition valid (pola _check_dialog_condition)
+            seen_endings: set[str] = set()
+            for end in arc.get("endings") or []:
+                eid = end.get("id")
+                if not eid or eid in seen_endings:
+                    self.error(f"config.arcs.{aid}.endings: id ending kosong/duplikat '{eid}' (aturan 7)")
+                seen_endings.add(eid)
+                if not end.get("title") or not isinstance(end["title"], str):
+                    self.error(f"config.arcs.{aid}.endings: title ending '{eid}' kosong/bukan string (aturan 7)")
+                if "desc" in end and not isinstance(end.get("desc"), str):
+                    self.error(f"config.arcs.{aid}.endings: desc ending '{eid}' bukan string (aturan 7)")
+                cond = end.get("condition") or {}
+                if not isinstance(cond, dict):
+                    self.error(f"config.arcs.{aid}.endings: condition ending '{eid}' bukan dict (aturan 7)")
+                else:
+                    self._check_dialog_condition(
+                        f"arc.{aid}.ending.{eid}", "condition", cond, "condition")
 
         # B2: fallback lokasi aman saat KO — harus lokasi yang ada dan is_safe
         sfl = cfg.get("world", {}).get("safe_fallback_location")
@@ -390,9 +407,18 @@ class Validator:
                                     self.error(f"dialog {did}: efek technique '{tid}' tidak ada di techniques.csv (aturan 13)")
 
     def _check_dialog_condition(self, did: str, nid: str, cond: dict | None, where: str) -> None:
-        """Validasi referensi kondisi dialog (P1-2 relation, P1-1 memory)."""
+        """Validasi referensi kondisi dialog (P1-2 relation, P1-1 memory, C2 month).
+        C3: dipakai ulang untuk ending — kunci tak dikenal (mis. `mood_min`) ditolak
+        agar skema kondisi konsisten dengan `_eval_condition` (subset kondisi dialog)."""
         if not cond:
             return
+        # kunci kondisi yang didukung `dialog.py::_eval_condition` (AND multi-kunci)
+        allowed = {"flag", "morality_min", "morality_max", "has_item", "realm_min",
+                   "academy", "quest_active", "quest_not_active",
+                   "relation_min", "relation_max", "memory", "month_min", "month_max"}
+        for ck in cond:
+            if ck not in allowed:
+                self.error(f"dialog {did} {where} {nid}: kunci kondisi '{ck}' tidak dikenal (aturan 7)")
         for ck in ("relation_min", "relation_max"):
             r = cond.get(ck) or {}
             if r.get("npc") and not self.has("npc", r["npc"]):

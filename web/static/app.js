@@ -463,6 +463,11 @@ function openArcSummaryModal(s) {
     ${statRow("Waktu Berlalu", `Hari ${s.day}`)}
     ${statRow("Pilihan Akhir", s.branch, "gold")}
   </div>`;
+  if (s.ending) {
+    html += `<div class="dialog-text" style="text-align:center; margin-bottom: 12px;">` +
+            `<span style="color:var(--gold); font-size: 18px;">Ending: ${esc(s.ending.title)}</span><br>` +
+            `${esc(s.ending.desc)}</div>`;
+  }
   html += `<div class="dialog-text" style="font-style:italic; color:var(--gray); text-align:center; margin-bottom: 24px;">"${esc(s.teaser)}"</div>`;
   html += `<button class="btn btn-gold" style="width:100%" onclick="dismissArcSummary()">Lanjut Eksplorasi Bebas</button>`;
   

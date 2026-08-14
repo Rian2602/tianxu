@@ -22,6 +22,8 @@ def _good() -> dict:
         "battle": {"crit_chance": 0.1, "turn_order": "fixed_alternate", "damage_formula": "percent"},
         "academies": [],
         "element_advantage": {},
+        "arcs": [{"id": "arc1", "final_quest": "q1", "title": "T", "teaser": "t",
+                   "memories_total": 1, "branches": {"b1": "B"}}],
     }
     return {
         "config.json": cfg,
@@ -215,6 +217,33 @@ def test_aturan7_kondisi_month_dialog_tidak_valid():
         "nodes": {"n0": {"speaker": "narration", "text": "x",
                          "condition": {"month_min": 3, "month_max": 5}, "end": True}},
     }]}
+    v, ok = make(d)
+    assert ok
+
+
+def test_aturan7_ending_arc_tidak_valid():
+    """C3: config.arcs[].endings — ending tanpa title / condition kunci tak dikenal ditolak (aturan 7)."""
+    d = _good()
+    d["config.json"]["arcs"][0]["endings"] = [{"id": "e1", "desc": "d", "condition": {}}]
+    v, ok = make(d)
+    assert not ok
+    assert any("title" in e for e in v.errors)
+
+    d = _good()
+    d["config.json"]["arcs"][0]["endings"] = [{
+        "id": "e1", "title": "T", "desc": "d",
+        "condition": {"mood_min": 10},  # kunci kondisi tak dikenal
+    }]
+    v, ok = make(d)
+    assert not ok
+    assert any("mood_min" in e for e in v.errors)
+
+    # ending valid (kondisi moralitas + flag, pola kondisi dialog) diterima
+    d = _good()
+    d["config.json"]["arcs"][0]["endings"] = [{
+        "id": "e1", "title": "T", "desc": "d",
+        "condition": {"morality_min": 30, "flag": {"key": "kunci_x", "value": True}},
+    }]
     v, ok = make(d)
     assert ok
 

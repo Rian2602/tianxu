@@ -703,6 +703,46 @@ def test_view_month_derived_dari_day(session):
     assert s.month_name(session.reg) == "Bulan 3"
 
 
+def test_arc_summary_ending_data_driven(session):
+    """C3: arc_summary.ending dipilih dari config.arcs[].endings (first-match, AND)."""
+    cfg_arcs = session.reg.config["arcs"]
+    session.state.completed_quests.append(cfg_arcs[0]["final_quest"])
+    session.state.flags["branch_3aa"] = True
+
+    # (c) tanpa endings → ending None (kontrak view lama utuh)
+    v = session.view()
+    assert v["arc_summary"].get("ending") is None
+
+    # (a) dengan endings dummy → pilih sesuai moralitas+flags (first-match AND)
+    cfg_arcs[0]["endings"] = [
+        {"id": "reformer", "title": "Pembangun Ulang", "desc": "d",
+         "condition": {"morality_min": 30, "flag": {"key": "kunci_reformasi", "value": True}}},
+        {"id": "destroyer", "title": "Penghancur", "desc": "d",
+         "condition": {"morality_max": -30, "flag": {"key": "kunci_kehancuran", "value": True}}},
+        {"id": "ascetic", "title": "Pertapa", "desc": "d", "condition": {}},
+    ]
+    session.state.player.morality = 50
+    session.state.flags["kunci_reformasi"] = True
+    v = session.view()
+    assert v["arc_summary"]["ending"]["id"] == "reformer"
+
+    # (b) moralitas beda + flag beda → ending beda (destroyer)
+    session.state.player.morality = -50
+    session.state.flags.pop("kunci_reformasi")
+    session.state.flags["kunci_kehancuran"] = True
+    v = session.view()
+    assert v["arc_summary"]["ending"]["id"] == "destroyer"
+
+    # fallback: tidak ada kondisi cocok → ending default (condition kosong) menang
+    session.state.player.morality = 0
+    session.state.flags.pop("kunci_kehancuran")
+    v = session.view()
+    assert v["arc_summary"]["ending"]["id"] == "ascetic"
+
+    # bersihkan config agar test lain tidak terpengaruh (config di-share antar test)
+    cfg_arcs[0].pop("endings", None)
+
+
 def test_talk_returns_view_during_battle(session):
     session.state.pending_battle = {"active": True}
     session._talk({"npc": "npc_penjaga"})
