@@ -124,6 +124,52 @@ def test_aturan2_report_to_npc_tidak_ada():
     assert any("report_to" in e for e in v.errors)
 
 
+def test_aturan7_arcs_final_quest_tidak_ada():
+    """B1: config.arcs — final_quest harus merujuk quest yang ada (aturan 7)."""
+    d = _good()
+    d["config.json"]["arcs"] = [{
+        "id": "sekte", "final_quest": "q_tidak_ada", "title": "ARC",
+        "teaser": "t", "memories_total": 4, "branches": {"b": "B"},
+    }]
+    v, ok = make(d)
+    assert not ok
+    assert any("final_quest" in e for e in v.errors)
+
+
+def test_aturan7_arcs_memories_total_tidak_valid():
+    """B1: config.arcs — memories_total harus int > 0 (aturan 7)."""
+    d = _good()
+    d["config.json"]["arcs"] = [{
+        "id": "akademi", "final_quest": "q1", "title": "ARC",
+        "teaser": "t", "memories_total": 0, "branches": {"b": "B"},
+    }]
+    v, ok = make(d)
+    assert not ok
+    assert any("memories_total" in e for e in v.errors)
+
+
+def test_aturan7_safe_fallback_location_bukan_aman():
+    """B2: config.world.safe_fallback_location harus lokasi yang ada dan is_safe (aturan 7)."""
+    d = _good()
+    d["config.json"]["world"] = {"safe_fallback_location": "loc_tidak_ada"}
+    v, ok = make(d)
+    assert not ok
+    assert any("safe_fallback_location" in e for e in v.errors)
+
+
+def test_aturan13_unlock_arc_tidak_dikenal():
+    """B4: techniques.csv unlock_arc harus merujuk config.arcs[].id (aturan 13)."""
+    d = _good()
+    d["config.json"]["arcs"] = [{
+        "id": "akademi", "final_quest": "q1", "title": "ARC",
+        "teaser": "t", "memories_total": 4, "branches": {"b": "B"},
+    }]
+    d["techniques.csv"] = [{"id": "t1", "academy": "elemen", "kind": "attack", "unlock_arc": "arc_tidak_ada"}]
+    v, ok = make(d)
+    assert not ok
+    assert any("unlock_arc" in e for e in v.errors)
+
+
 def test_aturan7_night_window_tidak_valid():
     d = _good()
     d["config.json"]["world"] = {"hunt": {"pool": [], "night_window": {"hour_start": 30, "hour_end": 6}}}

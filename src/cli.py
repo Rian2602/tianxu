@@ -212,7 +212,9 @@ def main() -> None:
                 if len(parts) > 1:
                     action = {"type": "battle_action", "action": "technique", "technique": parts[1]}
                 else:
-                    teks = session.reg.player_techniques(session.state.player.academy or "")
+                    teks = session.reg.player_techniques(
+                        session.state.player.academy or "", None,
+                        frozenset(session.state.completed_quests))
                     if teks:
                         print("Teknik: " + ", ".join(t["id"] for t in teks))
                         action = {"type": "battle_action", "action": "guard"}  # fallback aman
@@ -309,10 +311,11 @@ def main() -> None:
         if action:
             session.apply_action(action)
         # cek selesai arc (tampilkan sekali; lanjutkan loop agar pemain bisa simpan)
-        if not arc_ended and "arc_akademi_selesai" in session.state.flags:
-            arc_ended = True
+        # B3: trigger via arc_summary (data-driven) — bukan flag literal arc-1
+        if not arc_ended:
             v_after = session.view()
             if v_after.get("arc_summary"):
+                arc_ended = True
                 s = v_after["arc_summary"]
                 print(f"\n{GOLD}═══ {s['title']} ═══{RESET}")
                 print(f"Kultivator: {s['player_name']}")

@@ -90,21 +90,36 @@ class DataRegistry:
 
     # ---------- pemain ----------
 
-    def player_techniques(self, academy: str, realm: str | None = None) -> list[dict]:
+    def player_techniques(self, academy: str, realm: str | None = None,
+                          completed_quests: frozenset = frozenset()) -> list[dict]:
         """Teknik yang tersedia untuk akademi pilihan pemain (skill_pool), dibatasi ranah.
 
         Bila `realm` diberikan, teknik dengan `realm_required` lebih tinggi disembunyikan
         (H4) — pola sama seperti `dialog.py` membandingkan `order` ranah.
+
+        B4 (GDD §5.2): teknik dengan `unlock_arc` terisi ikut tampil untuk akademi mana
+        pun bila quest final arc itu sudah selesai (arc selesai = data arc berikutnya
+        bisa membuka teknik akademi lain tanpa mengubah engine).
         """
         pool = ""
         for a in self.config.get("academies", []):
             if a["id"] == academy:
                 pool = a.get("skill_pool", [""])[0] if a.get("skill_pool") else ""
                 break
-        if not pool:
-            return []
-        prefix = pool.rstrip("*")
-        out = [t for t in self.techniques.values() if t["id"].startswith(prefix)]
+        out: list[dict] = []
+        if pool:
+            prefix = pool.rstrip("*")
+            out = [t for t in self.techniques.values() if t["id"].startswith(prefix)]
+        # teknik lintas akademi: unlock_arc → arc selesai bila final_quest-nya di completed_quests
+        done_arcs = {
+            a["id"] for a in self.config.get("arcs", [])
+            if a.get("final_quest") in completed_quests
+        }
+        out += [
+            t for t in self.techniques.values()
+            if t.get("unlock_arc") and t["unlock_arc"] in done_arcs
+            and t not in out
+        ]
         if realm:
             cur_r = self.realms.get(realm)
             if cur_r:

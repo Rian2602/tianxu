@@ -421,8 +421,19 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
   },
   "ko_penalty": { "exp_loss_ratio": 0.1 },
   "companion": { "hp_per_level": 12, "attack_per_level": 2, "defense_per_level": 1, "speed_per_level": 0.5 },
+  "arcs": [
+    {
+      "id": "akademi",
+      "final_quest": "q_akademi_07",
+      "title": "AKHIR ARC 1: AKADEMI CHANGFENG",
+      "teaser": "Kebenaran di balik Penatua An telah terkuak. Namun bayang-bayang masa lalu Long Tianxu dan intrik Sekte Regional baru saja dimulai...",
+      "memories_total": 4,
+      "branches": { "branch_3aa": "Cabang 3AA — Konfrontasi Terbuka Penatua An", "branch_3ab": "Cabang 3AB — Penyelidikan Diam-Diam Mo Yun", "branch_3b": "Cabang 3B — Memeras Zhou Yan & Mengambil Keuntungan", "branch_3c": "Cabang 3C — Berdiam Diri & Menjaga Diri" }
+    }
+  ],
   "world": {
     "monster_respawn_hours": 5,
+    "safe_fallback_location": "loc_asrama",
     "hunt": {
       "location": "loc_wilayah_berburu",
       "pool": ["eno_serigala_qi", "eno_babi_hutan"],
@@ -444,6 +455,9 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
 ```
 
 - **Akademi = data**, bukan hardcode: engine membaca `academies` dari config. Pilihan akademi (quest `choose`) hanya membuka `skill_pool` akademi itu (GDD §5.2 — sejajar DAG, tidak berpotongan naratif).
+- **`arcs` (B1, 2026-08-14)**: metadata arc (final_quest, title, teaser, memories_total, branches) data-driven — `view().arc_summary` membaca `config.arcs` (arc TERAKHIR yang selesai yang ditampilkan). Arc berikutnya = tambah entri di list, tanpa ubah engine.
+- **`world.safe_fallback_location` (B2)**: lokasi respawn KO saat `last_safe_location` kosong — prioritas `last_safe_location` → config → lokasi `is_safe` pertama dari data (validator aturan 7 memastikan lokasi valid & aman).
+- **Teknik lintas akademi (B4, GDD §5.2)**: `techniques.csv` punya kolom opsional `unlock_arc` — teknik dengan `unlock_arc` terisi ikut tampil untuk akademi mana pun setelah quest final arc itu selesai (`player_techniques(..., completed_quests)`); tanpa data baru perilaku identik (non-breaking).
 - `element_advantage` = siklus 五行 (克制): logam克kayu, kayu克tanah, tanah克air, air克api, api克logam — dipakai battle engine dengan multiplier.
 - `roots.tiers` = tier akar spiritual + `exp_multiplier`; `ko_penalty.exp_loss_ratio` = penalti KO ringan (10% exp progres tingkat).
 
@@ -759,7 +773,7 @@ player_action(menu):
 ```
 
 - `mode` menentukan panel yang dirender: `dialog` → render `dialog` (node aktif + opsi); `battle` → render `battle` (menu battle + status musuh); `choose` → render `choose` (objektif pilih, mis. pilih akademi). Panel Tianyuan Ling memakai `GET /api/tianyuan`, bukan `view()`.
-- `companion` = `null` untuk non-Summoning atau kompanion KO; `arc_summary` terisi saat `q_akademi_07` selesai (layar penutup Arc 1).
+- `companion` = `null` untuk non-Summoning atau kompanion KO; `arc_summary` terisi saat quest final suatu arc (`config.arcs[].final_quest`) selesai — layar penutup arc (B1, data-driven).
 - `view.log` memuat seluruh log; UI merender ulang penuh per aksi — tidak ada `log_delta` terpisah.
 
 ### 12.5 Frontend (Fase 1 — tanpa build step)
@@ -805,13 +819,13 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 | 4 | Quest dengan >1 sisi punya `choice_id` & semua `option` terpetakan ke dialog | `q3: sisi b_3a tidak punya option di dlg_3_pilih_jalur` |
 | 5 | Tidak ada konflik NPC/lokasi/objek antar quest yang bisa aktif bersamaan | `quest q_side_02 & q_side_05 sama-sama butuh npc_pedagang` |
 | 6 | ID unik (quest/dialog/NPC/item/musuh/lokasi/teknik/ingatan) | `duplikat id 'mem_01' di memories.json` |
-| 7 | `config.json`: starting quest ada, akademi valid, referensi `element_advantage` valid | `config.starting.current_quest tidak ditemukan` |
+| 7 | `config.json`: starting quest ada, akademi valid, referensi `element_advantage` valid; `arcs` valid (final_quest ada, memories_total > 0, branches non-kosong); `world.safe_fallback_location` valid & aman (B1/B2) | `config.starting.current_quest tidak ditemukan` / `config.arcs: final_quest ...` |
 | 8 | Setiap quest sampingan punya `available_from {day, hour}`; `cooldown` valid jika ada | `q_side_x: side quest butuh available_from {day, hour}` |
 | 9 | `repeatable: true` hanya untuk quest `kind: "side"` | `q_main_x: repeatable=true tapi kind='main'` |
 | 10 | Quest repeatable dilarang menuntut NPC/lokasi/objek yang dipakai quest utama | `q_side_berburu & q_akademi_04: konflik lokasi loc_ruang_lonceng` |
 | 11 | Resep alkimia: hasil & bahan valid, bahan ≠ hasil | `rc_pil_qi: bahan 'x' tidak ada di items.csv` |
 | 12 | Toko NPC: item `buy`/`sell` valid | `npc_pedagang: shop.buy[0].item 'x' tidak ada` |
-| 13 | Item `weapon` punya `power`; `config.roots.tiers` valid & `default` ada | `items.csv: weapon tanpa power` |
+| 13 | Item `weapon` punya `power`; `config.roots.tiers` valid & `default` ada; `techniques.unlock_arc` merujuk `config.arcs` (B4) | `items.csv: weapon tanpa power` / `techniques.csv: unlock_arc ...` |
 | 14 | Lokasi: `is_safe` bool; `connections` merujuk lokasi yang ada | `loc_x: connections[0] 'loc_y' tidak ditemukan` |
 | 15 | Kompanion: id unik, base stat valid, referensi elemen valid | `companions.json: id duplikat` |
 | 16 | `config.battle`: `crit_chance` 0–1, `turn_order` valid, `damage_formula` valid | `config.battle.crit_chance: harus 0–1` |
@@ -870,7 +884,8 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
   - **Cooldown Side Quest**: lihat catatan di atas (`side_quest_cooldowns` + `quest.py`).
   - **Timer Respawn Monster**: `_hunt()` menolak berburu ulang sebelum `world.monster_respawn_hours` (5 jam) sejak `last_hunt_time` (log sistem informatif).
   - **Jadwal Harian NPC**: `_is_npc_available(npc)` membatasi `_talk`/`_spar` pada `schedule.hour_start..hour_end` — NPC aktif tiap hari, tanpa softlock. (A1, 2026-08-14): pola diseragamkan dengan `quest._in_window` — mendukung jadwal lintas tengah malam (19 → 6) dan batas `hour_end` eksklusif. **Verifikasi 2026-08-14**: seluruh 9 schedule di `data/npcs.json` memenuhi `hour_start < hour_end` (6–22, 6–20, 8–18, 7–19, 9–17, …) — perubahan batas eksklusif tidak berdampak playthrough saat ini.
-  - **Layar Penutup Arc 1**: `view().arc_summary` saat `q_akademi_07` selesai → banner ANSI emas di CLI + modal penutup di web (`modal-arc-summary`). **Batasan (G3d)**: sekali-dismiss per save disimpan di `localStorage` frontend (`arc-seen:<nama-save>`) — **tidak ikut antar perangkat/browser** (keputusan K2; Fase 1 = lokal single-player, diterima). Opsi backend (flag di save) ditunda.
+  - **Layar Penutup Arc**: `view().arc_summary` saat quest final suatu arc (`config.arcs[].final_quest`) selesai → banner ANSI emas di CLI + modal penutup di web (`modal-arc-summary`). **Batasan (G3d)**: sekali-dismiss per save disimpan di `localStorage` frontend (`arc-seen:<nama-save>`) — **tidak ikut antar perangkat/browser** (keputusan K2; Fase 1 = lokal single-player, diterima). Opsi backend (flag di save) ditunda.
+- **Tahap B — engine adaptif (selesai 2026-08-14, plan `2026-08-14-rampungkan-arc-akademi-tahap-b.md`)**: 0 hardcode arc-1 di `src/` — (B1) `arc_summary` data-driven via `config.arcs` (arc terakhir selesai yang ditampilkan); (B2) respawn KO via `world.safe_fallback_location` → lokasi `is_safe` pertama data; (B3) banner CLI dipicu `arc_summary` (bukan flag literal); (B4) teknik lintas akademi via `unlock_arc` opsional (GDD §5.2). Arc berikutnya = data saja.
 - **Playtest putaran 2 — observasi → KEPUTUSAN (disahkan 2026-08-14, Tahap A plan `2026-08-14-rampungkan-arc-akademi-tahap-a.md`)** — tidak ada lagi item "open":
   - **Han Xiu undertuned → `turn_order: "speed"`** (keputusan: dukung urutan giliran berbasis `speed`, bukan naikkan stat): `battle.turn_order` kini `"speed"` — yang lebih cepat bertindak dulu tiap ronde (`battle.py::player_action`, `foe_speed > pc.speed` → `_enemy_turn` dulu). Han Xiu (speed 11) & serigala (10) kini menyerang duluan — gate ujian q3 jadi menantang (pemain bisa kalah; jalur kalah aman via G4a). `fixed_alternate` tetap didukung (validator aturan 16 menerima keduanya). Guard: god_mode test mematikan `_enemy_turn` (deterministik).
   - **Reward ganda spar q3 → reward quest q3 diturunkan** `exp 8 → 4` (total spar ujian = `spar_win_exp` 8 + 4 = 12 exp + 10 koin — tidak dobel penuh).

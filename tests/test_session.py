@@ -504,6 +504,35 @@ def test_view_arc_summaries(session):
     assert "Tidak Diketahui" in v["arc_summary"]["branch"]
 
 
+def test_view_arc_summaries_data_driven(session):
+    """B1: arc_summary dibaca dari config.arcs — memories_total mengikuti config
+    (bukan hardcode 4), arc terakhir yang selesai menang, quest asing tak memicu."""
+    cfg_arcs = session.reg.config["arcs"]
+    session.state.completed_quests.append(cfg_arcs[0]["final_quest"])
+    session.state.flags["branch_3aa"] = True
+
+    # (c) memories_total dari config, bukan hardcode 4
+    cfg_arcs[0]["memories_total"] = 7
+    v = session.view()
+    assert v["arc_summary"]["memories_unlocked"] == "0/7", v["arc_summary"]
+
+    # (d) arc terakhir di config yang selesai yang menang
+    cfg_arcs.append({
+        "id": "sekte", "final_quest": "q_sekte_final", "title": "AKHIR ARC 2: SEKTE",
+        "teaser": "t", "memories_total": 5, "branches": {"branch_sekte": "Cabang Sekte"},
+    })
+    session.state.completed_quests.append("q_sekte_final")
+    session.state.flags["branch_sekte"] = True
+    v = session.view()
+    assert v["arc_summary"]["title"] == "AKHIR ARC 2: SEKTE"
+    assert "Cabang Sekte" in v["arc_summary"]["branch"]
+
+    # (b) quest asing tanpa arc → tidak crash, summary tetap arc terakhir yang selesai
+    session.state.completed_quests.append("q_asing")
+    v = session.view()
+    assert v["arc_summary"]["title"] == "AKHIR ARC 2: SEKTE"
+
+
 def test_session_use_item_edge_cases(session):
     # Item tidak ada
     session.state.inventory.clear()

@@ -128,6 +128,35 @@ def test_ko_respawn_dan_penalti_exp(session):
     assert session.state.player.exp <= exp_before  # penalti exp (0 → tetap 0)
 
 
+def test_ko_respawn_fallback_config_dan_data(session):
+    """B2: fallback respawn KO data-driven — config.world.safe_fallback_location,
+    lalu lokasi is_safe pertama dari data (bukan hardcode "loc_asrama")."""
+    foe = {"id": "eno_boss_test", "name": "Bos Uji", "hp": 9999, "qi": 0,
+           "attack": 999, "defense": 999, "speed": 1, "element": None,
+           "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+
+    # (a) fallback config dipakai saat last_safe_location kosong
+    session.state.last_safe_location = None
+    session.reg.config["world"]["safe_fallback_location"] = "loc_pasar"
+    session.battle.start([foe], "hunt")
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    assert session.state.location == "loc_pasar", "fallback config harus dipakai"
+
+    # (b) tanpa key config → lokasi is_safe pertama dari data (bukan hardcode string)
+    session.reg.config["world"].pop("safe_fallback_location")
+    session.state.last_safe_location = None
+    session.battle.start([foe], "hunt")
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    safe_first = next(l["id"] for l in session.reg.locations if l.get("is_safe"))
+    assert session.state.location == safe_first, f"fallback data harus lokasi safe pertama ({safe_first})"
+
+    # (c) last_safe_location tetap prioritas utama
+    session.state.last_safe_location = "loc_aula_ujian"
+    session.battle.start([foe], "hunt")
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    assert session.state.location == "loc_aula_ujian", "last_safe_location prioritas utama"
+
+
 def test_teknik_serang_di_battle(session, god_mode):
     session.state.player.academy = "akademi_elemen"
     teks = session.reg.player_techniques("akademi_elemen")
@@ -155,6 +184,37 @@ def test_teknik_lintas_akademi_ditolak(session):
     assert session.state.player.qi == qi_before  # Qi tidak terpotong
     assert any("belum menguasai" in e["text"] for e in session.state.log)
     session.state.pending_battle = None
+
+
+def test_player_techniques_unlock_arc_lintas_akademi(session):
+    """B4 (GDD §5.2): teknik dengan unlock_arc tampil untuk akademi lain hanya
+    setelah quest final arc itu selesai; tanpa itu tersembunyi; teknik tanpa
+    unlock_arc tidak terpengaruh."""
+    reg = session.reg
+    arc_akademi = next(a for a in reg.config["arcs"] if a["id"] == "akademi")
+    dummy = {"id": "tek_senjata_lintas", "name": "Tebasan Lintas", "academy": "senjata",
+             "element": None, "realm_required": "realm_pengumpul_qi", "qi_cost": 5,
+             "power": 10, "kind": "attack", "description": "Dummy lintas akademi.",
+             "unlock_arc": "akademi"}
+    reg.techniques[dummy["id"]] = dummy
+
+    # (b) tanpa quest selesai → tidak tampil untuk akademi lain
+    ids = [t["id"] for t in reg.player_techniques("akademi_elemen", "realm_pengumpul_qi")]
+    assert dummy["id"] not in ids
+
+    # (a) final quest arc selesai → teknik lintas ikut tampil
+    ids = [t["id"] for t in reg.player_techniques(
+        "akademi_elemen", "realm_pengumpul_qi", frozenset({arc_akademi["final_quest"]}))]
+    assert dummy["id"] in ids
+
+    # (c) teknik tanpa unlock_arc tetap terbatas akademi sendiri
+    ids_elemen = [t["id"] for t in reg.player_techniques(
+        "akademi_elemen", "realm_pengumpul_qi", frozenset({arc_akademi["final_quest"]}))]
+    ids_senjata = [t["id"] for t in reg.player_techniques(
+        "akademi_senjata", "realm_pengumpul_qi", frozenset({arc_akademi["final_quest"]}))]
+    lintas_elemen = [i for i in ids_elemen if i.startswith("tek_senjata")]
+    assert lintas_elemen == [dummy["id"]], "hanya teknik unlock_arc yang lintas"
+    assert dummy["id"] in ids_senjata, "teknik akademi sendiri tetap tampil"
 
 
 def test_teknik_ranah_tinggi_ditolak(session, monkeypatch):

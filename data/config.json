@@ -51,8 +51,24 @@
   },
   "ko_penalty": { "exp_loss_ratio": 0.1 },
   "companion": { "hp_per_level": 12, "attack_per_level": 2, "defense_per_level": 1, "speed_per_level": 0.5 },
+  "arcs": [
+    {
+      "id": "akademi",
+      "final_quest": "q_akademi_07",
+      "title": "AKHIR ARC 1: AKADEMI CHANGFENG",
+      "teaser": "Kebenaran di balik Penatua An telah terkuak. Namun bayang-bayang masa lalu Long Tianxu dan intrik Sekte Regional baru saja dimulai...",
+      "memories_total": 4,
+      "branches": {
+        "branch_3aa": "Cabang 3AA — Konfrontasi Terbuka Penatua An",
+        "branch_3ab": "Cabang 3AB — Penyelidikan Diam-Diam Mo Yun",
+        "branch_3b": "Cabang 3B — Memeras Zhou Yan & Mengambil Keuntungan",
+        "branch_3c": "Cabang 3C — Berdiam Diri & Menjaga Diri"
+      }
+    }
+  ],
   "world": {
     "monster_respawn_hours": 5,
+    "safe_fallback_location": "loc_asrama",
     "hunt": {
       "location": "loc_wilayah_berburu",
       "pool": ["eno_serigala_qi", "eno_babi_hutan"],

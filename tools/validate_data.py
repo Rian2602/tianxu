@@ -102,6 +102,9 @@ class Validator:
         return len(self.errors) == 0
 
     def _load_all(self) -> None:
+        # config dimuat paling awal — cek teknik (aturan 13) butuh config.arcs
+        self.config = self.read_json("config.json")
+
         # CSV
         items = self.read_csv_rows("items.csv")
         self.register_ids("item", [r["id"] for r in items])
@@ -131,6 +134,7 @@ class Validator:
         for r in enemies:
             if r.get("element") and r["element"] not in ELEMENTS:
                 self.error(f"enemies.csv: elemen '{r['element']}' tidak valid")
+        arc_ids = {a.get("id") for a in (self.config or {}).get("arcs", [])}
         for r in techniques:
             if r.get("academy") not in {"elemen", "senjata", "summoning"}:
                 self.error(f"techniques.csv: akademi '{r.get('academy')}' tidak valid")
@@ -138,6 +142,8 @@ class Validator:
                 self.error(f"techniques.csv: elemen '{r.get('element')}' tidak valid")
             if r.get("kind") not in {"attack", "defend", "heal"}:
                 self.error(f"techniques.csv: kind '{r.get('kind')}' tidak valid")
+            if r.get("unlock_arc") and r["unlock_arc"] not in arc_ids:
+                self.error(f"techniques.csv: unlock_arc '{r.get('unlock_arc')}' bukan arc di config.arcs (aturan 13)")
 
         # JSON
         quests_main = self.read_json("quests/quests_akademi.json")
@@ -167,8 +173,6 @@ class Validator:
 
         companions = self.read_json("companions.json")
         self.companions = (companions or {}).get("companions", [])
-
-        self.config = self.read_json("config.json")
 
     def _check_config(self) -> None:
         cfg = self.config
@@ -206,6 +210,34 @@ class Validator:
         for a in cfg.get("academies", []):
             if not a.get("skill_pool"):
                 self.error(f"config.academies: '{a.get('id')}' tanpa skill_pool")
+
+        # B1: arcs — final_quest harus ada, title/teaser non-kosong, memories_total > 0, branches non-kosong
+        seen_arcs: set[str] = set()
+        for arc in cfg.get("arcs", []):
+            aid = arc.get("id")
+            if not aid or aid in seen_arcs:
+                self.error(f"config.arcs: id arc kosong/duplikat '{aid}' (aturan 7)")
+            seen_arcs.add(aid)
+            if not arc.get("final_quest") or not self.has("quest", arc["final_quest"]):
+                self.error(f"config.arcs: final_quest '{arc.get('final_quest')}' tidak ada di quest (aturan 7)")
+            if not arc.get("title") or not isinstance(arc["title"], str):
+                self.error(f"config.arcs: title arc '{aid}' kosong/bukan string (aturan 7)")
+            if not arc.get("teaser") or not isinstance(arc["teaser"], str):
+                self.error(f"config.arcs: teaser arc '{aid}' kosong/bukan string (aturan 7)")
+            mt = arc.get("memories_total")
+            if not isinstance(mt, int) or mt <= 0:
+                self.error(f"config.arcs: memories_total arc '{aid}' harus int > 0 (aturan 7)")
+            if not arc.get("branches") or not isinstance(arc["branches"], dict):
+                self.error(f"config.arcs: branches arc '{aid}' kosong/bukan dict (aturan 7)")
+
+        # B2: fallback lokasi aman saat KO — harus lokasi yang ada dan is_safe
+        sfl = cfg.get("world", {}).get("safe_fallback_location")
+        if sfl:
+            loc = self.has("location", sfl)
+            if not loc:
+                self.error(f"config.world.safe_fallback_location: lokasi '{sfl}' tidak ada (aturan 7)")
+            elif not any(l["id"] == sfl and l.get("is_safe") for l in self.locations):
+                self.error(f"config.world.safe_fallback_location: '{sfl}' bukan lokasi aman (aturan 7)")
 
         for k, v in cfg.get("element_advantage", {}).items():
             if k not in ELEMENTS or v not in ELEMENTS:

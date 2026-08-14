@@ -526,32 +526,31 @@ class GameSession:
         pc = player_combat(s, self.reg)
         realm = self.reg.realms[s.player.realm]
         
+        # arc_summary data-driven (B1): arc TERAKHIR di config yang final quest-nya selesai
         arc_summary = None
-        if "q_akademi_07" in s.completed_quests:
+        for arc in reversed(self.reg.config.get("arcs", [])):
+            if arc.get("final_quest") not in s.completed_quests:
+                continue
             chosen_branch = "Tidak Diketahui"
-            if "branch_3aa" in s.flags:
-                chosen_branch = "Cabang 3AA — Konfrontasi Terbuka Penatua An"
-            elif "branch_3ab" in s.flags:
-                chosen_branch = "Cabang 3AB — Penyelidikan Diam-Diam Mo Yun"
-            elif "branch_3b" in s.flags:
-                chosen_branch = "Cabang 3B — Memeras Zhou Yan & Mengambil Keuntungan"
-            elif "branch_3c" in s.flags:
-                chosen_branch = "Cabang 3C — Berdiam Diri & Menjaga Diri"
-                
+            for flag, label in (arc.get("branches") or {}).items():
+                if s.flags.get(flag):
+                    chosen_branch = label
+                    break
             arc_summary = {
                 "completed": True,
-                "title": "AKHIR ARC 1: AKADEMI CHANGFENG",
+                "title": arc.get("title", "AKHIR ARC"),
                 "player_name": s.player.name,
                 "realm": realm["name_pinyin"],
                 "realm_level": s.player.realm_level,
                 "academy": s.player.academy,
                 "morality": s.player.morality,
                 "branch": chosen_branch,
-                "memories_unlocked": f"{len(s.memories)}/4",
+                "memories_unlocked": f"{len(s.memories)}/{arc.get('memories_total', len(self.reg.memories))}",
                 "gold": s.player.gold,
                 "day": s.day,
-                "teaser": "Kebenaran di balik Penatua An telah terkuak. Namun bayang-bayang masa lalu Long Tianxu dan intrik Sekte Regional baru saja dimulai...",
+                "teaser": arc.get("teaser", ""),
             }
+            break
             
         return {
             "location": {

@@ -196,7 +196,9 @@ class BattleEngine:
                 add_log(self.state, "battle", "Ranahmu belum cukup untuk teknik itu.")
                 return
         # validasi kepemilikan akademi (skill_pool) — ENGINE_ARCHITECTURE §5.6/§8
-        allowed = [t["id"] for t in self.reg.player_techniques(self.state.player.academy or "", self.state.player.realm)]
+        allowed = [t["id"] for t in self.reg.player_techniques(
+            self.state.player.academy or "", self.state.player.realm,
+            frozenset(self.state.completed_quests))]
         if tid not in allowed:
             add_log(self.state, "battle", "Kau belum menguasai teknik itu.")
             return
@@ -350,8 +352,13 @@ class BattleEngine:
             # G4a: kalah sparring tetap menyelesaikan objektif `spar` (dialog berbeda)
             if b.get("spar_npc"):
                 self.quest_engine.notify_spar_loss(b["spar_npc"])
-        # respawn titik aman
-        safe = self.state.last_safe_location or "loc_asrama"
+        # respawn titik aman — data-driven (B2): last_safe → config.world.safe_fallback_location
+        # → lokasi is_safe pertama dari data (bukan hardcode nama lokasi arc-1)
+        safe = self.state.last_safe_location
+        if not safe:
+            safe = self.reg.config.get("world", {}).get("safe_fallback_location")
+        if not safe:
+            safe = next((l["id"] for l in self.reg.locations if l.get("is_safe")), "loc_gerbang_akademi")
         self.state.location = safe
         self.state.player.hp = self.state.max_hp(self.reg)
         self.state.player.qi = self.state.max_qi(self.reg)

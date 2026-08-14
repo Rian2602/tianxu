@@ -15,11 +15,12 @@ Semua perubahan penting pada **Tian Xu: Second Life**.
 - Toko (laporan pemain, UX1): tab Jual menjelaskan item yang belum dimiliki — baris "Belum punya" tanpa tombol + hint; `Cache-Control: no-cache` untuk aset statis agar perbaikan frontend selalu termuat.
 - **Fitur GDD P1** (plan `docs/superpowers/plans/2026-08-14-p1-fitur-gdd-belum-dibangun.md`): hubungan NPC berdampak pada dialog (P1-2 — kondisi `relation_min/max`, `spar_win_relation`, node gated Han Xiu/Gu Canghai); gating ingatan membuka opsi dialog (P1-1 — kondisi `memory`, menutup B3/#13); tipe musuh beragam + pool berburu malam (P1-3 — `night_pool`/`night_window`, 2 musuh baru).
 - **Rampungkan Arc Akademi — Tahap A** (plan `docs/superpowers/plans/2026-08-14-rampungkan-arc-akademi-tahap-a.md`): playthrough end-to-end 3 akademi (tutup DoD §11.2 #1); keputusan playtest §17 — `turn_order: "speed"` (urutan giliran berbasis speed), reward quest q3 diturunkan (exp 8→4), side quest defeat butuh lapor (`report_to`), cap exp grinding harian (`daily_grind_exp_cap` 60).
-- Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi + fitur P1), 4 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / STORY_FASE1 / DESIGN_SUMMARY / README / PROJECT.
+- **Rampungkan Arc Akademi — Tahap B FULL (engine adaptif)** (plan `docs/superpowers/plans/2026-08-14-rampungkan-arc-akademi-tahap-b.md`): 0 hardcode arc-1 di `src/` — (B1) `arc_summary` data-driven via `config.arcs` (final_quest/title/teaser/memories_total/branches, arc terakhir selesai yang tampil); (B2) respawn KO via `world.safe_fallback_location` → lokasi `is_safe` pertama data; (B3) banner CLI dipicu `arc_summary` (bukan flag literal); (B4) teknik lintas akademi via kolom opsional `unlock_arc` di `techniques.csv` (GDD §5.2). Arc berikutnya = data saja, tanpa ubah engine.
+- Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi + fitur P1), 5 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / STORY_FASE1 / DESIGN_SUMMARY / README / PROJECT.
 
 ### Changed
-- Jumlah test: 192 → **231**; validator 16 aturan tetap exit 0.
-- `README.md` & `PROJECT.md`: jumlah test disinkronkan (230).
+- Jumlah test: 192 → **238**; validator 16 aturan tetap exit 0 (aturan 7 & 13 diperluas untuk `arcs`/`safe_fallback_location`/`unlock_arc`).
+- `README.md` & `PROJECT.md`: jumlah test disinkronkan (238).
 
 ## [0.1.0-alpha] — 2026-08-14
 
