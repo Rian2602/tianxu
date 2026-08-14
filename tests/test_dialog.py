@@ -103,7 +103,8 @@ def test_side_quest_dimulai_dan_selesai(session, god_mode):
     assert "q_side_suqing" in session.state.completed_quests
     assert session.state.player.gold >= 30  # reward +10
 
-    # repeatable: bisa ditawarkan lagi setelah selesai
+    # repeatable: bisa ditawarkan lagi setelah selesai (cooldown 2 jam)
+    session.apply_action({"type": "advance_time", "hours": 2})
     assert session.quest.is_offerable("q_side_suqing") is True
 
 

@@ -236,6 +236,12 @@ class QuestEngine:
             return False
         if qid in self.state.completed_quests and not sq.get("repeatable"):
             return False
+        cd = sq.get("cooldown", 0)
+        if cd > 0 and qid in self.state.side_quest_cooldowns:
+            now_abs_hours = self.state.day * 24 + self.state.hour
+            last_completed = self.state.side_quest_cooldowns[qid]
+            if (now_abs_hours - last_completed) < cd:
+                return False
         af = sq.get("available_from")
         if af:
             if self.state.day < af.get("day", 1):
@@ -255,6 +261,8 @@ class QuestEngine:
     def _complete_side(self, qid: str) -> None:
         if qid not in self.state.active_side_quests:
             return
+        now_abs_hours = self.state.day * 24 + self.state.hour
+        self.state.side_quest_cooldowns[qid] = now_abs_hours
         q = self.reg.quest(qid)
         oc = q.get("on_complete", {})
         apply_effects(self.state, self.reg, oc.get("effects"))
