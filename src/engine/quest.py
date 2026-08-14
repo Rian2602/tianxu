@@ -101,11 +101,19 @@ class QuestEngine:
             prog["talk"] = prog.get("talk", 0) + 1
             if prog["talk"] >= obj.get("target", 1):
                 self._complete_main(qid)
+        # G1-T3: main quest defeat dengan `report_to` selesai saat lapor ke pemberi
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "defeat" and q.get("objective", {}).get("report_to") == npc_id:
+            obj = q["objective"]
+            prog = self.state.active_side_quests.setdefault(q["id"], {})
+            prog["talk"] = prog.get("talk", 0) + 1
+            if prog.get("defeated", 0) >= obj.get("target", 1):
+                self._complete_main(q["id"])
         # A2 (keputusan §17): side quest defeat dengan `report_to` selesai saat lapor ke pemberi
         for qid in list(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             obj = sq.get("objective", {})
-            if obj.get("kind") == "defeat" and obj.get("report_to") == npc_id:
+            if sq.get("kind") == "side" and obj.get("kind") == "defeat" and obj.get("report_to") == npc_id:
                 prog = self.state.active_side_quests[qid]
                 prog["talk"] = prog.get("talk", 0) + 1
                 if prog.get("defeated", 0) >= obj.get("target", 1):
@@ -115,7 +123,7 @@ class QuestEngine:
         for qid in list(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             obj = sq.get("objective", {})
-            if obj.get("kind") == "gather" and obj.get("report_to") == npc_id:
+            if sq.get("kind") == "side" and obj.get("kind") == "gather" and obj.get("report_to") == npc_id:
                 iid = obj.get("item", "")
                 target = obj.get("target", 1)
                 have = self.state.inventory.get(iid, 0)
@@ -157,13 +165,19 @@ class QuestEngine:
 
         A7: main quest `defeat` ikut pola side quest — bila `enemies`
         didefinisikan, hanya musuh dari daftar yang memenuhi; tanpa field itu
-        perilaku lama (musuh apa pun selesai), non-breaking."""
+        perilaku lama (musuh apa pun selesai), non-breaking.
+        G1-T3 (2026-08-15): quest defeat dengan `report_to` (main ATAU side)
+        menunggu lapor ke pemberi — kill saja belum menyelesaikan quest."""
         q = self.current_main()
         if q and q.get("objective", {}).get("kind") == "defeat":
             obj = q["objective"]
             allowed = obj.get("enemies", [])
-            if not allowed or any(e in allowed for e in defeated_enemy_ids):
-                self._complete_main(q["id"])
+            killed = [e for e in defeated_enemy_ids if not allowed or e in allowed]
+            if killed:
+                prog = self.state.active_side_quests.setdefault(q["id"], {})
+                prog["defeated"] = prog.get("defeated", 0) + len(killed)
+                if not obj.get("report_to") and prog["defeated"] >= obj.get("target", 1):
+                    self._complete_main(q["id"])
         for qid in list(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             obj = sq.get("objective", {})
