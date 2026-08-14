@@ -46,6 +46,8 @@ class UIState:
         self._mode = val
         if val == "battle" and not self._state.pending_battle:
             self._state.pending_battle = {"active": True}
+        elif val != "battle" and self._state.pending_battle:
+            self._state.pending_battle = None
 
     @property
     def battle(self) -> dict:
@@ -82,10 +84,14 @@ class GameState:
     pending_dialog: str | None = None
     pending_battle: dict | None = None  # data battle aktif (dict, lihat battle.py)
     companion: dict | None = None  # {"id", "hp", "active"} — jalur Summoning (ENGINE §9.4)
+    _ui_proxy: UIState | None = field(default=None, init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        self._ui_proxy = UIState(self)
 
     @property
     def ui(self) -> UIState:
-        if not hasattr(self, "_ui_proxy"):
+        if self._ui_proxy is None:
             self._ui_proxy = UIState(self)
         return self._ui_proxy
 

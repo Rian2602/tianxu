@@ -193,6 +193,18 @@ def test_action_blocked_in_battle(dummy_session):
     assert response.get("error") is not None or "blocked" in str(response.get("log_delta", []))
 
 
+def test_ui_mode_transition_clears_pending_battle(dummy_session):
+    state = dummy_session.state
+    state.ui.mode = "battle"
+    assert state.pending_battle is not None
+    assert state.ui.mode == "battle"
+
+    # Setting mode back to explore clears pending_battle
+    state.ui.mode = "explore"
+    assert state.pending_battle is None
+    assert state.ui.mode == "explore"
+
+
 def test_crafting_blocked_in_unsafe_zone(dummy_session):
     # Set lokasi ke area tidak aman
     dummy_session.state.location = "loc_gerbang_akademi"  # asumsi is_safe: false

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from src.engine.quest import QuestEngine
 from src.engine.session import GameSession
 
 from conftest import finish_dialog, move_path, play_to_incident  # noqa: F401
