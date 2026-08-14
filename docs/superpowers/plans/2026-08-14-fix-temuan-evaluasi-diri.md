@@ -3,6 +3,8 @@
 > **Untuk agentic workers:** REQUIRED SUB-SKILL: Gunakan `superpowers:subagent-driven-development` (disarankan) atau `superpowers:executing-plans` untuk implementasi task-by-task. Steps pakai checkbox (`- [ ]`).
 >
 > **Sumber temuan**: evaluasi diri atas eksekusi `docs/superpowers/plans/2026-08-14-fix-sisa-bug-dan-hardening.md` (indikator 3: bug baru yang diperkenalkan sendiri). Dua temuan nyata + satu verifikasi latent.
+>
+> **STATUS EKSEKUSI (2026-08-14)**: ✅ **SELESAI** — Task A (`node_kalah` → `node_umum`, TDD hijau), Task B (207 → 209 di list_bug & DESIGN_SUMMARY), Task C (audit 9 schedule NPC no-impact + catatan §17). Verifikasi akhir: `validate_data.py` exit 0 + `pytest` **209 passed**. Commit per task: `2c4646b`, `ddc3637`, `c6e7a5c`.
 
 **Goal:** Memperbaiki 2 temuan yang diperkenalkan batch sebelumnya (regresi konten `node_kalah`; dok drift angka test 207 vs 209) dan memverifikasi batas eksklusif jadwal NPC (A1) tidak menyentuh data nyata.
 
