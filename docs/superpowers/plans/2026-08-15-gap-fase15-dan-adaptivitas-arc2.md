@@ -9,7 +9,8 @@
 > - **A2 (quest failure) TIDAK dikerjakan sekarang** — membangun mekanik tanpa konsumen = risiko salah desain yang justru memaksa ubah engine saat arc 2. Dipindah: *outline cerita arc 2 → identifikasi mekanik yang dibutuhkan → bangun & validasi → isi konten*.
 > - Keputusan desain terbuka yang HARUS diselesaikan di G1-T2 (sebelum menulis konten arc 2): hunt multi-lokasi, gating quest by relation, scoping memory per arc.
 >
-> **STATUS EKSEKUSI (2026-08-15)**: 🔲 belum dimulai.
+> **STATUS EKSEKUSI (2026-08-15)**: ✅ **GELOMBANG 1 & 2 SELESAI** — 7 commit (`9ef0a94..83ed38f`): G1-T1 playtest 4 cabang (`162326d`) · G1-T2 transisi arc + §6.5 checklist (`ec5304b`) · G1-T3 fixture adaptivitas + fix defeat-report_to (`c98a47a`) · G1-T4 freeze (`58973cc`) · G2-T1a can_hunt (`d2f5f9e`) · G2-T1b auto-equip (`ee618a9`) · G3-T2 onboarding hint (`83ed38f`). Semua ter-push ke `origin/main`.
+> **PEMBARUAN (2026-08-15 lanjutan)**: **G3-T1 (quest failure) DIEKSEKUSI** di plan `2026-08-15-fix-gap-status-effect-dan-failure-state.md` (Task 2, commit `6983d66`) — karena outline arc 2 dikonfirmasi butuh deadline; skema `timeout`/`fail_next`/`fail_effects`/`failed_quests` dibangun persis dari spesifikasi di bawah, data-driven & non-breaking (arc 1 tanpa timeout identik). Status effect (Task 1, `45558c2`) + gating relation (Task 3, `b3a3cac`) + tier web 5 (Task 4, `b10f475`) juga tertutup → **freeze penuh: arc 2 = data saja** (368 test).
 
 **Goal:** Menutup gap Fase 1.5 + menutup lubang adaptivitas dengan **urutan yang mengutamakan dampak dan menghindari kerja spekulatif**, sehingga arc berikutnya cukup menulis data:
 
@@ -136,17 +137,17 @@ Urutan kerja G1 sengaja: **playtest dulu** (temukan & perbaiki bug alur pada fon
 
 # GELOMBANG 3 — P2: Ditunda ke pipeline desain cerita arc 2
 
-### G3-T1: Quest failure/deadline — DITUNDA (menunggu outline cerita arc 2)
+### G3-T1: Quest failure/deadline — ✅ SELESAI (dieksekusi plan fix-gap, Task 2)
 
-> **Keputusan evaluasi**: tidak dikerjakan sekarang. Blueprint #11 sendiri: *"Tidak harus semua digunakan di Fase 2."* Tanpa outline cerita arc 2 kita tidak tahu bentuk deadline (hari absolut vs jam relatif vs kondisi), dan membangun skema spekulatif berisiko **memaksa ubah engine saat arc 2** — kebalikan tujuan.
+> **Keputusan evaluasi awal**: tidak dikerjakan di gelombang ini karena menunggu outline cerita arc 2.
 >
-> **Kapan dikerjakan**: setelah outline cerita arc 2 disetujui (pipeline: outline → identifikasi mekanik yang dibutuhkan → bangun & validasi → isi konten). Spesifikasi yang sudah dirancang (siap eksekusi saat dibutuhkan):
-> - Schema: quest opsional `timeout: {hours}` (relatif sejak quest mulai, pola `advance_time.day_offset`), `fail_effects` (divalidasi seperti `on_complete.effects`), `fail_next` (quest pengganti — **wajib untuk main quest ber-timeout**, validator).
-> - Engine: `quest.check_timeouts()` dipanggil `session._pass_time` (konsisten H1); side quest gagal → efek + hapus + `failed_quests`; main quest gagal → efek + `fail_next` aktif + `failed_quests`.
-> - State: `failed_quests: list[str]` (diserialisasi, default `[]` — save lama tetap dimuat).
+> **PEMBARUAN (2026-08-15 lanjutan)**: outline cerita arc 2 dikonfirmasi membutuhkan quest ber-deadline → G3-T1 dieksekusi **verbatim spesifikasi di bawah** di plan `2026-08-15-fix-gap-status-effect-dan-failure-state.md` Task 2 (commit `6983d66`), dengan 3 pertanyaan verifikasi (Q1 sesua plan / Q2 test reproduksi merah→hijau / Q3 no-new-bug):
+> - Schema: quest opsional `timeout: {hours}` (relatif sejak quest mulai), `fail_effects` (divalidasi seperti `on_complete.effects`), `fail_next` (quest pengganti — **wajib untuk main quest ber-timeout**, divalidasi).
+> - Engine: `quest.check_timeouts()` dipanggil `session._pass_time` SETELAH `advance_time_target_met` (quest selesai tepat sebelum deadline tidak ikut gagal); side quest gagal → efek + hapus + `failed_quests`; main quest gagal → efek + `fail_next` aktif + `failed_quests` (percabangan gagal bila >1 sisi).
+> - State: `failed_quests: list[str]` (diserialisasi, default `[]` — save lama tetap dimuat); `start_side` mencatat start (dasar hitung timeout).
 > - UI: `objective_text` menampilkan sisa jam untuk quest ber-timeout.
-> - Validator: aturan baru (timeout valid; main ber-timeout wajib `fail_next`; `fail_next` quest kind=main valid; `fail_effects` dikenal).
-> - Test: side gagal, main gagal → fail_next, tanpa timeout tidak terpengaruh, save/load.
+> - Validator: aturan 8 — `timeout.hours` int > 0; main ber-timeout wajib `fail_next`; `fail_next` tanpa timeout / kind side / quest tak ada → ditolak.
+> - Test: side gagal, main gagal → fail_next, tanpa timeout tidak terpengaruh, batas `>=`, selesai sebelum deadline, save/load round-trip.
 
 ### G3-T2: Onboarding loop — AUDIT dulu (kemungkinan tanpa perubahan)
 
@@ -165,11 +166,11 @@ Urutan kerja G1 sengaja: **playtest dulu** (temukan & perbaiki bug alur pada fon
 3. Arc 1 (Akademi) **identik**: playthrough CLI 3 akademi + 4 cabang hijau (non-breaking).
 4. Keputusan desain arc 2 (hunt multi-lokasi, relation-gating quest, scoping memory per arc) **terdokumentasi** di ENGINE_ARCHITECTURE checklist — keputusan final menunggu outline cerita arc 2.
 5. Freeze resmi di DESIGN_SUMMARY; PROJECT.md/README sinkron.
-6. Quest failure (G3-T1) **tidak** dikerjakan di gelombang ini — spesifikasi siap, eksekusi menunggu outline cerita arc 2.
+6. ~~Quest failure (G3-T1) tidak dikerjakan di gelombang ini~~ — **DIEKSEKUSI** (plan fix-gap Task 2, commit `6983d66`) setelah outline arc 2 mengonfirmasi kebutuhan deadline; non-breaking (arc 1 tanpa timeout).
 7. Semua commit G1+G2 ter-push ke `origin/main`.
 
 ## Pasca-plan (di luar scope dokumen ini, urutan berikutnya)
 
 1. Tulis **outline cerita arc 2** (quest DAG, cabang, deadline, gating) — basis keputusan G3-T1 + keputusan desain G1-T2.
-2. Eksekusi G3 sesuai kebutuhan outline (quest failure bila dibutuhkan; onboarding bila audit menuntut).
+2. ~~Eksekusi G3 sesuai kebutuhan outline~~ — G3-T1 (quest failure) & G3-T2 (onboarding) **sudah dieksekusi** (2026-08-15); sisa pipeline: isi konten arc 2.
 3. Isi konten arc 2 = data (quests_arc2.json, NPC, lokasi, dialog, config.arcs) — tanpa ubah engine, diverifikasi via fixture G1-T3.

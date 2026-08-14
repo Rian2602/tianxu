@@ -8,7 +8,7 @@
 > 3. **Minor: gating quest by relation** — quest `available_from` belum dukung `relation_min` (dialog sudah).
 > 4. **Minor: tier relationship web 3 vs 5** — rekomendasi hostile/distrustful/neutral/friendly/close; web hanya 3.
 >
-> **STATUS EKSEKUSI (2026-08-15)**: 🔲 belum dimulai. Baseline terverifikasi: **341 passed**, validate exit 0, playthrough 4 cabang hijau, 0 hardcode arc-1 di `src/web`.
+> **STATUS EKSEKUSI (2026-08-15)**: ✅ **SELESAI SEMUA** — Task 1 `45558c2` · Task 2 `6983d66` · Task 3 `b3a3cac` · Task 4 `b10f475`. **368 passed**, validate exit 0, playthrough 4 cabang + fixture adaptivitas hijau. Baseline awal: **341 passed**.
 
 **Goal:** Menutup 2 gap + 2 minor secara **general & data-driven** (arc 2 tetap = data saja), dengan **3 pertanyaan verifikasi sebagai struktur wajib** untuk SETIAP task:
 
@@ -112,6 +112,10 @@
 
 ---
 
+> **STATUS EKSEKUSI (2026-08-15)**: Task 2 ✅ commit `6983d66` — SESUAI PLAN: ya.
+> Catatan: `is_offerable` juga menolak quest non-repeatable yang sudah gagal (failed_quests) —
+> pelengkap kecil dari perilaku completed non-repeatable (Q3: cegah re-take quest gagal).
+
 ### Task 3 (minor): Gating quest by relation (available_from.relation_min)
 
 > Kondisi sekarang: dialog punya `relation_min`; quest `available_from` belum. Arc 2: "quest hanya muncul bila relation ≥ X".
@@ -126,6 +130,10 @@
 - Commit: `feat+test: gating side quest by relation (available_from.relation_min)`
 
 ---
+
+> **STATUS EKSEKUSI (2026-08-15)**: Task 3 ✅ commit `b3a3cac` — SESUAI PLAN: ya.
+> Test reproduksi (relation 0 → tidak ditawarkan) merah → hijau; validator npc/value;
+> data arc-1 tanpa field relation_min → non-breaking.
 
 ### Task 4 (minor): Tier relationship web 5 tingkat
 
@@ -155,5 +163,6 @@
 
 ## Pasca-plan
 
-- Update plan `2026-08-15-gap-fase15-dan-adaptivitas-arc2.md`: tandai G3-T1 selesai (failure state) & §6.5 catatan status effect tertutup.
-- Setelah 2 gap + 2 minor tertutup → **freeze penuh** (termasuk mekanik battle & failure): arc 2 = data saja, satu-satunya jalur perubahan engine = mekanik baru yang diidentifikasi outline cerita (dengan fixture sebagai canary).
+- **DONE (2026-08-15)**: Task 4 ✅ commit `b10f475` — SESUAI PLAN: ya. 5 ambang diverifikasi via node (9 kasus PASS); perubahan murni tampilan (`node --check` OK, test web 23 hijau).
+- **DONE (2026-08-15)**: plan `2026-08-15-gap-fase15-dan-adaptivitas-arc2.md` ditandai G3-T1 selesai (failure state) & §6.5 status effect/gating relation tertutup; DESIGN_SUMMARY/PROJECT/README sinkron (368 test).
+- **FREEZE PENUH tercapai**: 2 gap + 2 minor tertutup → arc 2 = data saja; satu-satunya jalur perubahan engine = mekanik baru yang diidentifikasi outline cerita (dengan fixture `test_adaptivity.py` sebagai canary).

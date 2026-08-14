@@ -117,12 +117,15 @@ Seluruh kriteria penerimaan Fase 1 (Arc Akademi) **selesai dan tervalidasi** —
 
 Bukti (semua ter-push ke `origin/main`):
 - **Playtest 4 cabang moral** deterministik sampai `q_akademi_07` — world-state akhir diverifikasi per cabang (flags, relations, morality, memories, gold, arc_summary) — `tests/test_playthrough_branches.py`. **338 passed**, validator exit 0.
+- **Gap Fase 1.5 tertutup (2026-08-15, plan fix-gap-status-effect-dan-failure-state)**: status effect data-driven (dot/stun, `config.battle.statuses` + `enemies.csv`) · quest failure/deadline (`timeout`/`fail_next`/`fail_effects`/`failed_quests`, save/load round-trip) · gating quest by relation (`available_from.relation_min`) · tier relationship web 5 tingkat. **368 passed**, validator exit 0.
 - **0 hardcode id konten arc-1 di engine** (satu-satunya literal `loc_wilayah_berburu` di `cli.py` dihilangkan G2-T1 plan 2026-08-15).
 - **Kontrak transisi arc**: quest akhir arc → quest pertama arc berikutnya via `next` (data); `arc_summary` generik via `final_quest`; checklist §6.5 ENGINE_ARCHITECTURE.
 - **Fixture adaptivitas**: arc 2 sintetis dijalankan tanpa ubah kode (`tests/test_adaptivity.py`) — dan berhasil mengungkap 1 bug nyata (main-quest `defeat` mengabaikan `report_to`) yang sudah diperbaiki.
 - **Keputusan desain arc 2** (hunt multi-lokasi, gating quest by relation, konvensi id memory per arc) — final menunggu outline cerita.
 
 Arti freeze: **arc berikutnya = konten data saja** (quest/npc/lokasi/dialog/config). Mekanik tambahan (mis. quest failure/deadline) TIDAK dibangun spekulatif — menunggu outline cerita arc 2 (pipeline: outline → identifikasi mekanik → bangun & validasi → isi konten). Lihat plan `docs/superpowers/plans/2026-08-15-gap-fase15-dan-adaptivitas-arc2.md`.
+
+> **PEMBARUAN (2026-08-15, plan fix-gap-status-effect-dan-failure-state)**: dua mekanik yang tadinya "menunggu outline" kini **sudah dibangun secara umum** setelah outline arc 2 dikonfirmasi akan membutuhkannya (status effect & quest failure) — keduanya data-driven & non-breaking, jadi freeze tetap berlaku: **arc 2 = data saja**.
 
 ---
 
