@@ -254,6 +254,31 @@ def test_player_techniques_unlock_arc_lintas_akademi(session):
     assert dummy["id"] in ids_senjata, "teknik akademi sendiri tetap tampil"
 
 
+def test_player_techniques_skill_pool_banyak_elemen(session, monkeypatch):
+    """A6: `skill_pool` dengan lebih dari satu elemen — semua prefix diproses,
+    bukan hanya elemen pertama (bug: `a.get("skill_pool", [""])[0]`)."""
+    reg = session.reg
+    # dua teknik dummy: satu di pool pertama, satu di pool kedua
+    reg.techniques["tek_uji_a1"] = {"id": "tek_uji_a1", "name": "Uji A1", "academy": "elemen",
+                                    "element": None, "realm_required": "realm_pengumpul_qi",
+                                    "qi_cost": 5, "power": 10, "kind": "attack",
+                                    "description": "Dummy pool 1."}
+    reg.techniques["tek_uji_b1"] = {"id": "tek_uji_b1", "name": "Uji B1", "academy": "universal",
+                                    "element": None, "realm_required": "realm_pengumpul_qi",
+                                    "qi_cost": 5, "power": 10, "kind": "attack",
+                                    "description": "Dummy pool 2."}
+    # akademi sintetis dengan 2 pool
+    orig = reg.config.get("academies", [])
+    reg.config["academies"] = orig + [{"id": "akademi_uji", "name": "Uji",
+                                       "skill_pool": ["tek_uji_a*", "tek_uji_b*"]}]
+    try:
+        ids = [t["id"] for t in reg.player_techniques("akademi_uji", "realm_pengumpul_qi")]
+    finally:
+        reg.config["academies"] = orig
+    assert "tek_uji_a1" in ids
+    assert "tek_uji_b1" in ids, "elemen pool kedua harus diproses (A6)"
+
+
 def test_teknik_ranah_tinggi_ditolak(session, monkeypatch):
     """H4: teknik dengan realm_required lebih tinggi dari ranah pemain ditolak (ranah belum cukup)."""
     session.state.player.academy = "akademi_elemen"

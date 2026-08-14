@@ -104,15 +104,19 @@ class DataRegistry:
         bisa membuka teknik akademi lain tanpa mengubah engine).
         C1 (GDD §7): `owned` = id teknik milik pemain (dari efek `technique`).
         """
-        pool = ""
+        pools: list[str] = []
         for a in self.config.get("academies", []):
             if a["id"] == academy:
-                pool = a.get("skill_pool", [""])[0] if a.get("skill_pool") else ""
+                pools = list(a.get("skill_pool") or [])
                 break
         out: list[dict] = []
-        if pool:
+        # A6: semua elemen skill_pool diproses (bukan hanya [0]) — pool 2+ (mis.
+        # ["tek_elemen_*", "tek_universal_*"]); dedup via `t not in out`.
+        for pool in pools:
             prefix = pool.rstrip("*")
-            out = [t for t in self.techniques.values() if t["id"].startswith(prefix)]
+            for t in self.techniques.values():
+                if t["id"].startswith(prefix) and t not in out:
+                    out.append(t)
         # teknik lintas akademi: unlock_arc → arc selesai bila final_quest-nya di completed_quests
         done_arcs = {
             a["id"] for a in self.config.get("arcs", [])
