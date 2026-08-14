@@ -178,6 +178,13 @@ def test_spar_kalah_tetap_selesai_dan_dialog_beda(session, monkeypatch):
     session.apply_action({"type": "move", "to": "loc_aula_ujian"})
     session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
     assert "kalah" in session.dialog.view()["text"].lower()
+    # regresi evaluasi: setelah konsolasi, dialog normal (node_umum) tetap terjangkau
+    # dalam sesi yang sama — satu langkah lanjut dari node_kalah → node_umum
+    session.apply_action({"type": "dialog_choice", "choice_index": -1})
+    v = session.dialog.view()  # TypeError bila dialog tertutup (regresi node_kalah end)
+    assert "Kultivasi itu seperti laut" in v["text"]
+    assert v["choices"]  # node_umum punya pilihan nasihat
+    finish_dialog(session, [])
 
 
 def test_konvergensi_semua_cabang(session, god_mode):

@@ -39,7 +39,7 @@
           "condition": { "flag": { "key": "spar_kalah", "value": true } },
           "speaker": "npc:npc_gucanghai",
           "text": "Kalah di pertarungan pertamamu. Tidak apa — aku pernah kalah tiga kali berturut-turut sebelum mengerti apa artinya bertarung. Bangun, istirahat, dan lain kali kau akan lebih kuat. Menang atau kalah — yang penting kau berdiri lagi.",
-          "end": true
+          "next": "node_umum"
         },
         "node_ujian": {
           "condition": { "flag": { "key": "ujian_akar_selesai", "value": false } },
