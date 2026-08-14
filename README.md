@@ -77,7 +77,7 @@ Baca [CONTRIBUTING.md](CONTRIBUTING.md) untuk panduan setup, konvensi commit, da
 data/            # konten: quest, dialog, NPC, item, musuh, lokasi, ingatan, resep, teknik
 docs/            # GDD · arsitektur engine · alur cerita · ringkasan desain · audit bug
 src/             # engine Python: session, battle, dialog, cultivation, morality, memory, quest
-tests/           # 338 test (pytest)
+tests/           # 368 test (pytest)
 tools/           # validator data + optimasi aset (optimize_png.py)
 web/             # server web stdlib + halaman statis (index.html, app.js, style.css, assets/)
 saves/           # save game (di-gitignore)
