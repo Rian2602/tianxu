@@ -268,6 +268,8 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 | `realm_min` | `{ "realm_min": "realm_pengumpul_qi" }` | Ranah minimum |
 | `academy` | `{ "academy": "akademi_elemen" }` | Akademi pilihan pemain |
 | `quest_active` / `quest_not_active` | `{ "quest_not_active": "q_side_suqing" }` | Status quest (dipakai penawaran side quest) |
+| `relation_min` / `relation_max` | `{ "relation_min": { "npc": "npc_hanxiu", "value": 20 } }` | Ambang hubungan NPC — P1-2 (GDD §7): sparring berulang & on_complete quest menaikkan/menurunkan `relations`, kondisi membuka/menutup node/opsi dialog |
+| `memory` | `{ "memory": "mem_02" }` | Ingatan tertentu sudah pulih — P1-1 (GDD §3.1, B3/#13): opsi dialog hanya muncul setelah `memory_unlock` quest terkait; ingatan tetap tanpa power mekanik |
 
 **Jenis efek** (`effects`, format type-based):
 
@@ -371,7 +373,7 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
 }
 ```
 
-**Aturan kunci**: ingatan **tidak pernah** memberikan power mekanik (GDD §2.1). `memory_unlock` pada quest hanya membuka entri naratif di panel Tianyuan Ling. `unlocked_by_quest` bisa berupa string atau list (jika dibuka lebih dari satu quest — mis. mem_02 via 3aa/3ab); dokumentatif — mekanisme aktual tetap `on_complete.memory_unlock` di quest.
+**Aturan kunci**: ingatan **tidak pernah** memberikan power mekanik (GDD §2.1). `memory_unlock` pada quest membuka entri naratif di panel Tianyuan Ling **dan** (P1-1, 2026-08-14) mengaktifkan kondisi dialog `memory` — opsi tertentu hanya muncul setelah ingatan terkait pulih (mis. pilihan "pengembara" di `dlg_moyun:node_penutup` setelah `mem_02`, dan pertanyaan duka tua di `dlg_gucanghai:node_umum` setelah `mem_01`). Gating ini mewujudkan GDD §3.1 / STORY_FASE1 §3.1 (sebelumnya B3/#13 defer). `unlocked_by_quest` bisa berupa string atau list (mis. mem_02 via 3aa/3ab); dokumentatif — mekanisme aktual tetap `on_complete.memory_unlock` di quest.
 
 ### 5.6 config.json — State Awal & Konfigurasi
 
@@ -401,6 +403,7 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
     "grounding_exp_per_hour": 2,
     "grounding_max_hours_per_day": 8,
     "spar_win_exp": 8,
+    "spar_win_relation": 5,
     "spar_loss_exp": 3,
     "hunt_exp_per_kill": 6,
     "breakthrough": "auto"
@@ -422,6 +425,8 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
     "hunt": {
       "location": "loc_wilayah_berburu",
       "pool": ["eno_serigala_qi", "eno_babi_hutan"],
+      "night_pool": ["eno_pembelot_malam", "eno_ular_bayangan"],
+      "night_window": { "hour_start": 19, "hour_end": 6 },
       "mini_boss": "eno_raja_serigala",
       "mini_boss_chance": 0.1,
       "search_item": "material_herba"
@@ -582,7 +587,7 @@ player_action(menu):
 - Progresi via **Pengalaman Kultivasi (exp)** dari **aktivitas** (keputusan penulis: rajin beraktivitas = makin cepat naik tingkat):
   - **Berkultivasi / grounding (打坐 dǎzuò)** — aksi berulang di lokasi aman: habiskan waktu (jam) → dapat `grounding_exp_per_hour` exp + pulih Qi pelan; **maks `grounding_max_hours_per_day` (8) jam per hari** (disahkan).
   - **Berburu monster** — kalahkan musuh liar di wilayah berburu → `hunt_exp_per_kill` exp + material/drop.
-  - **Sparing NPC** — tantang NPC ber-`can_spar: true` (Han Xiu, Gu Canghai) — **tanpa batas frekuensi** (disahkan) → menang = `spar_win_exp` exp + hubungan naik; kalah = `spar_loss_exp` exp kecil + **penalti KO berlaku** (disahkan, konsisten dengan battle biasa). (G4a, 2026-08-14): objektif quest `spar` **selesai saat kalah juga** — `notify_spar_loss` men-set flag `spar_kalah` → dialog Gu Canghai berbeda (entri kondisional), tanpa game over permanen; konsisten STORY_FASE1 #19.
+  - **Sparing NPC** — tantang NPC ber-`can_spar: true` (Han Xiu, Gu Canghai) — **tanpa batas frekuensi** (disahkan) → menang = `spar_win_exp` exp + `spar_win_relation` (5) hubungan naik; kalah = `spar_loss_exp` exp kecil + **penalti KO berlaku** (disahkan, konsisten dengan battle biasa). (G4a, 2026-08-14): objektif quest `spar` **selesai saat kalah juga** — `notify_spar_loss` men-set flag `spar_kalah` → dialog Gu Canghai berbeda (entri kondisional), tanpa game over permanen; konsisten STORY_FASE1 #19. **(P1-2, 2026-08-14, GDD §7)**: `relations` kini **dikonsumsi** — kondisi dialog `relation_min/max` membuka node baru saat hubungan tumbuh (Han Xiu `node_tip_spar` ≥ 20, Gu Canghai `node_akui_latihan` ≥ 20), melengkapi efek relation yang sudah ada di on_complete quest; siklus penuh: spar/quest → relation → dialog berbeda.
 - **Naik tingkat**: `exp_needed(level) = round(exp_per_level_base × exp_growth_per_level^(level-1))` (kurva dari `config.cultivation`, data-driven). Saat exp ≥ ambang → `realm_level` naik, exp tersisa dibawa.
 - **Target balancing Fase 1 (disahkan)**: pemain yang rajin (grinding side quest/berburu) mencapai **Pengumpul Qi tingkat 5–6** di akhir arc.
   - **Rebalancing (hasil playtest, disahkan)**: exp quest dikurangi ~40% (q1–q07: 3–18) & exp aktivitas diturunkan (`grounding 2/jam`, `spar_win 8`, `hunt 6`) — playtest awal mencapai Lv.10 (maks) di akhir arc, melampaui target; dengan angka ini quest saja ≈ Lv.5, rajin ≈ Lv.6.
@@ -595,7 +600,7 @@ player_action(menu):
 - **Inventori**: map item→count; item consumable (`usable=true`) bisa dipakai di luar/dalam battle.
 - **Grinding loop Fase 1**: side quest repeatable (berburu / bantu Su Qing / tugas Mo Yun) + aktivitas grounding & sparing = sumber exp untuk menaikkan ranah tanpa mengganggu alur main quest.
 - **Mini-boss (disahkan)**: 1 binatang liar kuat / penjaga wilayah di area berburu — opsional, respawn, reward lebih besar; puncak tantangan Fase 1.
-- **Respawn monster (disahkan)**: monster area berburu muncul kembali setelah `world.monster_respawn_hours` (5) jam in-game — grinding butuh menunggu. (A2, 2026-08-14): pool musuh, lokasi berburu, mini-boss & item pencarian dibaca dari `world.hunt` di config (divalidasi aturan 7) — aktivitas berburu sepenuhnya data-driven.
+- **Respawn monster (disahkan)**: monster area berburu muncul kembali setelah `world.monster_respawn_hours` (5) jam in-game — grinding butuh menunggu. (A2, 2026-08-14): pool musuh, lokasi berburu, mini-boss & item pencarian dibaca dari `world.hunt` di config (divalidasi aturan 7) — aktivitas berburu sepenuhnya data-driven. **(P1-3, 2026-08-14, GDD §8)**: tipe musuh beragam — `world.hunt.night_pool` + `night_window` (pola `quest._in_window`, lintas tengah malam 19→6): jam malam memakai pool malam (`eno_pembelot_malam`, `eno_ular_bayangan` — elemen api/air, drop berbeda); fallback pool siang bila field absen (non-breaking). Validator aturan 7 memeriksa referensi `night_pool` & sanitasinya `night_window`.
 - **Waktu**: `world.py` memajukan waktu (hari/jam). Quest sampingan & NPC dengan `schedule` hanya tersedia pada waktu tertentu. **Event terjadwal (disahkan)**: beberapa momen hanya muncul pada waktu tertentu — mis. bukti malam Act 2 memakai objektif `reach` + `time_window` (malam) atau `advance_time` ke malam hari. Fase 1: ringan (1 kota, beberapa NPC, tanpa siklus hidup penuh).
 
 ### 9.3 Ekonomi, Alkimia & Senjata (disahkan Fase 1)

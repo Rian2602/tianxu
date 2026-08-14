@@ -70,13 +70,25 @@
           "text": "Mereka salah. Di akademi ini, yang menentukan bukan bakat, tapi ketekunan. Besok kau berhadapan dengan Han Xiu di arena. Menang atau kalah — yang penting kau berdiri lagi.",
           "end": true
         },
+        "node_akui_latihan": {
+          "condition": { "relation_min": { "npc": "npc_gucanghai", "value": 20 } },
+          "speaker": "npc:npc_gucanghai",
+          "text": "Kau terus datang ke arena walau sudah beberapa kali kukalahkan. Kebanyakan murid menyerah setelah tiga kekalahan. Kau... kau berbeda, Chen Xu. Ketekunan itu lebih berharga dari bakat apa pun yang bisa dibaca Batu Akar. Teruslah begini.",
+          "end": true
+        },
         "node_umum": {
           "speaker": "npc:npc_gucanghai",
           "text": "Kultivasi itu seperti laut: tenang di permukaan, tak kenal lelah di dasar. Apa yang mengganggu pikiranku, murid baru?",
           "choices": [
             { "label": "Bagaimana cara naik ranah dengan cepat?", "next": "node_nasihat" },
-            { "label": "Aku hanya ingin mendengar nasihatmu.", "next": "node_nasihat" }
+            { "label": "Aku hanya ingin mendengar nasihatmu.", "next": "node_nasihat" },
+            { "label": "Guru... pernahkah kau kehilangan seseorang yang kau sayangi?", "next": "node_gucanghai_memori", "condition": { "memory": "mem_01" } }
           ]
+        },
+        "node_gucanghai_memori": {
+          "speaker": "npc:npc_gucanghai",
+          "text": "Gu Canghai terdiam cukup lama. \n\n\"Aula kosong yang terlalu megah untuk diisi suara — kau menggambarkannya seperti orang yang pernah tinggal di sana.\" Ia menatapmu. \"Duka tua, di mata seorang murid baru. Nanti, kalau kau sudah kuat, duka itu akan menjadi bahan bakarmu — bukan bebanmu.\"",
+          "end": true
         },
         "node_nasihat": {
           "speaker": "npc:npc_gucanghai",
@@ -117,6 +129,12 @@
           "condition": { "flag": { "key": "branch_3ab", "value": true } },
           "speaker": "npc:npc_hanxiu",
           "text": "Kau membongkar kebenaran tanpa membuat keributan. Di akademi ini orang mengira berani itu harus berisik. ... Kau punya kepala dingin, murid desa. Lain kali kita sparring — dan aku tak akan menahan diri.",
+          "end": true
+        },
+        "node_tip_spar": {
+          "condition": { "relation_min": { "npc": "npc_hanxiu", "value": 20 } },
+          "speaker": "npc:npc_hanxiu",
+          "text": "Dengar, murid desa — karena kau lawan yang menyenangkan: jangan pernah biarkan lawanmu yang mengatur ritme. Kau yang tentukan kapan pertarungan dimulai, bukan mereka. ... Lain kali kita bertemu di arena, kau akan kupakai untuk menguji teori itu.",
           "end": true
         },
         "node_banter": {
@@ -243,6 +261,14 @@
         "node_penutup": {
           "speaker": "narration",
           "text": "Kebenaran itu sederhana — dan menyakitkan. Pola yang sama seperti yang kau kenali dari dalam dirimu: yang lemah dikorbankan untuk yang kuat.\n\nKau berdiri di perpustakaan yang sunyi, dan untuk pertama kalinya, kau merasakan tekad yang tenang — bukan amarah, tapi kepastian. Sesuatu di dadamu berdenyut pelan. Tianyuan Ling.",
+          "choices": [
+            { "label": "(Benda di dadamu berdenyut — kau ingat pengembara compang-camping yang kau beri jubah. \"Simpan ini.\")", "next": "node_moyun_memori", "condition": { "memory": "mem_02" } },
+            { "label": "(Lanjut)" }
+          ]
+        },
+        "node_moyun_memori": {
+          "speaker": "npc:npc_moyun",
+          "text": "Kau menatap benda di dadamu seolah ia bisa menjawab — pengembara compang-camping yang kau beri jubah di tengah hujan. \n\nMo Yun menatapmu lama. \"Ada catatan tua tentang benda seperti itu di perpustakaan ini. Datanglah lagi, kalau kau ingin tahu apa artinya.\"",
           "end": true
         },
         "node_offer_side": {

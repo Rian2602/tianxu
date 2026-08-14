@@ -100,6 +100,8 @@ Chen Xu — dengan ingatan pertama yang masih segar — menyadari **pola lama ya
 
 **Aturan ketat**: ingatan memengaruhi **sikap & pilihan dialog** — tetapi tetap **tidak pernah** memberi kekuatan mekanik (GDD §2.1). Kekuatan hanya lewat jalur kultivasi konvensional.
 
+> **Diimplementasikan 2026-08-14 (P1-1, menutup B3/#13)**: kondisi dialog `memory` aktif — opsi `mem_02` ("pengembara") di `dlg_moyun:node_penutup` hanya muncul setelah ingatan "Kebaikan yang Terlupakan" pulih, dan pertanyaan duka tua (`mem_01`, "Istana yang Sunyi") di `dlg_gucanghai:node_umum`. Detail teknis di ENGINE_ARCHITECTURE §5.2 (tabel kondisi).
+
 ---
 
 > Nama korban (Zhou Yan) & Penatua (usulan: An, 安长老) adalah **usulan** — silakan diganti saat penulisan konten.

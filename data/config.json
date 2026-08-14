@@ -33,6 +33,7 @@
     "grounding_exp_per_hour": 2,
     "grounding_max_hours_per_day": 8,
     "spar_win_exp": 8,
+    "spar_win_relation": 5,
     "spar_loss_exp": 3,
     "hunt_exp_per_kill": 6,
     "breakthrough": "auto"
@@ -54,6 +55,8 @@
     "hunt": {
       "location": "loc_wilayah_berburu",
       "pool": ["eno_serigala_qi", "eno_babi_hutan"],
+      "night_pool": ["eno_pembelot_malam", "eno_ular_bayangan"],
+      "night_window": { "hour_start": 19, "hour_end": 6 },
       "mini_boss": "eno_raja_serigala",
       "mini_boss_chance": 0.1,
       "search_item": "material_herba"

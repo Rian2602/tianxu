@@ -300,6 +300,10 @@ class BattleEngine:
         # exp
         if b["context"] == "spar":
             gain_exp(self.state, self.reg, self.reg.config["cultivation"]["spar_win_exp"])
+            # P1-2: spar menang menaikkan hubungan dengan NPC lawan (data-driven)
+            rel = int(self.reg.config.get("cultivation", {}).get("spar_win_relation", 0))
+            if rel and b.get("spar_npc"):
+                self.state.relations[b["spar_npc"]] = self.state.relations.get(b["spar_npc"], 0) + rel
             if b.get("spar_npc"):
                 self.quest_engine.notify_spar_won(b["spar_npc"])
         else:

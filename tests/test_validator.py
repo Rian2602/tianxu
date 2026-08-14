@@ -102,6 +102,22 @@ def test_aturan7_world_hunt_chance_invalid():
     assert any("mini_boss_chance" in e for e in v.errors)
 
 
+def test_aturan7_night_pool_referensi_tidak_ada():
+    d = _good()
+    d["config.json"]["world"] = {"hunt": {"pool": [], "night_pool": ["eno_hantu_malam"]}}
+    v, ok = make(d)
+    assert not ok
+    assert any("night_pool" in e for e in v.errors)
+
+
+def test_aturan7_night_window_tidak_valid():
+    d = _good()
+    d["config.json"]["world"] = {"hunt": {"pool": [], "night_window": {"hour_start": 30, "hour_end": 6}}}
+    v, ok = make(d)
+    assert not ok
+    assert any("night_window.hour_start" in e for e in v.errors)
+
+
 # ---------- aturan 3: graf quest acyclic ----------
 
 def test_aturan3_siklus_dag():

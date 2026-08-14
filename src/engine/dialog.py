@@ -149,6 +149,17 @@ class DialogEngine:
             qid = cond["quest_not_active"]
             if qid == s.current_quest or qid in s.active_side_quests:
                 return False
+        if "relation_min" in cond:
+            r = cond["relation_min"]
+            if s.relations.get(r["npc"], 0) < r["value"]:
+                return False
+        if "relation_max" in cond:
+            r = cond["relation_max"]
+            if s.relations.get(r["npc"], 0) > r["value"]:
+                return False
+        if "memory" in cond:
+            if cond["memory"] not in s.memories:
+                return False
         return True
 
     def _eval(self, cond: dict[str, Any]) -> bool:

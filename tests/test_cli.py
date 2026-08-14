@@ -39,7 +39,7 @@ def test_cli_playthrough_3aa(monkeypatch, capsys):
         "pindah loc_perpustakaan", "pindah loc_paviliun",
         "talk npc_penatua", "1", "lanjut", "lanjut",
         "pindah loc_perpustakaan",
-        "talk npc_moyun", "lanjut", "lanjut",
+        "talk npc_moyun", "lanjut", "1", "lanjut",  # penutup: pilih opsi ingatan mem_02
         # pasca arc: CLI tidak boleh langsung berhenti — pemain bisa pindah & simpan
         "pindah loc_paviliun", "pindah loc_aula_ujian", "pindah loc_asrama",
         "simpan test_arc_end",
@@ -103,7 +103,7 @@ def test_cli_full_playthrough_commands(monkeypatch, capsys):
         "pindah loc_perpustakaan", "pindah loc_paviliun",
         "talk npc_penatua", "1", "lanjut", "lanjut",
         "pindah loc_perpustakaan",
-        "talk npc_moyun", "lanjut", "lanjut",
+        "talk npc_moyun", "lanjut", "1", "lanjut",  # penutup: pilih opsi ingatan mem_02
         # pasca arc: CLI tetap hidup — istirahat, pasang senjata, side quest, berburu
         "pindah loc_paviliun", "pindah loc_aula_ujian", "pindah loc_asrama", "istirahat 8",
         "pindah loc_aula_ujian", "pindah loc_gerbang_akademi",

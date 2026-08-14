@@ -335,6 +335,176 @@ def test_dialog_engine_visible_choices_conditions(session):
     assert len(v2["choices"]) == 3
 
 
+def test_eval_condition_relation(dummy_session):
+    """P1-2: kondisi relation_min/relation_max dibaca dari state.relations."""
+    state = dummy_session.state
+    # relations kosong (default 0)
+    assert DialogEngine._eval_condition(state, {"relation_min": {"npc": "npc_hanxiu", "value": 10}}) is False
+    assert DialogEngine._eval_condition(state, {"relation_max": {"npc": "npc_hanxiu", "value": 10}}) is True
+    # npc lain (0) tidak terpengaruh skor npc target
+    state.relations["npc_hanxiu"] = 25
+    assert DialogEngine._eval_condition(state, {"relation_min": {"npc": "npc_hanxiu", "value": 20}}) is True
+    assert DialogEngine._eval_condition(state, {"relation_min": {"npc": "npc_hanxiu", "value": 25}}) is True
+    assert DialogEngine._eval_condition(state, {"relation_min": {"npc": "npc_hanxiu", "value": 26}}) is False
+    assert DialogEngine._eval_condition(state, {"relation_max": {"npc": "npc_hanxiu", "value": 20}}) is False
+    assert DialogEngine._eval_condition(state, {"relation_min": {"npc": "npc_suqing", "value": 1}}) is False
+
+
+def test_pilihan_gated_relation(session):
+    """P1-2: choice ber-condition relation_min tersembunyi lalu tampil setelah relation naik."""
+    session.dialog.current = {
+        "id": "dlg_mock_rel",
+        "nodes": {
+            "start": {
+                "speaker": "narrator",
+                "text": "Han Xiu menatapmu.",
+                "choices": [
+                    {"label": "Tip Sparring Rahasia", "condition": {"relation_min": {"npc": "npc_hanxiu", "value": 20}}},
+                    {"label": "Basa-basi"},
+                ]
+            }
+        }
+    }
+    session.dialog.node_id = "start"
+    # relation 0 → opsi gated tersembunyi
+    labels = [c["label"] for c in session.dialog.view()["choices"]]
+    assert labels == ["Basa-basi"]
+    # spar menang berulang → relation naik → opsi muncul
+    session.state.relations["npc_hanxiu"] = 20
+    labels = [c["label"] for c in session.dialog.view()["choices"]]
+    assert "Tip Sparring Rahasia" in labels
+
+
+def test_spar_menang_menaikkan_relation(session, monkeypatch):
+    """P1-2: kemenangan spar menyuntikkan relation ke NPC lawan (cultivation.spar_win_relation)."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit, no drop
+    session.state.location = "loc_arena"
+    session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
+    assert session.state.pending_battle is not None
+    rel_before = session.state.relations.get("npc_hanxiu", 0)
+    # selesaikan battle — serang sampai menang
+    for _ in range(20):
+        session.apply_action({"type": "battle_action", "action": "attack"})
+        if session.state.pending_battle is None:
+            break
+    assert session.state.pending_battle is None
+    rel_after = session.state.relations.get("npc_hanxiu", 0)
+    assert rel_after >= rel_before + 1, f"relation tidak naik: {rel_before} → {rel_after}"
+
+
+def test_hanxiu_tip_spar_saat_relation_tinggi(session, god_mode):
+    """P1-2: hubungan tinggi dengan Han Xiu (sparring berulang) membuka node tip spar."""
+    from conftest import move_path
+
+    session.state.flags["spar_ujian_selesai"] = True
+    move_path(session, ["loc_aula_ujian", "loc_arena"])
+    # relation rendah → tetap node banter biasa
+    session.state.relations["npc_hanxiu"] = 5
+    session.apply_action({"type": "talk", "npc": "npc_hanxiu"})
+    assert "Masih hidup" in session.dialog.view()["text"]
+    finish_dialog(session, [])
+    # relation tinggi (sparring berulang) → node tip spar
+    session.state.relations["npc_hanxiu"] = 20
+    session.apply_action({"type": "talk", "npc": "npc_hanxiu"})
+    assert "ritme" in session.dialog.view()["text"]
+
+
+def test_gucanghai_akui_latihan_saat_relation_tinggi(session, god_mode):
+    """P1-2: hubungan tinggi dengan Gu Canghai membuka node pengakuan ketekunan."""
+    from conftest import move_path
+
+    session.state.flags["ujian_akar_selesai"] = True
+    move_path(session, ["loc_aula_ujian"])
+    # relation rendah → nasihat biasa tetap tersedia
+    session.state.relations["npc_gucanghai"] = 0
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    assert "Kultivasi itu seperti laut" in session.dialog.view()["text"]
+    finish_dialog(session, [0])
+    # relation tinggi (sering sparring) → node pengakuan ketekunan
+    session.state.relations["npc_gucanghai"] = 20
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    assert "Ketekunan" in session.dialog.view()["text"]
+
+
+def test_eval_condition_memory(dummy_session):
+    """P1-1: kondisi memory true hanya setelah id ingatan ada di state.memories."""
+    state = dummy_session.state
+    assert DialogEngine._eval_condition(state, {"memory": "mem_01"}) is False
+    state.memories.append("mem_01")
+    assert DialogEngine._eval_condition(state, {"memory": "mem_01"}) is True
+    assert DialogEngine._eval_condition(state, {"memory": "mem_02"}) is False
+
+
+def test_pilihan_gated_memory(session):
+    """P1-1: choice ber-condition memory tersembunyi sebelum ingatan pulih."""
+    session.dialog.current = {
+        "id": "dlg_mock_mem",
+        "nodes": {
+            "start": {
+                "speaker": "narrator",
+                "text": "Sesuatu berdenyut di dadamu.",
+                "choices": [
+                    {"label": "Pengembara itu...", "condition": {"memory": "mem_02"}, "next": "node_dalam"},
+                    {"label": "Lanjut"},
+                ]
+            },
+            "node_dalam": {"speaker": "narrator", "text": "Kau ingat jubah yang kau berikan."},
+        }
+    }
+    session.dialog.node_id = "start"
+    # ingatan belum pulih → hanya "Lanjut"
+    labels = [c["label"] for c in session.dialog.view()["choices"]]
+    assert labels == ["Lanjut"]
+    # ingatan pulih → pilihan mendalam muncul
+    session.state.memories.append("mem_02")
+    labels = [c["label"] for c in session.dialog.view()["choices"]]
+    assert "Pengembara itu..." in labels
+
+
+def test_moyun_pilihan_ingatan_muncul_saat_q07(session, god_mode):
+    """P1-1: di q07, pilihan terkait mem_02 muncul di node_penutup setelah ingatan pulih (3aa)."""
+    from conftest import play_to_incident
+    from src.engine.session import GameSession
+
+    s = GameSession.new(session.reg)
+    play_to_incident(s)
+    finish_dialog(s, [0, 0])  # opt_3aa
+    move_path(s, ["loc_perpustakaan", "loc_paviliun"])
+    s.apply_action({"type": "talk", "npc": "npc_penatua"})  # selesaikan q_akademi_3aa (mem_02 terbuka)
+    finish_dialog(s, [])
+    assert "mem_02" in s.state.memories
+    # q07: bicara Mo Yun → truth → penutup
+    s.apply_action({"type": "move", "to": "loc_perpustakaan"})
+    s.apply_action({"type": "talk", "npc": "npc_moyun"})  # node_truth_3aa (tanpa pilihan)
+    s.apply_action({"type": "dialog_choice", "choice_index": -1})  # lanjut → node_penutup
+    # penutup kini punya pilihan terkait ingatan (mem_02 sudah pulih)
+    labels = [c["label"] for c in s.dialog.view()["choices"]]
+    assert any("pengembara" in l for l in labels), f"opsi ingatan tidak muncul: {labels}"
+    # pilih opsi ingatan → node_moyun_memori
+    s.apply_action({"type": "dialog_choice", "choice_index": 0})
+    assert "pengembara" in s.dialog.view()["text"]
+    finish_dialog(s, [])
+
+
+def test_gucanghai_pilihan_ingatan_muncul(session, god_mode):
+    """P1-1: node_umum Gu Canghai menampilkan pilihan duka tua hanya setelah mem_01 pulih."""
+    from conftest import move_path
+
+    move_path(session, ["loc_aula_ujian"])
+    # tanpa mem_01 → hanya 2 pilihan nasihat
+    session.state.flags["ujian_akar_selesai"] = True
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    labels = [c["label"] for c in session.dialog.view()["choices"]]
+    assert len(labels) == 2
+    finish_dialog(session, [0])
+    # mem_01 pulih → pilihan ketiga muncul
+    session.state.memories.append("mem_01")
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    labels = [c["label"] for c in session.dialog.view()["choices"]]
+    assert len(labels) == 3
+
+
 def test_dialog_engine_choose_no_next_ends(session):
     session.dialog.current = {
         "id": "dlg_mock_end",

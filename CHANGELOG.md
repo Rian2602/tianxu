@@ -13,11 +13,12 @@ Semua perubahan penting pada **Tian Xu: Second Life**.
 - Batch audit `docs/list_bug.md` (diverifikasi): guard `pending_dialog` simetris battle (F2), body API non-objek → 400 (F1), teknik lintas ranah ditolak via `realm_required` (H4), jadwal NPC lintas tengah malam (A1), berburu data-driven `world.hunt` (A2), spar kalah = quest selesai + dialog berbeda (G4a), world-facts cabang untuk kontinuitas Arc 2 (G4b/#10), reaksi NPC untuk cabang 3ab (G4c), q07 pasca-konfrontasi 3aa (G4f), penutup tematik cabang 3b (B2), choice illusion konfrontasi (J3#6), lock server web (K4), breakpoint responsif (I1#9).
 - Konten: `system_msg` prematur q06 dihapus (B1); opsi "(Tidak menjawab)" dihapus — cabang 3b wajib lewat tawaran berbayar (G4d); flag `branch_3aa` membocorkan dialog konfrontasi ke 3ab diperbaiki (G4e); dialog Gu Canghai tetap terbuka setelah konsolasi kalah.
 - Toko (laporan pemain, UX1): tab Jual menjelaskan item yang belum dimiliki — baris "Belum punya" tanpa tombol + hint; `Cache-Control: no-cache` untuk aset statis agar perbaikan frontend selalu termuat.
-- Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi), 2 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / DESIGN_SUMMARY / README / PROJECT.
+- **Fitur GDD P1** (plan `docs/superpowers/plans/2026-08-14-p1-fitur-gdd-belum-dibangun.md`): hubungan NPC berdampak pada dialog (P1-2 — kondisi `relation_min/max`, `spar_win_relation`, node gated Han Xiu/Gu Canghai); gating ingatan membuka opsi dialog (P1-1 — kondisi `memory`, menutup B3/#13); tipe musuh beragam + pool berburu malam (P1-3 — `night_pool`/`night_window`, 2 musuh baru).
+- Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi + fitur P1), 3 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / STORY_FASE1 / DESIGN_SUMMARY / README / PROJECT.
 
 ### Changed
-- Jumlah test: 192 → **210**; validator 16 aturan tetap exit 0.
-- `README.md` & `PROJECT.md`: jumlah test disinkronkan (210).
+- Jumlah test: 192 → **222**; validator 16 aturan tetap exit 0.
+- `README.md` & `PROJECT.md`: jumlah test disinkronkan (222).
 
 ## [0.1.0-alpha] — 2026-08-14
 

@@ -229,6 +229,16 @@ class Validator:
             mbc = hunt.get("mini_boss_chance")
             if mbc is not None and not (isinstance(mbc, (int, float)) and 0 <= mbc <= 1):
                 self.error(f"config.world.hunt.mini_boss_chance: harus 0–1 (aturan 7)")
+            # P1-3: pool malam + window (GDD §8)
+            for eid in hunt.get("night_pool", []):
+                if not self.has("enemy", eid):
+                    self.error(f"config.world.hunt.night_pool: musuh '{eid}' tidak ada di enemies.csv (aturan 7)")
+            nw = hunt.get("night_window")
+            if nw:
+                for k in ("hour_start", "hour_end"):
+                    v = nw.get(k)
+                    if not isinstance(v, int) or not 0 <= v <= 23:
+                        self.error(f"config.world.hunt.night_window.{k}: harus int 0–23 (aturan 7)")
 
     def _check_quests(self) -> None:
         for q in self.quests:
@@ -310,13 +320,26 @@ class Validator:
                     self.error(f"dialog {did} node {nid}: next '{node['next']}' tidak ada")
                 if node.get("end") and node.get("next"):
                     self.error(f"dialog {did} node {nid}: punya end & next sekaligus")
+                self._check_dialog_condition(did, nid, node.get("condition"), "node")
                 for c in node.get("choices", []):
                     if c.get("next") and c["next"] not in d["nodes"]:
                         self.error(f"dialog {did} node {nid}: choice next '{c['next']}' tidak ada")
+                    self._check_dialog_condition(did, nid, c.get("condition"), "choice")
                     for fx in c.get("effects", []):
                         self._check_effect(fx, f"dialog {did} node {nid}")
                         if fx.get("type") == "start_quest" and not self.has("quest", fx.get("quest", "")):
                             self.error(f"dialog {did}: start_quest '{fx.get('quest')}' tidak ada")
+
+    def _check_dialog_condition(self, did: str, nid: str, cond: dict | None, where: str) -> None:
+        """Validasi referensi kondisi dialog (P1-2 relation, P1-1 memory)."""
+        if not cond:
+            return
+        for ck in ("relation_min", "relation_max"):
+            r = cond.get(ck) or {}
+            if r.get("npc") and not self.has("npc", r["npc"]):
+                self.error(f"dialog {did} {where} {nid}: kondisi {ck} npc '{r['npc']}' tidak ada")
+        if cond.get("memory") and not self.has("memory", cond["memory"]):
+            self.error(f"dialog {did} {where} {nid}: kondisi memory '{cond['memory']}' tidak ada")
 
     def _check_memories(self) -> None:
         for m in self.memories:

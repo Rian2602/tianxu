@@ -559,6 +559,43 @@ def test_guard_pending_dialog_tolak_aksi_lain(session):
     assert session.state.pending_dialog == "dlg_penjaga"  # dialog berlanjut normal
 
 
+def test_berburu_malam_memakai_pool_malam(session, monkeypatch):
+    """P1-3: jam dalam night_window (19–6) → pool musuh malam; siang → pool biasa."""
+    import src.engine.session as sess_mod
+
+    captured = {}
+    orig_choice = sess_mod.random.choice
+
+    def fake_choice(pool):
+        captured["pool"] = list(pool)
+        return pool[0]
+
+    monkeypatch.setattr(sess_mod.random, "choice", fake_choice)
+    monkeypatch.setattr(sess_mod.random, "random", lambda: 0.99)  # hindari mini-boss
+    session.state.location = "loc_wilayah_berburu"
+
+    # malam (jam 21) → pool malam
+    session.state.hour = 21
+    session.apply_action({"type": "hunt"})
+    assert session.state.pending_battle is not None
+    assert captured["pool"] == ["eno_pembelot_malam", "eno_ular_bayangan"], captured["pool"]
+    session.state.pending_battle = None
+
+    # siang (jam 10) → pool siang
+    session.state.last_hunt_time = None
+    session.state.hour = 10
+    session.apply_action({"type": "hunt"})
+    assert captured["pool"] == ["eno_serigala_qi", "eno_babi_hutan"], captured["pool"]
+    session.state.pending_battle = None
+
+    # subuh (jam 5, lintas tengah malam masih dalam window) → pool malam
+    session.state.last_hunt_time = None
+    session.state.hour = 5
+    session.apply_action({"type": "hunt"})
+    assert captured["pool"] == ["eno_pembelot_malam", "eno_ular_bayangan"], captured["pool"]
+    session.state.pending_battle = None
+
+
 def test_session_shop_sell_deletion(session):
     session.state.location = "loc_pasar"
     session.state.inventory["material_tulang"] = 1

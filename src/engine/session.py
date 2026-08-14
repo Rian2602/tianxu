@@ -336,7 +336,14 @@ class GameSession:
             nama = loc.get("name", "Wilayah Berburu") if loc else "Wilayah Berburu"
             add_log(self.state, "system", f"Berburu hanya bisa dilakukan di {nama}.")
             return self.view()
-        pool = list(hunt.get("pool", ["eno_serigala_qi", "eno_babi_hutan"]))
+        # P1-3: pool malam (GDD §8) — jam dalam night_window memakai night_pool
+        nw = hunt.get("night_window")
+        if nw and self.quest._in_window(nw):
+            pool = list(hunt.get("night_pool") or [])
+        else:
+            pool = []
+        if not pool:
+            pool = list(hunt.get("pool", ["eno_serigala_qi", "eno_babi_hutan"]))
         if not pool:
             add_log(self.state, "system", "Tidak ada mangsa di sini.")
             return self.view()

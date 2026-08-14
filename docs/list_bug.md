@@ -16,7 +16,7 @@
 
 ## Status perbaikan (diterapkan 2026-08-14, diperbarui 2026-08-14 lanjutan)
 
-Sebagian bug aktif sudah diperbaiki — detail di bawah. Verifikasi: `tools/validate_data.py` lulus + `pytest` **210 passed**. Yang **tidak** dicantumkan di sini belum diperbaiki (desain/konten/defer).
+Sebagian bug aktif sudah diperbaiki — detail di bawah. Verifikasi: `tools/validate_data.py` lulus + `pytest` **222 passed**. Yang **tidak** dicantumkan di sini belum diperbaiki (desain/konten/defer).
 
 | ID | Status | Ringkasan fix |
 |----|--------|---------------|
@@ -68,7 +68,17 @@ Test baru batch ini: `test_teknik_ranah_tinggi_ditolak`, `test_player_techniques
 
 Test baru batch ini: `test_reaksi_3ab`, `test_spar_kalah_tetap_selesai_dan_dialog_beda`, `test_static_no_cache` (plus perluasan `test_konvergensi_semua_cabang` dengan assertion world-facts per cabang).
 
-**Belum diperbaiki (defer resmi)**: B3/#13 (gating ingatan — fitur baru, butuh plan terpisah).
+**Batch 4 (2026-08-14, plan `docs/superpowers/plans/2026-08-14-p1-fitur-gdd-belum-dibangun.md`) — fitur GDD P1, 222 test total:**
+
+| ID | Status | Ringkasan fix |
+|----|--------|---------------|
+| P1-2 | ✅ | hubungan NPC berdampak: kondisi dialog `relation_min`/`relation_max` (konsumen `state.relations` yang sebelumnya mati) + `cultivation.spar_win_relation` (spar menang +5) + 2 node gated (Han Xiu `node_tip_spar` ≥ 20, Gu Canghai `node_akui_latihan` ≥ 20). `dialog.py`, `battle.py`, `config.json`, `dialogs_akademi.json` |
+| P1-1 | ✅ | **B3/#13 tertutup** — gating ingatan: kondisi `memory` membuka opsi dialog hanya setelah ingatan pulih (`dlg_moyun` `mem_02`, `dlg_gucanghai` `mem_01`). `dialog.py`, `dialogs_akademi.json` |
+| P1-3 | ✅ | tipe musuh beragam: `world.hunt.night_pool` + `night_window` (19→6, pola `_in_window` lintas tengah malam) + 2 musuh baru (Pembelot Malam api, Ular Bayangan air); validator aturan 7 diperluas. `enemies.csv`, `config.json`, `session.py`, `validate_data.py` |
+
+Test baru batch ini: `test_eval_condition_relation`, `test_pilihan_gated_relation`, `test_spar_menang_menaikkan_relation`, `test_hanxiu_tip_spar_saat_relation_tinggi`, `test_gucanghai_akui_latihan_saat_relation_tinggi`, `test_eval_condition_memory`, `test_pilihan_gated_memory`, `test_moyun_pilihan_ingatan_muncul_saat_q07`, `test_gucanghai_pilihan_ingatan_muncul`, `test_berburu_malam_memakai_pool_malam`, `test_aturan7_night_pool_referensi_tidak_ada`, `test_aturan7_night_window_tidak_valid`.
+
+**Defer resmi tersisa**: tidak ada (B3/#13 tertutup oleh P1-1).
 
 ## A. Bug terverifikasi — kode
 
@@ -490,4 +500,4 @@ Dampak: P0/P1 terfokus pada #1/#2/#15.
 4. **A2** (hardcode) — ✅ **selesai** (`world.hunt` di config + validator aturan 7).
 5. **B3** (gating ingatan) — fitur baru, skala lebih besar; tunda.
 
-Tambahan dari plan `2026-08-14-fix-sisa-bug-dan-hardening.md`: H4 ✅ · A1 ✅ · J3#6 ✅ · #9 ✅ · A2 ✅ · G4d ✅ · K5 ✅ · G4b/#10 ✅ · G4c ✅ · G4f ✅ · B2 ✅ · G4a ✅ · K4-lock ✅ — seluruhnya selesai (Fase A/B/D); satu-satunya defer = B3/#13. Temuan tindak lanjut (plan `2026-08-14-fix-temuan-evaluasi-diri.md`): regresi `node_kalah` ✅ · dok drift angka test ✅. Laporan pemain (2026-08-14): UX1 (tab Jual toko) ✅ — lihat tabel status di atas.
+Tambahan dari plan `2026-08-14-fix-sisa-bug-dan-hardening.md`: H4 ✅ · A1 ✅ · J3#6 ✅ · #9 ✅ · A2 ✅ · G4d ✅ · K5 ✅ · G4b/#10 ✅ · G4c ✅ · G4f ✅ · B2 ✅ · G4a ✅ · K4-lock ✅ — seluruhnya selesai (Fase A/B/D); satu-satunya defer = B3/#13. Temuan tindak lanjut (plan `2026-08-14-fix-temuan-evaluasi-diri.md`): regresi `node_kalah` ✅ · dok drift angka test ✅. Laporan pemain (2026-08-14): UX1 (tab Jual toko) ✅. **Fitur GDD P1 (plan `2026-08-14-p1-fitur-gdd-belum-dibangun.md`)**: P1-2 (relations berdampak) ✅ · P1-1 (gating ingatan = B3/#13) ✅ · P1-3 (musuh malam) ✅ — tidak ada defer tersisa. Lihat tabel status di atas.
