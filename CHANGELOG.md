@@ -18,7 +18,7 @@ Semua perubahan penting pada **Tian Xu: Second Life**.
 - Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi + fitur P1), 4 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / STORY_FASE1 / DESIGN_SUMMARY / README / PROJECT.
 
 ### Changed
-- Jumlah test: 192 → **230**; validator 16 aturan tetap exit 0.
+- Jumlah test: 192 → **231**; validator 16 aturan tetap exit 0.
 - `README.md` & `PROJECT.md`: jumlah test disinkronkan (230).
 
 ## [0.1.0-alpha] — 2026-08-14

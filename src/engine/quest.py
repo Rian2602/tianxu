@@ -50,7 +50,9 @@ class QuestEngine:
             if obj.get("report_to"):
                 npc = self.reg.npc(obj["report_to"])
                 nama = npc["name"] if npc else obj["report_to"]
-                lapor = "✓" if self.state.active_side_quests.get(quest["id"], {}).get("talk", 0) else "—"
+                prog = self.state.active_side_quests.get(quest["id"], {})
+                # laporan sah hanya bila kill sudah penuh (lapor sebelum kill bukan laporan)
+                lapor = "✓" if prog.get("talk", 0) and prog.get("defeated", 0) >= obj.get("target", 1) else "—"
                 return f"{base} · lapor ke {nama} ({lapor})"
             return base
         if kind == "gather":

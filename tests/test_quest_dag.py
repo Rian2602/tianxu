@@ -158,6 +158,29 @@ def test_side_quest_berburu_selesai_via_kemenangan_dan_lapor(session, god_mode, 
     assert "q_side_berburu" in session.state.completed_quests
 
 
+def test_objective_text_lapor_check_hanya_saat_kill_terpenuhi(dummy_session):
+    """Fix UX: indikator lapor (✓) hanya tampil setelah target kill TERCAPAI juga,
+    bukan sejak talk pertama (lapor sebelum kill bukan laporan yang sah)."""
+    qe = dummy_session.quest
+    q = {
+        "id": "q_side_berburu", "kind": "side", "title": "Berburu",
+        "objective": {
+            "kind": "defeat", "enemies": ["eno_serigala_qi"], "target": 2,
+            "report_to": "npc_pemburu", "hint": "Kalahkan 2 binatang.",
+        },
+        "next": [], "on_complete": {"rewards": {"exp": 1}},
+    }
+    # sudah lapor (talk=1) tapi baru 1 kill → laporan belum sah → harus "—"
+    dummy_session.state.active_side_quests["q_side_berburu"] = {"talk": 1, "defeated": 1}
+    txt = qe.objective_text(q)
+    assert "—" in txt, f"kill belum penuh harus tampil '—', dapat: {txt}"
+    assert "✓" not in txt, f"kill belum penuh tidak boleh tampil '✓', dapat: {txt}"
+    # kill penuh (2) + sudah lapor → laporan sah → "✓"
+    dummy_session.state.active_side_quests["q_side_berburu"]["defeated"] = 2
+    txt = qe.objective_text(q)
+    assert "✓" in txt, f"kill penuh + lapor harus tampil '✓', dapat: {txt}"
+
+
 def test_spar_kalah_tetap_selesai_dan_dialog_beda(session, monkeypatch):
     """G4a: kalah sparring ujian → quest spar selesai + flag spar_kalah + dialog Gu Canghai berbeda."""
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
