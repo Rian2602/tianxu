@@ -625,6 +625,22 @@ def test_berburu_malam_memakai_pool_malam(session, monkeypatch):
     session.state.pending_battle = None
 
 
+def test_hunt_tanpa_config_ditolak_aman(session, monkeypatch):
+    """A8: tanpa config.world.hunt, aksi hunt/search tidak crash & menolak dengan
+    log — engine tidak memakai fallback id konten arc-1."""
+    import copy
+
+    cfg = copy.deepcopy(session.reg.config)
+    cfg["world"] = {k: v for k, v in cfg["world"].items() if k != "hunt"}
+    monkeypatch.setattr(session.reg, "config", cfg)
+    session.state.location = "loc_wilayah_berburu"
+    session.apply_action({"type": "hunt"})
+    assert session.state.pending_battle is None
+    assert any("Berburu" in e["text"] for e in session.state.log)
+    session.apply_action({"type": "search"})
+    assert any("Mencari" in e["text"] or "Berburu" in e["text"] for e in session.state.log)
+
+
 def test_session_shop_sell_deletion(session):
     session.state.location = "loc_pasar"
     session.state.inventory["material_tulang"] = 1

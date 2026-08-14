@@ -336,9 +336,16 @@ class GameSession:
         return self.view()
 
     def _hunt(self, action: dict) -> dict:
-        # A2: pool musuh & lokasi dari config (data-driven, fallback ke nilai lama)
-        hunt = self.reg.config.get("world", {}).get("hunt", {})
-        hunt_loc = hunt.get("location", "loc_wilayah_berburu")
+        # A8: semua konten hunt dari config.world.hunt — TANPA fallback id konten
+        # arc-1 (data-driven murni; arc baru = data saja)
+        hunt = self.reg.config.get("world", {}).get("hunt")
+        if not hunt:
+            add_log(self.state, "system", "Berburu belum tersedia di dunia ini.")
+            return self.view()
+        hunt_loc = hunt.get("location")
+        if not hunt_loc:
+            add_log(self.state, "system", "Berburu belum tersedia di dunia ini.")
+            return self.view()
         if self.state.location != hunt_loc:
             loc = self.reg.location(hunt_loc)
             nama = loc.get("name", "Wilayah Berburu") if loc else "Wilayah Berburu"
@@ -351,39 +358,45 @@ class GameSession:
         else:
             pool = []
         if not pool:
-            pool = list(hunt.get("pool", ["eno_serigala_qi", "eno_babi_hutan"]))
+            pool = list(hunt.get("pool") or [])
         if not pool:
             add_log(self.state, "system", "Tidak ada mangsa di sini.")
             return self.view()
         if random.random() < float(hunt.get("mini_boss_chance", 0.1)):  # mini-boss jarang
-            pool = [hunt.get("mini_boss") or "eno_raja_serigala"]
+            pool = [hunt["mini_boss"]] if hunt.get("mini_boss") else pool
         eid = random.choice(pool)
         foe = self.reg.enemy(eid)
         if not foe:
             add_log(self.state, "system", "Tidak ada mangsa di sini.")
             return self.view()
-            
+
         respawn_hours = self.reg.config.get("world", {}).get("monster_respawn_hours", 5)
         now_abs_hours = self.state.absolute_hours
         if self.state.last_hunt_time is not None and (now_abs_hours - self.state.last_hunt_time) < respawn_hours:
             remaining = respawn_hours - (now_abs_hours - self.state.last_hunt_time)
             add_log(self.state, "system", f"Wilayah Berburu masih sepi. Monster liar baru muncul kembali dalam {remaining} jam.")
             return self.view()
-            
+
         self.state.last_hunt_time = now_abs_hours
         self.battle.start([foe], "hunt")
         return self.view()
 
     def _search(self, action: dict) -> dict:
-        # A2: item & lokasi dari config (data-driven)
-        hunt = self.reg.config.get("world", {}).get("hunt", {})
-        hunt_loc = hunt.get("location", "loc_wilayah_berburu")
+        # A8: item & lokasi dari config.world.hunt — tanpa fallback id konten
+        hunt = self.reg.config.get("world", {}).get("hunt")
+        if not hunt or not hunt.get("location"):
+            add_log(self.state, "system", "Mencari belum tersedia di dunia ini.")
+            return self.view()
+        hunt_loc = hunt.get("location")
         if self.state.location != hunt_loc:
             loc = self.reg.location(hunt_loc)
             nama = loc.get("name", "Wilayah Berburu") if loc else "Wilayah Berburu"
             add_log(self.state, "system", f"Mencari herba hanya bisa dilakukan di {nama}.")
             return self.view()
-        item_id = hunt.get("search_item", "material_herba")
+        item_id = hunt.get("search_item")
+        if not item_id:
+            add_log(self.state, "system", "Tidak ada yang bisa dicari di sini.")
+            return self.view()
         if random.random() < 0.6:
             self.state.inventory[item_id] = self.state.inventory.get(item_id, 0) + 1
             it = self.reg.item(item_id)
