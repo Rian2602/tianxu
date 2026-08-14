@@ -23,6 +23,33 @@ def test_penjaga_dialog_flow(session):
     assert session.state.flags.get("met_penjaga") is True
 
 
+def test_penjaga_dialog_kedua_berbeda(session):
+    """Dialog ulang Penjaga berbeda dari perkenalan — entri kondisional `met_penjaga`:
+    klik 1 = node_greet (perkenalan), klik 2 = node_ulang (menu topik)."""
+    # klik 1 — perkenalan
+    session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    assert session.dialog.view()["node_id"] == "node_greet"
+    finish_dialog(session, [0])
+    assert session.state.flags.get("met_penjaga") is True
+    # klik 2 — menu ulang, bukan perkenalan lagi
+    session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    v = session.dialog.view()
+    assert v["node_id"] == "node_ulang"
+    labels = [c["label"] for c in v["choices"]]
+    assert any("Akademi Changfeng" in l for l in labels)
+    assert any("kabar" in l for l in labels)
+    # tanya kabar → info Lonceng (foreshadowing) → kembali ke menu
+    session.apply_action({"type": "dialog_choice", "choice_index": 1})
+    assert session.dialog.view()["node_id"] == "node_ulang_kabar"
+    session.apply_action({"type": "dialog_choice", "choice_index": -1})  # lanjut (node tanpa pilihan)
+    assert session.dialog.view()["node_id"] == "node_ulang"
+    # pergi → node penutup → advance → dialog selesai
+    session.apply_action({"type": "dialog_choice", "choice_index": 2})
+    assert session.dialog.view()["node_id"] == "node_ulang_pergi"
+    session.apply_action({"type": "dialog_choice", "choice_index": -1})  # lanjut (end: true)
+    assert session.state.pending_dialog is None
+
+
 def test_konfrontasi_pilihan_efek_beda(session, god_mode):
     """J3#6: opsi 'menuntut' (0) memberi morality +1; opsi 'diam' (1) tidak — hilangkan choice illusion."""
     from conftest import play_to_incident

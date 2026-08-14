@@ -1,11 +1,49 @@
 {
   "dialogs": [
+    { "id": "dlg_penjaga",
+ "npc": "npc_penjaga",
+ "start": "node_greet",
+ "nodes": {
+  "node_ulang": {
+   "condition": {
+    "flag": {
+     "key": "met_penjaga",
+     "value": true
+    }
+   },
+   "speaker": "npc:npc_penjaga",
+   "text": "Kau lagi. Sudah kukatakan — Aula Ujian ada di depan, Gu Canghai yang menunggu. Ada yang ingin kau tanyakan?",
+   "choices": [
     {
-      "id": "dlg_penjaga",
-      "npc": "npc_penjaga",
-      "start": "node_greet",
-      "nodes": {
-        "node_greet": {
+     "label": "Apa yang bisa kuceritakan tentang Akademi Changfeng?",
+     "next": "node_ulang_akademi"
+    },
+    {
+     "label": "Ada kabar apa belakangan ini?",
+     "next": "node_ulang_kabar"
+    },
+    {
+     "label": "(Aku hanya lewat — sampai jumpa)",
+     "next": "node_ulang_pergi"
+    }
+   ]
+  },
+  "node_ulang_akademi": {
+   "speaker": "npc:npc_penjaga",
+   "text": "Akademi Changfeng berdiri tiga ratus tahun. Tiga paviliun — Elemen, Senjata, dan Summoning — melatih murid dari seluruh penjuru. Yang lemah gugur di ujian, yang kuat bertahan. Itu semua yang perlu kau tahu.",
+   "next": "node_ulang"
+  },
+  "node_ulang_kabar": {
+   "speaker": "npc:npc_penjaga",
+   "text": "Kabar? Belakangan ini murid-murid ramai membicarakan Lonceng Angin Panjang yang hilang dari Ruang Lonceng. Desas-desus memang selalu mengudara di akademi ini. Jangan ikut-ikutan memercayai semuanya.",
+   "next": "node_ulang"
+  },
+  "node_ulang_pergi": {
+   "speaker": "npc:npc_penjaga",
+   "text": "Hmph. Jangan lupa: Aula Ujian menunggumu, bukan gerbang ini.",
+   "end": true
+  },
+  "node_greet": {
           "speaker": "npc:npc_penjaga",
           "text": "Berhenti. Siapa yang datang ke gerbang Akademi Changfeng?",
           "choices": [
