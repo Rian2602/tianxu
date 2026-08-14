@@ -639,6 +639,15 @@ player_action(menu):
 - **Regen Qi (disahkan)**: pemain & musuh memulihkan `qi_regen_percent_per_turn` (5%) Qi maks di awal giliran masing-masing.
 - **Sparing (disahkan)**: mekanik sama seperti battle biasa — kalah = penalti KO berlaku (respawn di titik aman + kehilangan 10% exp).
 
+### 8.1b Status Effect (data-driven, 2026-08-15 — Task 1 fix-plan)
+
+- **Skema**: `config.battle.statuses` — dict id → `{name, kind, power?, duration}`. Kind: `dot` (damage per giliran pemain, `power`) & `stun` (lewati giliran pemain).
+- **Sumber**: `enemies.csv` kolom opsional `status` + `status_chance` (0–1) — saat serangan musuh kena pemain, peluang menerapkan status (durasi di-*replace*, tidak menumpuk).
+- **Alur**: di awal giliran pemain, `dot` langsung mengurangi HP & `stun` membuat pemain melewatkan aksi (giliran musuh tetap jalan); durasi di-tick setelah giliran selesai — status yang baru kena di giliran itu menunggu giliran berikutnya (durasi = jumlah giliran pemain yang terpengaruh).
+- **View battle**: `player_statuses` (id, name, remaining) — non-breaking (field baru opsional).
+- **Persistensi**: status tersimpan di `pending_battle` (save/load round-trip).
+- Validator aturan 16: skema status valid; `enemies.csv.status` harus ada di `battle.statuses`; `status_chance` 0–1. Arc 1 tidak memakai (non-breaking).
+
 ### 8.2 Elemen (五行)
 
 - Damage multiplier elemen: serangan elemen X ke musuh elemen Y:

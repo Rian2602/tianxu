@@ -142,6 +142,19 @@ class Validator:
         for r in enemies:
             if r.get("element") and r["element"] not in ELEMENTS:
                 self.error(f"enemies.csv: elemen '{r['element']}' tidak valid")
+            # Task 1: status effect — referensi status & peluang valid
+            sid = r.get("status") or ""
+            if sid and sid not in ((self.config or {}).get("battle", {}).get("statuses") or {}):
+                self.error(f"enemies.csv: status '{sid}' tidak ada di config.battle.statuses (aturan 16)")
+            sc = r.get("status_chance") or ""
+            if sc:
+                try:
+                    scf = float(sc)
+                except ValueError:
+                    self.error(f"enemies.csv: status_chance '{sc}' bukan angka (aturan 16)")
+                else:
+                    if not 0 <= scf <= 1:
+                        self.error(f"enemies.csv: status_chance '{sc}' harus 0–1 (aturan 16)")
         arc_ids = {a.get("id") for a in (self.config or {}).get("arcs", [])}
         for r in techniques:
             if r.get("academy") not in {"elemen", "senjata", "summoning"}:
@@ -230,6 +243,24 @@ class Validator:
             self.error(f"config.battle.turn_order tidak valid (aturan 16)")
         if battle.get("damage_formula") not in {"percent", "flat"}:
             self.error(f"config.battle.damage_formula tidak valid (aturan 16)")
+        # Task 1 (2026-08-15): status effect — skema data-driven
+        st_cfg = battle.get("statuses") or {}
+        if not isinstance(st_cfg, dict):
+            self.error("config.battle.statuses: harus dict id → {name, kind, ...} (aturan 16)")
+        for sid, sc in st_cfg.items():
+            if not sid or not isinstance(sc, dict):
+                self.error(f"config.battle.statuses: id '{sid}' tidak valid (aturan 16)")
+                continue
+            if not sc.get("name"):
+                self.error(f"config.battle.statuses.{sid}: name wajib (aturan 16)")
+            if sc.get("kind") not in {"dot", "stun"}:
+                self.error(f"config.battle.statuses.{sid}: kind harus dot/stun (aturan 16)")
+            p = sc.get("power")
+            if p is not None and (not isinstance(p, int) or p < 0):
+                self.error(f"config.battle.statuses.{sid}: power harus int ≥ 0 (aturan 16)")
+            dur = sc.get("duration")
+            if not isinstance(dur, int) or dur <= 0:
+                self.error(f"config.battle.statuses.{sid}: duration harus int > 0 (aturan 16)")
 
         for a in cfg.get("academies", []):
             aid = a.get("id", "?")

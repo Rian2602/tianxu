@@ -1,6 +1,6 @@
-id,name,realm,hp,qi,attack,defense,speed,element,exp_reward,drop_item,drop_chance
-eno_serigala_qi,Serigala Qi (气狼 Qì Láng),realm_pengumpul_qi,40,10,8,3,10,tanah,15,material_tulang,0.4
-eno_babi_hutan,Babi Hutan Liar (野猪 Yězhū),realm_pengumpul_qi,55,8,10,5,6,tanah,18,material_tulang,0.5
-eno_raja_serigala,Raja Serigala Qi (气狼王 Qì Láng Wáng),realm_pengumpul_qi,120,25,14,6,12,tanah,60,material_tulang,1.0
-eno_pembelot_malam,Pembelot Malam (夜叛 Yè Pàn),realm_pengumpul_qi,70,15,13,4,8,api,25,material_tulang,0.35
-eno_ular_bayangan,Ular Bayangan (影蛇 Yǐng Shé),realm_pengumpul_qi,45,12,11,2,16,air,20,pil_pemulihan,0.25
+id,name,realm,hp,qi,attack,defense,speed,element,exp_reward,drop_item,drop_chance,status,status_chance
+eno_serigala_qi,Serigala Qi (气狼 Qì Láng),realm_pengumpul_qi,40,10,8,3,10,tanah,15,material_tulang,0.4,,
+eno_babi_hutan,Babi Hutan Liar (野猪 Yězhū),realm_pengumpul_qi,55,8,10,5,6,tanah,18,material_tulang,0.5,,
+eno_raja_serigala,Raja Serigala Qi (气狼王 Qì Láng Wáng),realm_pengumpul_qi,120,25,14,6,12,tanah,60,material_tulang,1.0,,
+eno_pembelot_malam,Pembelot Malam (夜叛 Yè Pàn),realm_pengumpul_qi,70,15,13,4,8,api,25,material_tulang,0.35,,
+eno_ular_bayangan,Ular Bayangan (影蛇 Yǐng Shé),realm_pengumpul_qi,45,12,11,2,16,air,20,pil_pemulihan,0.25,,

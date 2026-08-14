@@ -302,6 +302,103 @@ def test_player_techniques_filter_ranah(session):
     assert fake["id"] in ids_fondasi  # order 2 <= order 2 → tampil
 
 
+# ---------- status effect (Task 1, plan 2026-08-15) ----------
+
+
+def _foe_with_status(sid, chance=1.0):
+    return {"id": f"eno_{sid}", "name": f"Musuh {sid}", "hp": 100, "hp_max": 100,
+            "attack": 0, "defense": 0, "speed": 1, "status": sid, "status_chance": chance}
+
+
+def test_status_burn_dot_dan_hit(session, monkeypatch):
+    """Q2: musuh dengan status burn → pemain kena; DoT 3 HP di awal giliran berikutnya."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.0)  # status selalu kena
+    s = session
+    s.battle.start([_foe_with_status("burn")], "hunt")
+    # ronde 1: pemain serang → musuh menyerang (min 1 HP) + kena burn
+    s.apply_action({"type": "battle_action", "action": "attack"})
+    v = s.battle.view()
+    assert any(x["id"] == "burn" for x in v["player_statuses"]), "burn harus aktif di view"
+    hp1 = v["player"]["hp"]
+    assert hp1 == 79  # 80 - 1 (hit musuh min)
+    # ronde 2: burn dot 3 di awal giliran + hit musuh 1
+    s.apply_action({"type": "battle_action", "action": "attack"})
+    v = s.battle.view()
+    assert v["player"]["hp"] == hp1 - 4, "3 dot + 1 hit musuh"
+    assert any(x["id"] == "burn" for x in v["player_statuses"])
+
+
+def test_status_stun_lewati_giliran(session, monkeypatch):
+    """Q2: stun → pemain tidak bisa menyerang 1 giliran; pulih setelahnya."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.0)
+    s = session
+    s.battle.start([_foe_with_status("stun")], "hunt")
+    s.apply_action({"type": "battle_action", "action": "attack"})  # ronde 1: kena stun
+    v = s.battle.view()
+    assert any(x["id"] == "stun" for x in v["player_statuses"])
+    hp_foe = v["foes"][0]["hp"]
+    # ronde 2: terpana — HP musuh tidak turun, ada log "terpana"
+    s.apply_action({"type": "battle_action", "action": "attack"})
+    v = s.battle.view()
+    assert v["foes"][0]["hp"] == hp_foe, "stun: pemain tidak menyerang"
+    assert any("terpana" in e["text"].lower() for e in s.state.log)
+    # ronde 3: stun habis → bisa menyerang lagi
+    s.apply_action({"type": "battle_action", "action": "attack"})
+    v = s.battle.view()
+    assert v["foes"][0]["hp"] < hp_foe, "stun habis, pemain menyerang lagi"
+
+
+def test_status_chance_0_tidak_mempan(session, monkeypatch):
+    """Q2: status_chance 0 → status tidak pernah aktif (non-breaking arc 1)."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.0)
+    s = session
+    s.battle.start([_foe_with_status("burn", chance=0.0)], "hunt")
+    s.apply_action({"type": "battle_action", "action": "attack"})
+    v = s.battle.view()
+    assert not v.get("player_statuses"), "chance 0 → tidak ada status"
+
+
+def test_status_burn_tanpa_fitur_sebelumnya_tidak_ada(session, monkeypatch):
+    """Q2 (regresi): musuh tanpa status → view tidak punya player_statuses sama sekali."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.0)
+    s = session
+    s.battle.start([{"id": "eno_biasa", "name": "Biasa", "hp": 50, "hp_max": 50,
+                     "attack": 0, "defense": 0, "speed": 1}], "hunt")
+    s.apply_action({"type": "battle_action", "action": "attack"})
+    assert not s.battle.view().get("player_statuses")
+
+
+def test_status_burn_save_load_tengah_battle(session, monkeypatch):
+    """Q3: status aktif tengah battle ikut tersimpan (pending_battle deepcopy round-trip)."""
+    from src.engine.state import GameState
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.0)
+    s = session
+    s.battle.start([_foe_with_status("burn")], "hunt")
+    s.apply_action({"type": "battle_action", "action": "attack"})
+    assert s.battle.view()["player_statuses"]
+    restored = GameState.from_dict(s.state.to_dict())
+    assert restored.pending_battle is not None
+    assert "burn" in (restored.pending_battle.get("player_statuses") or {}), "status ikut tersimpan"
+
+
+def test_status_expiry_setelah_durasi_habis(session, monkeypatch):
+    """Q3: status durasi 1 hilang setelah 1 giliran penuh (tick + tidak di-apply ulang)."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.0)
+    s = session
+    # musuh tanpa status → status tidak di-apply ulang
+    s.battle.start([{"id": "eno_biasa", "name": "Biasa", "hp": 50, "hp_max": 50,
+                     "attack": 0, "defense": 0, "speed": 1}], "hunt")
+    s.state.pending_battle["player_statuses"] = {"stun": 1}
+    s.apply_action({"type": "battle_action", "action": "attack"})  # terpana + tick 1→0
+    assert not s.battle.view().get("player_statuses"), "status durasi 1 harus hilang setelah 1 giliran"
+
+
 def test_regen_qi_per_giliran(session, monkeypatch):
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)

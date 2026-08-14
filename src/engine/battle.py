@@ -136,6 +136,13 @@ class BattleEngine:
         if not b or b["over"]:
             return self.view()
         pc = player_combat(self.state, self.reg)
+        # status effect (Task 1): proses dot & cek stun di awal giliran pemain;
+        # status yang ADA sebelum giliran ini yang di-tick (yang baru kena giliran ini
+        # menunggu giliran berikutnya — durasi = jumlah giliran pemain yang terpengaruh)
+        pre_round = set(b.get("player_statuses", {}))
+        stunned = self._apply_player_statuses(pc, b)
+        if pc["hp"] <= 0:
+            return self._ko(b)
         # A2 (keputusan §17): turn_order "speed" — yang lebih cepat bertindak dulu tiap ronde
         speed_order = self.reg.config.get("battle", {}).get("turn_order") == "speed"
         foe_speed = max((f.get("speed", 0) for f in b["foes"] if f["hp"] > 0), default=0)
@@ -145,24 +152,27 @@ class BattleEngine:
             if pc["hp"] <= 0:
                 self._regen_foes(b)
                 return self._ko(b)
-        a = action.get("action")
-        if a == "attack":
-            self._attack(pc, b, b["foes"][0])
-        elif a == "technique":
-            self._technique(pc, b, action.get("technique"))
-        elif a == "item":
-            self._use_item(pc, b, action.get("item"))
-        elif a == "guard":
-            b["player_guard"] = 50
-            add_log(self.state, "battle", "Kau bertahan — damage masuk dikurangi setengah.")
-        elif a == "flee":
-            if self._try_flee(pc, b):
-                b["over"] = True
-                b["player_fled"] = True
-                self.state.pending_battle = None
-                add_log(self.state, "battle", "Kau berhasil kabur dari pertarungan.")
-                return self.view()
-            add_log(self.state, "battle", "Kau gagal kabur!")
+        if not stunned:
+            a = action.get("action")
+            if a == "attack":
+                self._attack(pc, b, b["foes"][0])
+            elif a == "technique":
+                self._technique(pc, b, action.get("technique"))
+            elif a == "item":
+                self._use_item(pc, b, action.get("item"))
+            elif a == "guard":
+                b["player_guard"] = 50
+                add_log(self.state, "battle", "Kau bertahan — damage masuk dikurangi setengah.")
+            elif a == "flee":
+                if self._try_flee(pc, b):
+                    b["over"] = True
+                    b["player_fled"] = True
+                    self.state.pending_battle = None
+                    add_log(self.state, "battle", "Kau berhasil kabur dari pertarungan.")
+                    return self.view()
+                add_log(self.state, "battle", "Kau gagal kabur!")
+        else:
+            add_log(self.state, "battle", "Kau terpana — tidak bisa bergerak giliran ini!")
         self._companion_turn(b)
         self._regen(pc, b)
         if not b["over"] and self._all_dead(b):
@@ -172,6 +182,7 @@ class BattleEngine:
         self._regen_foes(b)
         if not b["over"] and pc["hp"] <= 0:
             return self._ko(b)
+        self._tick_player_statuses(b, pre_round)
         self._sync_player(pc)
         return self.view()
 
@@ -248,6 +259,55 @@ class BattleEngine:
         chance = max(0.2, min(0.9, chance))
         return random.random() < chance
 
+    # ---------- status effect (Task 1, data-driven) ----------
+
+    def _status_config(self) -> dict:
+        return self.reg.config.get("battle", {}).get("statuses", {}) or {}
+
+    def _apply_player_statuses(self, pc: dict, b: dict) -> bool:
+        """Proses status aktif di awal giliran pemain. Return True bila terpana (stun)."""
+        st = b.get("player_statuses", {})
+        if not st:
+            return False
+        cfg = self._status_config()
+        stunned = False
+        for sid, _dur in list(st.items()):
+            sc = cfg.get(sid)
+            if not sc:
+                continue
+            if sc.get("kind") == "dot":
+                dmg = int(sc.get("power", 0))
+                pc["hp"] -= dmg
+                add_log(self.state, "battle", f"{sc.get('name', sid)}! Kehilangan {dmg} HP.")
+            elif sc.get("kind") == "stun":
+                stunned = True
+        return stunned
+
+    def _tick_player_statuses(self, b: dict, pre_round: set) -> None:
+        """Kurangi durasi status yang sudah aktif SEBELUM giliran ini; hapus yang habis."""
+        st = b.get("player_statuses")
+        if not st:
+            return
+        for sid in [k for k in st if k in pre_round]:
+            st[sid] -= 1
+            if st[sid] <= 0:
+                del st[sid]
+                sc = self._status_config().get(sid)
+                add_log(self.state, "battle", f"Efek {sc.get('name', sid) if sc else sid} hilang.")
+
+    def _maybe_apply_status(self, b: dict, foe: dict) -> None:
+        """Serangan musuh yang kena ke pemain berpeluang menerapkan status (data-driven)."""
+        sid = foe.get("status")
+        chance = float(foe.get("status_chance", 0) or 0)
+        if not sid or random.random() >= chance:
+            return
+        sc = self._status_config().get(sid)
+        if not sc:
+            return
+        st = b.setdefault("player_statuses", {})
+        st[sid] = int(sc.get("duration", 1))  # replace (tidak menumpuk)
+        add_log(self.state, "battle", f"Kau terkena {sc.get('name', sid)}!")
+
     # ---------- giliran musuh ----------
 
     def _enemy_turn(self, pc: dict, b: dict) -> None:
@@ -272,6 +332,7 @@ class BattleEngine:
                     dmg = max(1, int(dmg * (100 - b["player_guard"]) / 100))
                 pc["hp"] -= dmg
                 add_log(self.state, "battle", f"{foe['name']} menyerang! Kau kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
+                self._maybe_apply_status(b, foe)
         b["player_guard"] = False
 
     def _companion_turn(self, b: dict) -> None:
@@ -382,9 +443,14 @@ class BattleEngine:
         if not b:
             return {"mode": "explore"}
         pc = player_combat(self.state, self.reg)
+        st_cfg = self._status_config()
         return {
             "mode": "battle",
             "player": {"hp": pc["hp"], "hp_max": pc["hp_max"], "qi": pc["qi"], "qi_max": pc["qi_max"]},
+            "player_statuses": [
+                {"id": sid, "name": st_cfg.get(sid, {}).get("name", sid), "remaining": dur}
+                for sid, dur in (b.get("player_statuses") or {}).items()
+            ],
             "foes": [
                 {"name": f["name"], "hp": f["hp"], "hp_max": f["hp_max"], "element": f.get("element")}
                 for f in b.get("foes", [])

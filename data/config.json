@@ -116,6 +116,10 @@
     "qi_regen_percent_per_turn": 5,
     "crit_chance": 0.08,
     "crit_multiplier": 1.5,
-    "turn_order": "speed"
+    "turn_order": "speed",
+    "statuses": {
+      "burn": { "name": "Terbakar", "kind": "dot", "power": 3, "duration": 3 },
+      "stun": { "name": "Terpana", "kind": "stun", "duration": 1 }
+    }
   }
 }

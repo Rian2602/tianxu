@@ -559,6 +559,37 @@ def test_aturan16_crit_chance_di_luar_rentang():
     assert any("crit_chance" in e for e in v.errors)
 
 
+def test_aturan16_status_kind_tidak_valid():
+    """Task 1: status effect — kind harus dot/stun (aturan 16)."""
+    d = _good()
+    d["config.json"]["battle"]["statuses"] = {"racun": {"name": "Racun", "kind": "heal", "duration": 2}}
+    v, ok = make(d)
+    assert not ok
+    assert any("kind harus dot/stun" in e for e in v.errors)
+
+
+def test_aturan16_status_duration_tidak_valid():
+    """Task 1: duration harus int > 0."""
+    d = _good()
+    d["config.json"]["battle"]["statuses"] = {"racun": {"name": "Racun", "kind": "dot", "power": 2, "duration": 0}}
+    v, ok = make(d)
+    assert not ok
+    assert any("duration" in e for e in v.errors)
+
+
+def test_aturan16_enemy_status_referensi_tidak_ada():
+    """Task 1: enemies.csv status harus ada di config.battle.statuses."""
+    d = _good()
+    d["config.json"]["battle"]["statuses"] = {"burn": {"name": "B", "kind": "dot", "power": 1, "duration": 1}}
+    d["enemies.csv"] = [{"id": "eno_x", "name": "X", "realm": "r", "hp": "10", "qi": "0",
+                          "attack": "1", "defense": "0", "speed": "5", "element": "",
+                          "exp_reward": "1", "drop_item": "", "drop_chance": "",
+                          "status": "racun_tak_ada", "status_chance": "0.5"}]
+    v, ok = make(d)
+    assert not ok
+    assert any("status 'racun_tak_ada'" in e for e in v.errors)
+
+
 # ---------- validasi efek & kondisi baru (Phase 1.5) ----------
 
 def test_aturan2_efek_relation_npc_tidak_ada():
