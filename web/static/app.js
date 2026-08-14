@@ -405,16 +405,29 @@ function renderShop() {
       </div>`;
     });
   } else {
+    const owned = s.sell.filter(i => (invMap[i.item] || 0) >= 1);
+    if (owned.length < s.sell.length) {
+      html += `<p class="hint" style="margin-bottom:10px">Pedagang hanya membeli bahan yang kamu punya — item tanpa tombol berarti belum kamu miliki (dapatkan dari berburu / mencari herba).</p>`;
+    }
     s.sell.forEach(item => {
       const count = invMap[item.item] || 0;
-      const disabled = count < 1 ? "disabled" : "";
-      html += `<div class="shop-item-row">
-        <div class="shop-item-info">
-          <span class="item-name">${esc(item.name)} (Punya: ${count})</span>
-          <span class="shop-item-price">${item.price} Emas</span>
-        </div>
-        <button class="btn btn-small" ${disabled} onclick="actShop('shop_sell', '${item.item}')">Jual (1×)</button>
-      </div>`;
+      if (count < 1) {
+        html += `<div class="shop-item-row shop-item-empty">
+          <div class="shop-item-info">
+            <span class="item-name">${esc(item.name)}</span>
+            <span class="shop-item-price">${item.price} Emas</span>
+          </div>
+          <span class="shop-item-soldout">Belum punya</span>
+        </div>`;
+      } else {
+        html += `<div class="shop-item-row">
+          <div class="shop-item-info">
+            <span class="item-name">${esc(item.name)} (Punya: ${count})</span>
+            <span class="shop-item-price">${item.price} Emas</span>
+          </div>
+          <button class="btn btn-small" onclick="actShop('shop_sell', '${item.item}')">Jual (1×)</button>
+        </div>`;
+      }
     });
   }
   html += `</div>`;

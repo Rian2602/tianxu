@@ -164,10 +164,12 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---------- utilitas ----------
 
-    def _send(self, body: bytes, ctype: str, status: int = 200) -> None:
+    def _send(self, body: bytes, ctype: str, status: int = 200, extra: dict[str, str] | None = None) -> None:
         self.send_response(status)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
+        for k, v in (extra or {}).items():
+            self.send_header(k, v)
         self.end_headers()
         self.wfile.write(body)
 
@@ -180,7 +182,9 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json({"error": "tidak ditemukan"}, 404)
             return
         ctype = mimetypes.guess_type(str(path))[0] or "application/octet-stream"
-        self._send(path.read_bytes(), ctype)
+        # no-cache: file statis dibaca dari disk tiap request — browser wajib revalidasi,
+        # sehingga perbaikan frontend (app.js/style.css) selalu termuat tanpa hard-refresh
+        self._send(path.read_bytes(), ctype, extra={"Cache-Control": "no-cache"})
 
     def _read_body(self) -> dict:
         length = int(self.headers.get("Content-Length", 0))

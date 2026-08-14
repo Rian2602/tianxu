@@ -265,3 +265,12 @@ def test_context_loc_names(base_url: str) -> None:
     """Konteks menyediakan peta id lokasi → nama untuk tombol Pindah (G3a)."""
     data = post(base_url, "/api/new")
     assert data["context"]["loc_names"]["loc_aula_ujian"] == "Aula Ujian"
+
+
+def test_static_no_cache(base_url: str) -> None:
+    """File statis dikirim dengan Cache-Control: no-cache agar fix frontend selalu termuat (K6)."""
+    for path in ("/", "/static/app.js", "/static/style.css"):
+        req = urllib.request.Request(base_url + path)
+        with urllib.request.urlopen(req) as r:
+            assert r.status == 200
+            assert r.headers.get("Cache-Control") == "no-cache"

@@ -42,7 +42,7 @@
 | 17 | Side Quest Cooldown Schema & Logic | Quest/Data | ENGINE §5.1, §6.4 | `data/quests/quests_side.json`, `src/engine/quest.py`, `src/engine/state.py` (`side_quest_cooldowns`) | DONE (Verified) |
 | 18 | Monster Respawn & NPC Schedule | World Sim | GDD §7, ENGINE §9.2 | `src/engine/session.py::_hunt`, `_is_npc_available` | DONE (Verified) |
 | 19 | Arc 1 Completion Summary / Screen | Story/UI | GDD §11.2, DoD | `src/engine/session.py::view` (`arc_summary`), `src/cli.py`, `web/static/app.js` | DONE (Verified) |
-| 20 | Edge Case Unit Test Coverage | Testing | QA Review §5.1 | `tests/` (209 test, coverage src ≈ 99,9%) | DONE (Verified) |
+| 20 | Edge Case Unit Test Coverage | Testing | QA Review §5.1 | `tests/` (210 test, coverage src ≈ 99,9%) | DONE (Verified) |
 | 21 | Architecture Doc Sync | Docs | ENGINE §12, §16 | `docs/ENGINE_ARCHITECTURE.md` (EP3-T2, 2026-08-14) | DONE (Verified) |
 
 ## Identified Gaps and Subagent-Driven Development (SDD) Roadmap

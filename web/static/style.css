@@ -309,6 +309,9 @@ select, input[type="text"], input[type="number"] {
 .shop-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dotted #2a2530; }
 .shop-item-info { display: flex; flex-direction: column; }
 .shop-item-price { color: var(--gold); font-size: 13px; }
+.shop-item-empty { opacity: 0.55; }
+.shop-item-empty .shop-item-price { color: var(--gray); }
+.shop-item-soldout { color: var(--gray); font-size: 13px; font-style: italic; white-space: nowrap; }
 
 .mem-locked {
   border: 1px dashed var(--gold-dim);

@@ -16,7 +16,7 @@
 
 ## Status perbaikan (diterapkan 2026-08-14, diperbarui 2026-08-14 lanjutan)
 
-Sebagian bug aktif sudah diperbaiki — detail di bawah. Verifikasi: `tools/validate_data.py` lulus + `pytest` **209 passed**. Yang **tidak** dicantumkan di sini belum diperbaiki (desain/konten/defer).
+Sebagian bug aktif sudah diperbaiki — detail di bawah. Verifikasi: `tools/validate_data.py` lulus + `pytest` **210 passed**. Yang **tidak** dicantumkan di sini belum diperbaiki (desain/konten/defer).
 
 | ID | Status | Ringkasan fix |
 |----|--------|---------------|
@@ -54,7 +54,21 @@ Test baru/update: `test_spar_id_pendek_simpan_id_penuh`, `test_guard_pending_dia
 
 Test baru batch ini: `test_teknik_ranah_tinggi_ditolak`, `test_player_techniques_filter_ranah`, `test_jadwal_npc_lintas_tengah_malam`, `test_konfrontasi_pilihan_efek_beda`, `test_aturan7_world_hunt_referensi_tidak_ada`, `test_aturan7_world_hunt_chance_invalid`.
 
-**Belum diperbaiki (butuh keputusan desain / defer)**: B2, B3/#13, G4a, G4b/#10, G4c, G4f, A2-sisa (defer opsional, sudah data-driven), K4 server-lock (opsional). Lihat plan untuk keputusan default.
+**Batch 3 (2026-08-14, Fase B + hardening; plan `docs/superpowers/plans/2026-08-14-fix-sisa-bug-dan-hardening.md`) — 210 test total:**
+
+| ID | Status | Ringkasan fix |
+|----|--------|---------------|
+| G4b/#10 | ✅ | 4 world-facts sebagai `flags` (`zhouyan_status`, `bell_status`, `elder_exposed`, `academy_knows_truth`) diset di on_complete tiap cabang + q07. `quests_akademi.json` |
+| G4c | ✅ | 3 node reaksi 3ab (Su Qing hangat, Han Xiu respect, Zhou Yan bersyukur). `dialogs_akademi.json` |
+| G4f | ✅ | `node_truth_3aa` jadi konfirmasi pasca-konfrontasi (bukan reveal ulang). `dialogs_akademi.json` |
+| B2 | ✅ | `node_penutup_3b` versi gelap dari payoff tematik. `dialogs_akademi.json` |
+| G4a | ✅ | `notify_spar_loss`: kalah spar ujian = quest selesai + flag `spar_kalah` + dialog Gu Canghai beda (`node_kalah` lanjut `node_umum`; regresi tertutup). `quest.py`, `battle.py`, `dialogs_akademi.json` |
+| K4-lock | ✅ | `threading.Lock` server web (new/load/action + GET tianyuan/state). `web/app.py` |
+| UX1 | ✅ | laporan pemain: tab Jual toko menjelaskan item tak terjual — baris "Belum punya" tanpa tombol + hint; `Cache-Control: no-cache` untuk aset statis (fix frontend selalu termuat, tanpa hard-refresh). `app.js`, `style.css`, `web/app.py` |
+
+Test baru batch ini: `test_reaksi_3ab`, `test_spar_kalah_tetap_selesai_dan_dialog_beda`, `test_static_no_cache` (plus perluasan `test_konvergensi_semua_cabang` dengan assertion world-facts per cabang).
+
+**Belum diperbaiki (defer resmi)**: B3/#13 (gating ingatan — fitur baru, butuh plan terpisah).
 
 ## A. Bug terverifikasi — kode
 
@@ -476,4 +490,4 @@ Dampak: P0/P1 terfokus pada #1/#2/#15.
 4. **A2** (hardcode) — ✅ **selesai** (`world.hunt` di config + validator aturan 7).
 5. **B3** (gating ingatan) — fitur baru, skala lebih besar; tunda.
 
-Tambahan dari plan `2026-08-14-fix-sisa-bug-dan-hardening.md`: H4 ✅ · J3#6 ✅ · #9 ✅ · G4d ✅ · K5 ✅ — sisanya (G4b/#10, G4c, G4f, G4a) menunggu keputusan desain Fase B.
+Tambahan dari plan `2026-08-14-fix-sisa-bug-dan-hardening.md`: H4 ✅ · A1 ✅ · J3#6 ✅ · #9 ✅ · A2 ✅ · G4d ✅ · K5 ✅ · G4b/#10 ✅ · G4c ✅ · G4f ✅ · B2 ✅ · G4a ✅ · K4-lock ✅ — seluruhnya selesai (Fase A/B/D); satu-satunya defer = B3/#13. Temuan tindak lanjut (plan `2026-08-14-fix-temuan-evaluasi-diri.md`): regresi `node_kalah` ✅ · dok drift angka test ✅. Laporan pemain (2026-08-14): UX1 (tab Jual toko) ✅ — lihat tabel status di atas.
