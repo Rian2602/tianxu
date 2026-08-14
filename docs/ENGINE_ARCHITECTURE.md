@@ -719,7 +719,7 @@ player_action(menu):
                 "description": "...", "is_safe": false, "connections": ["loc_aula_ujian"] },
   "day": 1, "hour": 8,
   "player": { "name": "Chen Xu", "realm": "Pengumpul Qi", "realm_level": 3, "exp": 45, "exp_next": 60,
-              "roots": "akar_mid", "gold": 20, "equipment": { "weapon": "pedang_bambu" },
+              "roots": "Akar Menengah (中品)", "gold": 20, "equipment": { "weapon": "pedang_bambu" },
               "hp": 80, "hp_max": 80, "qi": 40, "qi_max": 40, "academy": null, "morality": 0 },
   "current_quest": { "id": "q_akademi_01", "title": "Pintu Gerbang Akademi",
                      "objective": "Bicaralah dengan Penjaga Gerbang." } | null,
