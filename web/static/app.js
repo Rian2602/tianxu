@@ -59,6 +59,35 @@ function esc(s) {
   }[c]));
 }
 
+// ---------- C2: icon Lucide (self-host, inline SVG) ----------
+// SVG di-fetch dari /static/assets/icons/ sekali lalu di-cache; dipakai via
+// `icon(name, size)` → `<svg class="lucide" ...>` dengan stroke currentColor.
+const ICON_CACHE = {};
+
+async function loadIcons() {
+  const names = ["heart", "sparkles", "sword", "shield", "backpack", "scroll-text",
+                 "book-open", "map-pin", "message-circle", "save", "x", "flame",
+                 "orbit", "target", "circle-check"];
+  await Promise.all(names.map(async (n) => {
+    try {
+      const r = await fetch(`/static/assets/icons/${n}.svg`);
+      const t = await r.text();
+      ICON_CACHE[n] = t.replace(/^<!--[\s\S]*?-->\s*/, "").replace(/^\s*/, "");
+    } catch (e) { ICON_CACHE[n] = ""; }
+  }));
+  // re-render bila icon tiba setelah layar game aktif
+  if (view) render();
+}
+
+function icon(name, size) {
+  const s = size || 14;
+  let svg = ICON_CACHE[name] || "";
+  if (!svg) return "";
+  svg = svg.replace("width=\"24\"", `width="${s}"`).replace("height=\"24\"", `height="${s}"`);
+  svg = svg.replace("<svg", `<svg style="vertical-align:-2px; margin-right:5px;"`);
+  return svg;
+}
+
 // ---------- layar judul ----------
 
 async function refreshSaveSlots() {
@@ -135,19 +164,20 @@ function renderLeft(v) {
   const comp = v.companion;
   let html = `<h3 class="stat-title">✦ ${esc(p.name)}</h3>`;
   const pct = p.exp_next > 0 ? Math.min(100, Math.round((p.exp / p.exp_next) * 100)) : 0;
+  const ic = icon;
   html += `<div class="realm-hero">`;
   html += `<span class="realm-name">${esc(p.realm)}</span>`;
   html += `<span class="realm-level">Lv.${p.realm_level}</span>`;
   html += `<div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
   html += `<div class="progress-caption">${p.exp}/${p.exp_next} EXP</div>`;
   html += `</div>`;
-  html += statRow("HP", `${p.hp}/${p.hp_max}`, p.hp < p.hp_max ? "red" : "");
-  html += statRow("Qi", `${p.qi}/${p.qi_max}`, "blue");
-  html += statRow("Koin Emas", p.gold, "gold");
-  html += statRow("Moral", p.morality);
+  html += statRow(ic("heart") + "HP", `${p.hp}/${p.hp_max}`, p.hp < p.hp_max ? "red" : "");
+  html += statRow(ic("sparkles") + "Qi", `${p.qi}/${p.qi_max}`, "blue");
+  html += statRow(ic("orbit") + "Koin Emas", p.gold, "gold");
+  html += statRow(ic("target") + "Moral", p.morality);
   html += statRow("Akar", p.roots);
   html += statRow("Akademi", (ctx && ctx.academy) || "—");
-  html += statRow("Senjata", w);
+  html += statRow(ic("sword") + "Senjata", w);
   if (comp) {
     html += `<h3 class="stat-title" style="margin-top:18px">✦ Roh</h3>`;
     html += statRow(comp.name, `HP ${comp.hp}/${comp.hp_max}`, comp.hp <= 0 ? "red" : "");
@@ -158,7 +188,7 @@ function renderLeft(v) {
 function renderRight(v) {
   let html = "";
   // quest utama
-  html += `<div class="section"><h3 class="stat-title">Quest Utama</h3>`;
+  html += `<div class="section"><h3 class="stat-title">${icon("scroll-text")}Quest Utama</h3>`;
   if (v.current_quest) {
     html += `<div class="quest-title">${esc(v.current_quest.title)}</div>`;
     html += `<div class="quest-objective">${esc(v.current_quest.objective)}</div>`;
@@ -176,7 +206,7 @@ function renderRight(v) {
     html += `</div>`;
   }
   // inventori
-  html += `<div class="section"><h3 class="stat-title">Inventori</h3>`;
+  html += `<div class="section"><h3 class="stat-title">${icon("backpack")}Inventori</h3>`;
   if (v.inventory && v.inventory.length) {
     v.inventory.forEach((i) => {
       html += `<div class="item-row"><span class="item-name">${esc(i.name)}</span>` +
@@ -187,7 +217,7 @@ function renderRight(v) {
   }
   html += `</div>`;
   // ingatan
-  html += `<div class="section"><h3 class="stat-title">天缘灵 · Ingatan</h3>`;
+  html += `<div class="section"><h3 class="stat-title">${icon("book-open")}天缘灵 · Ingatan</h3>`;
   if (v.memories && v.memories.length) {
     v.memories.forEach((m) => {
       html += `<div class="mem-row" onclick="openTianyuan()">${esc(m.title)}</div>`;
@@ -260,7 +290,7 @@ function renderExplore(v, c, box) {
   // NPC di lokasi
   (c.npcs || []).forEach((n) => {
     const tag = n.can_spar ? " (sparing)" : n.shop ? " (toko)" : "";
-    html += `<div class="action-row"><button class="btn" onclick='act({type:"talk",npc:"${n.id}"})'>Bicara ${esc(n.name)}${tag}</button></div>`;
+    html += `<div class="action-row"><button class="btn" onclick='act({type:"talk",npc:"${n.id}"})'>${icon("message-circle")}Bicara ${esc(n.name)}${tag}</button></div>`;
     if (n.can_spar) {
       html += `<div class="action-row"><button class="btn" onclick='act({type:"spar",npc:"${n.id}"})'>Sparring vs ${esc(n.name)}</button></div>`;
     }
@@ -273,7 +303,7 @@ function renderExplore(v, c, box) {
 
   // tujuan
   (loc.connections || []).forEach((cid) => {
-    html += `<div class="action-row"><button class="btn" onclick='act({type:"move",to:"${cid}"})'>Pindah → ${esc(ctx.loc_names[cid] || cid)}</button></div>`;
+    html += `<div class="action-row"><button class="btn" onclick='act({type:"move",to:"${cid}"})'>${icon("map-pin")}Pindah → ${esc(ctx.loc_names[cid] || cid)}</button></div>`;
   });
 
   // wilayah berburu
@@ -343,7 +373,7 @@ function renderExplore(v, c, box) {
 
   // ingatan
   if (v.memories && v.memories.length) {
-    html += `<div class="action-row"><button class="btn" onclick="openTianyuan()">Baca Ingatan</button></div>`;
+    html += `<div class="action-row"><button class="btn" onclick="openTianyuan()">${icon("book-open")}Baca Ingatan</button></div>`;
   }
 
   html += `</div>`;
@@ -388,9 +418,9 @@ function renderBattle(v, c, box) {
   if (b.companion) {
     html += `<div class="battle-foe"><span class="foe-name">${esc(b.companion.name)}</span> (otomatis) — HP ${b.companion.hp}/${b.companion.hp_max}</div>`;
   }
-  html += `<div class="action-row"><button class="btn" onclick='act({type:"battle_action",action:"attack"})'>Serang</button>` +
-          `<button class="btn" onclick='act({type:"battle_action",action:"guard"})'>Bertahan</button>` +
-          `<button class="btn" onclick='act({type:"battle_action",action:"flee"})'>Kabur</button></div>`;
+  html += `<div class="action-row"><button class="btn" onclick='act({type:"battle_action",action:"attack"})'>${icon("sword")}Serang</button>` +
+          `<button class="btn" onclick='act({type:"battle_action",action:"guard"})'>${icon("shield")}Bertahan</button>` +
+          `<button class="btn" onclick='act({type:"battle_action",action:"flee"})'>${icon("x")}Kabur</button></div>`;
 
   // teknik
   if (c.techniques && c.techniques.length) {
@@ -613,3 +643,4 @@ function closeTianyuan() { $("tianyuan").classList.add("hidden"); }
 $("btn-new").onclick = startNew;
 $("btn-tianyuan").onclick = openTianyuan;
 refreshSaveSlots();
+loadIcons();  // C2: icon Lucide self-host — dimuat async, re-render bila sudah masuk

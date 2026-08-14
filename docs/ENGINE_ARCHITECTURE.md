@@ -796,6 +796,8 @@ player_action(menu):
 - **Desktop dulu (disahkan)**: tidak dioptimalkan untuk layar HP (responsif ditunda).
 - Panel: **Teks utama** (narasi/dialog/log), **Action bar** (kontekstual: Bicara/Pindah/Serang/Item), **Panel statistik** (HP/Qi/ranah/inventori, selalu terlihat), **Panel Tianyuan Ling** (modal — tombol "Baca Ingatan" / tombol panel membukanya, ✕ menutupnya).
 - **Tema (disahkan)**: xianxia **gelap + emas** — latar gelap, aksen emas, font serif untuk narasi.
+- **Font self-host (C1, 2026-08-14)**: `Noto Serif SC` (cerita/world — `--serif`) + `Noto Sans SC` (HUD/sistem — `--sans`, panel statistik/quest/inventori & tombol) — kontras tipografi story vs game system. Subset woff2 dari Google Fonts (lisensi OFL): hanya Latin + Hanzi yang dipakai game (天缘灵五行阁兵锋院御灵宗 等) → ~1.4MB; self-host di `web/static/assets/fonts/` (+ `fonts.css` dengan `unicode-range`), **offline tanpa CDN saat runtime** (konsisten prinsip stdlib).
+- **Icon Lucide (C2, 2026-08-14)**: SVG inline self-host di `web/static/assets/icons/` (lisensi ISC, `LICENSE.lucide.txt`) — dipakai di stat HP/Qi/Koin/Moral/Senjata & tombol Bicara/Pindah/Serang/Bertahan/Kabur; bukan emoji (keputusan "tanpa emoji" dipertahankan).
 
 **Detail implementasi (engine web, disepakati saat pembangunan):**
 - `web/app.py` — server **stdlib-only** (`http.server.ThreadingHTTPServer`), satu sesi aktif per proses (single-player lokal); jalankan `python3 web/app.py [port]`.

@@ -104,7 +104,7 @@ Test baru batch ini: `test_apply_technique_single_dan_list`, `test_upgrade_techn
 
 Test baru batch ini: `test_ranah_tertinggi_exp_dicap_tidak_hang`, `test_ranah_tertinggi_exp_raksasa_selesai_cepat`, `test_dialog_start_node_dipaksa`, `test_quest_talk_node_wajib`, `test_quest_talk_tanpa_node_perilaku_lama`, `test_3aa_konfrontasi_saat_quest_aktif`, `test_aturan4_talk_node_wajib_harus_ada_di_dialog`, `test_advance_time_overshoot_selesai`, `test_advance_time_dalam_window_masih_selesai`, `test_player_techniques_skill_pool_banyak_elemen`, `test_main_defeat_filter_enemies`, `test_main_defeat_tanpa_enemies_perilaku_lama`, `test_hunt_tanpa_config_ditolak_aman`, `test_aturan14_ambience_harus_enum_terdaftar`, `test_view_location_ambience`.
 
-**Defer resmi tersisa**: tidak ada (B3/#13 tertutup oleh P1-1). C1-C3 plan (font self-host & texture eksternal) didefer ke plan terpisah — butuh keputusan aset.
+**Defer resmi tersisa**: tidak ada (B3/#13 tertutup oleh P1-1). **Defer C1-C3 plan dieksekusi (2026-08-14)**: C1 font self-host Noto Serif/Sans SC subset OFL (Latin + 16 Hanzi game, 1.4MB, offline) · C2 icon Lucide 15 SVG self-host ISC inline (stat + tombol, bukan emoji) · kompresi tekstur 14MB→3MB (downscale 2× + zlib 9, stdlib-only) · `do_HEAD` header-only RFC 9110. Keterangan subset font: Google Fonts TTF penuh = 10-14MB/file → dipilih subset woff2 (Hanzi di luar 16 karakter game jatuh ke fallback Georgia/sistem).
 
 ## A. Bug terverifikasi — kode
 

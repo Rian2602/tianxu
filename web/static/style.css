@@ -1,3 +1,6 @@
+/* ═══ Font self-host (C1) — Noto Serif SC & Noto Sans SC, subset OFL ═══ */
+@import url("/static/assets/fonts.css");
+
 /* ═══ Tian Xu: Second Life — Tema Xianxia gelap + emas (keputusan visual terkunci) ═══
    Fase polish (2026-08-14, plan fix-temuan-audit-chatgpt):
    - Semantic color (B2): gold = kultivasi/utama · blue = pemain/roh/pengetahuan ·
@@ -21,7 +24,9 @@
   --red: #d96b5f;
   --green: #8fbf8f;
   --border: #3a3540;
-  --serif: Georgia, "Times New Roman", serif;
+  /* C1: Noto Serif SC = cerita/world · Noto Sans SC = HUD/sistem (kontras tipografi) */
+  --serif: "Noto Serif SC", Georgia, "Times New Roman", serif;
+  --sans: "Noto Sans SC", "Segoe UI", system-ui, sans-serif;
   /* hierarchy — warna per peran (B2) */
   --c-cultivation: var(--gold);   /* ranah, teknik, judul, tombol utama */
   --c-player: var(--blue);        /* pemain, roh, pengetahuan, ingatan */
@@ -46,6 +51,15 @@ body {
 }
 
 .hidden { display: none !important; }
+
+/* ═══ Icon Lucide (C2) — self-host, stroke currentColor ═══ */
+.lucide {
+  color: currentColor;
+  flex-shrink: 0;
+}
+
+.stat-label .lucide { color: var(--gray); }
+.stat-value .lucide { display: none; }
 
 /* ═══ Aksesibilitas keyboard (B8) — fokus terlihat konsisten ═══ */
 
@@ -112,7 +126,7 @@ body {
 .game-tagline { color: var(--gray); font-style: italic; margin: 8px 0 30px; }
 
 .btn {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 16px;
   padding: 10px 26px;
   margin: 6px;
@@ -145,7 +159,7 @@ body {
   width: 260px;
   margin: 6px auto;
   padding: 8px 14px;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 14px;
   background: var(--bg-input);
   color: var(--gray);
@@ -191,6 +205,7 @@ body {
 #col-left, #col-right {
   background: var(--bg-panel);
   font-size: 14px;
+  font-family: var(--sans);  /* HUD/statistik → sans (C1: kontras dengan cerita serif) */
 }
 
 #col-left {
@@ -396,7 +411,7 @@ body.ambience-library #col-center {
   text-align: left;
   margin: 6px 0;
   padding: 9px 12px;
-  font-family: var(--serif);
+  font-family: var(--serif);  /* pilihan dialog = bagian cerita → serif */
   font-size: 15px;
   background: var(--bg-input);
   color: var(--cream);
@@ -412,7 +427,7 @@ body.ambience-library #col-center {
 .action-label { color: var(--gray); font-size: 13px; margin-right: 4px; }
 
 select, input[type="text"], input[type="number"] {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 14px;
   padding: 6px 8px;
   background: var(--bg-input);

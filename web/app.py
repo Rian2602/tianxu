@@ -202,6 +202,23 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---------- GET ----------
 
+    def do_HEAD(self) -> None:
+        """HEAD: header saja tanpa body (RFC 9110). Untuk file statis dipakai
+        curl -I / validasi; API HEAD tidak dijanjikan (fallback 501)."""
+        if self.path.startswith("/static/"):
+            path = STATIC_DIR / self.path[len("/static/"):]
+            if path.is_file() and path.resolve().is_relative_to(STATIC_DIR.resolve()):
+                ctype = mimetypes.guess_type(str(path))[0] or "application/octet-stream"
+                self.send_response(200)
+                self.send_header("Content-Type", ctype)
+                self.send_header("Content-Length", str(path.stat().st_size))
+                self.send_header("Cache-Control", "no-cache")
+                self.end_headers()
+                return
+            self._send_json({"error": "tidak ditemukan"}, 404)
+            return
+        self.send_error(501, "HEAD tidak didukung untuk endpoint ini")
+
     def do_GET(self) -> None:
         if self.path in ("/", "/index.html"):
             self._send_file(STATIC_DIR / "index.html")
