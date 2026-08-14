@@ -219,3 +219,166 @@ def test_side_quest_cooldown(session, god_mode, monkeypatch):
     assert session.quest.is_offerable("q_side_berburu") is True
 
 
+def test_notify_move_reach_outside_time_window(dummy_session):
+    """Reach quest dengan time_window (q_akademi_06, 19–6): di luar jendela → tidak selesai."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_akademi_06"
+    state.location = "loc_ruang_lonceng"
+    state.hour = 12
+    qe.notify_move()
+    assert state.current_quest == "q_akademi_06"
+
+
+def test_notify_battle_won_completes_main_defeat(dummy_session, monkeypatch):
+    """Quest utama berobjektif defeat selesai saat battle dimenangkan."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_synth_defeat"
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_defeat", "title": "Buru Synth", "kind": "main",
+            "objective": {"kind": "defeat", "target": 1, "enemies": ["eno_serigala_qi"]},
+            "next": [], "on_complete": {"rewards": {"exp": 1}},
+        },
+    )
+    qe.notify_battle_won(["eno_serigala_qi"])
+    assert state.current_quest is None
+    assert "q_synth_defeat" in state.completed_quests
+
+
+def test_in_window_regular_range(dummy_session):
+    """_in_window tanpa lintas tengah malam: dalam jendela True, di luar False."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.hour = 12
+    assert qe._in_window({"hour_start": 8, "hour_end": 18}) is True
+    state.hour = 20
+    assert qe._in_window({"hour_start": 8, "hour_end": 18}) is False
+
+
+def test_resolve_choose_noop_without_choose_objective(dummy_session):
+    """resolve_choose tanpa quest utama / bukan objektif choose → no-op."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = None
+    qe.resolve_choose("akademi_elemen")
+    assert state.player.academy is None
+    state.current_quest = "q_akademi_01"  # objektif talk
+    qe.resolve_choose("akademi_elemen")
+    assert state.player.academy is None
+
+
+def test_grant_companion_ignores_missing_companion(dummy_session, monkeypatch):
+    """Akademi menunjuk companion tak dikenal → tidak crash, companion tidak diberikan."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_synth_choose"
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_choose", "title": "Pilih Synth", "kind": "main",
+            "objective": {"kind": "choose", "options": [{"label": "x", "value": "akademi_xyz"}]},
+            "next": [], "on_complete": {"rewards": {"exp": 1}},
+        },
+    )
+    qe.reg.config["academies"].append({"id": "akademi_xyz", "companion": "mem_999"})
+    qe.resolve_choose("akademi_xyz")
+    assert state.companion is None
+
+
+def test_advance_time_notes_start_when_missing(dummy_session):
+    """advance_time_target_met saat progres belum tercatat → mencatat start tanpa crash."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_akademi_3c"
+    qe.advance_time_target_met()
+    assert "q_akademi_3c" in state.active_side_quests
+
+
+def test_complete_main_ignores_wrong_quest(dummy_session):
+    """_complete_main untuk quest yang bukan current → tidak terjadi apa-apa."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_akademi_01"
+    qe._complete_main("q_akademi_99")
+    assert state.current_quest == "q_akademi_01"
+    assert state.completed_quests == []
+
+
+def test_select_branch_noop_without_completed_quest(dummy_session):
+    """select_branch tanpa quest terselesaikan → pending branch dipertahankan."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.branch_pending = "dlg_3_pilih_sikap"
+    qe.select_branch("opt_3aa")
+    assert state.branch_pending == "dlg_3_pilih_sikap"
+
+
+def test_select_branch_unmatched_option_clears_pending(dummy_session):
+    """Opsi tak cocok dengan cabang mana pun → branch_pending dibersihkan, quest tidak berubah."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.completed_quests.append("q_akademi_06")
+    state.branch_pending = "dlg_3_pilih_sikap"
+    qe.select_branch("opt_tidak_ada")
+    assert state.branch_pending is None
+    assert state.current_quest == "q_akademi_01"  # tidak berubah
+
+
+def test_is_offerable_rejects_unknown_and_main(dummy_session):
+    """Quest tak dikenal dan quest utama bukan side → tidak dapat ditawarkan."""
+    qe = dummy_session.quest
+    assert qe.is_offerable("q_tidak_ada") is False
+    assert qe.is_offerable("q_akademi_01") is False
+
+
+def test_is_offerable_rejects_completed_non_repeatable(dummy_session, monkeypatch):
+    """Side quest non-repeatable yang sudah selesai → tidak dapat ditawarkan."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.completed_quests.append("q_synth_side")
+    monkeypatch.setattr(qe.reg, "quest", lambda qid: {"id": "q_synth_side", "kind": "side"})
+    assert qe.is_offerable("q_synth_side") is False
+
+
+def test_is_offerable_available_from_day(dummy_session, monkeypatch):
+    """available_from hari belum tiba → tidak dapat ditawarkan."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day = 1
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {"id": "q_synth_side", "kind": "side", "available_from": {"day": 5, "hour": 0}},
+    )
+    assert qe.is_offerable("q_synth_side") is False
+
+
+def test_is_offerable_available_from_hour(dummy_session, monkeypatch):
+    """available_from hari sama tapi jam belum tiba → tidak dapat ditawarkan."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day = 1
+    state.hour = 5
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {"id": "q_synth_side", "kind": "side", "available_from": {"day": 1, "hour": 8}},
+    )
+    assert qe.is_offerable("q_synth_side") is False
+
+
+def test_start_side_rejects_unofferable(dummy_session):
+    """start_side quest yang tak dapat ditawarkan → False, tidak aktif."""
+    qe = dummy_session.quest
+    assert qe.start_side("q_akademi_01") is False
+    assert "q_akademi_01" not in dummy_session.state.active_side_quests
+
+
+def test_complete_side_ignores_inactive(dummy_session):
+    """_complete_side quest yang tidak aktif → tidak crash, tidak tercatat selesai."""
+    qe = dummy_session.quest
+    qe._complete_side("q_side_berburu")
+    assert "q_side_berburu" not in dummy_session.state.completed_quests
+
+

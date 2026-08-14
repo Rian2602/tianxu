@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
+
 import pytest
 
 from src.engine.session import GameSession, SaveError
@@ -119,5 +121,86 @@ def test_save_null_byte_rejected(dummy_session):
     dummy_session.state.location = "loc_asrama"
     res = dummy_session.apply_action({"type": "save", "save_name": "test\x00slot"})
     assert res.get("error") is not None
+
+
+def test_ui_mode_battle_creates_pending_battle(dummy_session):
+    state = dummy_session.state
+    assert state.pending_battle is None
+    state.ui.mode = "battle"
+    assert state.pending_battle == {"active": True}
+
+
+def test_ui_mode_dialog_with_pending_dialog(dummy_session):
+    state = dummy_session.state
+    state.pending_dialog = "dlg_penjaga"
+    assert state.ui.mode == "dialog"
+
+
+def test_safe_save_path_resolve_error_raises(tmp_path, monkeypatch):
+    from src.engine import session as session_mod
+
+    monkeypatch.setattr(session_mod, "SAVES_DIR", tmp_path)
+    monkeypatch.setattr(session_mod.Path, "resolve", lambda self: (_ for _ in ()).throw(OSError("boom")))
+    with pytest.raises(SaveError):
+        session_mod._safe_save_path("ok")
+
+
+def test_safe_save_path_parent_mismatch_raises(tmp_path, monkeypatch):
+    from src.engine import session as session_mod
+
+    monkeypatch.setattr(session_mod, "SAVES_DIR", tmp_path)
+    monkeypatch.setattr(session_mod.Path, "resolve", lambda self: Path(tmp_path / "evil" / "x.json"))
+    with pytest.raises(SaveError):
+        session_mod._safe_save_path("ok")
+
+
+def test_new_session_marks_safe_start(monkeypatch, registry):
+    monkeypatch.setitem(registry.config["starting"], "location", "loc_asrama")
+    s = GameSession.new(registry)
+    assert s.state.last_safe_location == "loc_asrama"
+
+
+def test_load_missing_save_raises_file_not_found(tmp_path, monkeypatch, registry):
+    from src.engine import session as session_mod
+
+    monkeypatch.setattr(session_mod, "SAVES_DIR", tmp_path)
+    with pytest.raises(FileNotFoundError):
+        GameSession.load(registry, "save_tidak_ada")
+
+
+def test_ui_battle_returns_pending_battle(dummy_session):
+    state = dummy_session.state
+    assert state.pending_battle is None
+    assert state.ui.battle == state._ui_proxy._battle
+    state.pending_battle = {"active": True, "turn": 2}
+    assert state.ui.battle == {"active": True, "turn": 2}
+
+
+def test_ui_battle_empty_clears_pending(dummy_session):
+    state = dummy_session.state
+    state.pending_battle = {"active": True, "turn": 2}
+    state.ui.battle = {}
+    assert state.pending_battle is None
+
+
+def test_ui_proxy_lazily_recreated(dummy_session):
+    state = dummy_session.state
+    state._ui_proxy = None
+    assert state.ui is not None
+    assert state.ui._state is state
+
+
+def test_max_hp_unknown_realm_returns_current(dummy_session, registry):
+    state = dummy_session.state
+    state.player.realm = "realm_tidak_ada"
+    state.player.hp = 55
+    assert state.max_hp(registry) == 55
+
+
+def test_max_qi_unknown_realm_returns_current(dummy_session, registry):
+    state = dummy_session.state
+    state.player.realm = "realm_tidak_ada"
+    state.player.qi = 33
+    assert state.max_qi(registry) == 33
 
 

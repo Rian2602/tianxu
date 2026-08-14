@@ -168,3 +168,231 @@ def test_regen_qi_per_giliran(session, monkeypatch):
     assert session.state.player.qi == min(qi_max, 10 + round(qi_max * 0.05))
     assert session.state.pending_battle["foes"][0]["qi"] == 15
 
+
+def test_teknik_defend(session, monkeypatch):
+    """Teknik jenis 'defend' mengurangi damage masuk sesuai efek guard."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit
+    session.state.player.academy = "akademi_elemen"
+    session.state.player.hp = 80
+    session.state.player.qi = 40
+
+    foe = {"id": "eno_test", "name": "Musuh", "hp": 500, "qi": 0, "attack": 20, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    session.battle.start([foe], "hunt")
+
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_elemen_perisai_tanah"})
+    # Musuh serang: attack 20 vs def 3 -> base ~19, guarded -> max(1, 19 // 2) = 9
+    assert session.state.player.hp < 80
+    assert any("Perisai Tanah" in e["text"] for e in session.state.log)
+    assert session.state.pending_battle is not None
+    session.state.pending_battle = None
+
+
+def test_teknik_heal_clamped_and_unclamped(session, monkeypatch):
+    """Teknik jenis 'heal' memulihkan HP dan terbatasi ke hp_max (clamped)."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
+    session.state.player.academy = "akademi_elemen"
+    hp_max = session.state.max_hp(session.reg)
+
+    # Kasus A: Clamped ke hp_max (hanya kurang 5 HP, heal power 20, musuh balas dealt 1 min dmg)
+    session.state.player.hp = hp_max - 5
+    session.state.player.qi = 40
+    foe = {"id": "eno_dummy", "name": "Dummy", "hp": 500, "qi": 0, "attack": 0, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    session.battle.start([foe], "hunt")
+
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_elemen_embun_air"})
+    # Healed to hp_max, then foe attacks for min 1 damage -> hp_max - 1
+    assert session.state.player.hp == hp_max - 1
+    assert any("memulihkan 5 HP" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+    # Kasus B: Unclamped (kurang 40 HP, heal power 20, musuh balas dealt 1 min dmg)
+    session.state.player.hp = hp_max - 40
+    session.state.player.qi = 40
+    session.battle.start([foe], "hunt")
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_elemen_embun_air"})
+    # Healed 20 (hp was hp_max - 40 -> hp_max - 20), foe deals 1 dmg -> hp_max - 21
+    assert session.state.player.hp == hp_max - 21
+    assert any("memulihkan 20 HP" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+
+def test_battle_item_usage(session, monkeypatch):
+    """Penggunaan item di battle: item tidak ada, non-consumable, dan consumable."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
+    foe = {"id": "eno_dummy", "name": "Dummy", "hp": 500, "qi": 0, "attack": 0, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+
+    # 1. Item tidak dimiliki
+    session.battle.start([foe], "hunt")
+    session.state.inventory.clear()
+    session.apply_action({"type": "battle_action", "action": "item", "item": "pil_qi"})
+    assert any("Item tidak tersedia" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+    # 2. Item bukan consumable (misalnya pedang_angin)
+    session.battle.start([foe], "hunt")
+    session.state.inventory["pedang_angin"] = 1
+    session.apply_action({"type": "battle_action", "action": "item", "item": "pedang_angin"})
+    assert any("Item itu tidak bisa dipakai di battle" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+    # 3. Item consumable (pil_qi)
+    session.battle.start([foe], "hunt")
+    session.state.player.qi = 5
+    session.state.inventory["pil_qi"] = 1
+    session.apply_action({"type": "battle_action", "action": "item", "item": "pil_qi"})
+    assert "pil_qi" not in session.state.inventory
+    assert session.state.player.qi > 5
+    assert any("Memakai Pil Qi" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+
+def test_battle_flee_failed_and_success(session, monkeypatch):
+    """Percobaan kabur: gagal (RNG tinggi) vs berhasil (RNG rendah)."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    foe = {"id": "eno_fast", "name": "Monster Cepat", "hp": 500, "qi": 0, "attack": 0, "defense": 0,
+           "speed": 99, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+
+    # Gagal kabur (random.random() = 0.99 >= chance)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.99)
+    session.battle.start([foe], "hunt")
+    v = session.apply_action({"type": "battle_action", "action": "flee"})
+    assert any("Kau gagal kabur!" in e["text"] for e in session.state.log)
+    assert session.state.pending_battle is not None
+    assert v["mode"] == "battle"
+    session.state.pending_battle = None
+
+    # Berhasil kabur (random.random() = 0.0 < chance)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.0)
+    session.battle.start([foe], "hunt")
+    v = session.apply_action({"type": "battle_action", "action": "flee"})
+    assert any("Kau berhasil kabur" in e["text"] for e in session.state.log)
+    assert session.state.pending_battle is None
+    assert v["mode"] == "explore"
+
+
+def test_battle_spar_loss_exp(session):
+    """Saat kalah (KO) di pertandingan spar, pemain mendapat spar_loss_exp."""
+    session.state.player.exp = 0
+    foe = {"id": "eno_spar", "name": "Han Xiu", "hp": 500, "qi": 0, "attack": 999, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    session.battle.start([foe], "spar")
+    session.state.pending_battle["spar_npc"] = "npc_hanxiu"
+
+    session.apply_action({"type": "battle_action", "action": "attack"})  # Musuh balas dengan attack 999 -> KO
+    assert session.state.pending_battle is None
+    assert session.state.location == "loc_asrama"  # respawn di safe zone
+    assert session.state.player.hp == session.state.max_hp(session.reg)
+    # Exp bertambah karena spar_loss_exp
+    loss_exp = session.reg.config["cultivation"]["spar_loss_exp"]
+    assert session.state.player.exp == loss_exp
+
+
+def test_battle_unknown_technique_and_low_qi(session):
+    session.state.player.academy = "akademi_elemen"
+    foe = {"id": "eno_x", "name": "X", "hp": 500, "qi": 0, "attack": 0, "defense": 0, "speed": 1}
+    session.battle.start([foe], "hunt")
+
+    # Teknik tidak dikenal
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_ngawur"})
+    assert any("Teknik tidak dikenal" in e["text"] for e in session.state.log)
+
+    # Qi tidak cukup
+    session.state.player.qi = 0
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_elemen_bola_api"})
+    assert any("Qi tidak cukup" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+
+def test_companion_in_battle_attack_and_ko(session, monkeypatch):
+    from src.engine.battle import companion_stats
+
+    # companion_stats when companion is None or inactive
+    session.state.companion = None
+    assert companion_stats(session.state, session.reg) is None
+    session.state.companion = {"id": "comp_unknown", "active": True, "hp": 50}
+    assert companion_stats(session.state, session.reg) is None
+
+    # Valid companion (komp_roh_awan)
+    session.state.companion = {"id": "komp_roh_awan", "active": True, "hp": 20}
+    c_stats = companion_stats(session.state, session.reg)
+    assert c_stats is not None
+    assert c_stats["name"] == "Roh Awan"
+
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    # Musuh serang target companion (random.random() < 0.5)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 0.1)
+
+    foe = {"id": "eno_strong", "name": "Serigala", "hp": 100, "qi": 0, "attack": 100, "defense": 0, "speed": 1}
+    session.battle.start([foe], "hunt")
+
+    # Giliran guard -> companion menyerang musuh, lalu musuh menyerang kompanion hingga KO
+    session.apply_action({"type": "battle_action", "action": "guard"})
+    assert session.state.companion["active"] is False
+    assert session.state.companion["hp"] == 0
+    assert any("KO" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+    # Kasus: Companion diserang tapi tidak sampai KO
+    session.state.companion = {"id": "komp_roh_awan", "active": True, "hp": 50}
+    foe_weak = {"id": "eno_weak", "name": "Kelinci", "hp": 100, "qi": 0, "attack": 2, "defense": 0, "speed": 1}
+    session.battle.start([foe_weak], "hunt")
+    session.apply_action({"type": "battle_action", "action": "guard"})
+    assert session.state.companion["active"] is True
+    assert session.state.companion["hp"] < 50 and session.state.companion["hp"] > 0
+    assert any("menyerang Roh Awan" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+
+def test_battle_spar_win_exp(session):
+    """Menang pertarungan spar memberikan spar_win_exp dan memanggil notify_spar_won."""
+    foe = {"id": "eno_spar", "name": "Han Xiu", "hp": 5, "qi": 0, "attack": 0, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    session.battle.start([foe], "spar")
+    session.state.pending_battle["spar_npc"] = "npc_hanxiu"
+    exp_before = session.state.player.exp
+
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    assert session.state.pending_battle is None
+    win_exp = session.reg.config["cultivation"]["spar_win_exp"]
+    assert session.state.player.exp >= exp_before + win_exp
+
+
+def test_battle_view_no_battle(session):
+    session.state.pending_battle = None
+    assert session.battle.view() == {"mode": "explore"}
+    # player_action saat battle None
+    assert session.battle.player_action({"action": "attack"}) == {"mode": "explore"}
+
+
+def test_battle_item_decrement_not_deleted(session, monkeypatch):
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
+    foe = {"id": "eno_dummy", "name": "Dummy", "hp": 500, "qi": 0, "attack": 0, "defense": 0, "speed": 1}
+    session.battle.start([foe], "hunt")
+    session.state.inventory["pil_qi"] = 2
+    session.apply_action({"type": "battle_action", "action": "item", "item": "pil_qi"})
+    assert session.state.inventory.get("pil_qi") == 1
+    session.state.pending_battle = None
+
+
+def test_battle_multiple_foes_with_dead_foe(session, monkeypatch):
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
+    foes = [
+        {"id": "eno_dead", "name": "Mati", "hp": 0, "qi": 0, "attack": 10, "defense": 0, "speed": 1},
+        {"id": "eno_alive", "name": "Hidup", "hp": 100, "qi": 0, "attack": 5, "defense": 0, "speed": 1}
+    ]
+    session.battle.start(foes, "hunt")
+    # Serang musuh pertama
+    session.apply_action({"type": "battle_action", "action": "guard"})
+    assert session.state.pending_battle is not None
+    session.state.pending_battle = None
+
+
+

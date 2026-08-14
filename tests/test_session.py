@@ -314,3 +314,237 @@ def test_npc_schedule_availability(session):
     assert "sedang beristirahat" in v["log"][-1]["text"]
     
     session.reg.npcs.remove(npc)
+
+
+def test_shop_buy_rejected_and_edge_cases(session):
+    # Di lokasi tanpa pedagang
+    session.state.location = "loc_asrama"
+    v = session.apply_action({"type": "shop_buy", "item": "pil_qi", "count": 1})
+    assert any("Tidak ada pedagang di sini" in e["text"] for e in session.state.log)
+
+    # Pindah ke pasar (ada pedagang)
+    session.state.location = "loc_pasar"
+    # Item tidak dijual
+    session.apply_action({"type": "shop_buy", "item": "item_gaib_99", "count": 1})
+    assert any("Pedagang tidak menjual item itu" in e["text"] for e in session.state.log)
+
+    # Emas tidak cukup
+    pil_before = session.state.inventory.get("pil_qi", 0)
+    session.state.player.gold = 10  # Pil Qi seharga 50
+    session.apply_action({"type": "shop_buy", "item": "pil_qi", "count": 1})
+    assert any("Koin Emas tidak cukup" in e["text"] for e in session.state.log)
+    assert session.state.player.gold == 10
+    assert session.state.inventory.get("pil_qi", 0) == pil_before
+
+
+def test_shop_sell_rejected_and_edge_cases(session):
+    # Di lokasi tanpa pedagang
+    session.state.location = "loc_asrama"
+    session.apply_action({"type": "shop_sell", "item": "material_tulang", "count": 1})
+    assert any("Tidak ada pedagang di sini" in e["text"] for e in session.state.log)
+
+    # Pindah ke pasar
+    session.state.location = "loc_pasar"
+    # Item tidak dibeli pedagang
+    session.apply_action({"type": "shop_sell", "item": "item_gaib_99", "count": 1})
+    assert any("Pedagang tidak membeli item itu" in e["text"] for e in session.state.log)
+
+    # Item tidak dimiliki / jumlah tidak cukup
+    session.state.inventory["material_tulang"] = 1
+    session.state.player.gold = 50
+    session.apply_action({"type": "shop_sell", "item": "material_tulang", "count": 5})
+    assert any("Kau tidak punya item sebanyak itu" in e["text"] for e in session.state.log)
+    assert session.state.player.gold == 50
+    assert session.state.inventory["material_tulang"] == 1
+
+
+def test_craft_rejected_and_edge_cases(session):
+    # Di titik aman (pasar)
+    session.state.location = "loc_pasar"
+    # Resep tidak dikenal
+    session.apply_action({"type": "craft", "recipe": "rc_resep_palsu"})
+    assert any("Resep tidak dikenal" in e["text"] for e in session.state.log)
+
+    # Bahan tidak cukup (misal rc_pil_qi butuh material_herba: 2)
+    session.state.inventory.clear()
+    session.apply_action({"type": "craft", "recipe": "rc_pil_qi"})
+    assert any("Bahan tidak cukup untuk meracik" in e["text"] for e in session.state.log)
+
+
+def test_search_rolls_success_and_failure(session, monkeypatch):
+    # Di luar wilayah berburu
+    session.state.location = "loc_asrama"
+    session.apply_action({"type": "search"})
+    assert any("Mencari herba hanya bisa dilakukan di Wilayah Berburu" in e["text"] for e in session.state.log)
+
+    # Di wilayah berburu: Gagal roll (random >= 0.6)
+    session.state.location = "loc_wilayah_berburu"
+    session.state.inventory.clear()
+    monkeypatch.setattr("src.engine.session.random.random", lambda: 0.8)
+    session.apply_action({"type": "search"})
+    assert any("tidak menemukan herba" in e["text"] for e in session.state.log)
+    assert session.state.inventory.get("material_herba", 0) == 0
+
+    # Di wilayah berburu: Berhasil roll (random < 0.6)
+    monkeypatch.setattr("src.engine.session.random.random", lambda: 0.2)
+    session.apply_action({"type": "search"})
+    assert any("Kau menemukan 1 Herba Awan" in e["text"] for e in session.state.log)
+    assert session.state.inventory.get("material_herba", 0) == 1
+
+
+def test_talk_edge_cases(session):
+    # NPC tidak ditemukan
+    session.apply_action({"type": "talk", "npc": "npc_palsu_999"})
+    assert any("NPC tidak ditemukan" in e["text"] for e in session.state.log)
+
+    # NPC tidak di lokasi ini
+    session.state.location = "loc_asrama"
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    assert any("tidak ada di sini" in e["text"] for e in session.state.log)
+
+
+def test_move_unknown_location(session):
+    session.apply_action({"type": "move", "to": "loc_alam_gaib"})
+    assert any("Lokasi tidak dikenal" in e["text"] for e in session.state.log)
+
+
+def test_spar_edge_cases(session):
+    # NPC tidak bisa diajak spar
+    session.apply_action({"type": "spar", "npc": "npc_penjaga"})
+    assert any("tidak bisa diajak sparing" in e["text"] for e in session.state.log)
+
+    # NPC tidak ada di lokasi ini
+    session.state.location = "loc_asrama"
+    session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
+    assert any("tidak ada di sini" in e["text"] for e in session.state.log)
+
+
+def test_hunt_outside_hunt_area_and_miniboss(session, monkeypatch):
+    session.state.location = "loc_asrama"
+    session.apply_action({"type": "hunt"})
+    assert any("Berburu hanya bisa dilakukan di Wilayah Berburu" in e["text"] for e in session.state.log)
+
+    # Mini-boss roll (< 0.1)
+    session.state.location = "loc_wilayah_berburu"
+    session.state.last_hunt_time = None
+    monkeypatch.setattr("src.engine.session.random.random", lambda: 0.05)
+    session.apply_action({"type": "hunt"})
+    assert session.state.pending_battle is not None
+    assert session.state.pending_battle["foes"][0]["id"] == "eno_raja_serigala"
+    session.state.pending_battle = None
+
+
+def test_rest_revives_companion(session):
+    session.state.location = "loc_asrama"
+    session.state.companion = {"id": "komp_roh_awan", "active": False, "hp": 0}
+    session.apply_action({"type": "rest", "hours": 8})
+    assert session.state.companion["active"] is True
+    assert session.state.companion["hp"] > 0
+    assert any("bangkit kembali" in e["text"] for e in session.state.log)
+
+
+def test_safe_save_path_security():
+    from src.engine.session import _safe_save_path, SaveError
+
+    for bad in ["../hack", "sub/save", "sub\\save", "bad\x00name", ""]:
+        with pytest.raises(SaveError):
+            _safe_save_path(bad)
+
+
+def test_unknown_action(session):
+    v = session.apply_action({"type": "aksi_gaib"})
+    assert "error" in v
+    assert any("Aksi tak dikenal" in e["text"] for e in session.state.log)
+
+
+def test_view_arc_summaries(session):
+    session.state.completed_quests.append("q_akademi_07")
+    
+    # 3ab
+    session.state.flags["branch_3ab"] = True
+    v = session.view()
+    assert "Cabang 3AB" in v["arc_summary"]["branch"]
+
+    # 3b
+    session.state.flags.pop("branch_3ab")
+    session.state.flags["branch_3b"] = True
+    v = session.view()
+    assert "Cabang 3B" in v["arc_summary"]["branch"]
+
+    # 3c
+    session.state.flags.pop("branch_3b")
+    session.state.flags["branch_3c"] = True
+    v = session.view()
+    assert "Cabang 3C" in v["arc_summary"]["branch"]
+
+    # 3aa
+    session.state.flags.pop("branch_3c")
+    session.state.flags["branch_3aa"] = True
+    v = session.view()
+    assert "Cabang 3AA" in v["arc_summary"]["branch"]
+
+    # unknown branch
+    session.state.flags.pop("branch_3aa")
+    v = session.view()
+    assert "Tidak Diketahui" in v["arc_summary"]["branch"]
+
+
+def test_session_use_item_edge_cases(session):
+    # Item tidak ada
+    session.state.inventory.clear()
+    session.apply_action({"type": "use_item", "item": "pil_qi"})
+    assert any("Item tidak tersedia" in e["text"] for e in session.state.log)
+
+    # Item bukan consumable
+    session.state.inventory["pedang_angin"] = 1
+    session.apply_action({"type": "use_item", "item": "pedang_angin"})
+    assert any("Item itu tidak bisa dipakai di sini" in e["text"] for e in session.state.log)
+
+    # Item consumable habis (count == 0 dihapus dari dict)
+    session.state.inventory["pil_qi"] = 1
+    session.apply_action({"type": "use_item", "item": "pil_qi"})
+    assert "pil_qi" not in session.state.inventory
+
+
+def test_session_spar_success_and_schedule(session):
+    # Spar sukses
+    session.state.location = "loc_arena"
+    v = session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
+    assert session.state.pending_battle is not None
+    assert session.state.pending_battle["context"] == "spar"
+    session.state.pending_battle = None
+
+    # Spar ditolak karena jadwal
+    npc = session.reg.npc("npc_hanxiu")
+    npc["schedule"] = [{"hour_start": 8, "hour_end": 12}]
+    session.state.hour = 20
+    session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
+    assert any("tidak berada di tempat untuk berlatih" in e["text"] for e in session.state.log)
+    npc.pop("schedule", None)
+
+
+def test_session_shop_sell_deletion(session):
+    session.state.location = "loc_pasar"
+    session.state.inventory["material_tulang"] = 1
+    session.apply_action({"type": "shop_sell", "item": "material_tulang", "count": 1})
+    assert "material_tulang" not in session.state.inventory
+
+
+def test_session_hunt_no_foe(session, monkeypatch):
+    session.state.location = "loc_wilayah_berburu"
+    session.state.last_hunt_time = None
+    monkeypatch.setattr(session.reg, "enemy", lambda eid: None)
+    session.apply_action({"type": "hunt"})
+    assert any("Tidak ada mangsa di sini" in e["text"] for e in session.state.log)
+
+
+def test_is_npc_available_without_schedule(session):
+    assert session._is_npc_available({"name": "Orang Tanpa Jadwal"}) is True
+
+
+def test_talk_returns_view_during_battle(session):
+    session.state.pending_battle = {"active": True}
+    v = session._talk({"npc": "npc_penjaga"})
+    assert "location" in v or "error" in v
+
+

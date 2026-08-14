@@ -115,3 +115,187 @@ def test_dialog_tidak_dikenal(session):
     s = session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
     # Gu Canghai ada di aula, bukan gerbang → tidak bisa bicara dari sini
     assert s["mode"] == "explore"
+
+
+def test_eval_condition_flag(dummy_session):
+    state = dummy_session.state
+    # flag belum diset (default False)
+    assert DialogEngine._eval_condition(state, {"flag": {"key": "sudah_kenal", "value": True}}) is False
+    assert DialogEngine._eval_condition(state, {"flag": {"key": "sudah_kenal", "value": False}}) is True
+    # flag diset True
+    state.flags["sudah_kenal"] = True
+    assert DialogEngine._eval_condition(state, {"flag": {"key": "sudah_kenal", "value": True}}) is True
+    assert DialogEngine._eval_condition(state, {"flag": {"key": "sudah_kenal", "value": False}}) is False
+    # flag tanpa spesifikasi value eksplisit (default True)
+    assert DialogEngine._eval_condition(state, {"flag": {"key": "sudah_kenal"}}) is True
+
+
+def test_eval_condition_morality_max(dummy_session):
+    state = dummy_session.state
+    state.player.morality = 20
+    assert DialogEngine._eval_condition(state, {"morality_max": 10}) is False
+    assert DialogEngine._eval_condition(state, {"morality_max": 20}) is True
+    assert DialogEngine._eval_condition(state, {"morality_max": 30}) is True
+
+
+def test_eval_condition_has_item(dummy_session):
+    state = dummy_session.state
+    state.inventory.clear()
+    assert DialogEngine._eval_condition(state, {"has_item": "pil_qi"}) is False
+    state.inventory["pil_qi"] = 0
+    assert DialogEngine._eval_condition(state, {"has_item": "pil_qi"}) is False
+    state.inventory["pil_qi"] = 2
+    assert DialogEngine._eval_condition(state, {"has_item": "pil_qi"}) is True
+
+
+def test_eval_condition_realm_min(dummy_session, registry):
+    state = dummy_session.state
+    # tanpa registry -> False
+    assert DialogEngine._eval_condition(state, {"realm_min": "realm_pembangun_fondasi"}, None) is False
+
+    # dengan registry
+    state.player.realm = "realm_pengumpul_qi"  # order 1
+    assert DialogEngine._eval_condition(state, {"realm_min": "realm_pembangun_fondasi"}, registry) is False
+    assert DialogEngine._eval_condition(state, {"realm_min": "realm_pengumpul_qi"}, registry) is True
+
+    state.player.realm = "realm_pembentuk_inti"  # order 3
+    assert DialogEngine._eval_condition(state, {"realm_min": "realm_pembangun_fondasi"}, registry) is True
+
+
+def test_eval_condition_academy(dummy_session):
+    state = dummy_session.state
+    state.player.academy = "akademi_elemen"
+    assert DialogEngine._eval_condition(state, {"academy": "akademi_senjata"}) is False
+    assert DialogEngine._eval_condition(state, {"academy": "akademi_elemen"}) is True
+
+
+def test_eval_condition_quest_active(dummy_session):
+    state = dummy_session.state
+    state.current_quest = "q_akademi_01"
+    state.active_side_quests = {"q_side_suqing": {}}
+
+    # quest utama aktif -> True
+    assert DialogEngine._eval_condition(state, {"quest_active": "q_akademi_01"}) is True
+    # side quest aktif -> True
+    assert DialogEngine._eval_condition(state, {"quest_active": "q_side_suqing"}) is True
+    # quest lain tidak aktif -> False
+    assert DialogEngine._eval_condition(state, {"quest_active": "q_akademi_02"}) is False
+
+
+def test_eval_condition_quest_not_active(dummy_session):
+    state = dummy_session.state
+    state.current_quest = "q_akademi_01"
+    state.active_side_quests = {"q_side_suqing": {}}
+
+    # quest utama aktif -> False
+    assert DialogEngine._eval_condition(state, {"quest_not_active": "q_akademi_01"}) is False
+    # side quest aktif -> False
+    assert DialogEngine._eval_condition(state, {"quest_not_active": "q_side_suqing"}) is False
+    # quest lain tidak aktif -> True
+    assert DialogEngine._eval_condition(state, {"quest_not_active": "q_akademi_02"}) is True
+
+
+def test_dialog_engine_start_invalid(session):
+    # dialog tidak ada di registry
+    res = session.dialog.start("dialog_ngawur_tidak_ada")
+    assert res is None
+
+
+def test_dialog_engine_choose_edge_cases(session):
+    # choose saat dialog belum start
+    session.dialog.current = None
+    session.dialog.node_id = None
+    assert session.dialog.choose(0) is None
+
+    # start dialog valid
+    session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    v = session.dialog.view()
+    assert v is not None
+
+    # index negatif atau di luar range choices -> mengembalikan view tanpa error
+    assert session.dialog.choose(-1) is not None
+    assert session.dialog.choose(99) is not None
+
+
+def test_dialog_engine_advance_edge_cases(session):
+    # advance saat belum start
+    session.dialog.current = None
+    session.dialog.node_id = None
+    assert session.dialog.advance() is None
+
+    # start dialog yang punya choices di node awal -> advance mengembalikan view
+    session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    v_before = session.dialog.view()
+    v_adv = session.dialog.advance()
+    assert v_adv["node_id"] == v_before["node_id"]
+
+    # buat mock dialog node tanpa choices
+    session.dialog.current = {
+        "id": "dlg_mock",
+        "nodes": {
+            "node_1": {"speaker": "narrator", "text": "Langkah 1", "next": "node_2"},
+            "node_2": {"speaker": "narrator", "text": "Langkah 2"},
+        }
+    }
+    session.dialog.node_id = "node_1"
+    v2 = session.dialog.advance()
+    assert v2["node_id"] == "node_2"
+
+    # node_2 tidak punya next -> advance mengakhiri dialog
+    res = session.dialog.advance()
+    assert res == {"ended": True}
+    assert session.dialog.current is None
+    assert session.dialog.node_id is None
+
+
+def test_dialog_engine_visible_choices_conditions(session):
+    session.dialog.current = {
+        "id": "dlg_mock_choices",
+        "nodes": {
+            "start": {
+                "speaker": "narrator",
+                "text": "Pilih jalanmu",
+                "choices": [
+                    {"label": "Opsi Moral Tinggi", "condition": {"morality_min": 50}},
+                    {"label": "Opsi Selalu Ada"},
+                    {"label": "Opsi Quest Tidak Offerable", "effects": [{"type": "start_quest", "quest": "q_side_suqing"}]},
+                ]
+            }
+        }
+    }
+    session.dialog.node_id = "start"
+    session.state.player.morality = 0
+    # buat quest tidak offerable dengan memasukkannya ke active_side_quests
+    session.state.active_side_quests["q_side_suqing"] = {}
+    v = session.dialog.view()
+    # Opsi moral tinggi dan quest tidak offerable disembunyikan
+    assert len(v["choices"]) == 1
+    assert v["choices"][0]["label"] == "Opsi Selalu Ada"
+
+    # Setelah moral naik dan quest offerable (dihapus dari active), semua muncul
+    session.state.player.morality = 60
+    del session.state.active_side_quests["q_side_suqing"]
+    v2 = session.dialog.view()
+    assert len(v2["choices"]) == 3
+
+
+def test_dialog_engine_choose_no_next_ends(session):
+    session.dialog.current = {
+        "id": "dlg_mock_end",
+        "nodes": {
+            "start": {
+                "speaker": "narrator",
+                "text": "Pilihan Terakhir",
+                "choices": [
+                    {"label": "Selesai", "option": "opt_selesai"},
+                ]
+            }
+        }
+    }
+    session.dialog.node_id = "start"
+    res = session.dialog.choose(0)
+    assert res == {"ended": True}
+    assert session.dialog.current is None
+    assert session.dialog.chosen_option == "opt_selesai"
+
+
