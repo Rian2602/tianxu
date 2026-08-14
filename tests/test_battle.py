@@ -395,4 +395,14 @@ def test_battle_multiple_foes_with_dead_foe(session, monkeypatch):
     session.state.pending_battle = None
 
 
+def test_companion_turn_no_alive_foe_is_noop(session):
+    """Guard: tidak ada musuh hidup → _companion_turn tidak melakukan apa-apa."""
+    session.state.companion = {"id": "komp_roh_awan", "hp": 10, "active": True}
+    session.battle.start([{"id": "eno_test", "name": "Musuh", "hp": 0, "qi": 0, "qi_max": 0,
+                           "attack": 1, "defense": 0, "speed": 1, "element": None,
+                           "exp_reward": 0, "drop_item": None, "drop_chance": 0}], "hunt")
+    session.battle._companion_turn(session.state.pending_battle)
+    assert session.state.pending_battle["foes"][0]["hp"] == 0
+
+
 

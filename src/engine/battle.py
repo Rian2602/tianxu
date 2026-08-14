@@ -161,8 +161,6 @@ class BattleEngine:
         if not b["over"]:
             self._enemy_turn(pc, b)
         self._regen_foes(b)
-        if not b["over"] and self._all_dead(b):
-            return self._victory(b, pc)
         if not b["over"] and pc["hp"] <= 0:
             return self._ko(b)
         self._sync_player(pc)
