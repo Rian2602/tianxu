@@ -40,7 +40,7 @@ session: GameSession | None = None  # sesi aktif (single-player lokal)
 def _context() -> dict:
     """Konteks UI yang tidak ada di view engine: NPC di lokasi & teknik akademi."""
     if session is None:
-        return {"npcs": [], "techniques": []}
+        return {"npcs": [], "techniques": [], "merchant_shop": None, "recipes": []}
     loc = session.state.location
     npcs = [
         {"id": n["id"], "name": n["name"], "can_spar": n.get("can_spar"), "shop": bool(n.get("shop"))}
@@ -125,7 +125,7 @@ def _tianyuan_payload() -> dict:
         } if q else None,
         "side_quests": [
             {
-                "id": sq["id"],
+                "id": sq,
                 "title": registry.quest(sq)["title"],
                 "objective": session.quest.objective_text(registry.quest(sq)),
             }

@@ -110,6 +110,35 @@ def test_tianyuan_panel(base_url: str) -> None:
     assert data["tianyuan"]["mission"]["main"]["id"] == "q_akademi_01"
 
 
+def test_tianyuan_panel_side_quest(base_url: str) -> None:
+    post(base_url, "/api/new")
+    app.session.state.active_side_quests = {"sq_dummy": 0}
+    # Mock the quest in registry just for the test to avoid KeyError
+    app.registry.quest_by_id["sq_dummy"] = {"id": "sq_dummy", "title": "Dummy SQ", "objectives": [{"id": "obj1", "desc": "Test"}]}
+    
+    try:
+        body, status = get(base_url, "/api/tianyuan")
+        assert status == 200
+        data = json.loads(body)
+        assert len(data["tianyuan"]["mission"]["side_quests"]) == 1
+        assert data["tianyuan"]["mission"]["side_quests"][0]["id"] == "sq_dummy"
+    finally:
+        # Cleanup mock
+        del app.registry.quest_by_id["sq_dummy"]
+
+
+def test_api_state_tanpa_sesi(base_url: str) -> None:
+    app.session = None
+    body, status = get(base_url, "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["ok"] is True
+    assert data["view"] is None
+    assert data["context"]["merchant_shop"] is None
+    assert data["context"]["recipes"] == []
+    assert data["context"]["npcs"] == []
+
+
 def test_aksi_tanpa_sesi_ditolak() -> None:
     """Tanpa POST /api/new dulu, aksi ditolak dengan pesan jelas."""
     # sesi global dibersihkan
