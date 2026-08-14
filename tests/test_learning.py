@@ -68,10 +68,12 @@ def test_items_csv_new_items(session):
 def test_choose_elemen_grants_starter_kit(session):
     s = session
     s.state.current_quest = "q_akademi_04"
-    res = s.apply_action({"type": "choose", "option": "akademi_elemen"})
+    res =    s.apply_action({"type": "choose", "option": "akademi_elemen"})
     assert s.state.player.academy == "akademi_elemen"
     assert s.state.inventory.get("talisman_elemen", 0) == 1
     assert any("talisman_elemen" in e["text"] or "Talisman" in e["text"] for e in s.state.log)
+    # G2-T1: weapon starter terpasang otomatis ke slot weapon
+    assert s.state.player.equipment["weapon"] == "talisman_elemen"
 
 
 # 4. Pilih Senjata -> dapat pedang_bambu
@@ -81,6 +83,8 @@ def test_choose_senjata_grants_starter_kit(session):
     res = s.apply_action({"type": "choose", "option": "akademi_senjata"})
     assert s.state.player.academy == "akademi_senjata"
     assert s.state.inventory.get("pedang_bambu", 0) == 1
+    # G2-T1: weapon starter terpasang otomatis
+    assert s.state.player.equipment["weapon"] == "pedang_bambu"
 
 
 # 5. Pilih Summoning -> dapat kontrak_roh & kompanion
@@ -93,6 +97,31 @@ def test_choose_summoning_grants_starter_kit_and_companion(session):
     assert s.state.companion is not None
     assert s.state.companion["id"] == "komp_roh_awan"
     assert s.state.companion["active"] is True
+    # G2-T1: weapon starter terpasang otomatis
+    assert s.state.player.equipment["weapon"] == "kontrak_roh"
+
+
+# 5b. (G2-T1) Auto-equip tidak menimpa slot yang sudah terisi & non-weapon tidak ter-equip
+def test_auto_equip_tidak_menimpa_slot_terisi(session):
+    s = session
+    s.state.current_quest = "q_akademi_04"
+    s.state.player.equipment["weapon"] = "pedang_bambu"  # slot sudah terisi
+    s.apply_action({"type": "choose", "option": "akademi_elemen"})
+    assert s.state.player.equipment["weapon"] == "pedang_bambu", "auto-equip tidak menimpa slot terisi"
+    assert s.state.inventory.get("talisman_elemen", 0) == 1  # tetap masuk inventori
+
+
+def test_auto_equip_non_weapon_tidak_dipasang(session):
+    """Starter kit non-weapon (data arc lain) tidak boleh terpasang ke slot weapon."""
+    s = session
+    s.state.current_quest = "q_akademi_04"
+    # starter kit sintetis non-weapon (mutasi data config, bukan kode)
+    for a in s.reg.config["academies"]:
+        if a["id"] == "akademi_elemen":
+            a["starter_kit"] = [{"id": "pil_qi", "count": 1}]
+    s.apply_action({"type": "choose", "option": "akademi_elemen"})
+    assert s.state.player.equipment["weapon"] is None, "non-weapon tidak dipasang ke slot"
+    assert s.state.inventory.get("pil_qi", 0) >= 1
 
 
 # 6. Starter kit bertahan saat save/load tanpa duplikasi
@@ -336,26 +365,25 @@ def test_starter_kit_weapons_equip_and_combat_bonus(session, monkeypatch, acad, 
     s.state.current_quest = "q_akademi_04"
     s.apply_action({"type": "choose", "option": acad})
     assert s.state.inventory.get(item_id) == 1
+    # G2-T1: senjata starter terpasang OTOMATIS (tidak perlu equip manual)
+    assert s.state.player.equipment["weapon"] == item_id
 
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit
 
-    # Serangan tanpa senjata (attack 7): 7 damage
+    # Serangan DENGAN senjata (attack 10): 10 damage (+3 peningkatan)
     foe1 = {"id": "eno_dummy1", "name": "Musuh Uji 1", "hp": 100, "hp_max": 100, "attack": 0, "defense": 0, "speed": 1}
     s.battle.start([foe1], "hunt")
     s.apply_action({"type": "battle_action", "action": "attack"})
-    dmg_unarmed = 100 - s.state.pending_battle["foes"][0]["hp"]
+    dmg_armed = 100 - s.state.pending_battle["foes"][0]["hp"]
     s.state.pending_battle = None
 
-    # Pasang senjata starter kit (+3 power)
-    s.apply_action({"type": "equip", "item": item_id})
-    assert s.state.player.equipment["weapon"] == item_id
-
-    # Serangan dengan senjata (attack 10): 10 damage (+3 peningkatan)
+    # Lepas senjata → attack 7 (tanpa bonus)
+    s.state.player.equipment["weapon"] = None
     foe2 = {"id": "eno_dummy2", "name": "Musuh Uji 2", "hp": 100, "hp_max": 100, "attack": 0, "defense": 0, "speed": 1}
     s.battle.start([foe2], "hunt")
     s.apply_action({"type": "battle_action", "action": "attack"})
-    dmg_armed = 100 - s.state.pending_battle["foes"][0]["hp"]
+    dmg_unarmed = 100 - s.state.pending_battle["foes"][0]["hp"]
     s.state.pending_battle = None
 
     assert dmg_armed - dmg_unarmed == 3  # tepat +3 bonus power dari starter weapon

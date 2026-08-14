@@ -255,6 +255,10 @@ class QuestEngine:
                 item_obj = self.reg.item(iid)
                 iname = item_obj["name"] if item_obj else iid
                 add_log(self.state, "system", f"Menerima perlengkapan pemula: {iname} ×{cnt}.")
+                # G2-T1: senjata starter terpasang otomatis ke slot weapon yang kosong
+                if (item_obj or {}).get("type") == "weapon" and not self.state.player.equipment.get("weapon"):
+                    self.state.player.equipment["weapon"] = iid
+                    add_log(self.state, "narration", f"{iname} terpasang sebagai senjatamu.")
 
 
     def _grant_companion(self, academy: str) -> None:
