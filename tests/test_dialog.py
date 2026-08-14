@@ -377,8 +377,9 @@ def test_pilihan_gated_relation(session):
 
 def test_spar_menang_menaikkan_relation(session, monkeypatch):
     """P1-2: kemenangan spar menyuntikkan relation ke NPC lawan (cultivation.spar_win_relation)."""
-    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
-    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit, no drop
+    # serangan pemain 1-hit menang; serangan musuh (Han Xiu speed 11 > pemain) 0 damage
+    from src.engine.battle import BattleEngine as BE
+    monkeypatch.setattr(BE, "_calc_damage", lambda self, a, d, ea, ed: ((0, False) if ed is None else (99999, False)))
     session.state.location = "loc_arena"
     session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
     assert session.state.pending_battle is not None

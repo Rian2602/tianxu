@@ -33,8 +33,10 @@ PLAYTHROUGH_AKADEMI = [
 @pytest.mark.parametrize("akademi, nama_akademi, pakai_roh", PLAYTHROUGH_AKADEMI)
 def test_cli_playthrough_3aa(monkeypatch, capsys, akademi, nama_akademi, pakai_roh):
     """Playthrough penuh q01–q07 (cabang 3aa) untuk tiap akademi."""
-    # battle selalu menang dalam 1 serangan (deterministik)
+    # battle deterministik: serangan pemain 1-hit menang, giliran musuh dinonaktifkan
+    # (aman dengan turn_order "speed")
     monkeypatch.setattr(BattleEngine, "_calc_damage", lambda self, a, d, ea, ed: (99999, False))
+    monkeypatch.setattr(BattleEngine, "_enemy_turn", lambda self, pc, b: None)
     monkeypatch.setattr("src.engine.session.GameSession._is_npc_available", lambda self, npc: True)
 
     script = [

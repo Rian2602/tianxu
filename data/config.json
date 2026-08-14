@@ -36,6 +36,7 @@
     "spar_win_relation": 5,
     "spar_loss_exp": 3,
     "hunt_exp_per_kill": 6,
+    "daily_grind_exp_cap": 60,
     "breakthrough": "auto"
   },
   "currency": { "name": "Koin Emas", "start_gold": 20 },
@@ -67,6 +68,6 @@
     "qi_regen_percent_per_turn": 5,
     "crit_chance": 0.08,
     "crit_multiplier": 1.5,
-    "turn_order": "fixed_alternate"
+    "turn_order": "speed"
   }
 }

@@ -202,6 +202,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `reach` | `location` (+ opsional `time_window`) | Tiba di lokasi; jika `time_window` (`hour_start`/`hour_end`) ada, hanya sah pada waktu itu — **event terjadwal** |
 | `choose` | `options` (list) | Pilihan eksplisit (mis. pilih akademi, pilih jalur) |
 | `spar` | `npc` | Sparring wajib: bicara NPC ber-`combat` → battle; **menang = objektif selesai** (dipakai sparing ujian) |
+| `defeat` (+opsional `report_to`) | `enemies`, `target`, `report_to` | Side quest: kalahkan `target` musuh dari `enemies`. **A2 (2026-08-14)**: dengan `report_to`, quest hanya selesai setelah **lapor ke NPC pemberi** (`npc`) — `quest.py::notify_dialog_ended` memeriksa `defeat + report_to`; validator aturan 2 memeriksa referensi npc |
 | `advance_time` | `hour` (+ opsional `day_offset`) | Tunggu hingga jam tertentu; `day_offset` = maju N hari |
 
 **Aturan sisi `next`**:
@@ -437,7 +438,7 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
     "qi_regen_percent_per_turn": 5,
     "crit_chance": 0.08,
     "crit_multiplier": 1.5,
-    "turn_order": "fixed_alternate"
+    "turn_order": "speed"
   }
 }
 ```
@@ -551,7 +552,9 @@ selesaikan_quest(q):
 
 ```
 battle_start(enemy_ids, context)
-  → giliran: **tetap bergantian** (disahkan): pemain → musuh, berulang
+  → giliran: `battle.turn_order` — "speed" (default, A2 2026-08-14): yang lebih cepat
+    bertindak dulu tiap ronde (foe_speed > pc.speed → musuh dulu); "fixed_alternate"
+    tetap didukung (pemain → musuh, berulang)
 player_action(menu):
   - serang        : damage = attack × (100 / (100 + defense musuh)), minimal 1
   - teknik        : pilih teknik; cost Qi; multiplier elemen (§8.2)
@@ -868,9 +871,10 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
   - **Timer Respawn Monster**: `_hunt()` menolak berburu ulang sebelum `world.monster_respawn_hours` (5 jam) sejak `last_hunt_time` (log sistem informatif).
   - **Jadwal Harian NPC**: `_is_npc_available(npc)` membatasi `_talk`/`_spar` pada `schedule.hour_start..hour_end` — NPC aktif tiap hari, tanpa softlock. (A1, 2026-08-14): pola diseragamkan dengan `quest._in_window` — mendukung jadwal lintas tengah malam (19 → 6) dan batas `hour_end` eksklusif. **Verifikasi 2026-08-14**: seluruh 9 schedule di `data/npcs.json` memenuhi `hour_start < hour_end` (6–22, 6–20, 8–18, 7–19, 9–17, …) — perubahan batas eksklusif tidak berdampak playthrough saat ini.
   - **Layar Penutup Arc 1**: `view().arc_summary` saat `q_akademi_07` selesai → banner ANSI emas di CLI + modal penutup di web (`modal-arc-summary`). **Batasan (G3d)**: sekali-dismiss per save disimpan di `localStorage` frontend (`arc-seen:<nama-save>`) — **tidak ikut antar perangkat/browser** (keputusan K2; Fase 1 = lokal single-player, diterima). Opsi backend (flag di save) ditunda.
-- **Playtest putaran 2 — observasi (open, keputusan desain Fase 2, belum diubah data)**:
-  - Han Xiu undertuned: menang ≥85% di Lv1 (full HP), 100% Lv2+; `speed` tak berfungsi karena `turn_order: fixed_alternate` (pemain selalu duluan). Naikkan stat bila gate ujian (q3) ingin lebih menantang — hati-hati tidak menyumbat jalur utama.
-  - Reward ganda spar saat q3: `spar_win_exp` 8 + reward quest +8 exp/+10 koin = 16 exp sekali menang → Lv1→Lv2 + sisa 6/12 (bukan loncat 2 level). Overlap by-design (spar selalu kasih exp + reward quest); terima atau turunkan salah satu.
-  - Over-leveling via grind (Lv1→Lv8) disengaja — side quest untuk grinding; jalur utama berakhir Lv6 (target GDD Lv4–6).
-  - Side quest objektif "kalahkan" selesai otomatis tanpa lapor NPC (minor). Save tak ditemukan TIDAK diam-diam — pesan jelas di CLI (`cli.py:165`).
+- **Playtest putaran 2 — observasi → KEPUTUSAN (disahkan 2026-08-14, Tahap A plan `2026-08-14-rampungkan-arc-akademi-tahap-a.md`)** — tidak ada lagi item "open":
+  - **Han Xiu undertuned → `turn_order: "speed"`** (keputusan: dukung urutan giliran berbasis `speed`, bukan naikkan stat): `battle.turn_order` kini `"speed"` — yang lebih cepat bertindak dulu tiap ronde (`battle.py::player_action`, `foe_speed > pc.speed` → `_enemy_turn` dulu). Han Xiu (speed 11) & serigala (10) kini menyerang duluan — gate ujian q3 jadi menantang (pemain bisa kalah; jalur kalah aman via G4a). `fixed_alternate` tetap didukung (validator aturan 16 menerima keduanya). Guard: god_mode test mematikan `_enemy_turn` (deterministik).
+  - **Reward ganda spar q3 → reward quest q3 diturunkan** `exp 8 → 4` (total spar ujian = `spar_win_exp` 8 + 4 = 12 exp + 10 koin — tidak dobel penuh).
+  - **Side quest "kalahkan" tanpa lapor → objektif defeat kini punya `report_to`**: `q_side_berburu` butuh lapor ke `npc_pemburu` setelah 2 kill (`quest.py::notify_dialog_ended` memeriksa `defeat + report_to`; validator aturan 2 memeriksa referensi npc). `objective_text` menampilkan status lapor (✓/—).
+  - **Over-leveling via grind → cap exp grinding harian**: `cultivation.daily_grind_exp_cap` (60) — exp dari berburu, spar, dan side quest dibatasi per hari (`gain_grind_exp`, `state.exp_grind_today`, reset saat ganti hari); main quest & grounding tidak terpengaruh. Playthrough parametrize meng-assert arc-end Lv 4–6 sebagai guardrail pacing.
+  - Save tak ditemukan TIDAK diam-diam — pesan jelas di CLI (`cli.py:165`) — tanpa perubahan.
 - **GDD.md** sudah dipindah ke `docs/GDD.md` (struktur folder final sesuai GDD §10.3).

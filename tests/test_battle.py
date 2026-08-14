@@ -449,6 +449,39 @@ def test_teknik_akademi_dipakai_di_battle(session, monkeypatch, akademi, teknik_
     session.state.pending_battle = None
 
 
+def test_speed_order_musuh_lebih_cepat_menyerang_dulu(session, monkeypatch):
+    """A2 (keputusan §17): turn_order "speed" — musuh lebih cepat bertindak dulu;
+    guard pemain tidak menahan serangan yang datang lebih awal (damage penuh)."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit
+    foe = {"id": "eno_cepat", "name": "Cepat", "hp": 999, "qi": 0,
+           "attack": 10, "defense": 0, "speed": 20, "element": None,
+           "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    session.battle.start([foe], "hunt")
+    hp_before = session.state.player.hp
+    session.apply_action({"type": "battle_action", "action": "guard"})
+    lost = hp_before - session.state.player.hp
+    # damage penuh (guard tidak sempat aktif karena musuh duluan) — bukan setengah
+    assert lost >= 8, f"musuh cepat harus menyerang duluan dengan damage penuh, lost={lost}"
+    session.state.pending_battle = None
+
+
+def test_cap_exp_grind_harian(session, god_mode):
+    """A2 (keputusan §17): exp berburu dibatasi cap harian (daily_grind_exp_cap)."""
+    cap = int(session.reg.config["cultivation"]["daily_grind_exp_cap"])
+    assert cap > 0
+    session.state.exp_grind_today = cap - 5  # sisa 5
+    session.state.location = "loc_wilayah_berburu"
+    session.state.last_hunt_time = None
+    session.apply_action({"type": "hunt"})  # serigala exp 15
+    exp_before = session.state.player.exp
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    gained = session.state.player.exp - exp_before
+    assert gained == 5, f"exp harus dipotong jadi 5, dapat {gained}"
+    assert session.state.exp_grind_today == cap
+    session.state.pending_battle = None
+
+
 def test_companion_turn_no_alive_foe_is_noop(session):
     """Guard: tidak ada musuh hidup → _companion_turn tidak melakukan apa-apa."""
     session.state.companion = {"id": "komp_roh_awan", "hp": 10, "active": True}

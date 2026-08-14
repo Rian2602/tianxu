@@ -11,7 +11,7 @@ Invariant:
 from __future__ import annotations
 
 from ..loader import DataRegistry
-from .cultivation import gain_exp
+from .cultivation import gain_exp, gain_grind_exp
 from .effects import apply as apply_effects
 from .events import add_log
 from .memory import unlock as unlock_memory
@@ -46,7 +46,13 @@ class QuestEngine:
             npc = self.reg.npc(obj.get("npc", ""))
             return f"{hint} ({self._talk_count(quest)}/{obj.get('target', 1)})"
         if kind == "defeat":
-            return f"{hint} ({self.state.active_side_quests.get(quest['id'], {}).get('defeated', 0)}/{obj.get('target', 1)})"
+            base = f"{hint} ({self.state.active_side_quests.get(quest['id'], {}).get('defeated', 0)}/{obj.get('target', 1)})"
+            if obj.get("report_to"):
+                npc = self.reg.npc(obj["report_to"])
+                nama = npc["name"] if npc else obj["report_to"]
+                lapor = "✓" if self.state.active_side_quests.get(quest["id"], {}).get("talk", 0) else "—"
+                return f"{base} · lapor ke {nama} ({lapor})"
+            return base
         if kind == "gather":
             return f"{hint} ({self.state.inventory.get(obj.get('item', ''), 0)}/{obj.get('target', 1)})"
         if kind == "reach":
@@ -65,7 +71,7 @@ class QuestEngine:
     # ---------- selesaikan quest utama ----------
 
     def notify_dialog_ended(self, npc_id: str) -> None:
-        """Dipanggil sesi saat dialog berakhir — memeriksa objektif talk."""
+        """Dipanggil sesi saat dialog berakhir — memeriksa objektif talk & lapor side quest."""
         q = self.current_main()
         if q and q.get("objective", {}).get("kind") == "talk" and q.get("objective", {}).get("npc") == npc_id:
             qid = q["id"]
@@ -73,6 +79,15 @@ class QuestEngine:
             prog["talk"] = prog.get("talk", 0) + 1
             if prog["talk"] >= q["objective"].get("target", 1):
                 self._complete_main(qid)
+        # A2 (keputusan §17): side quest defeat dengan `report_to` selesai saat lapor ke pemberi
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if obj.get("kind") == "defeat" and obj.get("report_to") == npc_id:
+                prog = self.state.active_side_quests[qid]
+                prog["talk"] = prog.get("talk", 0) + 1
+                if prog.get("defeated", 0) >= obj.get("target", 1):
+                    self._complete_side(qid)
 
     def notify_spar_won(self, npc_id: str) -> None:
         """Objektif `spar` selesai saat pemain MENANG battle melawan NPC itu."""
@@ -115,7 +130,8 @@ class QuestEngine:
             if killed:
                 prog = self.state.active_side_quests[qid]
                 prog["defeated"] = prog.get("defeated", 0) + len(killed)
-                if prog["defeated"] >= obj.get("target", 1):
+                # A2: dengan `report_to`, selesaian butuh lapor ke pemberi — bukan langsung selesai
+                if not obj.get("report_to") and prog["defeated"] >= obj.get("target", 1):
                     self._complete_side(qid)
 
     def notify_gather(self) -> None:
@@ -280,7 +296,7 @@ class QuestEngine:
         oc = q.get("on_complete", {})
         apply_effects(self.state, self.reg, oc.get("effects"))
         rewards = oc.get("rewards", {})
-        gain_exp(self.state, self.reg, rewards.get("exp", 0))
+        gain_grind_exp(self.state, self.reg, rewards.get("exp", 0))  # A2: cap grind harian
         self.state.player.gold += rewards.get("gold", 0)
         if oc.get("system_msg"):
             add_log(self.state, "system", oc["system_msg"])

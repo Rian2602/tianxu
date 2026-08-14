@@ -110,6 +110,20 @@ def test_aturan7_night_pool_referensi_tidak_ada():
     assert any("night_pool" in e for e in v.errors)
 
 
+def test_aturan2_report_to_npc_tidak_ada():
+    """A2: objective.report_to harus merujuk npc yang ada (aturan 2)."""
+    d = _good()
+    d["quests/quests_side.json"] = {"quests": [{
+        "id": "sq_report", "kind": "side", "repeatable": True, "cooldown": 2,
+        "available_from": {"day": 1, "hour": 8},
+        "objective": {"kind": "defeat", "enemies": [], "target": 1, "report_to": "npc_tidak_ada"},
+        "next": [], "on_complete": {"rewards": {"exp": 1}},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("report_to" in e for e in v.errors)
+
+
 def test_aturan7_night_window_tidak_valid():
     d = _good()
     d["config.json"]["world"] = {"hunt": {"pool": [], "night_window": {"hour_start": 30, "hour_end": 6}}}

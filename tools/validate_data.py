@@ -254,6 +254,9 @@ class Validator:
                 for e in obj.get("enemies", []):
                     if not self.has("enemy", e):
                         self.error(f"quest {qid}: objective.enemies '{e}' tidak ada")
+                # A2: lapor ke pemberi — npc harus ada (keputusan §17)
+                if obj.get("report_to") and not self.has("npc", obj["report_to"]):
+                    self.error(f"quest {qid}: objective.report_to '{obj['report_to']}' tidak ada")
             if kind == "gather" and obj.get("item") and not self.has("item", obj["item"]):
                 self.error(f"quest {qid}: objective.item '{obj['item']}' tidak ada")
             if kind == "reach" and obj.get("location") and not self.has("location", obj["location"]):

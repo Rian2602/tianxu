@@ -14,11 +14,12 @@ Semua perubahan penting pada **Tian Xu: Second Life**.
 - Konten: `system_msg` prematur q06 dihapus (B1); opsi "(Tidak menjawab)" dihapus — cabang 3b wajib lewat tawaran berbayar (G4d); flag `branch_3aa` membocorkan dialog konfrontasi ke 3ab diperbaiki (G4e); dialog Gu Canghai tetap terbuka setelah konsolasi kalah.
 - Toko (laporan pemain, UX1): tab Jual menjelaskan item yang belum dimiliki — baris "Belum punya" tanpa tombol + hint; `Cache-Control: no-cache` untuk aset statis agar perbaikan frontend selalu termuat.
 - **Fitur GDD P1** (plan `docs/superpowers/plans/2026-08-14-p1-fitur-gdd-belum-dibangun.md`): hubungan NPC berdampak pada dialog (P1-2 — kondisi `relation_min/max`, `spar_win_relation`, node gated Han Xiu/Gu Canghai); gating ingatan membuka opsi dialog (P1-1 — kondisi `memory`, menutup B3/#13); tipe musuh beragam + pool berburu malam (P1-3 — `night_pool`/`night_window`, 2 musuh baru).
-- Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi + fitur P1), 3 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / STORY_FASE1 / DESIGN_SUMMARY / README / PROJECT.
+- **Rampungkan Arc Akademi — Tahap A** (plan `docs/superpowers/plans/2026-08-14-rampungkan-arc-akademi-tahap-a.md`): playthrough end-to-end 3 akademi (tutup DoD §11.2 #1); keputusan playtest §17 — `turn_order: "speed"` (urutan giliran berbasis speed), reward quest q3 diturunkan (exp 8→4), side quest defeat butuh lapor (`report_to`), cap exp grinding harian (`daily_grind_exp_cap` 60).
+- Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi + fitur P1), 4 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / STORY_FASE1 / DESIGN_SUMMARY / README / PROJECT.
 
 ### Changed
-- Jumlah test: 192 → **222**; validator 16 aturan tetap exit 0.
-- `README.md` & `PROJECT.md`: jumlah test disinkronkan (222).
+- Jumlah test: 192 → **230**; validator 16 aturan tetap exit 0.
+- `README.md` & `PROJECT.md`: jumlah test disinkronkan (230).
 
 ## [0.1.0-alpha] — 2026-08-14
 

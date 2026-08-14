@@ -245,6 +245,7 @@ class GameSession:
             self.state.hour -= 24
             self.state.day += 1
             self.state.grounding_hours_today = 0  # hari baru
+            self.state.exp_grind_today = 0
         self.quest.notify_move()
         self.quest.advance_time_target_met()
 

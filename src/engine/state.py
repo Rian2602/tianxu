@@ -82,6 +82,7 @@ class GameState:
     last_safe_location: str | None = None
     last_hunt_time: int | None = None
     grounding_hours_today: int = 0
+    exp_grind_today: int = 0  # cap exp grinding harian (berburu/spar/side quest)
     branch_pending: str | None = None  # dialog id untuk pilih cabang quest
     pending_dialog: str | None = None
     pending_battle: dict | None = None  # data battle aktif (dict, lihat battle.py)
@@ -162,6 +163,7 @@ class GameState:
             "last_safe_location": self.last_safe_location,
             "last_hunt_time": self.last_hunt_time,
             "grounding_hours_today": self.grounding_hours_today,
+            "exp_grind_today": self.exp_grind_today,
             "branch_pending": self.branch_pending,
             "pending_battle": copy.deepcopy(self.pending_battle) if self.pending_battle else None,
             "companion": copy.deepcopy(self.companion) if self.companion else None,
@@ -198,6 +200,7 @@ class GameState:
             last_safe_location=d.get("last_safe_location"),
             last_hunt_time=d.get("last_hunt_time"),
             grounding_hours_today=d.get("grounding_hours_today", 0),
+            exp_grind_today=d.get("exp_grind_today", 0),
             branch_pending=d.get("branch_pending"),
             pending_battle=copy.deepcopy(d.get("pending_battle")),
             companion=copy.deepcopy(d.get("companion")),

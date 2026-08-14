@@ -40,8 +40,10 @@ def mock_god_mode(monkeypatch):
 
 @pytest.fixture
 def god_mode(monkeypatch):
-    """Battle selalu menang 1 serangan (deterministik untuk test alur)."""
+    """Battle deterministik untuk test alur: serangan pemain/kompanion 1-hit menang,
+    giliran musuh dinonaktifkan (aman dengan turn_order "speed" — musuh tak pernah menyerang)."""
     monkeypatch.setattr(BattleEngine, "_calc_damage", lambda self, attack, defense, ea, ed: (99999, False))
+    monkeypatch.setattr(BattleEngine, "_enemy_turn", lambda self, pc, b: None)
     monkeypatch.setattr(BattleEngine, "_try_flee", lambda self, pc, b: True)
     monkeypatch.setattr(GameSession, "_is_npc_available", lambda self, npc: True)
 

@@ -133,8 +133,8 @@ def test_advance_time_day_offset_ditegakkan(session, god_mode):
     assert session.state.current_quest == "q_akademi_07"
 
 
-def test_side_quest_berburu_selesai_via_kemenangan(session, god_mode, monkeypatch):
-    """Side quest defeat: mulai lewat dialog pemburu, selesai setelah 2 kill."""
+def test_side_quest_berburu_selesai_via_kemenangan_dan_lapor(session, god_mode, monkeypatch):
+    """A2 (keputusan §17): side quest defeat selesai setelah 2 kill DAN lapor ke Pemburu."""
 
     monkeypatch.setattr("src.engine.session.random.choice", lambda seq: "eno_serigala_qi")
     session.apply_action({"type": "advance_time", "hours": 24})  # hari 2, jam 8
@@ -148,6 +148,12 @@ def test_side_quest_berburu_selesai_via_kemenangan(session, god_mode, monkeypatc
     session.apply_action({"type": "advance_time", "hours": 5})
     session.apply_action({"type": "hunt"})
     session.apply_action({"type": "battle_action", "action": "attack"})
+    # 2 kill tercapai tapi belum lapor → quest BELUM selesai
+    assert "q_side_berburu" in session.state.active_side_quests
+    # lapor ke Pemburu → selesai
+    session.apply_action({"type": "move", "to": "loc_gerbang_akademi"})
+    session.apply_action({"type": "talk", "npc": "npc_pemburu"})
+    finish_dialog(session, [])
     assert "q_side_berburu" not in session.state.active_side_quests
     assert "q_side_berburu" in session.state.completed_quests
 
@@ -251,6 +257,10 @@ def test_side_quest_cooldown(session, god_mode, monkeypatch):
     session.apply_action({"type": "advance_time", "hours": 5})
     session.apply_action({"type": "hunt"})
     session.apply_action({"type": "battle_action", "action": "attack"})
+    # A2: lapor ke Pemburu untuk menyelesaikan
+    session.apply_action({"type": "move", "to": "loc_gerbang_akademi"})
+    session.apply_action({"type": "talk", "npc": "npc_pemburu"})
+    finish_dialog(session, [])
     assert "q_side_berburu" not in session.state.active_side_quests
     assert "q_side_berburu" in session.state.completed_quests
     assert "q_side_berburu" in session.state.side_quest_cooldowns

@@ -26,6 +26,22 @@ def gain_exp(state: GameState, registry: DataRegistry, amount: int) -> None:
     state.player.qi = min(state.player.qi, state.max_qi(registry))
 
 
+def gain_grind_exp(state: GameState, registry: DataRegistry, amount: int) -> None:
+    """A2: exp dari sumber grinding (berburu/spar/side quest) dibatasi cap harian.
+    `cultivation.daily_grind_exp_cap` (0 = tanpa batas). Main quest & grounding
+    tidak terpengaruh (grounding sudah dibatasi jam per hari)."""
+    if amount <= 0:
+        return
+    cap = int(registry.config.get("cultivation", {}).get("daily_grind_exp_cap", 0))
+    if cap > 0:
+        room = max(0, cap - state.exp_grind_today)
+        amount = min(amount, room)
+        if amount <= 0:
+            return
+    state.exp_grind_today += amount
+    gain_exp(state, registry, amount)
+
+
 def _level_up(state: GameState, registry: DataRegistry) -> None:
     c = registry.config.get("cultivation", {})
     levels = int(registry.realms[state.player.realm]["levels"])

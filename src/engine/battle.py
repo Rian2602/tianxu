@@ -14,7 +14,7 @@ from __future__ import annotations
 import random
 
 from ..loader import DataRegistry
-from .cultivation import gain_exp
+from .cultivation import gain_exp, gain_grind_exp
 from .events import add_log
 from .state import GameState
 
@@ -136,6 +136,15 @@ class BattleEngine:
         if not b or b["over"]:
             return self.view()
         pc = player_combat(self.state, self.reg)
+        # A2 (keputusan §17): turn_order "speed" — yang lebih cepat bertindak dulu tiap ronde
+        speed_order = self.reg.config.get("battle", {}).get("turn_order") == "speed"
+        foe_speed = max((f.get("speed", 0) for f in b["foes"] if f["hp"] > 0), default=0)
+        foe_first = speed_order and foe_speed > pc["speed"]
+        if foe_first:
+            self._enemy_turn(pc, b)
+            if pc["hp"] <= 0:
+                self._regen_foes(b)
+                return self._ko(b)
         a = action.get("action")
         if a == "attack":
             self._attack(pc, b, b["foes"][0])
@@ -158,7 +167,7 @@ class BattleEngine:
         self._regen(pc, b)
         if not b["over"] and self._all_dead(b):
             return self._victory(b, pc)
-        if not b["over"]:
+        if not b["over"] and not foe_first:
             self._enemy_turn(pc, b)
         self._regen_foes(b)
         if not b["over"] and pc["hp"] <= 0:
@@ -297,9 +306,9 @@ class BattleEngine:
         b["won"] = True
         self.state.pending_battle = None
         killed = [f["id"] for f in b["foes"] if f.get("id")]
-        # exp
+        # exp — sumber grinding (spar/berburu) dibatasi cap harian (A2, keputusan §17)
         if b["context"] == "spar":
-            gain_exp(self.state, self.reg, self.reg.config["cultivation"]["spar_win_exp"])
+            gain_grind_exp(self.state, self.reg, self.reg.config["cultivation"]["spar_win_exp"])
             # P1-2: spar menang menaikkan hubungan dengan NPC lawan (data-driven)
             rel = int(self.reg.config.get("cultivation", {}).get("spar_win_relation", 0))
             if rel and b.get("spar_npc"):
@@ -308,7 +317,7 @@ class BattleEngine:
                 self.quest_engine.notify_spar_won(b["spar_npc"])
         else:
             total = sum(int(f.get("exp_reward", 0)) for f in b["foes"])
-            gain_exp(self.state, self.reg, total)
+            gain_grind_exp(self.state, self.reg, total)
         # drop
         for f in b["foes"]:
             di = f.get("drop_item")
