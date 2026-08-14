@@ -491,6 +491,12 @@ class Validator:
         for l in self.locations:  # aturan 14
             if not isinstance(l.get("is_safe"), bool):
                 self.error(f"lokasi {l['id']}: is_safe harus bool (aturan 14)")
+            # C4: ambience opsional — harus terdaftar di config.world.ambiences
+            amb = l.get("ambience")
+            if amb:
+                ambiences = (self.config.get("world") or {}).get("ambiences") or {}
+                if amb not in ambiences:
+                    self.error(f"lokasi {l['id']}: ambience '{amb}' tidak ada di config.world.ambiences (aturan 14)")
             for c in l.get("connections", []):
                 if not self.has("location", c):
                     self.error(f"lokasi {l['id']}: connections '{c}' tidak ditemukan (aturan 14)")

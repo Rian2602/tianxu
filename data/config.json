@@ -69,8 +69,16 @@
     }
   ],
   "world": {
-    "monster_respawn_hours": 5,
-    "safe_fallback_location": "loc_asrama",
+ "monster_respawn_hours": 5,
+ "safe_fallback_location": "loc_asrama",
+ "ambiences": {
+  "academy": "Akademi",
+  "forest": "Hutan",
+  "night": "Malam",
+  "market": "Pasar",
+  "hall": "Aula",
+  "library": "Perpustakaan"
+ },
     "hunt": {
       "location": "loc_wilayah_berburu",
       "pool": ["eno_serigala_qi", "eno_babi_hutan"],

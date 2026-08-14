@@ -1,31 +1,105 @@
 {
-  "locations": [
-    { "id": "loc_gerbang_akademi", "name": "Gerbang Akademi", "is_safe": false,
-      "description": "Gerbang batu besar Akademi Changfeng. Ukiran naga menaiki tiang — kota bergemuruh di belakangmu.",
-      "connections": ["loc_aula_ujian", "loc_pasar", "loc_wilayah_berburu"] },
-    { "id": "loc_aula_ujian", "name": "Aula Ujian", "is_safe": false,
-      "description": "Aula luas tempat calon murid diuji. Meja batu berjajar, dan di ujungnya Gu Canghai menanti.",
-      "connections": ["loc_gerbang_akademi", "loc_paviliun", "loc_asrama", "loc_arena"] },
-    { "id": "loc_paviliun", "name": "Lapangan Tiga Paviliun", "is_safe": false,
-      "description": "Tiga bangunan menghadap satu lapangan: 五行阁, 兵锋院, 御灵宗. Di sini calon murid memilih jalannya.",
-      "connections": ["loc_aula_ujian", "loc_perpustakaan"] },
-    { "id": "loc_perpustakaan", "name": "Perpustakaan", "is_safe": false,
-      "description": "Rak buku menjulang penuh gulungan kuno. Mo Yun biasanya berdiri diam di balik meja tinta.",
-      "connections": ["loc_paviliun", "loc_ruang_lonceng"] },
-    { "id": "loc_ruang_lonceng", "name": "Ruang Lonceng", "is_safe": false,
-      "description": "Ruang penyimpanan pusaka. Di tengahnya, tiang kosong tempat Lonceng Angin Panjang biasa berdiri.",
-      "connections": ["loc_perpustakaan"] },
-    { "id": "loc_asrama", "name": "Asrama Murid", "is_safe": true,
-      "description": "Kamar sederhana dengan tikar bambu. Titik aman: kau bisa beristirahat dan menyimpan kemajuan di sini.",
-      "connections": ["loc_aula_ujian", "loc_pasar", "loc_arena"] },
-    { "id": "loc_pasar", "name": "Pasar Changfeng", "is_safe": true,
-      "description": "Pasar ramai di kaki kota. Seorang pedagang berjaga di kios penuh pil dan herba.",
-      "connections": ["loc_gerbang_akademi", "loc_asrama"] },
-    { "id": "loc_arena", "name": "Arena Latihan", "is_safe": false,
-      "description": "Tanah lapang berdebu dengan pagar kayu. Tempat sparring para murid — Han Xiu sering berlatih di sini.",
-      "connections": ["loc_asrama", "loc_aula_ujian"] },
-    { "id": "loc_wilayah_berburu", "name": "Wilayah Berburu", "is_safe": false,
-      "description": "Hutan di luar kota. Suara serigala Qi bergema di antara pepohonan — sumber material dan pengalaman.",
-      "connections": ["loc_gerbang_akademi"] }
-  ]
+ "locations": [
+  {
+   "id": "loc_gerbang_akademi",
+   "name": "Gerbang Akademi",
+   "is_safe": false,
+   "description": "Gerbang batu besar Akademi Changfeng. Ukiran naga menaiki tiang — kota bergemuruh di belakangmu.",
+   "connections": [
+    "loc_aula_ujian",
+    "loc_pasar",
+    "loc_wilayah_berburu"
+   ],
+   "ambience": "academy"
+  },
+  {
+   "id": "loc_aula_ujian",
+   "name": "Aula Ujian",
+   "is_safe": false,
+   "description": "Aula luas tempat calon murid diuji. Meja batu berjajar, dan di ujungnya Gu Canghai menanti.",
+   "connections": [
+    "loc_gerbang_akademi",
+    "loc_paviliun",
+    "loc_asrama",
+    "loc_arena"
+   ],
+   "ambience": "hall"
+  },
+  {
+   "id": "loc_paviliun",
+   "name": "Lapangan Tiga Paviliun",
+   "is_safe": false,
+   "description": "Tiga bangunan menghadap satu lapangan: 五行阁, 兵锋院, 御灵宗. Di sini calon murid memilih jalannya.",
+   "connections": [
+    "loc_aula_ujian",
+    "loc_perpustakaan"
+   ],
+   "ambience": "academy"
+  },
+  {
+   "id": "loc_perpustakaan",
+   "name": "Perpustakaan",
+   "is_safe": false,
+   "description": "Rak buku menjulang penuh gulungan kuno. Mo Yun biasanya berdiri diam di balik meja tinta.",
+   "connections": [
+    "loc_paviliun",
+    "loc_ruang_lonceng"
+   ],
+   "ambience": "library"
+  },
+  {
+   "id": "loc_ruang_lonceng",
+   "name": "Ruang Lonceng",
+   "is_safe": false,
+   "description": "Ruang penyimpanan pusaka. Di tengahnya, tiang kosong tempat Lonceng Angin Panjang biasa berdiri.",
+   "connections": [
+    "loc_perpustakaan"
+   ],
+   "ambience": "night"
+  },
+  {
+   "id": "loc_asrama",
+   "name": "Asrama Murid",
+   "is_safe": true,
+   "description": "Kamar sederhana dengan tikar bambu. Titik aman: kau bisa beristirahat dan menyimpan kemajuan di sini.",
+   "connections": [
+    "loc_aula_ujian",
+    "loc_pasar",
+    "loc_arena"
+   ],
+   "ambience": "academy"
+  },
+  {
+   "id": "loc_pasar",
+   "name": "Pasar Changfeng",
+   "is_safe": true,
+   "description": "Pasar ramai di kaki kota. Seorang pedagang berjaga di kios penuh pil dan herba.",
+   "connections": [
+    "loc_gerbang_akademi",
+    "loc_asrama"
+   ],
+   "ambience": "market"
+  },
+  {
+   "id": "loc_arena",
+   "name": "Arena Latihan",
+   "is_safe": false,
+   "description": "Tanah lapang berdebu dengan pagar kayu. Tempat sparring para murid — Han Xiu sering berlatih di sini.",
+   "connections": [
+    "loc_asrama",
+    "loc_aula_ujian"
+   ],
+   "ambience": "hall"
+  },
+  {
+   "id": "loc_wilayah_berburu",
+   "name": "Wilayah Berburu",
+   "is_safe": false,
+   "description": "Hutan di luar kota. Suara serigala Qi bergema di antara pepohonan — sumber material dan pengalaman.",
+   "connections": [
+    "loc_gerbang_akademi"
+   ],
+   "ambience": "forest"
+  }
+ ]
 }

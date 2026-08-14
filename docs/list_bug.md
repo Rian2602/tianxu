@@ -89,7 +89,22 @@ Test baru batch ini: `test_eval_condition_relation`, `test_pilihan_gated_relatio
 
 Test baru batch ini: `test_apply_technique_single_dan_list`, `test_upgrade_technique_hanya_di_titik_aman_dan_batas_slots`, `test_teknik_power_scaling_per_level`, `test_aturan13_efek_technique_tidak_dikenal`, `test_aturan7_teknik_upgrade_config_tidak_valid`, `test_view_month_derived_dari_day`, `test_eval_condition_month_min_max`, `test_aturan7_month_length_dan_month_names_tidak_valid`, `test_aturan7_kondisi_month_dialog_tidak_valid`, `test_arc_summary_ending_data_driven`, `test_aturan7_ending_arc_tidak_valid`, `test_eval_condition_flag_tidak_mengabaikan_kondisi_lain`.
 
-**Defer resmi tersisa**: tidak ada (B3/#13 tertutup oleh P1-1).
+**Batch 6 (2026-08-14, plan `docs/superpowers/plans/2026-08-14-fix-temuan-audit-chatgpt.md`) — fix temuan audit ChatGPT, 266 test total:**
+
+| ID | Status | Ringkasan fix |
+|----|--------|---------------|
+| A1 | ✅ | **CRITICAL — hang EXP ranah tertinggi**: `_breakthrough` gagal di ranah puncak mengembalikan level ke maks → `while exp >= exp_next` berulang (exp 1e9 ≈ 19 juta iterasi, hang praktis ratusan detik). Kini `_breakthrough`/`_level_up` mengembalikan `bool`; saat puncak exp dikembalikan & di-cap di bawah threshold + log "exp tertahan". Reproduksi exp 1e9: hang → **0.00s**. `cultivation.py` |
+| A2+A3 | ✅ | **HIGH — objective talk longgar → 3aa salah urutan**: quest `talk` hanya cek `npc`, tak peduli node — konfrontasi 3aa muncul SETELAH quest selesai. Kini skema `talk` opsional `node`/`nodes` (node WAJIB dimainkan — cek keanggotaan semua node yang dikunjungi, bukan node terakhir) + `start_node` (dialog dipaksa mulai dari node itu saat quest aktif); `dialog.start(forced_node)` + `visited` set; validator aturan 4 cek node ada di dialog default NPC; data 3aa: konfrontasi terjadi SAAT quest berjalan. Test lama yang mengunci bug sebagai expected ditulis ulang. `quest.py`, `dialog.py`, `session.py`, `validate_data.py`, `quests_akademi.json` |
+| A5 | ✅ | **advance_time overshoot**: cek lama `elapsed >= required AND hour >= target` — tunggu 30 jam dari Hari 1 19:00 (Hari 3 01:00) gagal `hour >= 20` → quest molor. Kini bandingkan waktu absolut `day*24+hour >= target_abs` — overshoot memenuhi. `quest.py` |
+| A6 | ✅ | **skill_pool hanya elemen pertama**: `a.get("skill_pool", [""])[0]` — pool kedua tak pernah dibaca. Kini semua prefix diproses + dedup. `loader.py` |
+| A7 | ✅ | **main quest defeat tanpa filter**: hanya cek `kind == "defeat"`. Kini ikut pola side quest — `enemies` didefinisikan → hanya musuh dari daftar yang memenuhi; tanpa field perilaku lama. `quest.py` |
+| A8 | ✅ | **fallback hardcode hunt**: 5 literal id konten arc-1 (`loc_wilayah_berburu`, `eno_serigala_qi`, `eno_babi_hutan`, `eno_raja_serigala`, `material_herba`). Kini semua dari `config.world.hunt`; tanpa field itu aksi menolak dengan log aman. `session.py` |
+| B1-B9 | ✅ | **polish web** (dalam batas GDD §12.5 — tanpa animasi/audio): hierarchy visual + semantic color (B1/B2), ranah hero stat + progress exp statis (B3), log speaker + separator scene (B4), dialog story card (B5), mobile naratif + drawer quest/inventori (B6), ornamen title SVG inline (B7), `:focus-visible` + focus trap modal + Escape (B8), feedback loading `is-loading` (B9). Tekstur aset pengguna (paper-dark, silk-dark, ink-wash, cloud-mist, gold-noise) dipakai halus via overlay gelap. `style.css`, `app.js`, `index.html` |
+| C4 | ✅ | **ambience lokasi data-driven**: field opsional `ambience` per lokasi ∈ enum `config.world.ambiences` → gradient/tekstur latar statis web (body class `ambience-<x>`); `view().location.ambience`; validator aturan 14 tolak enum tak dikenal. `locations.json`, `config.json`, `session.py`, `validate_data.py`, `style.css`, `app.js` |
+
+Test baru batch ini: `test_ranah_tertinggi_exp_dicap_tidak_hang`, `test_ranah_tertinggi_exp_raksasa_selesai_cepat`, `test_dialog_start_node_dipaksa`, `test_quest_talk_node_wajib`, `test_quest_talk_tanpa_node_perilaku_lama`, `test_3aa_konfrontasi_saat_quest_aktif`, `test_aturan4_talk_node_wajib_harus_ada_di_dialog`, `test_advance_time_overshoot_selesai`, `test_advance_time_dalam_window_masih_selesai`, `test_player_techniques_skill_pool_banyak_elemen`, `test_main_defeat_filter_enemies`, `test_main_defeat_tanpa_enemies_perilaku_lama`, `test_hunt_tanpa_config_ditolak_aman`, `test_aturan14_ambience_harus_enum_terdaftar`, `test_view_location_ambience`.
+
+**Defer resmi tersisa**: tidak ada (B3/#13 tertutup oleh P1-1). C1-C3 plan (font self-host & texture eksternal) didefer ke plan terpisah — butuh keputusan aset.
 
 ## A. Bug terverifikasi — kode
 

@@ -487,14 +487,15 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
 ```json
 {
   "locations": [
-    { "id": "loc_gerbang_akademi", "name": "Gerbang Akademi", "is_safe": false, "connections": ["loc_aula_ujian"] },
-    { "id": "loc_asrama", "name": "Asrama Murid", "is_safe": true, "connections": ["loc_aula_ujian"] }
+    { "id": "loc_gerbang_akademi", "name": "Gerbang Akademi", "is_safe": false, "ambience": "academy", "connections": ["loc_aula_ujian"] },
+    { "id": "loc_asrama", "name": "Asrama Murid", "is_safe": true, "ambience": "academy", "connections": ["loc_aula_ujian"] }
   ]
 }
 ```
 
 - `is_safe: true` = **titik aman**: tempat respawn saat KO, tempat **simpan game** (disahkan), & tempat aksi `rest`.
 - `connections` = peta pergerakan pemain (pindah lokasi lewat aksi `move`).
+- `ambience` (opsional, C4 2026-08-14) = tipe atmosfer lokasi dari `config.world.ambiences` (mis. `academy`/`forest`/`night`/`market`/`hall`/`library`) — dipakai web untuk gradient/tekstur latar statis; validator aturan 14 memastikan nilai ∈ enum config. `view().location.ambience` meneruskannya ke frontend (non-breaking: field opsional).
 
 ### 5.9 Kompanion (companions.json) — jalur Summoning
 

@@ -1,4 +1,13 @@
-/* ═══ Tema Xianxia gelap + emas (keputusan visual terkunci) ═══ */
+/* ═══ Tian Xu: Second Life — Tema Xianxia gelap + emas (keputusan visual terkunci) ═══
+   Fase polish (2026-08-14, plan fix-temuan-audit-chatgpt):
+   - Semantic color (B2): gold = kultivasi/utama · blue = pemain/roh/pengetahuan ·
+     red = bahaya/musuh · green = sukses/healing · cream = narasi · gray = sekunder
+   - Hierarchy visual (B1): kolom tengah (story) paling menonjol; panel samping redup
+   - Tekstur dari assets/textures/ (paper-dark, silk-dark, ink-wash, cloud-mist,
+     gold-noise) — dipakai halus via overlay gelap (tetap dalam batas GDD §12.5:
+     tanpa animasi, tanpa grafis penuh)
+   - Aksesibilitas keyboard (B8): :focus-visible outline emas konsisten
+   - Loading feedback (B9): .is-loading tanpa animasi (GDD §12.5) */
 
 :root {
   --bg: #14141c;
@@ -13,19 +22,46 @@
   --green: #8fbf8f;
   --border: #3a3540;
   --serif: Georgia, "Times New Roman", serif;
+  /* hierarchy — warna per peran (B2) */
+  --c-cultivation: var(--gold);   /* ranah, teknik, judul, tombol utama */
+  --c-player: var(--blue);        /* pemain, roh, pengetahuan, ingatan */
+  --c-danger: var(--red);         /* musuh, bahaya, HP kritis */
+  --c-success: var(--green);      /* sukses, healing, reward */
+  --c-narrative: var(--cream);    /* narasi cerita */
+  --c-secondary: var(--gray);     /* info sekunder */
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    linear-gradient(rgba(20, 20, 28, 0.93), rgba(20, 20, 28, 0.93)),
+    url("/static/assets/textures/paper-dark.png");
+  background-size: cover, cover;
+  background-attachment: fixed, fixed;
   color: var(--cream);
   font-family: var(--serif);
   min-height: 100vh;
 }
 
 .hidden { display: none !important; }
+
+/* ═══ Aksesibilitas keyboard (B8) — fokus terlihat konsisten ═══ */
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ═══ Feedback loading (B9) — tanpa animasi (GDD §12.5) ═══ */
+
+.is-loading {
+  opacity: 0.55;
+  pointer-events: none;
+}
 
 /* ═══ Layar judul ═══ */
 
@@ -35,10 +71,28 @@ body {
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(ellipse at 50% 20%, #2a2440 0%, var(--bg) 70%);
+    radial-gradient(ellipse at 50% 20%, #2a2440 0%, var(--bg) 70%),
+    linear-gradient(rgba(20, 20, 28, 0.88), rgba(20, 20, 28, 0.88)),
+    url("/static/assets/textures/ink-wash.png");
+  background-size: auto, cover, cover;
 }
 
-.title-box { text-align: center; padding: 40px; }
+.title-box {
+  text-align: center;
+  padding: 40px;
+  position: relative;
+}
+
+/* Ornamen xianxia (B7) — SVG inline, tanpa gambar eksternal */
+.title-ornament {
+  display: block;
+  margin: 0 auto;
+  color: var(--gold);
+  opacity: 0.85;
+  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.35));
+}
+.title-ornament.top { margin-bottom: 18px; }
+.title-ornament.bottom { margin-top: 22px; transform: scaleY(-1); }
 
 .game-title {
   font-size: 72px;
@@ -111,7 +165,10 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 18px;
-  background: var(--bg-panel);
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.96), rgba(27, 27, 38, 0.96)),
+    url("/static/assets/textures/silk-dark.png");
+  background-size: cover;
   border-bottom: 1px solid var(--gold-dim);
 }
 
@@ -121,6 +178,7 @@ body {
   font-size: 15px;
 }
 
+/* Layout — kolom tengah (story) paling menonjol (B1) */
 #layout {
   display: grid;
   grid-template-columns: 260px 1fr 300px;
@@ -135,13 +193,26 @@ body {
   font-size: 14px;
 }
 
-#col-left { border-right: 1px solid var(--border); }
-#col-right { border-left: 1px solid var(--border); }
+#col-left {
+  border-right: 1px solid var(--border);
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.97), rgba(27, 27, 38, 0.97)),
+    url("/static/assets/textures/silk-dark.png");
+  background-size: cover;
+}
+
+#col-right {
+  border-left: 1px solid var(--border);
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.97), rgba(27, 27, 38, 0.97)),
+    url("/static/assets/textures/silk-dark.png");
+  background-size: cover;
+}
 
 /* panel kiri — statistik */
 
 .stat-title {
-  color: var(--gold);
+  color: var(--c-cultivation);
   border-bottom: 1px solid var(--border);
   padding-bottom: 4px;
   margin: 0 0 10px;
@@ -161,8 +232,107 @@ body {
 .stat-value.gold { color: var(--gold); }
 .stat-value.red { color: var(--red); }
 .stat-value.blue { color: var(--blue); }
+.stat-value.green { color: var(--green); }
+
+/* B3 — Ranah sebagai hero stat: nama besar + progress exp statis */
+.realm-hero {
+  text-align: center;
+  padding: 10px 6px 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.realm-hero .realm-name {
+  color: var(--gold);
+  font-size: 22px;
+  letter-spacing: 2px;
+  display: block;
+}
+
+.realm-hero .realm-level {
+  color: var(--gray);
+  font-size: 13px;
+  letter-spacing: 3px;
+  display: block;
+  margin-top: 2px;
+}
+
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 3px;
+}
+
+.progress-caption {
+  color: var(--gray);
+  font-size: 11px;
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
 
 /* kolom tengah — log & interaksi */
+
+/* C4: ambience lokasi — atmosfer statis (gradient + tekstur) dari data, tanpa gambar */
+#col-center {
+  background:
+    linear-gradient(rgba(20, 20, 28, 0.90), rgba(20, 20, 28, 0.90)),
+    url("/static/assets/textures/cloud-mist.png");
+  background-size: cover;
+  border-right: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+body.ambience-academy #col-center {
+  background:
+    linear-gradient(rgba(26, 24, 34, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/silk-dark.png");
+  background-size: cover;
+}
+
+body.ambience-forest #col-center {
+  background:
+    linear-gradient(rgba(20, 28, 26, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/ink-wash.png");
+  background-size: cover;
+}
+
+body.ambience-night #col-center {
+  background:
+    linear-gradient(rgba(14, 14, 24, 0.94), rgba(20, 20, 28, 0.94)),
+    url("/static/assets/textures/cloud-mist.png");
+  background-size: cover;
+}
+
+body.ambience-market #col-center {
+  background:
+    linear-gradient(rgba(28, 24, 20, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/paper-dark.png");
+  background-size: cover;
+}
+
+body.ambience-hall #col-center {
+  background:
+    linear-gradient(rgba(24, 22, 30, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/gold-noise.png");
+  background-size: cover;
+}
+
+body.ambience-library #col-center {
+  background:
+    linear-gradient(rgba(22, 24, 30, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/paper-dark.png");
+  background-size: cover;
+}
 
 #log {
   max-height: 52vh;
@@ -173,25 +343,50 @@ body {
 }
 
 .log-entry { margin-bottom: 6px; white-space: pre-wrap; }
-.log-narration { color: var(--cream); }
+.log-narration { color: var(--c-narrative); }
 .log-npc { color: var(--gray); }
-.log-player { color: var(--blue); }
-.log-battle { color: var(--red); }
-.log-system { color: var(--gold); }
+.log-player { color: var(--c-player); }
+.log-battle { color: var(--c-danger); }
+.log-system { color: var(--c-cultivation); font-size: 13px; }
+
+/* B4 — perlakuan speaker & separator antar-scene (berbasis waktu game) */
+.log-scene {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dotted rgba(212, 175, 55, 0.35);
+}
+.log-scene-first { margin-top: 0; padding-top: 0; border-top: none; }
+
+.log-entry.speaker-line .log-speaker-label {
+  color: var(--gold);
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.log-entry.log-npc.speaker-line { color: var(--cream); }
+.log-entry.log-player.speaker-line { color: var(--c-player); }
 
 #interact { margin-top: 18px; }
 
+/* B5 — dialog sebagai "story card": accent emas kiri, beda dari panel statistik */
 .interact-box {
   border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
   border-radius: 6px;
-  padding: 14px 16px;
-  background: var(--bg-panel);
+  padding: 16px 18px;
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.94), rgba(27, 27, 38, 0.94)),
+    url("/static/assets/textures/gold-noise.png");
+  background-size: cover;
 }
 
 .dialog-speaker {
   color: var(--gold);
   font-weight: bold;
   margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 13px;
 }
 
 .dialog-text { font-size: 16px; line-height: 1.55; margin-bottom: 12px; white-space: pre-wrap; }
@@ -228,12 +423,12 @@ select, input[type="text"], input[type="number"] {
 }
 
 .battle-foe { margin: 4px 0; }
-.battle-foe .foe-name { color: var(--red); font-weight: bold; }
+.battle-foe .foe-name { color: var(--c-danger); font-weight: bold; }
 .battle-hp { color: var(--cream); }
 
 .hint { color: var(--gray); font-style: italic; font-size: 13px; }
 
-/* panel kanan — quest & inventori */
+/* panel kanan — quest & inventori (B1: hierarchy lebih redup dari story) */
 
 .section { margin-bottom: 18px; }
 
@@ -251,7 +446,7 @@ select, input[type="text"], input[type="number"] {
 .item-name { color: var(--cream); }
 .item-count { color: var(--gray); }
 
-.mem-row { padding: 2px 0; font-size: 13px; color: var(--blue); cursor: pointer; }
+.mem-row { padding: 2px 0; font-size: 13px; color: var(--c-player); cursor: pointer; }
 .mem-row:hover { color: var(--gold); }
 
 /* ═══ Panel Tianyuan Ling ═══ */
@@ -263,7 +458,10 @@ select, input[type="text"], input[type="number"] {
   width: 420px;
   max-width: 90vw;
   height: 100vh;
-  background: var(--bg-panel);
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.98), rgba(27, 27, 38, 0.98)),
+    url("/static/assets/textures/silk-dark.png");
+  background-size: cover;
   border-left: 1px solid var(--gold-dim);
   padding: 18px;
   overflow-y: auto;
@@ -292,7 +490,11 @@ select, input[type="text"], input[type="number"] {
 
 .modal {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  background: var(--bg-panel); border: 1px solid var(--gold);
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.98), rgba(27, 27, 38, 0.98)),
+    url("/static/assets/textures/paper-dark.png");
+  background-size: cover;
+  border: 1px solid var(--gold);
   border-radius: 6px; padding: 20px; z-index: 100;
   max-width: 90vw; width: 500px; max-height: 90vh; overflow-y: auto;
   box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
@@ -320,9 +522,36 @@ select, input[type="text"], input[type="number"] {
   border-radius: 4px;
 }
 
-/* responsif dasar — desktop dulu (GDD §12.5): tumpuk kolom di bawah 1024px */
+/* ═══ B6 — mobile naratif: story → choices → quest; panel kanan jadi drawer ═══ */
+
+#btn-toggle-right { display: none; }
+
 @media (max-width: 1023px) {
   #layout { grid-template-columns: 1fr; }
   .col { overflow-y: visible; }
   #log { max-height: none; }
+
+  #btn-toggle-right {
+    display: inline-block;
+  }
+
+  /* panel kanan disembunyikan di mobile, dibuka via tombol (drawer tanpa animasi) */
+  #col-right {
+    position: fixed;
+    top: 0; right: 0;
+    width: min(340px, 90vw);
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 60;
+    border-left: 1px solid var(--gold-dim);
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.5);
+    display: none;
+  }
+  #col-right.drawer-open { display: block; }
+
+  /* overlay gelap untuk drawer */
+  #drawer-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.55); z-index: 55;
+  }
 }

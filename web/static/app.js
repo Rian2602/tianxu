@@ -4,14 +4,32 @@
 
 let currentSave = "save1";
 
+// B8: focus trap sederhana untuk modal — simpan fokus sebelum buka, restore saat tutup
+let lastFocus = null;
+
 function showModal(id) {
   $(id).classList.remove("hidden");
   $("modal-overlay").classList.remove("hidden");
+  lastFocus = document.activeElement;
+  const first = $(id).querySelector("button, a, input, select");
+  if (first) first.focus();
 }
 function closeModal(id) {
   $(id).classList.add("hidden");
   $("modal-overlay").classList.add("hidden");
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
 }
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  ["modal-shop", "modal-arc-summary"].forEach((id) => {
+    if (!$("modal-overlay").classList.contains("hidden") && !$(id).classList.contains("hidden")) {
+      closeModal(id);
+    }
+  });
+  closeTianyuan();
+  closeRightDrawer();
+});
 
 const $ = (id) => document.getElementById(id);
 
@@ -81,6 +99,10 @@ async function loadGame(name) {
 
 function render() {
   if (!view) return;
+  // C4: ambience lokasi saat ini → class di body untuk atmosfer visual
+  document.body.className = document.body.className
+    .split(" ").filter((c) => !c.startsWith("ambience-")).join(" ")
+    + (view.location && view.location.ambience ? ` ambience-${esc(view.location.ambience)}` : "");
   renderHeader(view);
   renderLeft(view);
   renderRight(view);
@@ -104,6 +126,7 @@ function statRow(label, value, cls) {
          `<span class="stat-value ${cls || ""}">${esc(value)}</span></div>`;
 }
 
+// B3: Ranah = hero stat dengan progress exp statis (bukan cuma 1 row kecil)
 function renderLeft(v) {
   const p = v.player;
   const names = (ctx && ctx.item_names) || {};
@@ -111,10 +134,15 @@ function renderLeft(v) {
   const w = wid ? (names[wid] || wid) : "—";
   const comp = v.companion;
   let html = `<h3 class="stat-title">✦ ${esc(p.name)}</h3>`;
-  html += statRow("Ranah", `${p.realm} Lv.${p.realm_level}`);
+  const pct = p.exp_next > 0 ? Math.min(100, Math.round((p.exp / p.exp_next) * 100)) : 0;
+  html += `<div class="realm-hero">`;
+  html += `<span class="realm-name">${esc(p.realm)}</span>`;
+  html += `<span class="realm-level">Lv.${p.realm_level}</span>`;
+  html += `<div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+  html += `<div class="progress-caption">${p.exp}/${p.exp_next} EXP</div>`;
+  html += `</div>`;
   html += statRow("HP", `${p.hp}/${p.hp_max}`, p.hp < p.hp_max ? "red" : "");
   html += statRow("Qi", `${p.qi}/${p.qi_max}`, "blue");
-  html += statRow("Exp", `${p.exp}/${p.exp_next}`);
   html += statRow("Koin Emas", p.gold, "gold");
   html += statRow("Moral", p.morality);
   html += statRow("Akar", p.roots);
@@ -173,9 +201,26 @@ function renderRight(v) {
 
 // ---------- kolom tengah ----------
 
+// B4: log dengan perlakuan speaker & separator antar-scene (berbasis waktu game)
+function renderLog(v) {
+  let html = "";
+  let prev = null;
+  v.log.forEach((e) => {
+    const scene = prev && (e.day !== prev.day || e.hour !== prev.hour);
+    const cls = `log-entry log-${esc(e.type)}${scene ? " log-scene" : ""}${scene === false && html === "" ? " log-scene-first" : ""}`;
+    // deteksi baris percakapan: teks dengan format "Pembicara: ..." dari dialog
+    const m = /^([^:\n]{2,24}):\s?/.exec(e.text);
+    const speaker = m && e.type !== "narration"
+      ? `<span class="log-speaker-label">${esc(m[1])}</span>: ${esc(e.text.slice(m[0].length))}`
+      : esc(e.text);
+    html += `<div class="${cls}${m && e.type !== "narration" ? " speaker-line" : ""}">${speaker}</div>`;
+    prev = e;
+  });
+  $("log").innerHTML = html;
+}
+
 function renderCenter(v, c) {
-  $("log").innerHTML = v.log.map((e) =>
-    `<div class="log-entry log-${esc(e.type)}">${esc(e.text)}</div>`).join("");
+  renderLog(v);
 
   const box = $("interact");
   if (v.mode === "dialog") renderDialog(v, box);
@@ -184,15 +229,23 @@ function renderCenter(v, c) {
   else renderExplore(v, c, box);
 }
 
+// B9: indikator loading — tombol sumber dinonaktifkan + label "Memproses…" (tanpa animasi)
+function setLoading(on) {
+  const btns = document.querySelectorAll("button, .choice-btn");
+  btns.forEach((b) => { b.disabled = on; });
+  document.body.classList.toggle("is-loading", on);
+}
+
 async function act(action) {
   if (busy) return;
   busy = true;
+  setLoading(true);
   closeTianyuan();
   try {
     const data = await api("/api/action", { body: { action } });
     if (data.ok) { view = data.view; ctx = data.context; render(); }
     else { window.alert(data.error || "Aksi ditolak."); }
-  } finally { busy = false; }
+  } finally { busy = false; setLoading(false); }
 }
 
 // ---------- explore ----------
@@ -445,11 +498,12 @@ function renderShop() {
 async function actShop(type, itemId) {
   if (busy) return;
   busy = true;
+  setLoading(true);
   try {
     const data = await api("/api/action", { body: { action: { type: type, item: itemId, count: 1 } } });
     if (data.ok) { view = data.view; ctx = data.context; render(); renderShop(); }
     else { window.alert(data.error || "Aksi ditolak."); }
-  } finally { busy = false; }
+  } finally { busy = false; setLoading(false); }
 }
 
 function openArcSummaryModal(s) {
@@ -479,6 +533,32 @@ function dismissArcSummary() {
   localStorage.setItem("arc-seen:" + currentSave, "1");
   closeModal("modal-arc-summary");
   render();
+}
+
+// ---------- B6: drawer mobile untuk panel kanan (quest/inventori/ingatan) ----------
+
+function toggleRightDrawer() {
+  const el = $("col-right");
+  const open = el.classList.toggle("drawer-open");
+  let ov = $("drawer-overlay");
+  if (open) {
+    if (!ov) {
+      ov = document.createElement("div");
+      ov.id = "drawer-overlay";
+      ov.addEventListener("click", closeRightDrawer);
+      document.body.appendChild(ov);
+    }
+    ov.classList.remove("hidden");
+  } else {
+    closeRightDrawer();
+  }
+}
+
+function closeRightDrawer() {
+  const el = $("col-right");
+  if (el) el.classList.remove("drawer-open");
+  const ov = $("drawer-overlay");
+  if (ov) ov.classList.add("hidden");
 }
 
 // ---------- panel Tianyuan Ling ----------

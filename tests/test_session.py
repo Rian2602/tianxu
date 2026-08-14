@@ -695,6 +695,13 @@ def test_upgrade_technique_hanya_di_titik_aman_dan_batas_slots(session):
     assert any("belum menguasai" in e["text"] for e in s.log[-1:])
 
 
+def test_view_location_ambience(session):
+    """C4: view location membawa `ambience` dari data lokasi (opsional, default academy)."""
+    v = session.view()
+    loc = session.reg.location(session.state.location)
+    assert v["location"]["ambience"] == loc.get("ambience", "academy")
+
+
 def test_view_month_derived_dari_day(session):
     """C2: view().month & month_name dihitung dari day (derived, kompatibel save lama)."""
     s = session.state

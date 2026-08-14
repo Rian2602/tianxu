@@ -51,6 +51,24 @@ def test_data_baik_lolos():
     assert ok, v.errors
 
 
+def test_aturan14_ambience_harus_enum_terdaftar():
+    """C4: field `ambience` lokasi (opsional) harus ∈ enum `world.ambiences`."""
+    good = _good()
+    good["config.json"]["world"] = {"ambiences": {"academy": "Kampus", "forest": "Hutan"}}
+    good["locations.json"] = {"locations": [
+        {"id": "l1", "name": "L1", "is_safe": True, "connections": [], "ambience": "academy"},
+    ]}
+    v, ok = make(good)
+    assert ok, v.errors
+    # ambience tak dikenal → ditolak
+    good["locations.json"] = {"locations": [
+        {"id": "l1", "name": "L1", "is_safe": True, "connections": [], "ambience": "gunung_salju"},
+    ]}
+    v, ok = make(good)
+    assert not ok
+    assert any("ambience" in e for e in v.errors)
+
+
 def test_aturan4_talk_node_wajib_harus_ada_di_dialog():
     """A3: objective talk `node`/`start_node`/`nodes` harus ada di dialog default NPC."""
     good = _good()

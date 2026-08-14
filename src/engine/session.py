@@ -620,6 +620,8 @@ class GameSession:
             "location": {
                 "id": loc["id"], "name": loc["name"], "description": loc["description"],
                 "is_safe": loc.get("is_safe", False), "connections": loc.get("connections", []),
+                # C4: ambience lokasi (data-driven, opsional) → atmosfer visual web
+                "ambience": loc.get("ambience", "academy"),
             },
             "day": s.day,
             "hour": s.hour,
