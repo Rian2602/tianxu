@@ -51,8 +51,44 @@ def _context() -> dict:
         (a["name"] for a in registry.config.get("academies", []) if a["id"] == session.state.player.academy),
         session.state.player.academy,
     )
+    merchant_shop = None
+    for n in registry.npcs:
+        if n.get("shop") and n.get("location") == loc:
+            merchant_shop = {
+                "merchant_id": n["id"],
+                "merchant_name": n["name"],
+                "buy": [
+                    {"item": s["item"], "name": registry.item(s["item"])["name"],
+                     "price": s["price"], "type": registry.item(s["item"]).get("type", "")}
+                    for s in n["shop"].get("buy", [])
+                ],
+                "sell": [
+                    {"item": s["item"], "name": registry.item(s["item"])["name"],
+                     "price": s["price"], "type": registry.item(s["item"]).get("type", "")}
+                    for s in n["shop"].get("sell", [])
+                ],
+            }
+            break
+
+    recipes = [
+        {
+            "id": r["id"],
+            "result": r["result"],
+            "result_name": registry.item(r["result"])["name"],
+            "count": r.get("count", 1),
+            "ingredients": [
+                {"item": ing["item"], "name": registry.item(ing["item"])["name"], "count": ing["count"]}
+                for ing in r.get("ingredients", [])
+            ],
+            "description": r.get("description", ""),
+        }
+        for r in registry.recipes
+    ]
+
     return {
         "npcs": npcs,
+        "merchant_shop": merchant_shop,
+        "recipes": recipes,
         "npc_names": {n["id"]: n["name"] for n in registry.npcs},
         "techniques": [
             {"id": t["id"], "name": t["name"], "qi_cost": int(t.get("qi_cost", 0)),
@@ -71,13 +107,52 @@ def _payload() -> dict:
 
 def _tianyuan_payload() -> dict:
     """Panel Tianyuan Ling: ingatan terbuka (dengan teks) + log sistem."""
+    if not session:
+        return {
+            "mission": {"main": None, "side_quests": []},
+            "memories": [],
+            "unlocked_count": 0,
+            "total_count": 4,
+            "system_log": [],
+        }
+
+    q = session.quest.current_main()
+    mission = {
+        "main": {
+            "id": q["id"],
+            "title": q["title"],
+            "objective": session.quest.objective_text(q),
+        } if q else None,
+        "side_quests": [
+            {
+                "id": sq["id"],
+                "title": registry.quest(sq)["title"],
+                "objective": session.quest.objective_text(registry.quest(sq)),
+            }
+            for sq in session.state.active_side_quests
+        ],
+    }
+
     memories = []
-    for mid in session.state.memories if session else []:
-        m = registry.memory(mid)
-        if m:
-            memories.append({"id": m["id"], "title": m["title"], "text": m.get("text", "")})
-    system_log = [e["text"] for e in (session.state.log if session else []) if e["type"] == "system"]
-    return {"memories": memories, "system_log": system_log}
+    for mem in registry.memories:
+        mid = mem["id"]
+        unlocked = mid in session.state.memories
+        memories.append({
+            "id": mid,
+            "title": mem["title"] if unlocked else "???",
+            "text": mem.get("text", "") if unlocked else None,
+            "unlocked": unlocked,
+        })
+
+    system_log = [e["text"] for e in session.state.log if e["type"] == "system"]
+
+    return {
+        "mission": mission,
+        "memories": memories,
+        "unlocked_count": len(session.state.memories),
+        "total_count": len(registry.memories),
+        "system_log": system_log[-30:],
+    }
 
 
 class Handler(BaseHTTPRequestHandler):

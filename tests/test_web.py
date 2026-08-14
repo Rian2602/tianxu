@@ -99,8 +99,15 @@ def test_tianyuan_panel(base_url: str) -> None:
     assert status == 200
     data = json.loads(body)
     assert data["ok"] is True
-    # di awal belum ada ingatan terbuka
-    assert data["tianyuan"]["memories"] == []
+    # di awal semua ingatan terkunci
+    memories = data["tianyuan"]["memories"]
+    assert len(memories) > 0
+    assert all(m["unlocked"] is False for m in memories)
+    assert all(m["title"] == "???" for m in memories)
+    assert all(m["text"] is None for m in memories)
+    assert data["tianyuan"]["unlocked_count"] == 0
+    assert data["tianyuan"]["total_count"] == len(memories)
+    assert data["tianyuan"]["mission"]["main"]["id"] == "q_akademi_01"
 
 
 def test_aksi_tanpa_sesi_ditolak() -> None:
