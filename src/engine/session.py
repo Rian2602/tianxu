@@ -106,6 +106,13 @@ class GameSession:
             res = self.view()
             res["error"] = msg
             return res
+        # dialog aktif: hanya pilihan dialog yang sah (asimetri dengan guard battle di atas)
+        if self.state.pending_dialog and t != "dialog_choice":
+            msg = "Selesaikan dialog dulu."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
         handler = {
             "talk": self._talk,
             "dialog_choice": self._dialog_choice,
@@ -146,13 +153,19 @@ class GameSession:
             self.dialog.start(self.state.branch_pending)
 
     def _is_npc_available(self, npc: dict) -> bool:
+        """Jadwal NPC — pola sama dengan quest._in_window (A1): dukung lintas tengah
+        malam (19 → 6) dan batas hour_end eksklusif (start <= h < end)."""
         schedules = npc.get("schedule", [])
         if not schedules:
             return True
         for s in schedules:
             h_start = s.get("hour_start", 0)
             h_end = s.get("hour_end", 24)
-            if h_start <= self.state.hour <= h_end:
+            h = self.state.hour
+            if h_start <= h_end:
+                if h_start <= h < h_end:
+                    return True
+            elif h >= h_start or h < h_end:  # lintas tengah malam
                 return True
         return False
 
@@ -224,7 +237,6 @@ class GameSession:
     def _advance_time(self, action: dict) -> dict:
         hours = max(1, int(action.get("hours", 1)))
         self._pass_time(hours)
-        self.quest.advance_time_target_met()
         return self.view()
 
     def _pass_time(self, hours: int) -> None:
@@ -233,6 +245,8 @@ class GameSession:
             self.state.hour -= 24
             self.state.day += 1
             self.state.grounding_hours_today = 0  # hari baru
+        self.quest.notify_move()
+        self.quest.advance_time_target_met()
 
     def _choose(self, action: dict) -> dict:
         self.quest.resolve_choose(action.get("option", ""))
@@ -310,16 +324,24 @@ class GameSession:
             return self.view()
         foe = dict(npc["combat"], name=npc["name"], id=npc["id"])
         self.battle.start([foe], "spar")
-        self.state.pending_battle["spar_npc"] = nid
+        self.state.pending_battle["spar_npc"] = npc["id"]
         return self.view()
 
     def _hunt(self, action: dict) -> dict:
-        if self.state.location != "loc_wilayah_berburu":
-            add_log(self.state, "system", "Berburu hanya bisa dilakukan di Wilayah Berburu.")
+        # A2: pool musuh & lokasi dari config (data-driven, fallback ke nilai lama)
+        hunt = self.reg.config.get("world", {}).get("hunt", {})
+        hunt_loc = hunt.get("location", "loc_wilayah_berburu")
+        if self.state.location != hunt_loc:
+            loc = self.reg.location(hunt_loc)
+            nama = loc.get("name", "Wilayah Berburu") if loc else "Wilayah Berburu"
+            add_log(self.state, "system", f"Berburu hanya bisa dilakukan di {nama}.")
             return self.view()
-        pool = ["eno_serigala_qi", "eno_babi_hutan"]
-        if random.random() < 0.1:  # mini-boss jarang
-            pool = ["eno_raja_serigala"]
+        pool = list(hunt.get("pool", ["eno_serigala_qi", "eno_babi_hutan"]))
+        if not pool:
+            add_log(self.state, "system", "Tidak ada mangsa di sini.")
+            return self.view()
+        if random.random() < float(hunt.get("mini_boss_chance", 0.1)):  # mini-boss jarang
+            pool = [hunt.get("mini_boss") or "eno_raja_serigala"]
         eid = random.choice(pool)
         foe = self.reg.enemy(eid)
         if not foe:
@@ -338,12 +360,20 @@ class GameSession:
         return self.view()
 
     def _search(self, action: dict) -> dict:
-        if self.state.location != "loc_wilayah_berburu":
-            add_log(self.state, "system", "Mencari herba hanya bisa dilakukan di Wilayah Berburu.")
+        # A2: item & lokasi dari config (data-driven)
+        hunt = self.reg.config.get("world", {}).get("hunt", {})
+        hunt_loc = hunt.get("location", "loc_wilayah_berburu")
+        if self.state.location != hunt_loc:
+            loc = self.reg.location(hunt_loc)
+            nama = loc.get("name", "Wilayah Berburu") if loc else "Wilayah Berburu"
+            add_log(self.state, "system", f"Mencari herba hanya bisa dilakukan di {nama}.")
             return self.view()
+        item_id = hunt.get("search_item", "material_herba")
         if random.random() < 0.6:
-            self.state.inventory["material_herba"] = self.state.inventory.get("material_herba", 0) + 1
-            add_log(self.state, "narration", "Kau menemukan 1 Herba Awan (云草) di antara semak.")
+            self.state.inventory[item_id] = self.state.inventory.get(item_id, 0) + 1
+            it = self.reg.item(item_id)
+            nama = it.get("name", item_id) if it else item_id
+            add_log(self.state, "narration", f"Kau menemukan 1 {nama} di antara semak.")
             self.quest.notify_gather()
         else:
             add_log(self.state, "narration", "Kau mencari-cari, tapi tidak menemukan herba.")

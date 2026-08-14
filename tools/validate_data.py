@@ -211,6 +211,25 @@ class Validator:
             if k not in ELEMENTS or v not in ELEMENTS:
                 self.error(f"config.element_advantage: '{k}→{v}' tidak valid (aturan 7)")
 
+        # A2: aktivitas berburu data-driven — referensi di config.world.hunt wajib valid
+        hunt = cfg.get("world", {}).get("hunt")
+        if hunt:
+            for eid in hunt.get("pool", []):
+                if not self.has("enemy", eid):
+                    self.error(f"config.world.hunt.pool: musuh '{eid}' tidak ada di enemies.csv (aturan 7)")
+            mb = hunt.get("mini_boss")
+            if mb and not self.has("enemy", mb):
+                self.error(f"config.world.hunt.mini_boss: musuh '{mb}' tidak ada di enemies.csv (aturan 7)")
+            hl = hunt.get("location")
+            if hl and not self.has("location", hl):
+                self.error(f"config.world.hunt.location: lokasi '{hl}' tidak ada (aturan 7)")
+            si = hunt.get("search_item")
+            if si and not self.has("item", si):
+                self.error(f"config.world.hunt.search_item: item '{si}' tidak ada di items.csv (aturan 7)")
+            mbc = hunt.get("mini_boss_chance")
+            if mbc is not None and not (isinstance(mbc, (int, float)) and 0 <= mbc <= 1):
+                self.error(f"config.world.hunt.mini_boss_chance: harus 0–1 (aturan 7)")
+
     def _check_quests(self) -> None:
         for q in self.quests:
             qid = q["id"]

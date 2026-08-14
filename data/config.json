@@ -49,7 +49,16 @@
   },
   "ko_penalty": { "exp_loss_ratio": 0.1 },
   "companion": { "hp_per_level": 12, "attack_per_level": 2, "defense_per_level": 1, "speed_per_level": 0.5 },
-  "world": { "monster_respawn_hours": 5 },
+  "world": {
+    "monster_respawn_hours": 5,
+    "hunt": {
+      "location": "loc_wilayah_berburu",
+      "pool": ["eno_serigala_qi", "eno_babi_hutan"],
+      "mini_boss": "eno_raja_serigala",
+      "mini_boss_chance": 0.1,
+      "search_item": "material_herba"
+    }
+  },
   "battle": {
     "damage_formula": "percent",
     "qi_regen_percent_per_turn": 5,

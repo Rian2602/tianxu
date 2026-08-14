@@ -78,6 +78,30 @@ def test_aturan2_referensi_npc_tidak_ada():
     assert any("objective.npc" in e for e in v.errors)
 
 
+# ---------- aturan 7: config.world.hunt referensi valid (A2) ----------
+
+def test_aturan7_world_hunt_referensi_tidak_ada():
+    d = _good()
+    d["config.json"]["world"] = {
+        "hunt": {"pool": ["eno_hantu"], "mini_boss": "eno_hantu2", "location": "loc_hantu",
+                 "search_item": "item_hantu", "mini_boss_chance": 0.5}
+    }
+    v, ok = make(d)
+    assert not ok
+    assert any("world.hunt.pool" in e for e in v.errors)
+    assert any("world.hunt.mini_boss" in e for e in v.errors)
+    assert any("world.hunt.location" in e for e in v.errors)
+    assert any("world.hunt.search_item" in e for e in v.errors)
+
+
+def test_aturan7_world_hunt_chance_invalid():
+    d = _good()
+    d["config.json"]["world"] = {"hunt": {"pool": [], "mini_boss_chance": 2.0}}
+    v, ok = make(d)
+    assert not ok
+    assert any("mini_boss_chance" in e for e in v.errors)
+
+
 # ---------- aturan 3: graf quest acyclic ----------
 
 def test_aturan3_siklus_dag():

@@ -155,6 +155,37 @@ def test_teknik_lintas_akademi_ditolak(session):
     session.state.pending_battle = None
 
 
+def test_teknik_ranah_tinggi_ditolak(session, monkeypatch):
+    """H4: teknik dengan realm_required lebih tinggi dari ranah pemain ditolak (ranah belum cukup)."""
+    session.state.player.academy = "akademi_elemen"
+    fake = {"id": "tek_elemen_palsu_tinggi", "name": "Teknik Tinggi", "academy": "elemen",
+            "element": None, "realm_required": "realm_pembangun_fondasi", "qi_cost": 5,
+            "power": 99, "kind": "attack", "description": "Dummy ranah tinggi."}
+    monkeypatch.setattr(session.reg, "technique", lambda tid: fake if tid == fake["id"] else None)
+    monkeypatch.setattr(session.reg, "player_techniques", lambda acad, realm=None: [fake])
+    foe = {"id": "eno_x", "name": "X", "hp": 9999, "qi": 0, "attack": 0, "defense": 0,
+           "speed": 1, "element": None, "exp_reward": 0, "drop_item": None, "drop_chance": 0}
+    session.battle.start([foe], "hunt")
+    qi_before = session.state.player.qi
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": fake["id"]})
+    assert session.state.pending_battle  # battle berlanjut seperti aksi invalid lain
+    assert session.state.player.qi == qi_before  # Qi tidak terpotong
+    assert any("Ranahmu belum cukup" in e["text"] for e in session.state.log)
+    session.state.pending_battle = None
+
+
+def test_player_techniques_filter_ranah(session):
+    """H4: player_techniques menyaring teknik dengan realm_required > ranah pemain."""
+    reg = session.reg
+    fake = {"id": "tek_elemen_palsu_tinggi", "name": "X", "academy": "elemen",
+            "realm_required": "realm_pembangun_fondasi", "qi_cost": 1, "power": 1, "kind": "attack"}
+    reg.techniques[fake["id"]] = fake
+    ids_pengumpul = [t["id"] for t in reg.player_techniques("akademi_elemen", "realm_pengumpul_qi")]
+    assert fake["id"] not in ids_pengumpul  # order 2 > order 1 → disembunyikan
+    ids_fondasi = [t["id"] for t in reg.player_techniques("akademi_elemen", "realm_pembangun_fondasi")]
+    assert fake["id"] in ids_fondasi  # order 2 <= order 2 → tampil
+
+
 def test_regen_qi_per_giliran(session, monkeypatch):
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
@@ -170,7 +201,7 @@ def test_regen_qi_per_giliran(session, monkeypatch):
 
 
 def test_teknik_defend(session, monkeypatch):
-    """Teknik jenis 'defend' mengurangi damage masuk sesuai efek guard."""
+    """Teknik jenis 'defend' mengurangi damage masuk sesuai power teknik (60%)."""
     monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
     monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit
     session.state.player.academy = "akademi_elemen"
@@ -182,8 +213,8 @@ def test_teknik_defend(session, monkeypatch):
     session.battle.start([foe], "hunt")
 
     session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_elemen_perisai_tanah"})
-    # Musuh serang: attack 20 vs def 3 -> base ~19, guarded -> max(1, 19 // 2) = 9
-    assert session.state.player.hp == 71
+    # Musuh serang: attack 20 vs def 3 -> base 19, defend power 60 -> int(19 * 0.4) = 7
+    assert session.state.player.hp == 73
     assert any("Perisai Tanah" in e["text"] for e in session.state.log)
     assert session.state.pending_battle is not None
     session.state.pending_battle = None

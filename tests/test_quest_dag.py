@@ -152,8 +152,42 @@ def test_side_quest_berburu_selesai_via_kemenangan(session, god_mode, monkeypatc
     assert "q_side_berburu" in session.state.completed_quests
 
 
+def test_spar_kalah_tetap_selesai_dan_dialog_beda(session, monkeypatch):
+    """G4a: kalah sparring ujian → quest spar selesai + flag spar_kalah + dialog Gu Canghai berbeda."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)
+    monkeypatch.setattr(GameSession, "_is_npc_available", lambda self, npc: True)
+
+    session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    finish_dialog(session, [0])
+    session.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    finish_dialog(session, [0])
+    session.apply_action({"type": "move", "to": "loc_arena"})
+    assert session.state.current_quest == "q_akademi_03"
+
+    session.state.player.hp = 5  # hampir KO — musuh membalas dan mengalahkan
+    session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    assert session.state.pending_battle is None  # KO → battle selesai
+    assert session.state.current_quest == "q_akademi_04"  # spar quest tetap selesai
+    assert session.state.flags.get("spar_kalah") is True
+    assert session.state.location != "loc_arena"  # respawn titik aman
+
+    # dialog Gu Canghai berbeda (entri kondisional spar_kalah)
+    session.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    session.apply_action({"type": "talk", "npc": "npc_gucanghai"})
+    assert "kalah" in session.dialog.view()["text"].lower()
+
+
 def test_konvergensi_semua_cabang(session, god_mode):
-    """Semua 4 cabang menyatu di q_akademi_07."""
+    """Semua 4 cabang menyatu di q_akademi_07 + world-facts per cabang (G4b/#10)."""
+    expected_world = {
+        "3aa": {"zhouyan_status": "bebas", "elder_exposed": True, "academy_knows_truth": True},
+        "3ab": {"zhouyan_status": "bebas", "elder_exposed": False, "academy_knows_truth": False},
+        "3b": {"zhouyan_status": "diusir", "elder_exposed": False, "academy_knows_truth": False},
+        "3c": {"zhouyan_status": "diusir", "elder_exposed": False, "academy_knows_truth": False},
+    }
     for branch, choices in [("3aa", [0, 0]), ("3ab", [0, 1]), ("3b", [1]), ("3c", [2])]:
         s = GameSession.new(session.reg)
         play_to_incident(s)
@@ -171,6 +205,9 @@ def test_konvergensi_semua_cabang(session, god_mode):
         _finish_truth(s)
         assert "q_akademi_07" in s.state.completed_quests
         assert s.state.flags.get("arc_akademi_selesai") is True
+        for k, v in expected_world[branch].items():
+            assert s.state.flags.get(k) == v, f"{branch}: flag {k} = {s.state.flags.get(k)!r}, harap {v!r}"
+        assert s.state.flags.get("bell_status") == "kembali"
 
 
 def test_single_active_main_quest(dummy_session):
@@ -380,5 +417,54 @@ def test_complete_side_ignores_inactive(dummy_session):
     qe = dummy_session.quest
     qe._complete_side("q_side_berburu")
     assert "q_side_berburu" not in dummy_session.state.completed_quests
+
+
+def test_advance_time_menyelesaikan_reach_dalam_window(dummy_session):
+    """Reach quest (q_akademi_06, window 19-6): lewati waktu dalam jendela → selesai (H1)."""
+    state = dummy_session.state
+    state.current_quest = "q_akademi_06"
+    state.location = "loc_ruang_lonceng"
+    state.hour = 18
+    state.day = 1
+    dummy_session.apply_action({"type": "advance_time", "hours": 2})  # jam 20 → dalam window
+    assert "q_akademi_06" in state.completed_quests
+
+
+def test_rest_memproses_quest_advance_time(dummy_session, monkeypatch):
+    """Rest (lewati waktu) ikut memproses quest advance_time — bukan hanya aksi Tunggu (H1)."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_synth_wait"
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_wait", "title": "Tunggu Synth", "kind": "main",
+            "objective": {"kind": "advance_time", "hour": 20, "day_offset": 0},
+            "next": [], "on_complete": {"rewards": {"exp": 1}},
+        },
+    )
+    state.location = "loc_asrama"  # titik aman
+    state.hour = 19
+    state.day = 1
+    dummy_session.apply_action({"type": "rest", "hours": 1})  # jam 20
+    assert "q_synth_wait" in state.completed_quests
+
+
+def test_resolve_choose_opsi_invalid_tidak_menuntaskan(dummy_session, monkeypatch):
+    """resolve_choose dengan opsi di luar daftar → quest tidak selesai (H2)."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_synth_choose"
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_choose", "title": "Pilih Synth", "kind": "main",
+            "objective": {"kind": "choose", "options": [{"label": "x", "value": "akademi_xyz"}]},
+            "next": [], "on_complete": {"rewards": {"exp": 1}},
+        },
+    )
+    qe.resolve_choose("akademi_tidak_ada")
+    assert state.current_quest == "q_synth_choose"
+    assert state.player.academy is None
 
 

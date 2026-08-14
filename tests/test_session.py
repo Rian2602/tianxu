@@ -15,6 +15,21 @@ def test_pindah_valid_dan_invalid(session):
     assert v["location"]["id"] == "loc_aula_ujian"  # tidak pindah
 
 
+def test_jadwal_npc_lintas_tengah_malam(session):
+    """A1: jadwal 19→06 tersedia di malam & subuh, tidak di siang (pola quest._in_window)."""
+    npc = {"id": "npc_test", "name": "Test",
+           "schedule": [{"day": 1, "hour_start": 19, "hour_end": 6, "location": "loc_x"}]}
+    session.state.hour = 20
+    assert session._is_npc_available(npc) is True
+    session.state.hour = 5
+    assert session._is_npc_available(npc) is True
+    session.state.hour = 12
+    assert session._is_npc_available(npc) is False
+    # batas: hour_end eksklusif (sama dengan quest._in_window) — jam 6 tepat sudah tidak tersedia
+    session.state.hour = 6
+    assert session._is_npc_available(npc) is False
+
+
 def test_grounding_hanya_di_titik_aman(session):
     # di gerbang (tidak aman) → ditolak
     session.apply_action({"type": "grounding", "hours": 4})
@@ -521,6 +536,27 @@ def test_session_spar_success_and_schedule(session):
     session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
     assert any("tidak berada di tempat untuk berlatih" in e["text"] for e in session.state.log)
     npc.pop("schedule", None)
+
+
+def test_spar_id_pendek_simpan_id_penuh(session):
+    # CLI menerima id pendek ("hanxiu") → spar_npc harus menyimpan id penuh agar quest spar selesai
+    session.state.location = "loc_arena"
+    session.apply_action({"type": "spar", "npc": "hanxiu"})
+    assert session.state.pending_battle is not None
+    assert session.state.pending_battle["spar_npc"] == "npc_hanxiu"
+    session.state.pending_battle = None
+
+
+def test_guard_pending_dialog_tolak_aksi_lain(session):
+    # saat dialog aktif, aksi non-dialog ditolak & dialog tidak hilang (asimetri F2)
+    session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    assert session.state.pending_dialog
+    session.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    assert any("Selesaikan dialog" in e["text"] for e in session.state.log)
+    assert session.state.pending_dialog
+    assert session.state.location != "loc_aula_ujian"  # aksi terlarang tidak mengeksekusi
+    session.apply_action({"type": "dialog_choice", "choice_index": 0})
+    assert session.state.pending_dialog == "dlg_penjaga"  # dialog berlanjut normal
 
 
 def test_session_shop_sell_deletion(session):

@@ -144,7 +144,7 @@ class BattleEngine:
         elif a == "item":
             self._use_item(pc, b, action.get("item"))
         elif a == "guard":
-            b["player_guard"] = True
+            b["player_guard"] = 50
             add_log(self.state, "battle", "Kau bertahan — damage masuk dikurangi setengah.")
         elif a == "flee":
             if self._try_flee(pc, b):
@@ -178,8 +178,16 @@ class BattleEngine:
         if not tek:
             add_log(self.state, "battle", "Teknik tidak dikenal.")
             return
+        # H4: ranah teknik tidak boleh melebihi ranah pemain (bandingkan order realm)
+        req_id = tek.get("realm_required")
+        if req_id:
+            req_r = self.reg.realms.get(req_id)
+            cur_r = self.reg.realms.get(self.state.player.realm)
+            if req_r and cur_r and int(req_r["order"]) > int(cur_r["order"]):
+                add_log(self.state, "battle", "Ranahmu belum cukup untuk teknik itu.")
+                return
         # validasi kepemilikan akademi (skill_pool) — ENGINE_ARCHITECTURE §5.6/§8
-        allowed = [t["id"] for t in self.reg.player_techniques(self.state.player.academy or "")]
+        allowed = [t["id"] for t in self.reg.player_techniques(self.state.player.academy or "", self.state.player.realm)]
         if tid not in allowed:
             add_log(self.state, "battle", "Kau belum menguasai teknik itu.")
             return
@@ -195,7 +203,7 @@ class BattleEngine:
             b["foes"][0]["hp"] -= dmg
             add_log(self.state, "battle", f"{tek['name']}! {b['foes'][0]['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
         elif kind == "defend":
-            b["player_guard"] = True
+            b["player_guard"] = power
             add_log(self.state, "battle", f"{tek['name']} — damage masuk dikurangi {power}%.")
         elif kind == "heal":
             heal = min(power, pc["hp_max"] - pc["hp"])
@@ -246,7 +254,7 @@ class BattleEngine:
             else:
                 dmg, crit = self._calc_damage(foe["attack"], pc["defense"], foe.get("element"), None)
                 if b["player_guard"]:
-                    dmg = max(1, dmg // 2)
+                    dmg = max(1, int(dmg * (100 - b["player_guard"]) / 100))
                 pc["hp"] -= dmg
                 add_log(self.state, "battle", f"{foe['name']} menyerang! Kau kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
         b["player_guard"] = False
@@ -326,6 +334,9 @@ class BattleEngine:
         self.state.player.exp = max(0, self.state.player.exp - loss)
         if b["context"] == "spar":
             gain_exp(self.state, self.reg, self.reg.config["cultivation"]["spar_loss_exp"])
+            # G4a: kalah sparring tetap menyelesaikan objektif `spar` (dialog berbeda)
+            if b.get("spar_npc"):
+                self.quest_engine.notify_spar_loss(b["spar_npc"])
         # respawn titik aman
         safe = self.state.last_safe_location or "loc_asrama"
         self.state.location = safe

@@ -90,8 +90,12 @@ class DataRegistry:
 
     # ---------- pemain ----------
 
-    def player_techniques(self, academy: str) -> list[dict]:
-        """Teknik yang tersedia untuk akademi pilihan pemain (skill_pool)."""
+    def player_techniques(self, academy: str, realm: str | None = None) -> list[dict]:
+        """Teknik yang tersedia untuk akademi pilihan pemain (skill_pool), dibatasi ranah.
+
+        Bila `realm` diberikan, teknik dengan `realm_required` lebih tinggi disembunyikan
+        (H4) — pola sama seperti `dialog.py` membandingkan `order` ranah.
+        """
         pool = ""
         for a in self.config.get("academies", []):
             if a["id"] == academy:
@@ -100,4 +104,13 @@ class DataRegistry:
         if not pool:
             return []
         prefix = pool.rstrip("*")
-        return [t for t in self.techniques.values() if t["id"].startswith(prefix)]
+        out = [t for t in self.techniques.values() if t["id"].startswith(prefix)]
+        if realm:
+            cur_r = self.realms.get(realm)
+            if cur_r:
+                order_cur = int(cur_r["order"])
+                out = [
+                    t for t in out
+                    if int(self.realms.get(t.get("realm_required", realm), cur_r)["order"]) <= order_cur
+                ]
+        return out

@@ -80,6 +80,14 @@ class QuestEngine:
         if q and q.get("objective", {}).get("kind") == "spar" and q.get("objective", {}).get("npc") == npc_id:
             self._complete_main(q["id"])
 
+    def notify_spar_loss(self, npc_id: str) -> None:
+        """G4a: kalah sparring tetap menyelesaikan objektif `spar` (dialog berbeda,
+        sesuai STORY_FASE1 #19) — tanpa game over permanen; penalti KO tetap berlaku."""
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "spar" and q.get("objective", {}).get("npc") == npc_id:
+            self.state.flags["spar_kalah"] = True
+            self._complete_main(q["id"])
+
     def notify_move(self) -> None:
         q = self.current_main()
         if not q or q.get("objective", {}).get("kind") != "reach":
@@ -135,13 +143,18 @@ class QuestEngine:
         if not q or q.get("objective", {}).get("kind") != "choose":
             return
         obj = q["objective"]
+        matched = False
         if obj.get("options"):
             for o in obj["options"]:
                 if o.get("value") == option:
                     self.state.player.academy = option
+                    matched = True
                     break
-        self._grant_companion(option)
-        self._complete_main(q["id"])
+        if matched:
+            self._grant_companion(option)
+            self._complete_main(q["id"])
+        else:
+            add_log(self.state, "system", "Pilihan tidak valid.")
 
     def _grant_companion(self, academy: str) -> None:
         """Akademi dengan field `companion` di config (data-driven) memberi binatang roh."""
