@@ -38,15 +38,35 @@ def test_penjaga_dialog_kedua_berbeda(session):
     labels = [c["label"] for c in v["choices"]]
     assert any("Akademi Changfeng" in l for l in labels)
     assert any("kabar" in l for l in labels)
-    # tanya kabar → info Lonceng (foreshadowing) → kembali ke menu
+    # tanya kabar → SEBELUM insiden: kabar umum, tanpa spoiler Lonceng
     session.apply_action({"type": "dialog_choice", "choice_index": 1})
-    assert session.dialog.view()["node_id"] == "node_ulang_kabar"
+    v = session.dialog.view()
+    assert v["node_id"] == "node_ulang_kabar"
+    assert "Lonceng" not in v["text"]
     session.apply_action({"type": "dialog_choice", "choice_index": -1})  # lanjut (node tanpa pilihan)
     assert session.dialog.view()["node_id"] == "node_ulang"
     # pergi → node penutup → advance → dialog selesai
     session.apply_action({"type": "dialog_choice", "choice_index": 2})
     assert session.dialog.view()["node_id"] == "node_ulang_pergi"
     session.apply_action({"type": "dialog_choice", "choice_index": -1})  # lanjut (end: true)
+    assert session.state.pending_dialog is None
+
+
+def test_penjaga_kabar_lonceng_setelah_insiden(session):
+    """SETELAH insiden (flag lihat_moyun_malam) kabar Penjaga bicara Lonceng hilang."""
+    session.state.flags["met_penjaga"] = True
+    session.state.flags["lihat_moyun_malam"] = True  # q6 selesai → insiden terjadi
+    session.apply_action({"type": "talk", "npc": "npc_penjaga"})
+    v = session.dialog.view()
+    assert v["node_id"] == "node_ulang"
+    session.apply_action({"type": "dialog_choice", "choice_index": 1})
+    v = session.dialog.view()
+    assert v["node_id"] == "node_ulang_kabar_lonceng"
+    assert "Lonceng Angin Panjang" in v["text"]
+    session.apply_action({"type": "dialog_choice", "choice_index": -1})
+    assert session.dialog.view()["node_id"] == "node_ulang"
+    session.apply_action({"type": "dialog_choice", "choice_index": 2})  # pergi
+    session.apply_action({"type": "dialog_choice", "choice_index": -1})  # end
     assert session.state.pending_dialog is None
 
 

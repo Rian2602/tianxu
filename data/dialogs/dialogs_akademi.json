@@ -18,10 +18,16 @@
      "label": "Apa yang bisa kuceritakan tentang Akademi Changfeng?",
      "next": "node_ulang_akademi"
     },
-    {
-     "label": "Ada kabar apa belakangan ini?",
-     "next": "node_ulang_kabar"
-    },
+  {
+   "label": "Ada kabar apa belakangan ini?",
+   "next": "node_ulang_kabar",
+   "condition": { "flag": { "key": "lihat_moyun_malam", "value": false } }
+  },
+  {
+   "label": "Ada kabar apa belakangan ini?",
+   "next": "node_ulang_kabar_lonceng",
+   "condition": { "flag": { "key": "lihat_moyun_malam", "value": true } }
+  },
     {
      "label": "(Aku hanya lewat — sampai jumpa)",
      "next": "node_ulang_pergi"
@@ -33,11 +39,16 @@
    "text": "Akademi Changfeng berdiri tiga ratus tahun. Tiga paviliun — Elemen, Senjata, dan Summoning — melatih murid dari seluruh penjuru. Yang lemah gugur di ujian, yang kuat bertahan. Itu semua yang perlu kau tahu.",
    "next": "node_ulang"
   },
-  "node_ulang_kabar": {
-   "speaker": "npc:npc_penjaga",
-   "text": "Kabar? Belakangan ini murid-murid ramai membicarakan Lonceng Angin Panjang yang hilang dari Ruang Lonceng. Desas-desus memang selalu mengudara di akademi ini. Jangan ikut-ikutan memercayai semuanya.",
-   "next": "node_ulang"
-  },
+ "node_ulang_kabar": {
+  "speaker": "npc:npc_penjaga",
+  "text": "Kabar? Ujian masuk sedang berlangsung — tiga puluh murid baru datang tahun ini, setengahnya mungkin gugur di sparing. Pasar Changfeng ikut ramai karena para pedagang mengikuti arus murid. Di akademi ini, yang penting bukan kabar, tapi siapa yang bertahan.",
+  "next": "node_ulang"
+ },
+ "node_ulang_kabar_lonceng": {
+  "speaker": "npc:npc_penjaga",
+  "text": "Kabar? Belakangan ini murid-murid ramai membicarakan Lonceng Angin Panjang yang hilang dari Ruang Lonceng. Desas-desus memang selalu mengudara di akademi ini. Jangan ikut-ikutan memercayai semuanya.",
+  "next": "node_ulang"
+ },
   "node_ulang_pergi": {
    "speaker": "npc:npc_penjaga",
    "text": "Hmph. Jangan lupa: Aula Ujian menunggumu, bukan gerbang ini.",
