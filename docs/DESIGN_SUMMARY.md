@@ -111,7 +111,7 @@ Seluruh kriteria penerimaan Fase 1 (Arc Akademi) **selesai dan tervalidasi** —
 
 **Rebalancing (hasil playtest, disahkan v0.1.0-alpha)**: exp quest diturunkan ~40% & exp aktivitas dikurangi (grounding 2/jam, spar 8, hunt 6) — jalur quest saja ≈ Lv.5, pemain rajin ≈ Lv.6 (target GDD Lv4–6). Detail: ENGINE_ARCHITECTURE §9.1.
 
-**Keadaan teknis saat sinkronisasi (2026-08-14)**: 192 test lolos, coverage `src/` ≈ 99,9%, `tools/validate_data.py` exit 0.
+**Keadaan teknis saat sinkronisasi (2026-08-14)**: 192 test lolos, coverage `src/` ≈ 99,9%, `tools/validate_data.py` exit 0. **Pembaruan (2026-08-14 lanjutan)**: batch fix audit (G1–G5/H1–H3/K1–K5/G4d/G4e) + batch plan sisa-bug (H4/A1/J3#6/#9/A2) → **207 test**, validator exit 0. Detail: `docs/list_bug.md` §Status perbaikan & plan `docs/superpowers/plans/2026-08-14-fix-sisa-bug-dan-hardening.md`.
 
 ---
 

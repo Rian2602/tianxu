@@ -29,7 +29,7 @@
 | 16 | Tianyuan Ling | **Pasif murni** — hanya mengumumkan (ingatan terbuka, notifikasi); tidak menjawab pertanyaan di Fase 1 |
 | 17 | Penutup q5 | **Konfrontasi langsung dengan Penatua di 3aa**; cabang lain: kebenaran lewat Mo Yun tanpa konfrontasi |
 | 18 | Struktur akademi | **Satu kompleks akademi, 3 paviliun** (五行阁/兵锋院/御灵宗) — terpusat, mudah dinavigasi |
-| 19 | Hasil sparing | **Pemain bisa menang/kalah** — menang = pengakuan & reputasi naik; kalah = motivasi & dialog berbeda |
+| 19 | Hasil sparing | **Pemain bisa menang/kalah** — menang = pengakuan & reputasi naik; kalah = motivasi & dialog berbeda *(diimplementasikan 2026-08-14, G4a: kalah tetap menyelesaikan quest spar + flag `spar_kalah` + dialog Gu Canghai berbeda; penalti KO tetap berlaku)* |
 | 20 | Progresi ranah | **Tiap ranah = 10 tingkat**; progresi via aktivitas (berkultivasi/grounding, berburu monster, menang sparing) yang menghasilkan qi/exp — rajin beraktivitas = makin cepat naik (detail teknis: ENGINE_ARCHITECTURE §9.1) |
 | 21 | Side quest | **Berburu, bantu Su Qing, tugas Mo Yun** — data terpisah, **bisa diulang** setelah selesai untuk menaikkan ranah, dilarang bertabrakan dengan main quest |
 | 22 | Benih romansa Su Qing | **Benih halus** — isyarat sangat halus (kontras dengan kenangan cinta masa lalu Long Tianxu); jalinan dibuka di arc berikutnya |
@@ -167,5 +167,14 @@ Pemetaan beat cerita ke skema quest (ENGINE_ARCHITECTURE §5.1–§5.2):
 | `q_side_moyun` | **Tugas perpustakaan Mo Yun** — **repeatable** | `gather` | paralel |
 
 **Side quest (disahkan)**: data terpisah (`quests_side.json`), bisa diulang setelah selesai untuk **grinding ranah** (ENGINE_ARCHITECTURE §6.4/§9), dan dilarang bertabrakan dengan main quest (validator §14-10).
+
+**World-state Arc 2 (G4b/#10, 2026-08-14)** — world-facts resmi tersimpan sebagai `flags` (diset di on_complete cabang, siap ditanyakan konten Arc 2):
+
+| World-fact | 3aa | 3ab | 3b | 3c |
+|---|---|---|---|---|
+| `zhouyan_status` | `bebas` | `bebas` | `diusir` | `diusir` |
+| `elder_exposed` | `true` | `false` | `false` | `false` |
+| `academy_knows_truth` | `true` | `false` | `false` | `false` |
+| `bell_status` (q07) | `kembali` | `kembali` | `kembali` | `kembali` |
 
 **Catatan teknis (disetujui)**: cabang 3a dipecah menjadi **3aa** (konfrontasi langsung) / **3ab** (kumpulkan bukti diam-diam) lewat **percabangan bertingkat di dalam dialog** pilihan sikap — keduanya **menyatu kembali** di q5 (`q_akademi_07`). Ini membuktikan **percabangan bertingkat** pada konten nyata (DoD GDD §11.2) tanpa menambah beban naratif berarti.

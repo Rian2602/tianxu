@@ -417,7 +417,16 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
   },
   "ko_penalty": { "exp_loss_ratio": 0.1 },
   "companion": { "hp_per_level": 12, "attack_per_level": 2, "defense_per_level": 1, "speed_per_level": 0.5 },
-  "world": { "monster_respawn_hours": 5 },
+  "world": {
+    "monster_respawn_hours": 5,
+    "hunt": {
+      "location": "loc_wilayah_berburu",
+      "pool": ["eno_serigala_qi", "eno_babi_hutan"],
+      "mini_boss": "eno_raja_serigala",
+      "mini_boss_chance": 0.1,
+      "search_item": "material_herba"
+    }
+  },
   "battle": {
     "damage_formula": "percent",
     "qi_regen_percent_per_turn": 5,
@@ -573,7 +582,7 @@ player_action(menu):
 - Progresi via **Pengalaman Kultivasi (exp)** dari **aktivitas** (keputusan penulis: rajin beraktivitas = makin cepat naik tingkat):
   - **Berkultivasi / grounding (打坐 dǎzuò)** — aksi berulang di lokasi aman: habiskan waktu (jam) → dapat `grounding_exp_per_hour` exp + pulih Qi pelan; **maks `grounding_max_hours_per_day` (8) jam per hari** (disahkan).
   - **Berburu monster** — kalahkan musuh liar di wilayah berburu → `hunt_exp_per_kill` exp + material/drop.
-  - **Sparing NPC** — tantang NPC ber-`can_spar: true` (Han Xiu, Gu Canghai) — **tanpa batas frekuensi** (disahkan) → menang = `spar_win_exp` exp + hubungan naik; kalah = `spar_loss_exp` exp kecil + **penalti KO berlaku** (disahkan, konsisten dengan battle biasa).
+  - **Sparing NPC** — tantang NPC ber-`can_spar: true` (Han Xiu, Gu Canghai) — **tanpa batas frekuensi** (disahkan) → menang = `spar_win_exp` exp + hubungan naik; kalah = `spar_loss_exp` exp kecil + **penalti KO berlaku** (disahkan, konsisten dengan battle biasa). (G4a, 2026-08-14): objektif quest `spar` **selesai saat kalah juga** — `notify_spar_loss` men-set flag `spar_kalah` → dialog Gu Canghai berbeda (entri kondisional), tanpa game over permanen; konsisten STORY_FASE1 #19.
 - **Naik tingkat**: `exp_needed(level) = round(exp_per_level_base × exp_growth_per_level^(level-1))` (kurva dari `config.cultivation`, data-driven). Saat exp ≥ ambang → `realm_level` naik, exp tersisa dibawa.
 - **Target balancing Fase 1 (disahkan)**: pemain yang rajin (grinding side quest/berburu) mencapai **Pengumpul Qi tingkat 5–6** di akhir arc.
   - **Rebalancing (hasil playtest, disahkan)**: exp quest dikurangi ~40% (q1–q07: 3–18) & exp aktivitas diturunkan (`grounding 2/jam`, `spar_win 8`, `hunt 6`) — playtest awal mencapai Lv.10 (maks) di akhir arc, melampaui target; dengan angka ini quest saja ≈ Lv.5, rajin ≈ Lv.6.
@@ -582,11 +591,11 @@ player_action(menu):
 
 ### 9.2 Teknik, Item & Waktu
 
-- **Teknik**: `techniques.csv`, terkunci ke akademi (`academy`), dibatasi ranah (`realm_required`), biaya Qi (`qi_cost`).
+- **Teknik**: `techniques.csv`, terkunci ke akademi (`academy`), dibatasi ranah (`realm_required`), biaya Qi (`qi_cost`). **Enforcement (H4, 2026-08-14)**: `battle.py::_technique` menolak teknik dengan `realm_required` lebih tinggi dari ranah pemain (bandingkan `order` realm, pola sama `dialog.py`); `loader.player_techniques(academy, realm)` menyaring ranah sehingga UI web hanya menampilkan teknik yang bisa dipakai.
 - **Inventori**: map item→count; item consumable (`usable=true`) bisa dipakai di luar/dalam battle.
 - **Grinding loop Fase 1**: side quest repeatable (berburu / bantu Su Qing / tugas Mo Yun) + aktivitas grounding & sparing = sumber exp untuk menaikkan ranah tanpa mengganggu alur main quest.
 - **Mini-boss (disahkan)**: 1 binatang liar kuat / penjaga wilayah di area berburu — opsional, respawn, reward lebih besar; puncak tantangan Fase 1.
-- **Respawn monster (disahkan)**: monster area berburu muncul kembali setelah `world.monster_respawn_hours` (5) jam in-game — grinding butuh menunggu.
+- **Respawn monster (disahkan)**: monster area berburu muncul kembali setelah `world.monster_respawn_hours` (5) jam in-game — grinding butuh menunggu. (A2, 2026-08-14): pool musuh, lokasi berburu, mini-boss & item pencarian dibaca dari `world.hunt` di config (divalidasi aturan 7) — aktivitas berburu sepenuhnya data-driven.
 - **Waktu**: `world.py` memajukan waktu (hari/jam). Quest sampingan & NPC dengan `schedule` hanya tersedia pada waktu tertentu. **Event terjadwal (disahkan)**: beberapa momen hanya muncul pada waktu tertentu — mis. bukti malam Act 2 memakai objektif `reach` + `time_window` (malam) atau `advance_time` ke malam hari. Fase 1: ringan (1 kota, beberapa NPC, tanpa siklus hidup penuh).
 
 ### 9.3 Ekonomi, Alkimia & Senjata (disahkan Fase 1)
@@ -621,6 +630,7 @@ player_action(menu):
 - Skala integer `[-100, +100]`, mulai 0 (netral). Disimpan di `GameState`.
 - Diubah lewat `effects.morality` pada pilihan dialog & quest.
 - Dipakai untuk: membuka/menutup opsi dialog (`condition.morality_min/max`) dan menentukan ending.
+- **World-facts (G4b/#10, 2026-08-14)**: konsekuensi cabang quest disimpan sebagai `flags` eksplisit (nilai string/bool apa pun didukung `effects.py`) — `zhouyan_status` (`bebas`/`diusir`), `elder_exposed`, `academy_knows_truth`, `bell_status` — sehingga konten Arc 2 bisa menanyakan kondisi dunia ("apakah Zhou Yan bebas?") tanpa field state baru.
 - **Ending (disahkan §13)**: 3 tematik — Reformer / Destroyer / Ascetic — ditentukan kombinasi **pilihan kunci di quest percabangan + skala moralitas akhir**. Semua ending valid secara naratif.
 
 ---
@@ -850,8 +860,8 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
   - **Dinamisasi Resep**: tombol racik dirender dari `context.recipes` (hanya resep yang bahan terpenuhi) — bukan list hardcode.
   - **Cooldown Side Quest**: lihat catatan di atas (`side_quest_cooldowns` + `quest.py`).
   - **Timer Respawn Monster**: `_hunt()` menolak berburu ulang sebelum `world.monster_respawn_hours` (5 jam) sejak `last_hunt_time` (log sistem informatif).
-  - **Jadwal Harian NPC**: `_is_npc_available(npc)` membatasi `_talk`/`_spar` pada `schedule.hour_start..hour_end` — NPC aktif tiap hari, tanpa softlock.
-  - **Layar Penutup Arc 1**: `view().arc_summary` saat `q_akademi_07` selesai → banner ANSI emas di CLI + modal penutup di web (`modal-arc-summary`).
+  - **Jadwal Harian NPC**: `_is_npc_available(npc)` membatasi `_talk`/`_spar` pada `schedule.hour_start..hour_end` — NPC aktif tiap hari, tanpa softlock. (A1, 2026-08-14): pola diseragamkan dengan `quest._in_window` — mendukung jadwal lintas tengah malam (19 → 6) dan batas `hour_end` eksklusif.
+  - **Layar Penutup Arc 1**: `view().arc_summary` saat `q_akademi_07` selesai → banner ANSI emas di CLI + modal penutup di web (`modal-arc-summary`). **Batasan (G3d)**: sekali-dismiss per save disimpan di `localStorage` frontend (`arc-seen:<nama-save>`) — **tidak ikut antar perangkat/browser** (keputusan K2; Fase 1 = lokal single-player, diterima). Opsi backend (flag di save) ditunda.
 - **Playtest putaran 2 — observasi (open, keputusan desain Fase 2, belum diubah data)**:
   - Han Xiu undertuned: menang ≥85% di Lv1 (full HP), 100% Lv2+; `speed` tak berfungsi karena `turn_order: fixed_alternate` (pemain selalu duluan). Naikkan stat bila gate ujian (q3) ingin lebih menantang — hati-hati tidak menyumbat jalur utama.
   - Reward ganda spar saat q3: `spar_win_exp` 8 + reward quest +8 exp/+10 koin = 16 exp sekali menang → Lv1→Lv2 + sisa 6/12 (bukan loncat 2 level). Overlap by-design (spar selalu kasih exp + reward quest); terima atau turunkan salah satu.
