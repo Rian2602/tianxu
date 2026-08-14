@@ -8,8 +8,11 @@ quest-dialog-battle-choose, dan deteksi akhir arc bekerja end-to-end.
 from __future__ import annotations
 
 import os
+import subprocess
+import sys
 from pathlib import Path
 
+from src.cli import battle_view, choose_view, dialog_view, explore_menu, print_header
 from src.engine.battle import BattleEngine
 from src.engine.session import GameSession
 
@@ -150,3 +153,47 @@ def test_cli_load_corrupt_save(monkeypatch, capsys, tmp_path):
     main()
     out = capsys.readouterr().out
     assert "Gagal memuat save 'save_rusak'" in out
+
+
+def test_dialog_view_without_dialog(session, capsys):
+    dialog_view(session)
+    assert capsys.readouterr().out == ""          # tidak ada dialog → return
+
+
+def test_choose_view_without_choose(session, capsys):
+    choose_view(session)
+    assert capsys.readouterr().out == ""          # tidak ada choose → return
+
+
+def test_dialog_view_speaker_variants(session, monkeypatch, capsys):
+    monkeypatch.setattr(session, "view",
+                        lambda: {"dialog": {"speaker": "system", "text": "pesan sistem", "choices": []}})
+    dialog_view(session)                          # speaker system
+    monkeypatch.setattr(session, "view",
+                        lambda: {"dialog": {"speaker": "player", "text": "kata pemain", "choices": []}})
+    dialog_view(session)                          # speaker lain → teks polos
+    out = capsys.readouterr().out
+    assert "pesan sistem" in out and "kata pemain" in out
+
+
+def test_print_header_companion(session, capsys):
+    session.state.companion = {"id": "komp_roh_awan", "hp": 5, "active": True}
+    print_header(session)                         # baris roh di header
+    out = capsys.readouterr().out
+    assert "Roh: Roh Awan" in out
+
+
+def test_explore_menu_racik_option(session, capsys):
+    session.state.location = "loc_asrama"
+    session.state.inventory["material_herba"] = 2
+    explore_menu(session)                         # opsi racik muncul
+    assert "[racik]" in capsys.readouterr().out
+
+
+def test_battle_view_with_companion(session, capsys):
+    session.state.companion = {"id": "komp_roh_awan", "hp": 10, "active": True}
+    session.battle.start([{"id": "eno_test", "name": "Musuh", "hp": 5, "qi": 0, "qi_max": 0,
+                           "attack": 1, "defense": 0, "speed": 1, "element": None,
+                           "exp_reward": 0, "drop_item": None, "drop_chance": 0}], "hunt")
+    battle_view(session)                          # baris companion battle
+    assert "otomatis" in capsys.readouterr().out

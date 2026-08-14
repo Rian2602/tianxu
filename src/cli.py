@@ -60,8 +60,7 @@ def print_header(session: GameSession) -> None:
             print(DIM + f"Senjata: {wi['name']} (+{wi.get('power', 0)} serangan)" + RESET)
     comp = v.get("companion")
     if comp:
-        status = " (KO — pulih di titik aman)" if comp["hp"] <= 0 else ""
-        print(DIM + f"Roh: {comp['name']} HP {comp['hp']}/{comp['hp_max']}{status}" + RESET)
+        print(DIM + f"Roh: {comp['name']} HP {comp['hp']}/{comp['hp_max']}" + RESET)
     if v["current_quest"]:
         q = v["current_quest"]
         print(f"{GOLD}◇ Quest: {q['title']}{RESET}")
