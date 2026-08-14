@@ -118,10 +118,14 @@ class DialogEngine:
     @staticmethod
     def _eval_condition(state: GameState, cond: dict[str, Any], registry: DataRegistry | None = None) -> bool:
         s = state
+        # C3: `flag` adalah cek AND biasa — TIDAK boleh early-return (bug laten:
+        # kombinasi `flag` + kondisi lain mengabaikan kondisi lain). Data dialog
+        # existing memakai flag tunggal; kombinasi multi-kunci kini benar-benar AND.
         if "flag" in cond:
             f = cond["flag"]
             # flag yang tidak pernah diset dianggap False (bukan None)
-            return s.flags.get(f["key"], False) == f.get("value", True)
+            if s.flags.get(f["key"], False) != f.get("value", True):
+                return False
         if "morality_min" in cond:
             if s.player.morality < cond["morality_min"]:
                 return False

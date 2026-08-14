@@ -273,6 +273,8 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 | `memory` | `{ "memory": "mem_02" }` | Ingatan tertentu sudah pulih — P1-1 (GDD §3.1, B3/#13): opsi dialog hanya muncul setelah `memory_unlock` quest terkait; ingatan tetap tanpa power mekanik |
 | `month_min` / `month_max` | `{ "month_min": 3, "month_max": 5 }` | C2 (GDD §7): batas bulan (derived dari `day`) — peristiwa dialog hanya muncul bulan tertentu; AND dengan kondisi lain (pola `_eval_condition` multi-kunci) |
 
+> **Catatan AND multi-kunci (C3, 2026-08-14)**: `_eval_condition` mengevaluasi SEMUA kunci dalam satu `condition` sebagai AND — termasuk `flag` (perbaikan: flag sempat *early-return* dan mengabaikan kondisi lain; data dialog existing memakai flag tunggal sehingga tidak terpengaruh). Kombinasi `flag` + `morality_min` (skema ending) kini benar-benar AND.
+
 **Jenis efek** (`effects`, format type-based):
 
 | Efek | Contoh | Keterangan |

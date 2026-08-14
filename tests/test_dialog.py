@@ -506,6 +506,26 @@ def test_gucanghai_pilihan_ingatan_muncul(session, god_mode):
     assert len(labels) == 3
 
 
+def test_eval_condition_flag_tidak_mengabaikan_kondisi_lain(session):
+    """C3: kombinasi `flag` + kondisi lain harus AND — flag TIDAK boleh early-return
+    (bug laten yang diekspos ending: morality_min + flag hanya cek flag)."""
+    from src.engine.dialog import DialogEngine
+    s = session.state
+    cond = {"morality_min": 30, "flag": {"key": "kunci_x", "value": True}}
+    # kasus 1: flag benar tapi moralitas rendah → harus False (AND)
+    s.player.morality = -50
+    s.flags["kunci_x"] = True
+    assert DialogEngine._eval_condition(s, cond, session.reg) is False
+    # kasus 2: moralitas cukup tapi flag salah → harus False (AND)
+    s.player.morality = 50
+    s.flags["kunci_x"] = False
+    assert DialogEngine._eval_condition(s, cond, session.reg) is False
+    # kasus 3: keduanya terpenuhi → True
+    s.player.morality = 50
+    s.flags["kunci_x"] = True
+    assert DialogEngine._eval_condition(s, cond, session.reg) is True
+
+
 def test_eval_condition_month_min_max(session):
     """C2: kondisi dialog month_min/max menyaring opsi berdasarkan bulan (derived)."""
     from src.engine.dialog import DialogEngine

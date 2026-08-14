@@ -22,8 +22,9 @@ Semua perubahan penting pada **Tian Xu: Second Life**.
 - Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi + fitur P1), 5 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / STORY_FASE1 / DESIGN_SUMMARY / README / PROJECT.
 
 ### Changed
-- Jumlah test: 192 → **250**; validator 16 aturan tetap exit 0 (aturan 7 & 13 diperluas: `arcs`/`safe_fallback_location`/`unlock_arc`; aturan 14 wajib ≥1 lokasi `is_safe`; upgrade teknik & efek `technique` (C1); time month + kondisi dialog month (C2); endings arc + kunci kondisi tak dikenal ditolak (C3)).
-- `README.md` & `PROJECT.md`: jumlah test disinkronkan (250).
+- Jumlah test: 192 → **251**; validator 16 aturan tetap exit 0 (aturan 7 & 13 diperluas: `arcs`/`safe_fallback_location`/`unlock_arc`; aturan 14 wajib ≥1 lokasi `is_safe`; upgrade teknik & efek `technique` (C1); time month + kondisi dialog month (C2); endings arc + kunci kondisi tak dikenal ditolak (C3)).
+- `README.md` & `PROJECT.md`: jumlah test disinkronkan (251).
+- **Temuan evaluasi Tahap C (C3)**: `dialog.py::_eval_condition` sempat *early-return* pada kunci `flag` — kombinasi `flag` + kondisi lain (mis. `morality_min`, skema ending) mengabaikan kondisi lain. Diperbaiki jadi cek AND biasa (test negatif + positif baru); data dialog existing memakai flag tunggal → tidak terpengaruh (playthrough CLI 15 hijau).
 
 ## [0.1.0-alpha] — 2026-08-14
 
