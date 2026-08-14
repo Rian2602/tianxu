@@ -15,6 +15,9 @@ saves/*.json
 .coverage
 graphify-out/
 
+# Proses pengembangan (artefak orchestration, tidak dipublikasikan)
+.agents/
+
 # OS
 .DS_Store
 Thumbs.db
