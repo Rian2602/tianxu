@@ -365,15 +365,14 @@ function renderLeft(v) {
   $("col-left").innerHTML = html;
 }
 
+// Task 4: 5 tingkat hubungan (rekomendasi hostile/distrustful/neutral/friendly/close)
 function getRelationTier(score) {
   const num = Number(score) || 0;
-  if (num > 0) {
-    return { label: "Bersahabat", cls: "friendly" };
-  } else if (num < 0) {
-    return { label: "Bermusuhan", cls: "hostile" };
-  } else {
-    return { label: "Netral", cls: "neutral" };
-  }
+  if (num <= -20) return { label: "Bermusuhan", cls: "hostile" };
+  if (num < 0)   return { label: "Kurang Akrab", cls: "distrustful" };
+  if (num === 0) return { label: "Netral", cls: "neutral" };
+  if (num < 20)  return { label: "Bersahabat", cls: "friendly" };
+  return { label: "Akrab", cls: "close" };
 }
 
 function renderRight(v) {
