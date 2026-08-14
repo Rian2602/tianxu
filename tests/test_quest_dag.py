@@ -190,3 +190,33 @@ def test_single_active_main_quest(dummy_session):
     assert isinstance(state.current_quest, str)
 
 
+def test_side_quest_cooldown(session, god_mode, monkeypatch):
+    """Side quest can be completed, cannot be immediately started again, but can be started after cooldown."""
+    from conftest import finish_dialog
+
+    monkeypatch.setattr("src.engine.session.random.choice", lambda seq: "eno_serigala_qi")
+    session.apply_action({"type": "advance_time", "hours": 24})  # hari 2, jam 8
+    
+    # 1. Take and finish quest
+    assert session.quest.is_offerable("q_side_berburu") is True
+    session.apply_action({"type": "talk", "npc": "npc_pemburu"})
+    finish_dialog(session, [0])  # Take quest
+    assert "q_side_berburu" in session.state.active_side_quests
+    
+    session.apply_action({"type": "move", "to": "loc_wilayah_berburu"})
+    session.apply_action({"type": "hunt"})
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    session.apply_action({"type": "hunt"})
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    assert "q_side_berburu" not in session.state.active_side_quests
+    assert "q_side_berburu" in session.state.completed_quests
+    assert "q_side_berburu" in session.state.side_quest_cooldowns
+    
+    # 2. Cannot start again immediately
+    assert session.quest.is_offerable("q_side_berburu") is False
+    
+    # 3. Advance time by cooldown (2 hours) and start again
+    session.apply_action({"type": "advance_time", "hours": 2})
+    assert session.quest.is_offerable("q_side_berburu") is True
+
+

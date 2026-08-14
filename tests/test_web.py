@@ -57,6 +57,8 @@ def test_new_game_mulai_dari_q1(base_url: str) -> None:
     # konteks: penjaga gerbang ada di lokasi
     npcs = [n["id"] for n in data["context"]["npcs"]]
     assert "npc_penjaga" in npcs
+    assert "recipes" in data["context"]
+    assert isinstance(data["context"]["recipes"], list)
 
 
 def test_aksi_talk_membuka_dialog(base_url: str) -> None:
@@ -101,13 +103,16 @@ def test_tianyuan_panel(base_url: str) -> None:
     assert data["ok"] is True
     # di awal semua ingatan terkunci
     memories = data["tianyuan"]["memories"]
-    assert len(memories) > 0
+    assert len(memories) == 4
     assert all(m["unlocked"] is False for m in memories)
     assert all(m["title"] == "???" for m in memories)
     assert all(m["text"] is None for m in memories)
     assert data["tianyuan"]["unlocked_count"] == 0
-    assert data["tianyuan"]["total_count"] == len(memories)
+    assert data["tianyuan"]["total_count"] == 4
     assert data["tianyuan"]["mission"]["main"]["id"] == "q_akademi_01"
+    assert "side_quests" in data["tianyuan"]["mission"]
+    assert "system_log" in data["tianyuan"]
+    assert isinstance(data["tianyuan"]["system_log"], list)
 
 
 def test_tianyuan_panel_side_quest(base_url: str) -> None:
@@ -125,6 +130,23 @@ def test_tianyuan_panel_side_quest(base_url: str) -> None:
     finally:
         # Cleanup mock
         del app.registry.quest_by_id["sq_dummy"]
+
+
+def test_web_shop_buy_sell(base_url: str) -> None:
+    post(base_url, "/api/new")
+    app.session.state.player.gold = 500  # give player some gold to buy
+    
+    # move to market
+    data = post(base_url, "/api/action", {"action": {"type": "move", "to": "loc_pasar"}})
+    assert data["ok"] is True
+    assert "merchant_shop" in data["context"]
+    assert data["context"]["merchant_shop"] is not None
+    assert "buy" in data["context"]["merchant_shop"]
+    
+    # buy an item
+    data = post(base_url, "/api/action", {"action": {"type": "shop_buy", "item": "pil_qi", "count": 1}})
+    assert data["ok"] is True
+    assert app.session.state.inventory.get("pil_qi", 0) >= 1
 
 
 def test_api_state_tanpa_sesi(base_url: str) -> None:
