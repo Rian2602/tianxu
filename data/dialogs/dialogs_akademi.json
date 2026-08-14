@@ -94,8 +94,8 @@
         },
         "node_pelajaran_elemen_selesai": {
           "speaker": "npc:npc_gucanghai",
-          "text": "Bagus. Api membutuhkan keteguhan hati. Latihlah teknik ini sampai menyatu dengan napasmu. Pergilah ke paviliun dan temui rekan-rekan barumu.",
-          "end": true
+    "text": "Bagus. Api membutuhkan keteguhan hati. Latihlah teknik ini sampai menyatu dengan napasmu — di arena untuk sparing, atau ber-meditasi grounding di asrama untuk menyerap Qi. Kalau Qi atau HP-mu menipis, pakai Pil Qi dari kantongmu. Pergilah ke paviliun dan temui rekan-rekan barumu.",
+    "end": true
         },
         "node_pelajaran_senjata": {
           "condition": { "quest_active": "q_akademi_04b", "academy": "akademi_senjata" },
@@ -107,8 +107,8 @@
         },
         "node_pelajaran_senjata_selesai": {
           "speaker": "npc:npc_gucanghai",
-          "text": "Bagus. Pedang yang tajam lahir dari seribu tebasan. Latihlah sampai angin pun terbelah. Pergilah ke paviliun dan temui rekan-rekan barumu.",
-          "end": true
+    "text": "Bagus. Pedang yang tajam lahir dari seribu tebasan. Latihlah sampai angin pun terbelah — di arena untuk sparing, atau ber-meditasi grounding di asrama untuk menyerap Qi. Kalau Qi atau HP-mu menipis, pakai Pil Qi dari kantongmu. Pergilah ke paviliun dan temui rekan-rekan barumu.",
+    "end": true
         },
         "node_pelajaran_summoning": {
           "condition": { "quest_active": "q_akademi_04b", "academy": "akademi_summoning" },
@@ -120,8 +120,8 @@
         },
         "node_pelajaran_summoning_selesai": {
           "speaker": "npc:npc_gucanghai",
-          "text": "Bagus. Roh adalah kawan seperjalanan, bukan sekadar alat. Rawatlah ikatan itu. Pergilah ke paviliun dan temui rekan-rekan barumu.",
-          "end": true
+    "text": "Bagus. Roh adalah kawan seperjalanan, bukan sekadar alat. Rawatlah ikatan itu — di arena untuk sparing, atau ber-meditasi grounding di asrama untuk menyerap Qi. Kalau Qi atau HP-mu menipis, pakai Pil Qi dari kantongmu. Pergilah ke paviliun dan temui rekan-rekan barumu.",
+    "end": true
         },
         "node_kalah": {
           "condition": { "flag": { "key": "spar_kalah", "value": true } },
