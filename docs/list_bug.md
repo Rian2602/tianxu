@@ -16,7 +16,7 @@
 
 ## Status perbaikan (diterapkan 2026-08-14, diperbarui 2026-08-14 lanjutan)
 
-Sebagian bug aktif sudah diperbaiki — detail di bawah. Verifikasi: `tools/validate_data.py` lulus + `pytest` **207 passed**. Yang **tidak** dicantumkan di sini belum diperbaiki (desain/konten/defer).
+Sebagian bug aktif sudah diperbaiki — detail di bawah. Verifikasi: `tools/validate_data.py` lulus + `pytest` **209 passed**. Yang **tidak** dicantumkan di sini belum diperbaiki (desain/konten/defer).
 
 | ID | Status | Ringkasan fix |
 |----|--------|---------------|
@@ -42,7 +42,7 @@ Sebagian bug aktif sudah diperbaiki — detail di bawah. Verifikasi: `tools/vali
 
 Test baru/update: `test_spar_id_pendek_simpan_id_penuh`, `test_guard_pending_dialog_tolak_aksi_lain`, `test_body_non_dict_tidak_crash`, `test_tianyuan_tidak_menampilkan_main_quest_sebagai_side`, `test_context_loc_names`, `test_teknik_defend` (60%), `test_advance_time_menyelesaikan_reach_dalam_window`, `test_rest_memproses_quest_advance_time`, `test_resolve_choose_opsi_invalid_tidak_menuntaskan`, `test_pending_dialog_tidak_diserialisasi`.
 
-**Batch berikutnya (2026-08-14, plan `docs/superpowers/plans/2026-08-14-fix-sisa-bug-dan-hardening.md`) — 207 test total:**
+**Batch berikutnya (2026-08-14, plan `docs/superpowers/plans/2026-08-14-fix-sisa-bug-dan-hardening.md`) — 209 test total:**
 
 | ID | Status | Ringkasan fix |
 |----|--------|---------------|
