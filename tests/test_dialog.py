@@ -23,6 +23,62 @@ def test_penjaga_dialog_flow(session):
     assert session.state.flags.get("met_penjaga") is True
 
 
+def test_konfrontasi_pilihan_efek_beda(session, god_mode):
+    """J3#6: opsi 'menuntut' (0) memberi morality +1; opsi 'diam' (1) tidak — hilangkan choice illusion."""
+    from conftest import play_to_incident
+    from src.engine.session import GameSession
+
+    def morality_delta(idx):
+        s = GameSession.new(session.reg)
+        play_to_incident(s)
+        finish_dialog(s, [0, 0])  # opt_3aa
+        move_path(s, ["loc_perpustakaan", "loc_paviliun"])
+        # bicara pertama: branch_3aa belum set → node_umum (selesaikan q_akademi_3aa)
+        s.apply_action({"type": "talk", "npc": "npc_penatua"})
+        finish_dialog(s, [])
+        # bicara kedua: branch_3aa sudah set → node_konfrontasi
+        s.apply_action({"type": "talk", "npc": "npc_penatua"})
+        m0 = s.state.player.morality
+        s.apply_action({"type": "dialog_choice", "choice_index": idx})
+        return s.state.player.morality - m0
+
+    assert morality_delta(0) == 1  # menuntut jawaban → moralitas naik
+    assert morality_delta(1) == 0  # menahan amarah → netral
+
+
+def test_reaksi_3ab(session, god_mode):
+    """G4c: cabang 3ab mendapat reaksi khusus (Su Qing hangat, Han Xiu respect, Zhou Yan bersyukur)."""
+    from conftest import play_to_incident
+    from src.engine.session import GameSession
+
+    s = GameSession.new(session.reg)
+    play_to_incident(s)
+    finish_dialog(s, [0, 1])  # opt_3ab
+    move_path(s, ["loc_perpustakaan"])
+    s.apply_action({"type": "talk", "npc": "npc_moyun"})  # selesaikan q_akademi_3ab
+    finish_dialog(s, [])
+    s.apply_action({"type": "talk", "npc": "npc_moyun"})  # q07 — kebenaran
+    finish_dialog(s, [])
+    assert "q_akademi_07" in s.state.completed_quests
+    assert s.state.flags.get("zhouyan_status") == "bebas"
+
+    # Su Qing (paviliun) → hangat 3ab
+    s.apply_action({"type": "move", "to": "loc_paviliun"})
+    s.apply_action({"type": "talk", "npc": "npc_suqing"})
+    assert "tanpa membuat gaduh" in s.dialog.view()["text"]
+    finish_dialog(s, [])
+    # Han Xiu (arena) → respect 3ab
+    s.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    s.apply_action({"type": "move", "to": "loc_arena"})
+    s.apply_action({"type": "talk", "npc": "npc_hanxiu"})
+    assert "kepala dingin" in s.dialog.view()["text"]
+    finish_dialog(s, [])
+    # Zhou Yan (aula ujian) → bersyukur 3ab
+    s.apply_action({"type": "move", "to": "loc_aula_ujian"})
+    s.apply_action({"type": "talk", "npc": "npc_zhouyan"})
+    assert "diam-diam" in s.dialog.view()["text"]
+
+
 def test_entri_kondisional_suqing(session, god_mode):
     # sebelum hari pertama selesai → entri intro (gerbang → aula → paviliun)
     move_path(session, ["loc_aula_ujian", "loc_paviliun"])

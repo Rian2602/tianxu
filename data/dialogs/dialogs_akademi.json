@@ -35,6 +35,12 @@
       "npc": "npc_gucanghai",
       "start": "node_umum",
       "nodes": {
+        "node_kalah": {
+          "condition": { "flag": { "key": "spar_kalah", "value": true } },
+          "speaker": "npc:npc_gucanghai",
+          "text": "Kalah di pertarungan pertamamu. Tidak apa — aku pernah kalah tiga kali berturut-turut sebelum mengerti apa artinya bertarung. Bangun, istirahat, dan lain kali kau akan lebih kuat. Menang atau kalah — yang penting kau berdiri lagi.",
+          "end": true
+        },
         "node_ujian": {
           "condition": { "flag": { "key": "ujian_akar_selesai", "value": false } },
           "speaker": "npc:npc_gucanghai",
@@ -107,6 +113,12 @@
           "text": "Kau berdiri di depan Penatua An dan menuntut jawaban. Di akademi ini, itu seperti menantang batu untuk jatuh. ... Aku mengakuinya, Chen Xu. Kau punya tulang. Lain kali kita sparring — dan aku tak akan menahan diri.",
           "end": true
         },
+        "node_respect_3ab": {
+          "condition": { "flag": { "key": "branch_3ab", "value": true } },
+          "speaker": "npc:npc_hanxiu",
+          "text": "Kau membongkar kebenaran tanpa membuat keributan. Di akademi ini orang mengira berani itu harus berisik. ... Kau punya kepala dingin, murid desa. Lain kali kita sparring — dan aku tak akan menahan diri.",
+          "end": true
+        },
         "node_banter": {
           "speaker": "npc:npc_hanxiu",
           "text": "Hei. Masih hidup, murid desa? Kalau kau mau mengasah kemampuan, aku selalu ada di arena. Menang lawan aku — itu cara tercepat untuk tumbuh.",
@@ -151,6 +163,12 @@
           "text": "Kau... kau benar-benar melakukannya. Berdiri di depan Penatua demi orang yang bahkan tidak kau kenal. Aku bangga mengenalmu, Chen Xu. Sungguh.",
           "end": true
         },
+        "node_hangat_3ab": {
+          "condition": { "flag": { "key": "branch_3ab", "value": true } },
+          "speaker": "npc:npc_suqing",
+          "text": "Kau menyelidiki Mo Yun tanpa membuat gaduh, dan tetap menuntun kebenaran sampai ke permukaan. Itu juga keberanian, Chen Xu — yang paling jarang ditemukan di akademi ini. Aku bangga mengenalmu.",
+          "end": true
+        },
         "node_offer_side": {
           "condition": { "quest_not_active": "q_side_suqing" },
           "speaker": "npc:npc_suqing",
@@ -185,7 +203,7 @@
         "node_truth_3aa": {
           "condition": { "flag": { "key": "branch_3aa", "value": true } },
           "speaker": "npc:npc_moyun",
-          "text": "Kau berdiri di depan Penatua dan masih hidup. Itu lebih dari yang bisa dilakukan kebanyakan orang. ... Kebenarannya: Lonceng itu diambil Penatua An untuk keperluan yang tak boleh kusebutkan. Zhou Yan dikorbankan agar akademi tenang. Aku tahu sejak awal — dan aku diam, karena aku berhutang nyawa padanya.",
+          "text": "Kau sudah tahu sebelum kau berdiri di depan Penatua — dan kau berdiri di sana juga. ... Kau benar: Lonceng itu diambil Penatua An untuk keperluan yang tak boleh kusebutkan. Zhou Yan dikorbankan agar akademi tenang. Aku tahu sejak awal — dan aku diam, karena aku berhutang nyawa padanya. Kau memilih jalan yang berisik. Sekarang mereka tahu kau tidak akan diam.",
           "next": "node_penutup"
         },
         "node_truth_3ab": {
@@ -198,6 +216,11 @@
           "condition": { "flag": { "key": "branch_3b", "value": true } },
           "speaker": "npc:npc_moyun",
           "text": "Kau memilih uang, bukan kebenaran. Mungkin kau pikir itu lebih aman. ... Lonceng itu diambil Penatua An. Zhou Yan dikorbankan. Itu saja yang perlu kau tahu — dan itu saja yang kau dapatkan.",
+          "next": "node_penutup_3b"
+        },
+        "node_penutup_3b": {
+          "speaker": "narration",
+          "text": "Kau berdiri di perpustakaan yang sunyi. Kebenaran itu sederhana — dan menyakitkan. Pola yang sama seperti yang kau kenali dari dalam dirimu: yang lemah dikorbankan untuk yang kuat.\n\nKau tahu polanya. Kau hanya memilih berada di sisi yang salah kali ini. Sesuatu di dadamu berdenyut pelan. Tianyuan Ling.",
           "end": true
         },
         "node_truth_3c": {
@@ -258,8 +281,7 @@
           "speaker": "npc:npc_zhouyan",
           "text": "Kau... kau murid baru yang duduk di sebelahku waktu ujian, kan? Aku dengar rumor tentangku. Aku tidak mengambil Lonceng itu. Aku bersumpah. Tapi tidak ada yang percaya.",
           "choices": [
-            { "label": "Aku bisa 'menghilangkan' sebagian bukti yang memberatkanmu... untuk sebuah imbalan.", "next": "node_imbalan", "effects": [ { "type": "morality", "value": -3 } ] },
-            { "label": "(Tidak menjawab)", "next": "node_umum" }
+            { "label": "Aku bisa 'menghilangkan' sebagian bukti yang memberatkanmu... untuk sebuah imbalan.", "next": "node_imbalan", "effects": [ { "type": "morality", "value": -3 } ] }
           ]
         },
         "node_imbalan": {
@@ -276,6 +298,12 @@
           "condition": { "flag": { "key": "branch_3aa", "value": true } },
           "speaker": "npc:npc_zhouyan",
           "text": "Chen Xu... aku tidak tahu harus berkata apa. Kau satu-satunya yang percaya padaku. Aku tidak akan melupakan ini. Selama aku hidup, jika kau butuh sesuatu — aku ada.",
+          "end": true
+        },
+        "node_bersyukur_3ab": {
+          "condition": { "flag": { "key": "branch_3ab", "value": true } },
+          "speaker": "npc:npc_zhouyan",
+          "text": "Chen Xu... aku dengar kau bekerja diam-diam untuk membantuku. Kau tidak perlu menyeret namamu ke tengah keramaian — dan kau tetap melakukannya. Terima kasih. Selama aku hidup, jika kau butuh sesuatu — aku ada.",
           "end": true
         },
         "node_pahit_3b": {
@@ -303,11 +331,11 @@
       "start": "node_umum",
       "nodes": {
         "node_konfrontasi": {
-          "condition": { "flag": { "key": "jalur_3a", "value": true } },
+          "condition": { "flag": { "key": "branch_3aa", "value": true } },
           "speaker": "npc:npc_penatua",
           "text": "Kau berdiri di depanku tanpa undangan. Murid baru, aku dengar kau mencari-cari soal Lonceng Angin Panjang. Pikirkan baik-baik langkah berikutnya.",
           "choices": [
-            { "label": "Zhou Yan tidak bersalah. Aku melihat siapa yang membawa Lonceng itu — malam itu.", "next": "node_konfrontasi2" },
+            { "label": "Zhou Yan tidak bersalah. Aku melihat siapa yang membawa Lonceng itu — malam itu.", "next": "node_konfrontasi2", "effects": [ { "type": "morality", "value": 1 } ] },
             { "label": "(Diam, menahan amarah)", "next": "node_konfrontasi2" }
           ]
         },
