@@ -297,6 +297,66 @@ def test_side_quest_cooldown(session, god_mode, monkeypatch):
     assert session.quest.is_offerable("q_side_berburu") is True
 
 
+def test_ular_bayangan_dihitung_quest_berburu(dummy_session):
+    """Ular bayangan (pool malam) = binatang liar → dihitung kill quest berburu."""
+    qe = dummy_session.quest
+    s = dummy_session.state
+    qe.start_side("q_side_berburu")
+    qe.notify_battle_won(["eno_ular_bayangan"])
+    qe.notify_battle_won(["eno_ular_bayangan"])
+    assert s.active_side_quests["q_side_berburu"]["defeated"] == 2
+    # quest belum selesai — masih butuh lapor ke Pemburu
+    assert "q_side_berburu" in s.active_side_quests
+
+
+def test_dialog_pemburu_lapor_saat_quest_aktif(session, god_mode, monkeypatch):
+    """Saat quest berburu aktif, bicara Pemburu = dialog LAPOR (bukan tawaran lagi);
+    setelah selesai, bicara lagi = tawaran baru (offer ulang)."""
+    monkeypatch.setattr("src.engine.session.random.choice", lambda seq: "eno_serigala_qi")
+    monkeypatch.setattr("src.engine.session.random.random", lambda: 0.5)  # bukan mini-boss
+    session.apply_action({"type": "advance_time", "hours": 24})  # hari 2, jam 8
+
+    # ambil quest → quest aktif
+    session.apply_action({"type": "talk", "npc": "npc_pemburu"})
+    v = session.dialog.view()
+    assert v["node_id"] == "node_tawaran"  # offer dulu
+    finish_dialog(session, [0])
+    assert "q_side_berburu" in session.state.active_side_quests
+
+    # bicara lagi SAAT quest aktif (belum ada kill) → node lapor, BUKAN tawaran;
+    # pilihan serah belum tampil karena kill 0 < 2
+    session.apply_action({"type": "talk", "npc": "npc_pemburu"})
+    v = session.dialog.view()
+    assert v["node_id"] == "node_lapor"
+    labels = [c["label"] for c in v["choices"]]
+    assert not any("ambil tugas" in l for l in labels), f"masih menawarkan: {labels}"
+    assert not any("dua ekor" in l for l in labels), f"pilihan serah tampil padahal kill 0: {labels}"
+    finish_dialog(session, [0])  # "Belum lengkap"
+    assert "q_side_berburu" in session.state.active_side_quests  # quest belum selesai
+
+    # 2 kill → lapor → selesai
+    session.apply_action({"type": "move", "to": "loc_wilayah_berburu"})
+    session.apply_action({"type": "hunt"})
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    session.apply_action({"type": "advance_time", "hours": 5})
+    session.apply_action({"type": "hunt"})
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    session.apply_action({"type": "move", "to": "loc_gerbang_akademi"})
+    session.apply_action({"type": "talk", "npc": "npc_pemburu"})
+    v = session.dialog.view()
+    assert v["node_id"] == "node_lapor"
+    labels = [c["label"] for c in v["choices"]]
+    assert any("hasil buruan" in l or "dua ekor" in l for l in labels)  # pilihan serah tampil (kill cukup)
+    finish_dialog(session, [0])  # serah
+    assert "q_side_berburu" not in session.state.active_side_quests
+    assert "q_side_berburu" in session.state.completed_quests
+
+    # setelah cooldown → bicara lagi = tawaran baru, bukan lapor
+    session.apply_action({"type": "advance_time", "hours": 2})
+    session.apply_action({"type": "talk", "npc": "npc_pemburu"})
+    assert session.dialog.view()["node_id"] == "node_tawaran"
+
+
 def test_notify_move_reach_outside_time_window(dummy_session):
     """Reach quest dengan time_window (q_akademi_06, 19–6): di luar jendela → tidak selesai."""
     qe = dummy_session.quest

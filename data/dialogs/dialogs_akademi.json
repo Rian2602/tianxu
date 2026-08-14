@@ -551,27 +551,71 @@
     {
       "id": "dlg_pemburu",
       "npc": "npc_pemburu",
-      "start": "node_tawaran",
-      "nodes": {
-        "node_tawaran": {
-          "speaker": "npc:npc_pemburu",
-          "text": "Hei, murid. Di hutan itu ada serigala Qi dan babi hutan yang merusak ladang. Kalahkan dua ekor untukku, bawa buktinya — aku bayar. Dan kalau sudah selesai, tugas serupa selalu ada. Hutan tidak pernah sepi.",
-          "choices": [
-            { "label": "Aku ambil tugasnya.", "next": "node_terima", "effects": [ { "type": "start_quest", "quest": "q_side_berburu" } ] },
-            { "label": "Mungkin lain kali.", "next": "node_tolak" }
-          ]
-        },
-        "node_terima": {
-          "speaker": "npc:npc_pemburu",
-          "text": "Bagus. Hutan tidak menunggu siapa pun.",
-          "end": true
-        },
-        "node_tolak": {
-          "speaker": "npc:npc_pemburu",
-          "text": "Sesukamu. Kalau berubah pikiran, aku di sini.",
-          "end": true
-        }
+      "start": "node_tawaran", "nodes": {
+  "node_lapor": {
+   "condition": {
+    "quest_active": "q_side_berburu"
+   },
+   "speaker": "npc:npc_pemburu",
+   "text": "Sudah dapat hasil buruannya? Serigala, babi hutan, atau ular bayangan — dua ekor, dan aku bayar.",
+   "choices": [
+    {
+     "label": "Ini, dua ekor hasil buruanku.",
+     "next": "node_serah_ok",
+     "condition": {
+      "defeated_min": {
+       "quest": "q_side_berburu",
+       "value": 2
       }
+     }
+    },
+    {
+     "label": "Belum lengkap — nanti kususulkan lagi.",
+     "next": "node_serah_belum"
+    }
+   ]
+  },
+  "node_serah_ok": {
+   "speaker": "npc:npc_pemburu",
+   "text": "Bagus, benar-benar hasil buruan yang pantas. Ini bayarannya — dan kalau butuh tugas lagi, hutan tidak pernah sepi. Aku selalu di sini.",
+   "end": true
+  },
+  "node_serah_belum": {
+   "speaker": "npc:npc_pemburu",
+   "text": "Tak apa. Hutan tidak lari. Serigala dan babi berkeliaran di Wilayah Berburu — dan kalau malam tiba, ular bayangan ikut merayap. Bawa dua ekor, kau kubayar.",
+   "end": true
+  },
+  "node_tawaran": {
+   "speaker": "npc:npc_pemburu",
+   "text": "Hei, murid. Di hutan itu ada serigala Qi dan babi hutan yang merusak ladang. Kalahkan dua ekor untukku, bawa buktinya — aku bayar. Dan kalau sudah selesai, tugas serupa selalu ada. Hutan tidak pernah sepi.",
+   "choices": [
+    {
+     "label": "Aku ambil tugasnya.",
+     "next": "node_terima",
+     "effects": [
+      {
+       "type": "start_quest",
+       "quest": "q_side_berburu"
+      }
+     ]
+    },
+    {
+     "label": "Mungkin lain kali.",
+     "next": "node_tolak"
+    }
+   ]
+  },
+  "node_terima": {
+   "speaker": "npc:npc_pemburu",
+   "text": "Bagus. Hutan tidak menunggu siapa pun.",
+   "end": true
+  },
+  "node_tolak": {
+   "speaker": "npc:npc_pemburu",
+   "text": "Sesukamu. Kalau berubah pikiran, aku di sini.",
+   "end": true
+  }
+ }
     }
   ]
 }

@@ -153,6 +153,12 @@ class DialogEngine:
             h = cond["has_items"]
             if s.inventory.get(h.get("item", ""), 0) < h.get("value", 1):
                 return False
+        if "defeated_min" in cond:
+            # progres kill side quest: { "quest": "q_side_berburu", "value": 2 }
+            dm = cond["defeated_min"]
+            prog = s.active_side_quests.get(dm.get("quest", ""), {})
+            if prog.get("defeated", 0) < dm.get("value", 1):
+                return False
         if "realm_min" in cond:
             if registry is None:
                 return False

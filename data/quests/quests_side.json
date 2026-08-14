@@ -5,16 +5,17 @@
       "title": "Tugas Berburu",
       "arc": "akademi",
       "kind": "side",
-      "summary": "Pemburu Tua meminta bantuan mengalahkan binatang buas di Wilayah Berburu.",  "objective": {
-   "kind": "defeat",
-   "enemies": [
-    "eno_serigala_qi",
-    "eno_babi_hutan"
-   ],
-   "target": 2,
-   "report_to": "npc_pemburu",
-   "hint": "Kalahkan 2 binatang liar di Wilayah Berburu, lalu lapor ke Pemburu Tua."
-  },
+      "summary": "Pemburu Tua meminta bantuan mengalahkan binatang buas di Wilayah Berburu.", "objective": {
+  "kind": "defeat",
+  "enemies": [
+   "eno_serigala_qi",
+   "eno_babi_hutan",
+   "eno_ular_bayangan"
+  ],
+  "target": 2,
+  "report_to": "npc_pemburu",
+  "hint": "Kalahkan 2 binatang liar (serigala, babi hutan, ular bayangan) di Wilayah Berburu, lalu serahkan hasilnya ke Pemburu Tua."
+ },
       "next": [],
       "repeatable": true,
       "cooldown": 2,

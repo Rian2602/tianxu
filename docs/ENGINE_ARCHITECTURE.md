@@ -202,7 +202,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `reach` | `location` (+ opsional `time_window`) | Tiba di lokasi; jika `time_window` (`hour_start`/`hour_end`) ada, hanya sah pada waktu itu — **event terjadwal** |
 | `choose` | `options` (list) | Pilihan eksplisit (mis. pilih akademi, pilih jalur) |
 | `spar` | `npc` | Sparring wajib: bicara NPC ber-`combat` → battle; **menang = objektif selesai** (dipakai sparing ujian) |
-| `defeat` (+opsional `report_to`) | `enemies`, `target`, `report_to` | Side quest: kalahkan `target` musuh dari `enemies`. **A2 (2026-08-14)**: dengan `report_to`, quest hanya selesai setelah **lapor ke NPC pemberi** (`npc`) — `quest.py::notify_dialog_ended` memeriksa `defeat + report_to`; validator aturan 2 memeriksa referensi npc |
+| `defeat` (+opsional `report_to`) | `enemies`, `target`, `report_to` | Side quest: kalahkan `target` musuh dari `enemies`. **A2 (2026-08-14)**: dengan `report_to`, quest hanya selesai setelah **lapor ke NPC pemberi** (`npc`) — `quest.py::notify_dialog_ended` memeriksa `defeat + report_to`; validator aturan 2 memeriksa referensi npc. **Catatan 2026-08-14**: `enemies` boleh mencakup musuh dari pool malam (`world.hunt.night_pool` — mis. ular bayangan); dialog pemberi memakai node lapor (`quest_active`) + pilihan serah bersyarat `defeated_min` agar lapor = dialog penyerahan, dan offer baru muncul setelah quest selesai/cooldown |
 | `advance_time` | `hour` (+ opsional `day_offset`) | Tunggu hingga jam tertentu; `day_offset` = maju N hari. **A5 (2026-08-14)**: selesai saat waktu absolut `day*24+hour` ≥ target `(start_day+day_offset)*24+hour` — overshoot (menunggu terlalu lama) otomatis memenuhi, tidak molor |
 
 **Aturan sisi `next`**:
@@ -267,6 +267,7 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 | `morality_min` / `morality_max` | `{ "morality_min": 10 }` | Batas skala moralitas |
 | `has_item` | `{ "has_item": "pil_qi" }` | Punya item (count ≥ 1) |
 | `has_items` | `{ "has_items": { "item": "material_herba", "value": 3 } }` | Punya item dengan jumlah spesifik (≥ value) — dipakai pilihan serah side quest gather |
+| `defeated_min` | `{ "defeated_min": { "quest": "q_side_berburu", "value": 2 } }` | Progres kill side quest defeat mencapai value — dipakai pilihan serah hasil buruan |
 | `realm_min` | `{ "realm_min": "realm_pengumpul_qi" }` | Ranah minimum |
 | `academy` | `{ "academy": "akademi_elemen" }` | Akademi pilihan pemain |
 | `quest_active` / `quest_not_active` | `{ "quest_not_active": "q_side_suqing" }` | Status quest (dipakai penawaran side quest) |

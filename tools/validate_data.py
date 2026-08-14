@@ -434,7 +434,7 @@ class Validator:
             return
         # kunci kondisi yang didukung `dialog.py::_eval_condition` (AND multi-kunci)
         allowed = {"flag", "morality_min", "morality_max", "has_item", "has_items", "realm_min",
-                   "academy", "quest_active", "quest_not_active",
+                   "academy", "quest_active", "quest_not_active", "defeated_min",
                    "relation_min", "relation_max", "memory", "month_min", "month_max"}
         for ck in cond:
             if ck not in allowed:
@@ -451,6 +451,12 @@ class Validator:
                 self.error(f"dialog {did} {where} {nid}: kondisi has_items harus {{item, value>=1}} (aturan 7)")
             elif not self.has("item", h.get("item", "")):
                 self.error(f"dialog {did} {where} {nid}: kondisi has_items item '{h.get('item')}' tidak ada")
+        if cond.get("defeated_min"):
+            dm = cond["defeated_min"]
+            if not isinstance(dm, dict) or not dm.get("quest") or not isinstance(dm.get("value"), int) or dm["value"] < 1:
+                self.error(f"dialog {did} {where} {nid}: kondisi defeated_min harus {{quest, value>=1}} (aturan 7)")
+            elif not self.has("quest", dm.get("quest", "")):
+                self.error(f"dialog {did} {where} {nid}: kondisi defeated_min quest '{dm.get('quest')}' tidak ada")
         # C2: kondisi bulan — int 1..12 (12 bulan dalam setahun, month_length_days ≥ 1)
         for ck in ("month_min", "month_max"):
             m = cond.get(ck)
