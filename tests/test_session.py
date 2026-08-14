@@ -544,7 +544,8 @@ def test_is_npc_available_without_schedule(session):
 
 def test_talk_returns_view_during_battle(session):
     session.state.pending_battle = {"active": True}
-    v = session._talk({"npc": "npc_penjaga"})
-    assert "location" in v or "error" in v
+    session._talk({"npc": "npc_penjaga"})
+    assert session.state.pending_dialog is None  # dialog tidak boleh mulai saat bertarung
+    assert session.state.pending_battle == {"active": True}  # battle tetap berjalan
 
 

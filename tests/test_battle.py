@@ -183,7 +183,7 @@ def test_teknik_defend(session, monkeypatch):
 
     session.apply_action({"type": "battle_action", "action": "technique", "technique": "tek_elemen_perisai_tanah"})
     # Musuh serang: attack 20 vs def 3 -> base ~19, guarded -> max(1, 19 // 2) = 9
-    assert session.state.player.hp < 80
+    assert session.state.player.hp == 71
     assert any("Perisai Tanah" in e["text"] for e in session.state.log)
     assert session.state.pending_battle is not None
     session.state.pending_battle = None

@@ -84,7 +84,7 @@ def test_cli_full_playthrough_commands(monkeypatch, capsys):
         "racik rc_pil_qi",         # ditolak (tidak aman)
         "cari",                    # ditolak (bukan Wilayah Berburu)
         "berburu",                 # ditolak (bukan Wilayah Berburu)
-        "pakai pil_qi",            # item tidak dimiliki
+        "pakai pil_qi",            # pakai item (dimiliki dari inventori awal)
         "ingatan",                 # belum ada ingatan
         "bicara npc_penjaga", "1", "lanjut", "lanjut",
         "pindah loc_aula_ujian",
@@ -109,7 +109,6 @@ def test_cli_full_playthrough_commands(monkeypatch, capsys):
         "pindah loc_wilayah_berburu", "berburu",
         "teknik", "bertahan", "item", "kabur", "foo", "teknik tek_elemen_bola_api", "serang",
         "ingatan", "ingatan mem_999",
-        "simpan cli_arc_end",
         "keluar",
     ]
     inputs = iter(script)

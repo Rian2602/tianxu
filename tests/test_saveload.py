@@ -170,10 +170,10 @@ def test_load_missing_save_raises_file_not_found(tmp_path, monkeypatch, registry
 
 def test_ui_battle_returns_pending_battle(dummy_session):
     state = dummy_session.state
-    assert state.pending_battle is None
-    assert state.ui.battle == state._ui_proxy._battle
+    state._ui_proxy._battle = {"stored": True}
+    assert state.ui.battle == {"stored": True}  # tanpa pending_battle → kembali ke _battle proxy
     state.pending_battle = {"active": True, "turn": 2}
-    assert state.ui.battle == {"active": True, "turn": 2}
+    assert state.ui.battle == {"active": True, "turn": 2}  # dengan pending → pending_battle
 
 
 def test_ui_battle_empty_clears_pending(dummy_session):

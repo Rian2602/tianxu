@@ -9,9 +9,10 @@ from src.engine.memory import unlock
 
 def test_apply_none_and_empty(dummy_session, registry):
     state = dummy_session.state
-    # None dan list kosong tidak menimbulkan error
+    # None dan list kosong adalah no-op: tidak error, tidak menulis log error
     apply(state, registry, None)
     apply(state, registry, [])
+    assert not any("Efek tak dikenal" in e["text"] for e in state.log)
 
 
 def test_apply_morality(dummy_session, registry):
@@ -108,6 +109,9 @@ def test_apply_start_quest(dummy_session, registry):
     state = dummy_session.state
     # start_quest adalah no-op di effects.py (ditangani dialog/session)
     apply(state, registry, [{"type": "start_quest", "quest": "q_side_suqing"}])
+    assert "q_side_suqing" not in state.active_side_quests
+    assert state.current_quest == "q_akademi_01"  # tidak berubah
+    assert not any("Efek tak dikenal" in e["text"] for e in state.log)
 
 
 def test_apply_unknown_type(dummy_session, registry):
