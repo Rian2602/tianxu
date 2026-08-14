@@ -267,6 +267,7 @@ class GameSession:
             self.state.exp_grind_today = 0
         self.quest.notify_move()
         self.quest.advance_time_target_met()
+        self.quest.check_timeouts()  # G3-T1: quest ber-deadline gagal saat batas terlampaui
         self._maybe_start_branch_dialog()
 
     def _choose(self, action: dict) -> dict:

@@ -426,6 +426,32 @@ class Validator:
                 if cd is not None and (not isinstance(cd, (int, float)) or cd <= 0):
                     self.error(f"quest {qid}: cooldown harus > 0 (aturan 8)")
 
+            # G3-T1: quest failure/deadline — timeout, fail_next, fail_effects (aturan 8)
+            to = q.get("timeout")
+            if to is not None:
+                hours = (to or {}).get("hours") if isinstance(to, dict) else None
+                if not isinstance(hours, int) or hours <= 0:
+                    self.error(f"quest {qid}: timeout.hours harus int > 0 (aturan 8)")
+                for fx in q.get("fail_effects", []):
+                    self._check_effect(fx, f"quest {qid} fail_effects")
+            fns = q.get("fail_next")
+            if fns:
+                if not isinstance(fns, list) or not fns:
+                    self.error(f"quest {qid}: fail_next harus list non-kosong (aturan 8)")
+                elif q.get("kind") != "main":
+                    self.error(f"quest {qid}: fail_next hanya untuk quest kind=main (aturan 8)")
+                elif not to:
+                    self.error(f"quest {qid}: fail_next tanpa timeout (aturan 8)")
+                else:
+                    for e in fns:
+                        nxt = e.get("quest")
+                        if not nxt or not self.has("quest", nxt):
+                            self.error(f"quest {qid}: fail_next.quest '{nxt}' tidak ada (aturan 8)")
+                        elif next((qq for qq in self.quests if qq["id"] == nxt), {}).get("kind") != "main":
+                            self.error(f"quest {qid}: fail_next '{nxt}' bukan quest kind=main (aturan 8)")
+            if q.get("kind") == "main" and to and not fns:
+                self.error(f"quest {qid}: main quest ber-timeout wajib fail_next (aturan 8)")
+
             # aturan 9: repeatable hanya side
             if q.get("repeatable") and q.get("kind") != "side":
                 self.error(f"quest {qid}: repeatable=true tapi kind='{q.get('kind')}' (aturan 9)")

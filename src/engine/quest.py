@@ -41,6 +41,10 @@ class QuestEngine:
     def objective_text(self, quest: dict) -> str:
         obj = quest.get("objective", {})
         hint = obj.get("hint", "")
+        # G3-T1: quest ber-timeout menampilkan sisa waktu (jam)
+        sisa = self._timeout_remaining(quest)
+        if sisa is not None:
+            hint = f"{hint} · Sisa: {sisa} jam" if hint else f"Sisa: {sisa} jam"
         kind = obj.get("kind")
         if kind == "talk":
             npc = self.reg.npc(obj.get("npc", ""))
@@ -66,6 +70,20 @@ class QuestEngine:
         if kind == "spar":
             return hint
         return hint
+
+    def _timeout_remaining(self, quest: dict) -> int | None:
+        """G3-T1: sisa jam quest ber-timeout; None bila quest tak ber-timeout.
+        Start diambil dari progress (start_day/start_hour, relatif jam game);
+        bila belum tercatat (save lama) → anggap mulai sekarang (tidak langsung gagal)."""
+        hours = (quest.get("timeout") or {}).get("hours")
+        if not hours:
+            return None
+        prog = self.state.active_side_quests.get(quest["id"], {})
+        if "start_day" not in prog:
+            return int(hours)
+        start_abs = int(prog["start_day"]) * 24 + int(prog.get("start_hour", 0))
+        sisa = int(hours) - (self.state.absolute_hours - start_abs)
+        return max(0, sisa)
 
     def _talk_count(self, quest: dict) -> int:
         return self.state.active_side_quests.get(quest["id"], {}).get("talk", 0)
@@ -362,6 +380,8 @@ class QuestEngine:
             return False
         if qid in self.state.completed_quests and not sq.get("repeatable"):
             return False
+        if qid in self.state.failed_quests and not sq.get("repeatable"):
+            return False  # G3-T1: quest non-repeatable yang gagal tidak ditawarkan lagi
         cd = sq.get("cooldown", 0)
         if cd > 0 and qid in self.state.side_quest_cooldowns:
             now_abs_hours = self.state.absolute_hours
@@ -379,10 +399,87 @@ class QuestEngine:
     def start_side(self, qid: str) -> bool:
         if not self.is_offerable(qid):
             return False
-        self.state.active_side_quests[qid] = {}
+        # G3-T1: catat start (jam game absolut) — dasar hitung timeout quest
+        self.state.active_side_quests[qid] = {
+            "start_day": self.state.day,
+            "start_hour": self.state.hour,
+        }
         sq = self.reg.quest(qid)
         add_log(self.state, "narration", f"→ Quest sampingan aktif: {sq['title']}.")
         return True
+
+    def check_timeouts(self) -> None:
+        """G3-T1: quest aktif ber-timeout gagal saat batas (>=) tercapai.
+
+        - main quest → `fail_effects` + `fail_next` (wajib ada, divalidasi) aktif
+        - side quest → `fail_effects` + hapus dari aktif
+        Keduanya tercatat di `failed_quests`. Dipanggil sesi dari `_pass_time`
+        setelah `advance_time_target_met` — quest yang SELESAI tepat sebelum
+        deadline sudah pop dari aktif, tidak ikut gagal.
+        """
+        now_abs = self.state.absolute_hours
+        # main quest
+        qid = self.state.current_quest
+        if qid:
+            q = self.reg.quest(qid)
+            hours = (q or {}).get("timeout", {}).get("hours")
+            if hours:
+                prog = self.state.active_side_quests.get(qid)
+                if prog is None:
+                    self._note_main_start(qid)
+                    prog = self.state.active_side_quests[qid]
+                if "start_day" not in prog:  # save lama tanpa start → anggap mulai sekarang
+                    prog["start_day"] = self.state.day
+                    prog["start_hour"] = self.state.hour
+                start_abs = int(prog["start_day"]) * 24 + int(prog.get("start_hour", 0))
+                if now_abs - start_abs >= int(hours):
+                    self._fail_main(qid)
+        # side quest
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            hours = (sq or {}).get("timeout", {}).get("hours")
+            if not hours or (sq or {}).get("kind") != "side":
+                continue
+            prog = self.state.active_side_quests[qid]
+            if "start_day" not in prog:
+                prog["start_day"] = self.state.day
+                prog["start_hour"] = self.state.hour
+            start_abs = int(prog["start_day"]) * 24 + int(prog.get("start_hour", 0))
+            if now_abs - start_abs >= int(hours):
+                self._fail_side(qid)
+
+    def _fail_main(self, qid: str) -> None:
+        """G3-T1: main quest gagal — efek, catat, lanjut ke `fail_next`."""
+        if self.state.current_quest != qid:
+            return
+        q = self.reg.quest(qid)
+        apply_effects(self.state, self.reg, q.get("fail_effects"))
+        if q.get("fail_system_msg"):
+            add_log(self.state, "system", q["fail_system_msg"])
+        add_log(self.state, "narration", f"✗ Quest gagal: {q['title']} (waktu habis).")
+        self.state.failed_quests.append(qid)
+        self.state.active_side_quests.pop(qid, None)
+        self.state.current_quest = None
+        nexts = q.get("fail_next") or []
+        if len(nexts) == 1:
+            self.state.current_quest = nexts[0]["quest"]
+            self._note_main_start(self.state.current_quest)
+        elif len(nexts) > 1:
+            # percabangan gagal: minta dialog pilihan (pola sama seperti _advance_main)
+            cid = nexts[0].get("choice_id")
+            self.state.branch_pending = cid
+
+    def _fail_side(self, qid: str) -> None:
+        """G3-T1: side quest gagal — efek, catat, hapus dari aktif."""
+        if qid not in self.state.active_side_quests:
+            return
+        q = self.reg.quest(qid)
+        apply_effects(self.state, self.reg, q.get("fail_effects"))
+        if q.get("fail_system_msg"):
+            add_log(self.state, "system", q["fail_system_msg"])
+        add_log(self.state, "narration", f"✗ Quest sampingan gagal: {q['title']} (waktu habis).")
+        self.state.failed_quests.append(qid)
+        del self.state.active_side_quests[qid]
 
     def _complete_side(self, qid: str) -> None:
         if qid not in self.state.active_side_quests:

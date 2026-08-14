@@ -206,6 +206,24 @@ def test_max_qi_unknown_realm_returns_current(dummy_session, registry):
     assert state.max_qi(registry) == 33
 
 
+def test_failed_quests_serialized_and_restored(dummy_session):
+    """G3-T1: failed_quests ikut to_dict/from_dict (round-trip)."""
+    state = dummy_session.state
+    state.failed_quests.append("q_synth_gagal")
+    d = state.to_dict()
+    assert d["failed_quests"] == ["q_synth_gagal"]
+    restored = GameState.from_dict(d)
+    assert restored.failed_quests == ["q_synth_gagal"]
+
+
+def test_failed_quests_default_save_lama(dummy_session):
+    """G3-T1: save lama tanpa field failed_quests → default [] (non-breaking)."""
+    d = dummy_session.state.to_dict()
+    d.pop("failed_quests")
+    restored = GameState.from_dict(d)
+    assert restored.failed_quests == []
+
+
 def test_pending_dialog_tidak_diserialisasi(dummy_session):
     """pending_dialog tak ikut to_dict; field stale dari save lama diabaikan (H3)."""
     state = dummy_session.state

@@ -686,3 +686,114 @@ def test_resolve_choose_opsi_invalid_tidak_menuntaskan(dummy_session, monkeypatc
     assert state.player.academy is None
 
 
+# ---------- G3-T1: quest failure/deadline (timeout, fail_next, failed_quests) ----------
+
+_SIDE_TO = {
+    "id": "q_synth_side_to", "kind": "side", "title": "Side TO",
+    "objective": {"kind": "talk", "npc": "npc_penjaga"},
+    "timeout": {"hours": 5},
+    "fail_effects": [{"type": "flag", "key": "side_to_gagal", "value": True}],
+    "next": [], "on_complete": {"rewards": {"exp": 1}},
+}
+
+
+_MAIN_TO_QUESTS = {
+    "q_synth_main_to": {
+        "id": "q_synth_main_to", "kind": "main", "title": "Main TO",
+        "objective": {"kind": "talk", "npc": "npc_penjaga"},
+        "timeout": {"hours": 5},
+        "fail_effects": [{"type": "flag", "key": "main_to_gagal", "value": True}],
+        "fail_next": [{"quest": "q_synth_fail_branch"}],
+        "next": [], "on_complete": {"rewards": {"exp": 1}},
+    },
+    "q_synth_fail_branch": {
+        "id": "q_synth_fail_branch", "kind": "main", "title": "Cabang Gagal",
+        "objective": {"kind": "talk", "npc": "npc_penjaga"},
+        "next": [], "on_complete": {"rewards": {"exp": 1}},
+    },
+}
+
+
+def test_side_quest_timeout_gagal(dummy_session, monkeypatch):
+    """G3-T1 (Q2): side quest ber-timeout — lewat batas (>=) → hilang dari aktif,
+    masuk failed_quests, fail_effects diterapkan."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day, state.hour = 1, 8
+    monkeypatch.setattr(qe.reg, "quest", lambda qid: _SIDE_TO if qid == "q_synth_side_to" else None)
+    qe.start_side("q_synth_side_to")
+    assert "q_synth_side_to" in state.active_side_quests
+    dummy_session.apply_action({"type": "advance_time", "hours": 6})  # 1:8 → 1:14, lewat 5 jam
+    assert "q_synth_side_to" not in state.active_side_quests
+    assert "q_synth_side_to" in state.failed_quests
+    assert state.flags.get("side_to_gagal") is True
+
+
+def test_main_quest_timeout_fail_next(dummy_session, monkeypatch):
+    """G3-T1 (Q2): main quest ber-timeout → fail_next aktif, current_quest berpindah,
+    failed_quests tercatat."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day, state.hour = 1, 8
+    monkeypatch.setattr(qe.reg, "quest", lambda qid: _MAIN_TO_QUESTS.get(qid))
+    state.current_quest = "q_synth_main_to"
+    qe._note_main_start("q_synth_main_to")
+    dummy_session.apply_action({"type": "advance_time", "hours": 6})
+    assert state.current_quest == "q_synth_fail_branch"
+    assert "q_synth_main_to" in state.failed_quests
+    assert state.flags.get("main_to_gagal") is True
+
+
+def test_quest_tanpa_timeout_tidak_gagal(dummy_session):
+    """G3-T1 (Q3): quest tanpa field timeout tidak pernah gagal (non-breaking)."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day, state.hour = 1, 8
+    qe.start_side("q_side_berburu")  # quest nyata tanpa timeout
+    dummy_session.apply_action({"type": "advance_time", "hours": 100})
+    assert "q_side_berburu" in state.active_side_quests
+    assert state.failed_quests == []
+
+
+def test_timeout_batas_persis_gagal(dummy_session, monkeypatch):
+    """G3-T1 (Q3): batas persis (>=) — lewat tepat 5 jam → gagal."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day, state.hour = 1, 8
+    monkeypatch.setattr(qe.reg, "quest", lambda qid: _SIDE_TO if qid == "q_synth_side_to" else None)
+    qe.start_side("q_synth_side_to")
+    dummy_session.apply_action({"type": "advance_time", "hours": 5})  # 1:8 → 1:13 = tepat 5 jam
+    assert "q_synth_side_to" in state.failed_quests
+
+
+def test_quest_selesai_sebelum_deadline_tidak_gagal(dummy_session, monkeypatch):
+    """G3-T1 (Q3): quest selesai TEPAT sebelum deadline → tidak masuk failed_quests
+    (urutan: advance_time_target_met dulu, quest selesai sudah pop dari aktif)."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day, state.hour = 1, 8
+    monkeypatch.setattr(qe.reg, "quest", lambda qid: _SIDE_TO if qid == "q_synth_side_to" else None)
+    qe.start_side("q_synth_side_to")
+    # selesaikan sebelum batas (4 jam berlalu) → quest pop dari aktif
+    dummy_session.apply_action({"type": "advance_time", "hours": 4})
+    qe._complete_side("q_synth_side_to")
+    # lewat waktu jauh setelahnya → tidak ada yang tersisa untuk gagal
+    dummy_session.apply_action({"type": "advance_time", "hours": 100})
+    assert "q_synth_side_to" not in state.failed_quests
+    assert "q_synth_side_to" in state.completed_quests
+
+
+def test_check_timeouts_tanpa_start_mencatat_start(dummy_session, monkeypatch):
+    """G3-T1 (Q3): quest aktif tanpa progress start (save lama) → dicatat saat cek,
+    tidak langsung gagal."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day, state.hour = 1, 8
+    monkeypatch.setattr(qe.reg, "quest", lambda qid: _SIDE_TO if qid == "q_synth_side_to" else None)
+    state.active_side_quests["q_synth_side_to"] = {}  # progress lama tanpa start_day/hour
+    dummy_session.apply_action({"type": "advance_time", "hours": 1})
+    assert "q_synth_side_to" in state.active_side_quests
+    assert "q_synth_side_to" not in state.failed_quests
+    assert "start_day" in state.active_side_quests["q_synth_side_to"]
+
+

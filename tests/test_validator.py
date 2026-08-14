@@ -441,6 +441,94 @@ def test_aturan8_cooldown_tidak_valid():
     assert any("cooldown" in e for e in v.errors)
 
 
+# ---------- G3-T1: quest failure/deadline (aturan 8) ----------
+
+def test_aturan8_main_timeout_tanpa_fail_next_ditolak():
+    """G3-T1: main quest ber-timeout WAJIB fail_next (engine tidak macet)."""
+    d = _good()
+    d["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main", "next": [],
+        "objective": {"kind": "reach"},
+        "timeout": {"hours": 5},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("wajib fail_next" in e for e in v.errors)
+
+
+def test_aturan8_fail_next_tanpa_timeout_ditolak():
+    """G3-T1: fail_next hanya sah pada quest ber-timeout."""
+    d = _good()
+    d["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main", "next": [],
+        "objective": {"kind": "reach"},
+        "fail_next": [{"quest": "q2"}],
+    }, {
+        "id": "q2", "kind": "main", "objective": {"kind": "reach"}, "next": [],
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("fail_next tanpa timeout" in e for e in v.errors)
+
+
+def test_aturan8_fail_next_side_ditolak():
+    """G3-T1: fail_next hanya untuk quest kind=main."""
+    d = _good()
+    d["quests/quests_side.json"] = {"quests": [{
+        "id": "qs", "kind": "side", "next": [],
+        "available_from": {"day": 1, "hour": 8}, "cooldown": 5,
+        "objective": {"kind": "reach"},
+        "timeout": {"hours": 5}, "fail_next": [{"quest": "q1"}],
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("hanya untuk quest kind=main" in e for e in v.errors)
+
+
+def test_aturan8_fail_next_quest_tidak_ada_ditolak():
+    """G3-T1: fail_next harus merujuk quest yang ada (aturan 2/8)."""
+    d = _good()
+    d["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main", "next": [],
+        "objective": {"kind": "reach"},
+        "timeout": {"hours": 5}, "fail_next": [{"quest": "q_hantu"}],
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("q_hantu" in e and "fail_next" in e for e in v.errors)
+
+
+def test_aturan8_timeout_hours_tidak_valid():
+    """G3-T1: timeout.hours harus int > 0."""
+    d = _good()
+    d["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main", "next": [],
+        "objective": {"kind": "reach"},
+        "timeout": {"hours": 0}, "fail_next": [{"quest": "q2"}],
+    }, {
+        "id": "q2", "kind": "main", "objective": {"kind": "reach"}, "next": [],
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("timeout.hours" in e for e in v.errors)
+
+
+def test_aturan8_quest_timeout_valid_lolos():
+    """G3-T1: quest ber-timeout yang konsisten (main + fail_next) diterima."""
+    d = _good()
+    d["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main", "next": [{"quest": "q2"}],
+        "objective": {"kind": "reach"},
+        "timeout": {"hours": 24},
+        "fail_effects": [{"type": "flag", "key": "x", "value": True}],
+        "fail_next": [{"quest": "q2"}],
+    }, {
+        "id": "q2", "kind": "main", "objective": {"kind": "reach"}, "next": [],
+    }]}
+    v, ok = make(d)
+    assert ok, v.errors
+
+
 # ---------- aturan 9: repeatable hanya side ----------
 
 def test_aturan9_repeatable_pada_main():

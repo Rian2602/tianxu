@@ -188,6 +188,9 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `on_complete` | object | – | `effects` (list, format type-based §5.2), `memory_unlock`, `system_msg`, `rewards` (`exp`/`gold`) |
 | `repeatable` | bool | – | Hanya `kind: "side"` — bisa diambil ulang (grinding) |
 | `cooldown` | number | – | Jam tunggu sebelum bisa diambil lagi; divalidasi §14-8 (harus > 0 jika ada), diterapkan engine (§6.4) |
+| `timeout` | object | – | **G3-T1 (2026-08-15)**: `{hours}` — quest gagal otomatis bila waktu aktif melebihi batas (`>=`, relatif sejak quest mulai); divalidasi §14-8 (int > 0) |
+| `fail_next` | array | – | **G3-T1**: sisi pengganti saat quest GAGAL (format sama seperti `next`) — **wajib untuk main quest ber-timeout**, dilarang tanpa `timeout` & dilarang untuk kind `side` (validator §14-8) |
+| `fail_effects` | array | – | **G3-T1**: efek (format §5.2) diterapkan saat quest GAGAL — divalidasi seperti `on_complete.effects` |
 | `giver` | string | – | NPC pemberi side quest (opsi `start_quest` hanya tampil lewat giver) |
 | `requires` | object | – | Prasyarat: `flags`, `morality_min/max`, `realm_min` |
 | `available_from` | object | – | Waktu tersedia (hari/jam) — untuk quest sampingan |
@@ -557,6 +560,30 @@ selesaikan_quest(q):
   - Field `repeatable: true` pada quest (hanya untuk `kind: "side"`) + opsional `cooldown` (jam, divalidasi §14-8).
   - Setelah selesai, quest masuk daftar **tersedia lagi**; progres objektif direset.
   - Data side quest **terpisah** (`quests_side.json`) dan **dilarang bertabrakan** dengan quest utama (validator §14-10).
+
+### 6.4b Failure/Deadline (G3-T1, 2026-08-15)
+
+Quest bisa **gagal** karena waktu habis (deadline) — skema data-driven:
+
+- **`timeout: {hours}`** — batas waktu **relatif** (jam game) sejak quest mulai aktif.
+  Start dicatat otomatis saat quest aktif: main quest via `_note_main_start`
+  (saat diaktifkan `_advance_main`/`select_branch`), side quest via `start_side`
+  (termasuk lewat efek dialog `start_quest`).
+- **Pemicu**: `session._pass_time` memanggil `quest.check_timeouts()` SETELAH
+  `advance_time_target_met()` — quest yang selesai tepat sebelum deadline sudah
+  pop dari aktif, tidak ikut gagal (urutan penting). Kegagalan = `>=` batas.
+- **Main quest gagal** → `fail_effects` + `fail_next` aktif (pengganti, DAG
+  tetap berlanjut — engine tidak macet; validator WAJIB `fail_next` ada) +
+  `failed_quests`. `fail_next` >1 sisi = percabangan gagal (pola `_advance_main`).
+- **Side quest gagal** → `fail_effects` + hapus dari aktif + `failed_quests`;
+  quest non-repeatable yang gagal tidak ditawarkan lagi (`is_offerable`).
+- **State**: `state.failed_quests: list[str]` — diserialisasi (save/load
+  round-trip); save lama tanpa field → default `[]`.
+- **UI**: `objective_text` quest ber-timeout menampilkan sisa jam
+  ("Sisa: X jam").
+- **Arc 1 non-breaking**: tidak ada quest arc 1 yang memakai `timeout` —
+  perilaku identik; arc berikutnya cukup isi data (timeout/fail_next/
+  fail_effects) tanpa ubah engine.
 
 ### 6.5 Menambah Arc Baru — Checklist (G1-T2, 2026-08-15)
 

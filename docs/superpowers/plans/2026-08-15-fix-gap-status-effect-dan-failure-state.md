@@ -68,6 +68,16 @@
 
 ---
 
+> **STATUS EKSEKUSI (2026-08-15)**: Task 1 ✅ commit `45558c2` (350 passed).
+> Task 2 ✅ commit `(lihat log)` — SESUAI PLAN: ya. Catatan:
+> - Test Q2 (side/main gagal, tanpa timeout, batas >=, selesai sebelum deadline,
+>   save lama tanpa start, save/load failed_quests) merah → hijau.
+> - Validator: timeout.hours int>0; main ber-timeout WAJIB fail_next; fail_next
+>   tanpa timeout / kind side / quest tak ada → ditolak; data arc-1 tanpa timeout
+>   tetap lolos.
+> - Docs §6.4b + skema §5.1; web memakai `objective_text` (sisa jam otomatis tampil,
+>   tanpa ubah web/app).
+
 ### Task 2: Quest failure/deadline (blueprint #11) — spesifikasi G3-T1 dieksekusi
 
 > Kondisi sekarang: quest hanya sukses; `failed_quests` tidak ada. Spesifikasi sudah final di plan `2026-08-15-gap-fase15-dan-adaptivitas-arc2.md` §G3-T1 — task ini mengeksekusinya VERBATIM (Q1).

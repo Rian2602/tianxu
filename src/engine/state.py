@@ -74,6 +74,7 @@ class GameState:
     hour: int
     current_quest: str | None
     completed_quests: list = field(default_factory=list)
+    failed_quests: list = field(default_factory=list)  # G3-T1: quest gagal (timeout)
     active_side_quests: dict = field(default_factory=dict)  # qid -> progress
     side_quest_cooldowns: dict = field(default_factory=dict)  # qid -> absolute hour
     inventory: dict = field(default_factory=dict)  # item_id -> count
@@ -179,6 +180,7 @@ class GameState:
             "hour": self.hour,
             "current_quest": self.current_quest,
             "completed_quests": copy.deepcopy(self.completed_quests),
+            "failed_quests": copy.deepcopy(self.failed_quests),
             "active_side_quests": copy.deepcopy(self.active_side_quests),
             "side_quest_cooldowns": copy.deepcopy(self.side_quest_cooldowns),
             "inventory": copy.deepcopy(self.inventory),
@@ -218,6 +220,7 @@ class GameState:
             hour=d["hour"],
             current_quest=d.get("current_quest"),
             completed_quests=copy.deepcopy(d.get("completed_quests", [])),
+            failed_quests=copy.deepcopy(d.get("failed_quests", [])),
             active_side_quests=copy.deepcopy(d.get("active_side_quests", {})),
             side_quest_cooldowns=copy.deepcopy(d.get("side_quest_cooldowns", {})),
             inventory=copy.deepcopy(d.get("inventory", {})),
