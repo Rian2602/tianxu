@@ -186,6 +186,21 @@ def test_aturan7_arcs_final_quest_tidak_ada():
     assert any("final_quest" in e for e in v.errors)
 
 
+def test_aturan7_arcs_final_quest_harus_main():
+    """G1-T2: config.arcs — final_quest harus quest kind=main (bukan side)."""
+    d = _good()
+    side = {"id": "qs", "kind": "side", "objective": {"kind": "reach"},
+            "available_from": {"day": 1, "hour": 8}, "cooldown": 5, "next": []}
+    d["quests/quests_side.json"] = {"quests": [side]}
+    d["config.json"]["arcs"] = [{
+        "id": "sekte", "final_quest": "qs", "title": "ARC",
+        "teaser": "t", "memories_total": 4, "branches": {"b": "B"},
+    }]
+    v, ok = make(d)
+    assert not ok
+    assert any("bukan quest kind=main" in e for e in v.errors)
+
+
 def test_aturan7_arcs_memories_total_tidak_valid():
     """B1: config.arcs — memories_total harus int > 0 (aturan 7)."""
     d = _good()

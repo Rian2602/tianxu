@@ -257,8 +257,11 @@ class Validator:
             if not aid or aid in seen_arcs:
                 self.error(f"config.arcs: id arc kosong/duplikat '{aid}' (aturan 7)")
             seen_arcs.add(aid)
-            if not arc.get("final_quest") or not self.has("quest", arc["final_quest"]):
-                self.error(f"config.arcs: final_quest '{arc.get('final_quest')}' tidak ada di quest (aturan 7)")
+            fqid = arc.get("final_quest")
+            if not fqid or not self.has("quest", fqid):
+                self.error(f"config.arcs: final_quest '{fqid}' tidak ada di quest (aturan 7)")
+            elif next((q for q in self.quests if q["id"] == fqid), {}).get("kind") != "main":
+                self.error(f"config.arcs: final_quest '{fqid}' bukan quest kind=main (aturan 7)")
             if not arc.get("title") or not isinstance(arc["title"], str):
                 self.error(f"config.arcs: title arc '{aid}' kosong/bukan string (aturan 7)")
             if not arc.get("teaser") or not isinstance(arc["teaser"], str):

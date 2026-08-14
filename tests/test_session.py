@@ -576,6 +576,64 @@ def test_session_use_item_edge_cases(session):
     assert "pil_qi" not in session.state.inventory
 
 
+def test_transisi_arc_via_next(session, god_mode):
+    """G1-T2: kontrak transisi arc — final quest arc 1 diberi `next` ke quest
+    pertama arc 2 (data) → setelah q_akademi_07 selesai, arc 2 otomatis aktif.
+    arc_summary memilih arc via final_quest (generik untuk N arc)."""
+    reg = session.reg
+    # 1) arc kedua sintetis (data test, bukan data main)
+    reg.config.setdefault("arcs", []).append({
+        "id": "arc2", "final_quest": "q_arc2_03", "title": "AKHIR ARC 2: INTRIK",
+        "teaser": "Teaser arc 2.", "memories_total": 2,
+        "branches": {"branch_arc2": "Cabang Arc 2"},
+    })
+    # 2) quest arc 2 sintetis (talk/reach — NPC & lokasi existing)
+    synth = [
+        {"id": "q_arc2_01", "kind": "main", "title": "Arc2 Mulai",
+         "objective": {"kind": "talk", "npc": "npc_moyun"},
+         "next": [{"quest": "q_arc2_02"}], "on_complete": {"rewards": {"exp": 1}}},
+        {"id": "q_arc2_02", "kind": "main", "title": "Arc2 Jelajah",
+         "objective": {"kind": "reach", "location": "loc_paviliun"},
+         "next": [{"quest": "q_arc2_03"}], "on_complete": {"rewards": {"exp": 1}}},
+        {"id": "q_arc2_03", "kind": "main", "title": "Arc2 Final",
+         "objective": {"kind": "talk", "npc": "npc_suqing"},
+         "next": [], "on_complete": {"effects": [{"type": "flag", "key": "branch_arc2", "value": True}],
+                               "rewards": {"exp": 1}}},
+    ]
+    for q in synth:
+        reg.quests.append(q)
+        reg.quest_by_id[q["id"]] = q
+    # 3) transisi: quest akhir arc 1 menunjuk quest pertama arc 2
+    reg.quest_by_id["q_akademi_07"]["next"] = [{"quest": "q_arc2_01"}]
+
+    # selesaikan arc 1 (cabang 3aa)
+    from test_playthrough_branches import _play_3aa
+    _play_3aa(session)
+
+    # transisi otomatis: arc 2 aktif; arc_summary masih menunjuk arc 1
+    assert session.state.current_quest == "q_arc2_01"
+    v = session.view()
+    assert v["arc_summary"]["title"] == "AKHIR ARC 1: AKADEMI CHANGFENG"
+
+    # selesaikan arc 2 (talk moyun → reach paviliun → talk suqing)
+    session.apply_action({"type": "talk", "npc": "npc_moyun"})
+    from conftest import finish_dialog
+    finish_dialog(session)
+    assert session.state.current_quest == "q_arc2_02"
+    session.apply_action({"type": "move", "to": "loc_paviliun"})
+    assert session.state.current_quest == "q_arc2_03"
+    session.apply_action({"type": "talk", "npc": "npc_suqing"})
+    finish_dialog(session)
+    assert session.state.current_quest is None
+
+    # arc_summary kini menunjuk arc 2 (reversed(config.arcs) first-match final_quest)
+    v = session.view()
+    summ = v["arc_summary"]
+    assert summ["completed"] is True
+    assert summ["title"] == "AKHIR ARC 2: INTRIK"
+    assert summ["branch"] == "Cabang Arc 2"
+
+
 def test_session_spar_success_and_schedule(session):
     # Spar sukses (syarat spar manual Han Xiu dipenuhi)
     session.state.flags["spar_ujian_selesai"] = True

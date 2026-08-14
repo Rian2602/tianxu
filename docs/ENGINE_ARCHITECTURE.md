@@ -558,6 +558,54 @@ selesaikan_quest(q):
   - Setelah selesai, quest masuk daftar **tersedia lagi**; progres objektif direset.
   - Data side quest **terpisah** (`quests_side.json`) dan **dilarang bertabrakan** dengan quest utama (validator §14-10).
 
+### 6.5 Menambah Arc Baru — Checklist (G1-T2, 2026-08-15)
+
+**Kontrak adaptif: arc berikutnya = data saja.** Engine tidak berubah; verifikasi
+otomatis lewat fixture arc sintetis (`tests/test_adaptivity.py`) — bila mekanik
+baru dibutuhkan, fixture itulah yang memaksa developer sadar (bukan hardcode
+sembunyi-sembunyi).
+
+Urutan pengerjaan arc baru:
+1. **`config.arcs[]` entry baru** — `id`, `title`, `teaser`, `final_quest`
+   (quest kind=main, divalidasi aturan 7), `memories_total`, `branches`
+   (peta flag → label), `endings` opsional (C3).
+2. **File quest arc** — `data/quests/quests_<arc>.json`, `kind: "main"`, DAG
+   (satu-aktif, percabangan via dialog pilihan `choice_id`).
+3. **Transisi arc** — quest akhir arc sebelumnya diberi `next: [{quest: <quest
+   pertama arc baru>}]` — `_advance_main` mengaktifkannya otomatis. Final quest
+   arc sebelumnya TIDAK perlu tahu arc baru di luar data.
+4. **NPC + jadwal** — `npcs.json` (`schedule` per hari/jam, `spar_require` bila
+   gating sparing, `default_dialog`).
+5. **Lokasi + ambience** — `locations.json` (`is_safe`, `connections`,
+   `ambience` ∈ `world.ambiences`).
+6. **Side quest** — `quests_side.json` (`available_from {day,hour}` +
+   `cooldown`, dilarang tabrakan dengan quest utama).
+7. **Wilayah berburu** — bila arc pakai wilayah berburu yang sama, `world.hunt`
+   global tetap; bila butuh wilayah baru → perluas schema `world.hunt` (lihat
+   keputusan terbuka di bawah), bukan hardcode.
+8. **Reward teknik/ingatan** — efek `technique` (quest/dialog), `memory_unlock`
+   (konvensi id per arc, lihat keputusan terbuka).
+9. **`starting`** — hanya untuk New Game (arc baru = lanjutan, bukan new game).
+10. **Verifikasi** — `tools/validate_data.py` exit 0 + `pytest -q` (termasuk
+    fixture adaptivitas + playthrough arc sebelumnya non-breaking).
+
+**Keputusan desain arc 2 (diputuskan 2026-08-15, final menunggu outline cerita):**
+
+1. **`world.hunt` multi-lokasi — DITUNDA.** Schema saat ini global tunggal
+   (`world.hunt.location`). Arc 2 memakai wilayah berburu yang sama dulu;
+   perluasan schema (`hunt_zones` per-lokasi atau `world.hunt` per-arc) HANYA
+   bila outline cerita arc 2 menuntut wilayah berburu baru. Prinsip: jangan
+   bangun skema tanpa konsumen.
+2. **Gating quest by relation — DITUNDA.** Dialog sudah punya `relation_min`;
+   quest `available_from` belum. Bila arc 2 butuh "quest hanya muncul bila
+   relation ≥ X" → tambah key `relation_min` di `available_from` (pola kondisi
+   dialog + validator). Menunggu outline cerita.
+3. **Scoping memory per arc — KONVENSI DITETAPKAN.** Id ingatan memakai
+   prefiks arc: `mem_1_*` (arc 1: `mem_01`..`mem_04` — lama, tidak diubah),
+   `mem_2_*` untuk arc 2 dst. `arcs[].memories_total` tetap sumber jumlah.
+   Validator: id ingatan harus unik global (sudah); prefiks per arc = konvensi
+   penulisan, bukan aturan engine.
+
 ---
 
 ## 7. Dialog Engine
