@@ -80,6 +80,7 @@ class GameState:
     memories: list = field(default_factory=list)  # id ingatan terbuka
     log: list = field(default_factory=list)
     last_safe_location: str | None = None
+    last_hunt_time: int | None = None
     grounding_hours_today: int = 0
     branch_pending: str | None = None  # dialog id untuk pilih cabang quest
     pending_dialog: str | None = None
@@ -159,6 +160,7 @@ class GameState:
             "relations": copy.deepcopy(self.relations),
             "memories": copy.deepcopy(self.memories),
             "last_safe_location": self.last_safe_location,
+            "last_hunt_time": self.last_hunt_time,
             "grounding_hours_today": self.grounding_hours_today,
             "branch_pending": self.branch_pending,
             "pending_dialog": self.pending_dialog,
@@ -195,6 +197,7 @@ class GameState:
             relations=copy.deepcopy(d.get("relations", {})),
             memories=copy.deepcopy(d.get("memories", [])),
             last_safe_location=d.get("last_safe_location"),
+            last_hunt_time=d.get("last_hunt_time"),
             grounding_hours_today=d.get("grounding_hours_today", 0),
             branch_pending=d.get("branch_pending"),
             pending_dialog=d.get("pending_dialog"),

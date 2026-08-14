@@ -272,5 +272,45 @@ def test_branch_dialog_included_in_apply_action_view(session, god_mode):
     assert v["dialog"] is not None
     assert v["mode"] == "dialog"
 
+def test_hunt_respawn_cooldown(session, god_mode, monkeypatch):
+    monkeypatch.setattr("src.engine.session.random.choice", lambda seq: "eno_serigala_qi")
+    session.apply_action({"type": "move", "to": "loc_wilayah_berburu"})
+    session.apply_action({"type": "hunt"})
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    
+    # Langsung berburu lagi -> ditolak
+    v = session.apply_action({"type": "hunt"})
+    assert "masih sepi" in v["log"][-1]["text"]
+    assert session.state.pending_battle is None
+    
+    # Lewat 4 jam -> masih ditolak
+    session.apply_action({"type": "advance_time", "hours": 4})
+    v = session.apply_action({"type": "hunt"})
+    assert "masih sepi" in v["log"][-1]["text"]
+    assert session.state.pending_battle is None
+    
+    # Lewat 1 jam lagi (total 5) -> bisa
+    session.apply_action({"type": "advance_time", "hours": 1})
+    v = session.apply_action({"type": "hunt"})
+    assert session.state.pending_battle is not None
 
-
+def test_npc_schedule_availability(session):
+    npc = {
+        "id": "npc_test_schedule",
+        "name": "Test NPC",
+        "location": session.state.location,
+        "schedule": [{"hour_start": 9, "hour_end": 17}]
+    }
+    session.reg.npcs.append(npc)
+    session.reg.npc_by_id["npc_test_schedule"] = npc
+    
+    session.state.hour = 10
+    v = session.apply_action({"type": "talk", "npc": "npc_test_schedule"})
+    assert "sedang beristirahat" not in v["log"][-1].get("text", "")
+    session.state.pending_dialog = None
+    
+    session.state.hour = 20
+    v = session.apply_action({"type": "talk", "npc": "npc_test_schedule"})
+    assert "sedang beristirahat" in v["log"][-1]["text"]
+    
+    session.reg.npcs.remove(npc)

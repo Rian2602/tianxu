@@ -145,6 +145,7 @@ def test_side_quest_berburu_selesai_via_kemenangan(session, god_mode, monkeypatc
     session.apply_action({"type": "move", "to": "loc_wilayah_berburu"})
     session.apply_action({"type": "hunt"})
     session.apply_action({"type": "battle_action", "action": "attack"})
+    session.apply_action({"type": "advance_time", "hours": 5})
     session.apply_action({"type": "hunt"})
     session.apply_action({"type": "battle_action", "action": "attack"})
     assert "q_side_berburu" not in session.state.active_side_quests
@@ -203,6 +204,7 @@ def test_side_quest_cooldown(session, god_mode, monkeypatch):
     session.apply_action({"type": "move", "to": "loc_wilayah_berburu"})
     session.apply_action({"type": "hunt"})
     session.apply_action({"type": "battle_action", "action": "attack"})
+    session.apply_action({"type": "advance_time", "hours": 5})
     session.apply_action({"type": "hunt"})
     session.apply_action({"type": "battle_action", "action": "attack"})
     assert "q_side_berburu" not in session.state.active_side_quests

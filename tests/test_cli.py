@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def test_cli_playthrough_3aa(monkeypatch, capsys):
     # battle selalu menang dalam 1 serangan (deterministik)
     monkeypatch.setattr(BattleEngine, "_calc_damage", lambda self, a, d, ea, ed: (99999, False))
+    monkeypatch.setattr("src.engine.session.GameSession._is_npc_available", lambda self, npc: True)
 
     script = [
         "talk npc_penjaga", "1", "lanjut", "lanjut",
@@ -46,7 +47,8 @@ def test_cli_playthrough_3aa(monkeypatch, capsys):
 
     main()
     out = capsys.readouterr().out
-    assert "AKHIR ARC AKADEMI" in out, "arc tidak selesai di CLI"
+    assert "AKHIR ARC 1: AKADEMI CHANGFENG" in out, "arc tidak selesai di CLI"
+    assert "Konfrontasi Terbuka Penatua An" in out, "branch tidak ada di CLI"
     assert "Ingatan" in out, "ingatan tidak ditampilkan di CLI"
     assert "Moral" in out
     save_path = ROOT / "saves" / "test_arc_end.json"

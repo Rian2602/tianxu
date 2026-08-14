@@ -145,6 +145,17 @@ class GameSession:
         if self.state.branch_pending and not self.state.pending_dialog and not self.state.pending_battle:
             self.dialog.start(self.state.branch_pending)
 
+    def _is_npc_available(self, npc: dict) -> bool:
+        schedules = npc.get("schedule", [])
+        if not schedules:
+            return True
+        for s in schedules:
+            h_start = s.get("hour_start", 0)
+            h_end = s.get("hour_end", 24)
+            if h_start <= self.state.hour <= h_end:
+                return True
+        return False
+
     # ---------- aksi spesifik ----------
 
     def _talk(self, action: dict) -> dict:
@@ -154,6 +165,9 @@ class GameSession:
         npc = self.reg.npc(nid)
         if not npc:
             add_log(self.state, "system", "NPC tidak ditemukan.")
+            return self.view()
+        if not self._is_npc_available(npc):
+            add_log(self.state, "system", f"{npc['name']} sedang beristirahat/bertapa dan tidak menerima tamu saat ini.")
             return self.view()
         if npc.get("location") != self.state.location:
             add_log(self.state, "system", f"{npc['name']} tidak ada di sini.")
@@ -288,6 +302,9 @@ class GameSession:
         if not npc or not npc.get("can_spar"):
             add_log(self.state, "system", "NPC itu tidak bisa diajak sparing.")
             return self.view()
+        if not self._is_npc_available(npc):
+            add_log(self.state, "system", f"{npc['name']} sedang tidak berada di tempat untuk berlatih tanding.")
+            return self.view()
         if npc.get("location") != self.state.location:
             add_log(self.state, "system", f"{npc['name']} tidak ada di sini.")
             return self.view()
@@ -308,6 +325,15 @@ class GameSession:
         if not foe:
             add_log(self.state, "system", "Tidak ada mangsa di sini.")
             return self.view()
+            
+        respawn_hours = self.reg.config.get("world", {}).get("monster_respawn_hours", 5)
+        now_abs_hours = self.state.absolute_hours
+        if self.state.last_hunt_time is not None and (now_abs_hours - self.state.last_hunt_time) < respawn_hours:
+            remaining = respawn_hours - (now_abs_hours - self.state.last_hunt_time)
+            add_log(self.state, "system", f"Wilayah Berburu masih sepi. Monster liar baru muncul kembali dalam {remaining} jam.")
+            return self.view()
+            
+        self.state.last_hunt_time = now_abs_hours
         self.battle.start([foe], "hunt")
         return self.view()
 
@@ -461,6 +487,34 @@ class GameSession:
         q = self.quest.current_main()
         pc = player_combat(s, self.reg)
         realm = self.reg.realms[s.player.realm]
+        
+        arc_summary = None
+        if "q_akademi_07" in s.completed_quests:
+            chosen_branch = "Tidak Diketahui"
+            if "branch_3aa" in s.flags:
+                chosen_branch = "Cabang 3AA — Konfrontasi Terbuka Penatua An"
+            elif "branch_3ab" in s.flags:
+                chosen_branch = "Cabang 3AB — Penyelidikan Diam-Diam Mo Yun"
+            elif "branch_3b" in s.flags:
+                chosen_branch = "Cabang 3B — Memeras Zhou Yan & Mengambil Keuntungan"
+            elif "branch_3c" in s.flags:
+                chosen_branch = "Cabang 3C — Berdiam Diri & Menjaga Diri"
+                
+            arc_summary = {
+                "completed": True,
+                "title": "AKHIR ARC 1: AKADEMI CHANGFENG",
+                "player_name": s.player.name,
+                "realm": realm["name_pinyin"],
+                "realm_level": s.player.realm_level,
+                "academy": s.player.academy,
+                "morality": s.player.morality,
+                "branch": chosen_branch,
+                "memories_unlocked": f"{len(s.memories)}/4",
+                "gold": s.player.gold,
+                "day": s.day,
+                "teaser": "Kebenaran di balik Penatua An telah terkuak. Namun bayang-bayang masa lalu Long Tianxu dan intrik Sekte Regional baru saja dimulai...",
+            }
+            
         return {
             "location": {
                 "id": loc["id"], "name": loc["name"], "description": loc["description"],
@@ -503,6 +557,7 @@ class GameSession:
             "battle": self.battle.view() if s.pending_battle else None,
             "choose": self._choose_view(),
             "log": s.log,
+            "arc_summary": arc_summary,
         }
 
     def _mode(self) -> str:

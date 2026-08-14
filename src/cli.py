@@ -312,10 +312,18 @@ def main() -> None:
         # cek selesai arc (tampilkan sekali; lanjutkan loop agar pemain bisa simpan)
         if not arc_ended and "arc_akademi_selesai" in session.state.flags:
             arc_ended = True
-            print()
-            print(GOLD + "═══ AKHIR ARC AKADEMI ═══" + RESET)
-            print("Terima kasih sudah memainkan bukti konsep Fase 1!")
-            print("Lanjutan: Arc Sekte (Fase 2). Simpan progressmu di titik aman.")
+            v_after = session.view()
+            if v_after.get("arc_summary"):
+                s = v_after["arc_summary"]
+                print(f"\n{GOLD}═══ {s['title']} ═══{RESET}")
+                print(f"Kultivator: {s['player_name']}")
+                print(f"Ranah: {s['realm']} Lv.{s['realm_level']}")
+                print(f"Akademi: {s['academy'] or '—'}")
+                print(f"Moralitas: {s['morality']}")
+                print(f"Pilihan Akhir: {s['branch']}")
+                print(f"Ingatan Terbuka: {s['memories_unlocked']}")
+                print(DIM + f"\"{s['teaser']}\"" + RESET)
+                print(f"{GOLD}════════════════════════════════{RESET}\n")
 
 
 if __name__ == "__main__":

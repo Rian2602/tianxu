@@ -43,6 +43,7 @@ def god_mode(monkeypatch):
     """Battle selalu menang 1 serangan (deterministik untuk test alur)."""
     monkeypatch.setattr(BattleEngine, "_calc_damage", lambda self, attack, defense, ea, ed: (99999, False))
     monkeypatch.setattr(BattleEngine, "_try_flee", lambda self, pc, b: True)
+    monkeypatch.setattr(GameSession, "_is_npc_available", lambda self, npc: True)
 
 
 
