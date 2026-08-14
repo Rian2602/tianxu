@@ -1,0 +1,28 @@
+# GitAttributes — normalisasi teks & metadata repo
+* text=auto eol=lf
+
+# File teks yang wajib LF (konsistensi antar OS)
+*.py text eol=lf
+*.json text eol=lf
+*.csv text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.html text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Diff khusus
+*.md diff=markdown
+*.py diff=python
+
+# Linguist: lokasi data game bukan kode
+data/*.json linguist-language=JSON
+data/*.csv linguist-language=CSV
+
+# Artefak internal (tidak ikut rilis/arsip git archive)
+docs/superpowers/** export-ignore
+.github/** export-ignore

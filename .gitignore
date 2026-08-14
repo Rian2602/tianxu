@@ -17,6 +17,10 @@ graphify-out/
 
 # Proses pengembangan (artefak orchestration, tidak dipublikasikan)
 .agents/
+.superpowers/
+
+# Coverage HTML
+htmlcov/
 
 # OS
 .DS_Store
