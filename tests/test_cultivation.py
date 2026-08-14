@@ -37,3 +37,34 @@ def test_ranah_tertinggi_tidak_breakthrough(session):
     gain_exp(session.state, session.reg, 52)
     assert session.state.player.realm == "realm_penantang_surga"
     assert session.state.player.realm_level == 10
+
+
+def test_ranah_tertinggi_exp_dicap_tidak_hang(session):
+    """A1: di puncak ranah, exp berlebih di-cap (tidak hang loop tak berujung).
+    Tepat di threshold (52) — pre-fix: loop jalan, level di-reset, pesan lama;
+    post-fix: cap exp = 51 + pesan baru 'exp tertahan'."""
+    session.state.player.realm = "realm_penantang_surga"
+    session.state.player.realm_level = 10
+    session.state.player.exp = 0
+    gain_exp(session.state, session.reg, 52)  # exp_next di level 10
+    assert session.state.player.realm == "realm_penantang_surga"
+    assert session.state.player.realm_level == 10
+    assert session.state.player.exp == 51  # di-cap di bawah threshold
+    assert any("exp tertahan" in e["text"] for e in session.state.log)
+
+
+def test_ranah_tertinggi_exp_raksasa_selesai_cepat(session):
+    """A1: exp raksasa (10 juta) di puncak ranah selesai cepat — post-fix langsung
+    cap di iterasi pertama (bukan ~192 ribu iterasi)."""
+    import time
+
+    session.state.player.realm = "realm_penantang_surga"
+    session.state.player.realm_level = 10
+    session.state.player.exp = 0
+    t0 = time.monotonic()
+    gain_exp(session.state, session.reg, 10_000_000)
+    dt = time.monotonic() - t0
+    assert session.state.player.realm_level == 10
+    assert session.state.player.exp < session.state.exp_next(session.reg)
+    assert dt < 0.5  # cap langsung — bukan ratusan detik
+    assert any("exp tertahan" in e["text"] for e in session.state.log)

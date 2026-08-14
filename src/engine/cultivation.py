@@ -20,7 +20,15 @@ def gain_exp(state: GameState, registry: DataRegistry, amount: int) -> None:
     state.player.exp += amount
     while state.player.exp >= state.exp_next(registry):
         state.player.exp -= state.exp_next(registry)
-        _level_up(state, registry)
+        if not _level_up(state, registry):
+            # A1: puncak ranah — level tidak bisa naik. Jangan loop tak berujung:
+            # kembalikan exp yang barusan dikurangi & cap di bawah threshold berikutnya
+            # (exp tidak hilang sia-sia). Ranah/level tidak berubah di puncak, jadi
+            # exp_next masih sama dengan yang dipakai di atas.
+            state.player.exp = min(state.player.exp + state.exp_next(registry),
+                                   state.exp_next(registry) - 1)
+            add_log(state, "system", "[Sistem] Kau di puncak ranah — exp tertahan.")
+            break
     # jaga HP/Qi tidak melebihi maks baru setelah level-up
     state.player.hp = min(state.player.hp, state.max_hp(registry))
     state.player.qi = min(state.player.qi, state.max_qi(registry))
@@ -42,19 +50,22 @@ def gain_grind_exp(state: GameState, registry: DataRegistry, amount: int) -> Non
     gain_exp(state, registry, amount)
 
 
-def _level_up(state: GameState, registry: DataRegistry) -> None:
-    c = registry.config.get("cultivation", {})
+def _level_up(state: GameState, registry: DataRegistry) -> bool:
+    """Naikkan level. Return False bila sudah di puncak ranah (level tidak bisa naik)."""
     levels = int(registry.realms[state.player.realm]["levels"])
     state.player.realm_level += 1
     if state.player.realm_level > levels:
-        _breakthrough(state, registry)
+        ok = _breakthrough(state, registry)
     else:
         add_log(state, "system", f"[Sistem] Ranah naik: {state.player.realm_level}.")
+        ok = True
     state.player.hp = state.max_hp(registry)
     state.player.qi = state.max_qi(registry)
+    return ok
 
 
-def _breakthrough(state: GameState, registry: DataRegistry) -> None:
+def _breakthrough(state: GameState, registry: DataRegistry) -> bool:
+    """Terobosan ke ranah berikutnya. Return False bila sudah ranah tertinggi."""
     realm_id = state.player.realm
     order = int(registry.realms[realm_id]["order"])
     nxt = None
@@ -66,9 +77,10 @@ def _breakthrough(state: GameState, registry: DataRegistry) -> None:
         # ranah tertinggi — tetap di level maks
         state.player.realm_level = int(registry.realms[realm_id]["levels"])
         add_log(state, "system", "[Sistem] Kau mencapai puncak ranah ini.")
-        return
+        return False
     old = registry.realms[realm_id]["name_pinyin"]
     new = registry.realms[nxt]["name_pinyin"]
     state.player.realm = nxt
     state.player.realm_level = 1
     add_log(state, "system", f"[Sistem] Terobosan! {old} → {new}.")
+    return True
