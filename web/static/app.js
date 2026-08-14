@@ -207,13 +207,15 @@ function renderLog(v) {
   let prev = null;
   v.log.forEach((e) => {
     const scene = prev && (e.day !== prev.day || e.hour !== prev.hour);
-    const cls = `log-entry log-${esc(e.type)}${scene ? " log-scene" : ""}${scene === false && html === "" ? " log-scene-first" : ""}`;
-    // deteksi baris percakapan: teks dengan format "Pembicara: ..." dari dialog
-    const m = /^([^:\n]{2,24}):\s?/.exec(e.text);
-    const speaker = m && e.type !== "narration"
+    const cls = `log-entry log-${esc(e.type)}${scene ? " log-scene" : ""}`;
+    // deteksi baris percakapan: hanya tipe npc/player yang jadi speaker line
+    // (system/narration/battle TIDAK — mis. "Quest utama diperbarui: ..." bukan dialog)
+    const isTalk = e.type === "npc" || e.type === "player";
+    const m = isTalk ? /^([^:\n]{2,24}):\s?/.exec(e.text) : null;
+    const speaker = m
       ? `<span class="log-speaker-label">${esc(m[1])}</span>: ${esc(e.text.slice(m[0].length))}`
       : esc(e.text);
-    html += `<div class="${cls}${m && e.type !== "narration" ? " speaker-line" : ""}">${speaker}</div>`;
+    html += `<div class="${cls}${m ? " speaker-line" : ""}">${speaker}</div>`;
     prev = e;
   });
   $("log").innerHTML = html;

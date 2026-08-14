@@ -355,7 +355,6 @@ body.ambience-library #col-center {
   padding-top: 12px;
   border-top: 1px dotted rgba(212, 175, 55, 0.35);
 }
-.log-scene-first { margin-top: 0; padding-top: 0; border-top: none; }
 
 .log-entry.speaker-line .log-speaker-label {
   color: var(--gold);
