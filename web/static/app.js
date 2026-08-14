@@ -280,7 +280,10 @@ async function act(action) {
   closeTianyuan();
   try {
     const data = await api("/api/action", { body: { action } });
-    if (data.ok) { view = data.view; ctx = data.context; render(); }
+    if (data.ok) {
+      view = data.view; ctx = data.context; render();
+      if (data.error) window.alert(data.error);  // penolakan aksi (guard dialog/battle, dll)
+    }
     else { window.alert(data.error || "Aksi ditolak."); }
   } finally { busy = false; setLoading(false); }
 }
@@ -538,7 +541,10 @@ async function actShop(type, itemId) {
   setLoading(true);
   try {
     const data = await api("/api/action", { body: { action: { type: type, item: itemId, count: 1 } } });
-    if (data.ok) { view = data.view; ctx = data.context; render(); renderShop(); }
+    if (data.ok) {
+      view = data.view; ctx = data.context; render(); renderShop();
+      if (data.error) window.alert(data.error);  // penolakan aksi
+    }
     else { window.alert(data.error || "Aksi ditolak."); }
   } finally { busy = false; setLoading(false); }
 }

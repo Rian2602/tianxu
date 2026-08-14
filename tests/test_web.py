@@ -287,6 +287,22 @@ def test_context_can_spar_gated(base_url: str) -> None:
     assert gucanghai["can_spar"] is False
 
 
+def test_action_error_diteruskan_ke_klien(base_url: str) -> None:
+    """Penolakan aksi (guard dialog) meneruskan `error` ke respons /api/action (Gap Claude)."""
+    post(base_url, "/api/new")
+    app.session.state.location = "loc_gerbang_akademi"
+    # mulai dialog → aksi move harus ditolak dengan error di respons
+    post(base_url, "/api/action", {"action": {"type": "talk", "npc": "npc_penjaga"}})
+    data = post(base_url, "/api/action", {"action": {"type": "move", "to": "loc_aula_ujian"}})
+    assert data["ok"] is True
+    assert data["error"]
+    assert "Selesaikan dialog" in data["error"]
+    # aksi normal tanpa penolakan → tidak ada field error
+    data = post(base_url, "/api/action", {"action": {"type": "dialog_choice", "choice_index": -1}})
+    assert data["ok"] is True
+    assert data.get("error") is None
+
+
 def test_static_no_cache(base_url: str) -> None:
     """File statis dikirim dengan Cache-Control: no-cache agar fix frontend selalu termuat (K6)."""
     for path in ("/", "/static/app.js", "/static/style.css"):

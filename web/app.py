@@ -263,11 +263,14 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json({"ok": False, "error": "Format aksi tidak valid — butuh objek {type, ...}."}, 400)
                     return
                 try:
-                    session.apply_action(action)
+                    res = session.apply_action(action)
                 except Exception as exc:  # engine error → respons JSON, bukan koneksi mati diam-diam
                     self._send_json({"ok": False, "error": f"Terjadi kesalahan: {exc}"}, 500)
                     return
-                self._send_json({"ok": True, **_payload()})
+                payload = _payload()
+                if res and res.get("error"):  # penolakan aksi (guard dialog/battle, dll) → diteruskan
+                    payload["error"] = res["error"]
+                self._send_json({"ok": True, **payload})
             else:
                 self._send_json({"error": "endpoint tidak dikenal"}, 404)
 
