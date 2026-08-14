@@ -113,6 +113,17 @@ Seluruh kriteria penerimaan Fase 1 (Arc Akademi) **selesai dan tervalidasi** —
 
 **Keadaan teknis saat sinkronisasi (2026-08-14)**: 192 test lolos, coverage `src/` ≈ 99,9%, `tools/validate_data.py` exit 0. **Pembaruan (2026-08-14 lanjutan)**: batch fix audit (G1–G5/H1–H3/K1–K5/G4d/G4e) + batch plan sisa-bug (H4/A1/J3#6/#9/A2) → **209 test**, validator exit 0. Detail: `docs/list_bug.md` §Status perbaikan & plan `docs/superpowers/plans/2026-08-14-fix-sisa-bug-dan-hardening.md`.
 
+**⚜️ FOUNDATION FREEZE (2026-08-15)** — **Gameplay & Narrative Foundation Fase 1 = FROZEN.**
+
+Bukti (semua ter-push ke `origin/main`):
+- **Playtest 4 cabang moral** deterministik sampai `q_akademi_07` — world-state akhir diverifikasi per cabang (flags, relations, morality, memories, gold, arc_summary) — `tests/test_playthrough_branches.py`. **338 passed**, validator exit 0.
+- **0 hardcode id konten arc-1 di engine** (satu-satunya literal `loc_wilayah_berburu` di `cli.py` dihilangkan G2-T1 plan 2026-08-15).
+- **Kontrak transisi arc**: quest akhir arc → quest pertama arc berikutnya via `next` (data); `arc_summary` generik via `final_quest`; checklist §6.5 ENGINE_ARCHITECTURE.
+- **Fixture adaptivitas**: arc 2 sintetis dijalankan tanpa ubah kode (`tests/test_adaptivity.py`) — dan berhasil mengungkap 1 bug nyata (main-quest `defeat` mengabaikan `report_to`) yang sudah diperbaiki.
+- **Keputusan desain arc 2** (hunt multi-lokasi, gating quest by relation, konvensi id memory per arc) — final menunggu outline cerita.
+
+Arti freeze: **arc berikutnya = konten data saja** (quest/npc/lokasi/dialog/config). Mekanik tambahan (mis. quest failure/deadline) TIDAK dibangun spekulatif — menunggu outline cerita arc 2 (pipeline: outline → identifikasi mekanik → bangun & validasi → isi konten). Lihat plan `docs/superpowers/plans/2026-08-15-gap-fase15-dan-adaptivitas-arc2.md`.
+
 ---
 
 ## 7. Konfirmasi

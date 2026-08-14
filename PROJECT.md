@@ -42,7 +42,7 @@
 | 17 | Side Quest Cooldown Schema & Logic | Quest/Data | ENGINE §5.1, §6.4 | `data/quests/quests_side.json`, `src/engine/quest.py`, `src/engine/state.py` (`side_quest_cooldowns`) | DONE (Verified) |
 | 18 | Monster Respawn & NPC Schedule | World Sim | GDD §7, ENGINE §9.2 | `src/engine/session.py::_hunt`, `_is_npc_available` | DONE (Verified) |
 | 19 | Arc 1 Completion Summary / Screen | Story/UI | GDD §11.2, DoD | `src/engine/session.py::view` (`arc_summary`), `src/cli.py`, `web/static/app.js` | DONE (Verified) |
-| 20 | Edge Case Unit Test Coverage | Testing | QA Review §5.1 | `tests/` (266 test, coverage src ≈ 99,9%) | DONE (Verified) |
+| 20 | Edge Case Unit Test Coverage | Testing | QA Review §5.1 | `tests/` (338 test, coverage src ≈ 99,9%) | DONE (Verified) |
 | 21 | Architecture Doc Sync | Docs | ENGINE §12, §16 | `docs/ENGINE_ARCHITECTURE.md` (EP3-T2, 2026-08-14) | DONE (Verified) |
 | 22 | Relations Berdampak pada Dialog | Relationship | GDD §7, §4.4 | `dialog.py::_eval_condition` (`relation_min/max`), `battle.py::_victory` (`spar_win_relation`), node gated Han Xiu/Gu Canghai | DONE (Verified) |
 | 23 | Gating Ingatan → Opsi Dialog | Narrative | GDD §3.1, STORY §3.1 (B3/#13) | `dialog.py::_eval_condition` (`memory`), opsi gated `dlg_moyun`/`dlg_gucanghai` | DONE (Verified) |
@@ -51,6 +51,8 @@
 | 26 | Siklus Waktu: Bulan (C2) | World Sim | GDD §7, ENGINE §5.6 | `state.month`/`month_name` (derived), kondisi dialog `month_min/max`, `view().month`, header CLI/web | DONE (Verified) |
 | 27 | Moralitas → Ending (C3) | Narrative | GDD §3.4/§9, ENGINE §10 | `config.arcs[].endings` (first-match AND), `arc_summary.ending`, CLI/web tampil ending | DONE (Verified) |
 | 28 | Sistem Pembelajaran Teknik & Starter Kit | Progression/Combat | GDD §5.2, R1-R4 | `config.json` (`curriculum`, `starter_kit`), `q_akademi_04b`, `dlg_gucanghai_ujian`, `loader.py`, `quest.py`, `web/app.py`, `tests/test_learning.py` | DONE (Verified) |
+| 29 | Hubungan NPC: Panel Web + Sparring Gating | Relationship | GDD §7, ENGINE §5.3 | `session.py::can_spar` (`spar_require`), panel "Hubungan" web (`context.relations`), tier Hostile/Netral/Bersahabat | DONE (Verified) |
+| 30 | Fase 1.5 Foundation Freeze — Playtest & Adaptivitas | Process/Adaptive | plan 2026-08-15 | playthrough 4 cabang (`tests/test_playthrough_branches.py`), kontrak transisi arc (§6.5), fixture arc sintetis (`tests/test_adaptivity.py`), fix defeat+report_to main quest | DONE (Verified) |
 
 ## Identified Gaps and Subagent-Driven Development (SDD) Roadmap
 
