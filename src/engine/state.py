@@ -97,6 +97,10 @@ class GameState:
         return self._ui_proxy
 
 
+    @property
+    def absolute_hours(self) -> int:
+        return self.day * 24 + self.hour
+
     # ---------- batas stat ----------
 
     def max_hp(self, registry) -> int:

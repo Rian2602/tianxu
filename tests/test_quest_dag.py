@@ -121,7 +121,6 @@ def test_satu_aktif_invariant(session, god_mode):
 
 def test_advance_time_day_offset_ditegakkan(session, god_mode):
     """Cabang 3c (advance_time + day_offset 1): butuh sehari penuh, bukan cuma jam target."""
-    from conftest import finish_dialog, play_to_incident
 
     play_to_incident(session)  # hari 1 jam 20, dialog pilih sikap pending
     finish_dialog(session, [2])  # berdiam diri → q_akademi_3c
@@ -136,7 +135,6 @@ def test_advance_time_day_offset_ditegakkan(session, god_mode):
 
 def test_side_quest_berburu_selesai_via_kemenangan(session, god_mode, monkeypatch):
     """Side quest defeat: mulai lewat dialog pemburu, selesai setelah 2 kill."""
-    from conftest import finish_dialog
 
     monkeypatch.setattr("src.engine.session.random.choice", lambda seq: "eno_serigala_qi")
     session.apply_action({"type": "advance_time", "hours": 24})  # hari 2, jam 8
@@ -192,7 +190,6 @@ def test_single_active_main_quest(dummy_session):
 
 def test_side_quest_cooldown(session, god_mode, monkeypatch):
     """Side quest can be completed, cannot be immediately started again, but can be started after cooldown."""
-    from conftest import finish_dialog
 
     monkeypatch.setattr("src.engine.session.random.choice", lambda seq: "eno_serigala_qi")
     session.apply_action({"type": "advance_time", "hours": 24})  # hari 2, jam 8

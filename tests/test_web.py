@@ -143,10 +143,34 @@ def test_web_shop_buy_sell(base_url: str) -> None:
     assert data["context"]["merchant_shop"] is not None
     assert "buy" in data["context"]["merchant_shop"]
     
+    buy_items = data["context"]["merchant_shop"]["buy"]
+    item_price = next(i["price"] for i in buy_items if i["item"] == "material_herba")
+    
+    gold_before = app.session.state.player.gold
+    item_before = app.session.state.inventory.get("material_herba", 0)
+    
     # buy an item
-    data = post(base_url, "/api/action", {"action": {"type": "shop_buy", "item": "pil_qi", "count": 1}})
+    data = post(base_url, "/api/action", {"action": {"type": "shop_buy", "item": "material_herba", "count": 1}})
     assert data["ok"] is True
-    assert app.session.state.inventory.get("pil_qi", 0) >= 1
+    
+    gold_after_buy = app.session.state.player.gold
+    item_after_buy = app.session.state.inventory.get("material_herba", 0)
+    
+    assert gold_after_buy == gold_before - item_price
+    assert item_after_buy == item_before + 1
+
+    sell_items = data["context"]["merchant_shop"]["sell"]
+    item_sell_price = next(i["price"] for i in sell_items if i["item"] == "material_herba")
+
+    # sell an item
+    data = post(base_url, "/api/action", {"action": {"type": "shop_sell", "item": "material_herba", "count": 1}})
+    assert data["ok"] is True
+
+    gold_after_sell = app.session.state.player.gold
+    item_after_sell = app.session.state.inventory.get("material_herba", 0)
+
+    assert gold_after_sell == gold_after_buy + item_sell_price
+    assert item_after_sell == item_after_buy - 1
 
 
 def test_api_state_tanpa_sesi(base_url: str) -> None:

@@ -58,14 +58,16 @@ def _context() -> dict:
                 "merchant_id": n["id"],
                 "merchant_name": n["name"],
                 "buy": [
-                    {"item": s["item"], "name": registry.item(s["item"])["name"],
-                     "price": s["price"], "type": registry.item(s["item"]).get("type", "")}
+                    {"item": s["item"], "name": i["name"],
+                     "price": s["price"], "type": i.get("type", "")}
                     for s in n["shop"].get("buy", [])
+                    for i in [registry.item(s["item"])]
                 ],
                 "sell": [
-                    {"item": s["item"], "name": registry.item(s["item"])["name"],
-                     "price": s["price"], "type": registry.item(s["item"]).get("type", "")}
+                    {"item": s["item"], "name": i["name"],
+                     "price": s["price"], "type": i.get("type", "")}
                     for s in n["shop"].get("sell", [])
+                    for i in [registry.item(s["item"])]
                 ],
             }
             break
@@ -112,7 +114,7 @@ def _tianyuan_payload() -> dict:
             "mission": {"main": None, "side_quests": []},
             "memories": [],
             "unlocked_count": 0,
-            "total_count": 4,
+            "total_count": len(registry.memories),
             "system_log": [],
         }
 
