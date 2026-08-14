@@ -93,7 +93,7 @@ def explore_menu(session: GameSession) -> None:
     for c in v["location"]["connections"]:
         lc = session.reg.location(c)
         print(f"  {GREEN}[pindah]{RESET} {lc['name']}")
-    if v["location"]["id"] == "loc_wilayah_berburu":
+    if session.can_hunt():
         print(f"  {GREEN}[berburu]{RESET} cari pertarungan · {GREEN}[cari]{RESET} herba")
     if v["location"]["is_safe"]:
         print(f"  {GREEN}[meditasi]{RESET} berkultivasi (jam) · {GREEN}[istirahat]{RESET} pulihkan HP/Qi · {GREEN}[simpan]{RESET} game")

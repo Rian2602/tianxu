@@ -155,6 +155,12 @@ class GameSession:
             if not res:
                 self.state.branch_pending = None
 
+    def can_hunt(self) -> bool:
+        """G2-T1: lokasi berburu dibaca dari data (config.world.hunt.location) —
+        tanpa hardcode id lokasi arc-1; konsisten dengan `_hunt` (A8)."""
+        loc = (self.reg.config.get("world", {}).get("hunt") or {}).get("location")
+        return bool(loc) and self.state.location == loc
+
     def _is_npc_available(self, npc: dict) -> bool:
         """Jadwal NPC — pola sama dengan quest._in_window (A1): dukung lintas tengah
         malam (19 → 6) dan batas hour_end eksklusif (start <= h < end)."""

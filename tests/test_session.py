@@ -576,6 +576,20 @@ def test_session_use_item_edge_cases(session):
     assert "pil_qi" not in session.state.inventory
 
 
+def test_can_hunt_data_driven(session):
+    """G2-T1: can_hunt membaca config.world.hunt.location — tanpa hardcode id lokasi."""
+    s = session
+    s.state.location = "loc_wilayah_berburu"
+    assert s.can_hunt() is True
+    s.state.location = "loc_asrama"
+    assert s.can_hunt() is False
+    # world.hunt tanpa location → False (perilaku A8: aksi menolak dengan log aman)
+    hunt = s.reg.config.get("world", {}).get("hunt") or {}
+    hunt.pop("location", None)
+    s.state.location = "loc_wilayah_berburu"
+    assert s.can_hunt() is False
+
+
 def test_transisi_arc_via_next(session, god_mode):
     """G1-T2: kontrak transisi arc — final quest arc 1 diberi `next` ke quest
     pertama arc 2 (data) → setelah q_akademi_07 selesai, arc 2 otomatis aktif.
