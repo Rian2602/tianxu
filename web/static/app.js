@@ -151,7 +151,12 @@ function renderHeader(v) {
 }
 
 function statRow(label, value, cls) {
-  return `<div class="stat-row"><span class="stat-label">${esc(label)}</span>` +
+  // Label boleh mengandung icon SVG dari icon() — aman (bukan input pemain).
+  // Escape hanya segmen TEKS; markup <svg>...</svg> dibiarkan utuh agar tampil
+  // sebagai ikon, bukan teks mentah (bug: seluruh label di-esc → SVG bocor).
+  const labelHtml = String(label ?? "").split(/(<svg[\s\S]*?<\/svg>)/g)
+    .map((part) => part.startsWith("<svg") ? part : esc(part)).join("");
+  return `<div class="stat-row"><span class="stat-label">${labelHtml}</span>` +
          `<span class="stat-value ${cls || ""}">${esc(value)}</span></div>`;
 }
 
