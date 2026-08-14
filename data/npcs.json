@@ -3,12 +3,21 @@
     { "id": "npc_penjaga", "name": "Penjaga Gerbang", "location": "loc_gerbang_akademi", "role": "gate_guard",
       "default_dialog": "dlg_penjaga",
       "schedule": [ { "day": 1, "hour_start": 6, "hour_end": 22, "location": "loc_gerbang_akademi" } ] },
-    { "id": "npc_gucanghai", "name": "Gu Canghai", "location": "loc_aula_ujian", "role": "mentor",
-      "default_dialog": "dlg_gucanghai_ujian", "can_spar": true,
+    { "id": "npc_gucanghai", "name": "Gu Canghai", "location": "loc_aula_ujian", "role": "mentor", "default_dialog": "dlg_gucanghai_ujian",
+ "can_spar": true,
+ "spar_require": {
+  "realm_min": "realm_pembangun_fondasi"
+ },
       "combat": { "hp": 90, "qi": 30, "attack": 12, "defense": 6, "speed": 8, "element": "air" },
       "schedule": [ { "day": 1, "hour_start": 6, "hour_end": 20, "location": "loc_aula_ujian" } ] },
-    { "id": "npc_hanxiu", "name": "Han Xiu", "location": "loc_arena", "role": "rival",
-      "default_dialog": "dlg_hanxiu", "can_spar": true,
+    { "id": "npc_hanxiu", "name": "Han Xiu", "location": "loc_arena", "role": "rival", "default_dialog": "dlg_hanxiu",
+ "can_spar": true,
+ "spar_require": {
+  "flag": {
+   "key": "spar_ujian_selesai",
+   "value": true
+  }
+ },
       "combat": { "hp": 60, "qi": 25, "attack": 9, "defense": 4, "speed": 11, "element": "logam" },
       "schedule": [ { "day": 1, "hour_start": 8, "hour_end": 18, "location": "loc_arena" } ] },
     { "id": "npc_suqing", "name": "Su Qing", "location": "loc_paviliun", "role": "friend",

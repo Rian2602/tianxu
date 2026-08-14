@@ -474,6 +474,14 @@ class Validator:
                 self.error(f"npc {n['id']}: location '{n['location']}' tidak ada")
             if n.get("default_dialog") and not self.has("dialog", n["default_dialog"]):
                 self.error(f"npc {n['id']}: default_dialog '{n['default_dialog']}' tidak ada")
+            # spar_require: format kondisi sama seperti dialog (flag/realm_min/dll)
+            req = n.get("spar_require")
+            if req is not None and not isinstance(req, dict):
+                self.error(f"npc {n['id']}: spar_require harus dict kondisi (aturan 12)")
+            elif req:
+                self._check_dialog_condition(n["id"], "spar_require", req, "spar_require")
+                if not n.get("can_spar"):
+                    self.error(f"npc {n['id']}: spar_require tanpa can_spar (aturan 12)")
             shop = n.get("shop")
             if shop:
                 for side in ("buy", "sell"):

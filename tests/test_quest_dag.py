@@ -196,7 +196,8 @@ def test_spar_kalah_tetap_selesai_dan_dialog_beda(session, monkeypatch):
     assert session.state.current_quest == "q_akademi_03"
 
     session.state.player.hp = 5  # hampir KO — musuh membalas dan mengalahkan
-    session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
+    session.apply_action({"type": "talk", "npc": "npc_hanxiu"})  # dialog → battle otomatis
+    finish_dialog(session, [])
     session.apply_action({"type": "battle_action", "action": "attack"})
     assert session.state.pending_battle is None  # KO → battle selesai
     assert session.state.current_quest == "q_akademi_04"  # spar quest tetap selesai

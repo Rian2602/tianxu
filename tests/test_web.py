@@ -267,6 +267,26 @@ def test_context_loc_names(base_url: str) -> None:
     assert data["context"]["loc_names"]["loc_aula_ujian"] == "Aula Ujian"
 
 
+def test_context_can_spar_gated(base_url: str) -> None:
+    """Tombol Sparring data-driven: false sebelum syarat, true setelah terpenuhi."""
+    post(base_url, "/api/new")
+    app.session.state.flags["spar_ujian_selesai"] = True
+    # Han Xiu (Arena): syarat flag terpenuhi → can_spar true
+    app.session.state.location = "loc_arena"
+    body, status = get(base_url, "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    hanxiu = next(n for n in data["context"]["npcs"] if n["id"] == "npc_hanxiu")
+    assert hanxiu["can_spar"] is True
+    # Gu Canghai (Aula Ujian): realm masih pengumpul qi → can_spar false
+    app.session.state.location = "loc_aula_ujian"
+    body, status = get(base_url, "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    gucanghai = next(n for n in data["context"]["npcs"] if n["id"] == "npc_gucanghai")
+    assert gucanghai["can_spar"] is False
+
+
 def test_static_no_cache(base_url: str) -> None:
     """File statis dikirim dengan Cache-Control: no-cache agar fix frontend selalu termuat (K6)."""
     for path in ("/", "/static/app.js", "/static/style.css"):

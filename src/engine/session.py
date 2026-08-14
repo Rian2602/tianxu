@@ -318,11 +318,27 @@ class GameSession:
         self.state.player.qi = min(self.state.max_qi(self.reg), self.state.player.qi + hours * 2)
         return self.view()
 
+    def can_spar(self, npc: dict) -> bool:
+        """Sparring manual tersedia bila NPC bisa spar DAN syarat `spar_require` terpenuhi.
+
+        Data-driven: kondisi di npcs.json (format sama seperti kondisi dialog —
+        `flag`, `realm_min`, dll). Tanpa field itu → perilaku lama (can_spar saja)."""
+        if not npc.get("can_spar"):
+            return False
+        req = npc.get("spar_require")
+        if not req:
+            return True
+        from src.engine.dialog import DialogEngine
+        return DialogEngine._eval_condition(self.state, req, self.reg)
+
     def _spar(self, action: dict) -> dict:
         nid = action.get("npc")
         npc = self.reg.npc(nid) or self.reg.npc(f"npc_{nid}")  # terima id pendek ("hanxiu")
         if not npc or not npc.get("can_spar"):
             add_log(self.state, "system", "NPC itu tidak bisa diajak sparing.")
+            return self.view()
+        if not self.can_spar(npc):
+            add_log(self.state, "system", f"{npc['name']} belum bersedia melayanimu sparing.")
             return self.view()
         if not self._is_npc_available(npc):
             add_log(self.state, "system", f"{npc['name']} sedang tidak berada di tempat untuk berlatih tanding.")

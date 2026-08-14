@@ -462,6 +462,36 @@ def test_aturan12_shop_item_tidak_ada():
     assert any("shop" in e for e in v.errors)
 
 
+def test_aturan12_spar_require_kondisi_tak_dikenal():
+    """spar_require harus format kondisi dialog; kunci tak dikenal ditolak."""
+    d = _good()
+    d["npcs.json"] = {"npcs": [
+        {"id": "n1", "can_spar": True, "spar_require": {"mood_min": 5}},
+    ]}
+    v, ok = make(d)
+    assert not ok
+    assert any("spar_require" in e for e in v.errors)
+
+
+def test_aturan12_spar_require_tanpa_can_spar():
+    d = _good()
+    d["npcs.json"] = {"npcs": [
+        {"id": "n1", "spar_require": {"realm_min": "realm_pembangun_fondasi"}},
+    ]}
+    v, ok = make(d)
+    assert not ok
+    assert any("tanpa can_spar" in e for e in v.errors)
+
+
+def test_aturan12_spar_require_valid():
+    d = _good()
+    d["npcs.json"] = {"npcs": [
+        {"id": "n1", "can_spar": True, "spar_require": {"realm_min": "realm_pembangun_fondasi"}},
+    ]}
+    v, ok = make(d)
+    assert ok
+
+
 # ---------- aturan 13: weapon punya power; roots valid ----------
 
 def test_aturan13_weapon_tanpa_power():

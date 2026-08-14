@@ -428,10 +428,32 @@ def test_spar_edge_cases(session):
     session.apply_action({"type": "spar", "npc": "npc_penjaga"})
     assert any("tidak bisa diajak sparing" in e["text"] for e in session.state.log)
 
-    # NPC tidak ada di lokasi ini
+    # NPC tidak ada di lokasi ini (syarat spar manual dipenuhi dulu)
+    session.state.flags["spar_ujian_selesai"] = True
     session.state.location = "loc_asrama"
     session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
     assert any("tidak ada di sini" in e["text"] for e in session.state.log)
+
+
+def test_spar_require_gating(session):
+    """Sparring manual tertutup sebelum syarat (data-driven npcs.json spar_require):
+    Han Xiu butuh spar_ujian_selesai; Gu Canghai butuh realm pembangun fondasi."""
+    # Han Xiu — ditolak sebelum quest spar ujian selesai
+    session.state.location = "loc_arena"
+    session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
+    assert any("belum bersedia melayanimu sparing" in e["text"] for e in session.state.log)
+    assert session.state.pending_battle is None
+
+    # Gu Canghai — ditolak di realm awal (pengumpul qi)
+    session.state.location = "loc_aula_ujian"
+    session.apply_action({"type": "spar", "npc": "npc_gucanghai"})
+    assert any("belum bersedia melayanimu sparing" in e["text"] for e in session.state.log)
+    assert session.state.pending_battle is None
+    # naikkan realm ke pembangun fondasi → diterima
+    session.state.player.realm = "realm_pembangun_fondasi"
+    session.apply_action({"type": "spar", "npc": "npc_gucanghai"})
+    assert session.state.pending_battle is not None
+    session.state.pending_battle = None
 
 
 def test_hunt_outside_hunt_area_and_miniboss(session, monkeypatch):
@@ -551,7 +573,8 @@ def test_session_use_item_edge_cases(session):
 
 
 def test_session_spar_success_and_schedule(session):
-    # Spar sukses
+    # Spar sukses (syarat spar manual Han Xiu dipenuhi)
+    session.state.flags["spar_ujian_selesai"] = True
     session.state.location = "loc_arena"
     v = session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
     assert session.state.pending_battle is not None
@@ -569,6 +592,7 @@ def test_session_spar_success_and_schedule(session):
 
 def test_spar_id_pendek_simpan_id_penuh(session):
     # CLI menerima id pendek ("hanxiu") → spar_npc harus menyimpan id penuh agar quest spar selesai
+    session.state.flags["spar_ujian_selesai"] = True
     session.state.location = "loc_arena"
     session.apply_action({"type": "spar", "npc": "hanxiu"})
     assert session.state.pending_battle is not None

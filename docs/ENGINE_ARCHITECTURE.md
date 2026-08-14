@@ -310,6 +310,7 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 
 - Opsional `shop`: NPC pedagang — `buy` (item yang dijual toko) & `sell` (item yang dibeli toko dari pemain) dengan harga tetap; tanpa `shop` = NPC biasa (ekonomi sederhana Fase 1, disahkan).
 - Opsional `can_spar: true`: NPC bisa diajak sparing **tanpa batas frekuensi** (disahkan) — mis. Han Xiu & Gu Canghai.
+- Opsional `spar_require`: kondisi (format sama seperti kondisi dialog: `flag`/`realm_min`/dll) yang harus dipenuhi sebelum sparing manual — data-driven gating (mis. Han Xiu butuh `spar_ujian_selesai`, Gu Canghai butuh `realm_pembangun_fondasi`). Dievaluasi `GameSession.can_spar()`; CLI & web menyembunyikan opsi sparing sampai syarat terpenuhi. Tanpa field ini → perilaku lama (`can_spar` saja). Validator aturan 12 memeriksa formatnya.
 - Opsional `combat`: stat battle NPC (`hp`/`qi`/`attack`/`defense`/`speed`/`element`) — dipakai untuk sparing & objektif `spar`.
 
 ### 5.4 CSV Balancing

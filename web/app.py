@@ -44,7 +44,7 @@ def _context() -> dict:
         return {"npcs": [], "techniques": [], "merchant_shop": None, "recipes": []}
     loc = session.state.location
     npcs = [
-        {"id": n["id"], "name": n["name"], "can_spar": n.get("can_spar"), "shop": bool(n.get("shop"))}
+        {"id": n["id"], "name": n["name"], "can_spar": session.can_spar(n), "shop": bool(n.get("shop"))}
         for n in registry.npcs if n.get("location") == loc and session._is_npc_available(n)
     ]
     techniques = registry.player_techniques(

@@ -428,6 +428,7 @@ def test_spar_menang_menaikkan_relation(session, monkeypatch):
     from src.engine.battle import BattleEngine as BE
     monkeypatch.setattr(BE, "_calc_damage", lambda self, a, d, ea, ed: ((0, False) if ed is None else (99999, False)))
     session.state.location = "loc_arena"
+    session.state.flags["spar_ujian_selesai"] = True  # syarat spar manual Han Xiu
     session.apply_action({"type": "spar", "npc": "npc_hanxiu"})
     assert session.state.pending_battle is not None
     rel_before = session.state.relations.get("npc_hanxiu", 0)

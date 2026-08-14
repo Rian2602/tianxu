@@ -87,7 +87,7 @@ def explore_menu(session: GameSession) -> None:
     # NPC di lokasi
     npcs = [n for n in session.reg.npcs if n.get("location") == v["location"]["id"]]
     for n in npcs:
-        spar = " (sparing)" if n.get("can_spar") else ""
+        spar = " (sparing)" if session.can_spar(n) else ""
         shop = " (toko)" if n.get("shop") else ""
         print(f"  {GREEN}[bicara]{RESET} {n['name']}{spar}{shop}")
     for c in v["location"]["connections"]:
@@ -98,7 +98,7 @@ def explore_menu(session: GameSession) -> None:
     if v["location"]["is_safe"]:
         print(f"  {GREEN}[meditasi]{RESET} berkultivasi (jam) · {GREEN}[istirahat]{RESET} pulihkan HP/Qi · {GREEN}[simpan]{RESET} game")
     for n in npcs:
-        if n.get("can_spar"):
+        if session.can_spar(n):
             print(f"  {GREEN}[spar]{RESET} latihan vs {n['name']}")
     if v["location"]["is_safe"] and any(i["id"] == "material_herba" and i["count"] >= 2 for i in v["inventory"]):
         print(f"  {GREEN}[racik]{RESET} pil dari bahan (rc_pil_qi / rc_pil_pemulihan)")
