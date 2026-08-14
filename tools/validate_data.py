@@ -433,7 +433,7 @@ class Validator:
         if not cond:
             return
         # kunci kondisi yang didukung `dialog.py::_eval_condition` (AND multi-kunci)
-        allowed = {"flag", "morality_min", "morality_max", "has_item", "realm_min",
+        allowed = {"flag", "morality_min", "morality_max", "has_item", "has_items", "realm_min",
                    "academy", "quest_active", "quest_not_active",
                    "relation_min", "relation_max", "memory", "month_min", "month_max"}
         for ck in cond:
@@ -445,6 +445,12 @@ class Validator:
                 self.error(f"dialog {did} {where} {nid}: kondisi {ck} npc '{r['npc']}' tidak ada")
         if cond.get("memory") and not self.has("memory", cond["memory"]):
             self.error(f"dialog {did} {where} {nid}: kondisi memory '{cond['memory']}' tidak ada")
+        if cond.get("has_items"):
+            h = cond["has_items"]
+            if not isinstance(h, dict) or not h.get("item") or not isinstance(h.get("value"), int) or h["value"] < 1:
+                self.error(f"dialog {did} {where} {nid}: kondisi has_items harus {{item, value>=1}} (aturan 7)")
+            elif not self.has("item", h.get("item", "")):
+                self.error(f"dialog {did} {where} {nid}: kondisi has_items item '{h.get('item')}' tidak ada")
         # C2: kondisi bulan — int 1..12 (12 bulan dalam setahun, month_length_days ≥ 1)
         for ck in ("month_min", "month_max"):
             m = cond.get(ck)

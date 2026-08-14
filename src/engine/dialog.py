@@ -148,6 +148,11 @@ class DialogEngine:
         if "has_item" in cond:
             if s.inventory.get(cond["has_item"], 0) < 1:
                 return False
+        if "has_items" in cond:
+            # jumlah spesifik: { "item": "material_herba", "value": 3 }
+            h = cond["has_items"]
+            if s.inventory.get(h.get("item", ""), 0) < h.get("value", 1):
+                return False
         if "realm_min" in cond:
             if registry is None:
                 return False

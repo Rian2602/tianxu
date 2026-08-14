@@ -211,13 +211,50 @@
           "speaker": "npc:npc_suqing",
           "text": "Akademi ini besar sekali, ya? Aku belum hafal setengahnya. Kalau kau juga bingung, kita bisa tersesat bersama-sama. Itu lebih menyenangkan daripada tersesat sendiri.",
           "end": true
-        },
-        "node_kecewa_3b": {
-          "condition": { "flag": { "key": "branch_3b", "value": true } },
-          "speaker": "npc:npc_suqing",
-          "text": "Aku dengar kau 'menawarkan bantuan' pada Zhou Yan. Dengan harga. ... Aku kira kau berbeda, Chen Xu. Ternyata kota ini mengajarimu lebih cepat dari yang kuduga.",
-          "end": true
-        },
+        },  "node_lapor_suqing": {
+   "condition": {
+    "quest_active": "q_side_suqing"
+   },
+   "speaker": "npc:npc_suqing",
+   "text": "Chen Xu! Sudah dapat ramuannya? Kalau sudah lengkap, langsung serahkan — ibuku sudah menunggu.",
+   "choices": [
+    {
+     "label": "Ini, tiga ikat Herba Awan.",
+     "next": "node_serah_ok",
+     "condition": {
+      "has_items": {
+       "item": "material_herba",
+       "value": 3
+      }
+     }
+    },
+    {
+     "label": "Belum lengkap — nanti kususulkan lagi.",
+     "next": "node_serah_belum"
+    }
+   ]
+  },
+  "node_serah_ok": {
+   "speaker": "npc:npc_suqing",
+   "text": "Terima kasih banyak, Chen Xu! Ini imbalannya — dan jangan lupa, kalau butuh ramuan lagi, aku pasti menghubungimu.",
+   "end": true
+  },
+  "node_serah_belum": {
+   "speaker": "npc:npc_suqing",
+   "text": "Tak apa. Herba Awan bisa kau cari di Wilayah Berburu atau tanya pedagang di Pasar. Aku tunggu di sini.",
+   "end": true
+  },
+  "node_kecewa_3b": {
+   "condition": {
+    "flag": {
+     "key": "branch_3b",
+     "value": true
+    }
+   },
+   "speaker": "npc:npc_suqing",
+   "text": "Aku dengar kau 'menawarkan bantuan' pada Zhou Yan. Dengan harga. ... Aku kira kau berbeda, Chen Xu. Ternyata kota ini mengajarimu lebih cepat dari yang kuduga.",
+   "end": true
+  },
         "node_kecewa_3c": {
           "condition": { "flag": { "key": "branch_3c", "value": true } },
           "speaker": "npc:npc_suqing",
@@ -318,6 +355,25 @@
         "node_moyun_memori": {
           "speaker": "npc:npc_moyun",
           "text": "Kau menatap benda di dadamu seolah ia bisa menjawab — pengembara compang-camping yang kau beri jubah di tengah hujan. \n\nMo Yun menatapmu lama. \"Ada catatan tua tentang benda seperti itu di perpustakaan ini. Datanglah lagi, kalau kau ingin tahu apa artinya.\"",
+          "end": true
+        },
+        "node_lapor_moyun": {
+          "condition": { "quest_active": "q_side_moyun" },
+          "speaker": "npc:npc_moyun",
+          "text": "Dua ikat Herba Awan untuk tinta dan dupa perpustakaan. Sudah kau bawa?",
+          "choices": [
+            { "label": "Ini, dua ikat Herba Awan.", "next": "node_serah_ok", "condition": { "has_items": { "item": "material_herba", "value": 2 } } },
+            { "label": "Belum lengkap — nanti kususulkan lagi.", "next": "node_serah_belum" }
+          ]
+        },
+        "node_serah_ok": {
+          "speaker": "npc:npc_moyun",
+          "text": "Terima kasih. Perpustakaan ini berutang padamu — dan kau tahu, perpustakaan tidak lupa. Ini imbalannya.",
+          "end": true
+        },
+        "node_serah_belum": {
+          "speaker": "npc:npc_moyun",
+          "text": "Tak apa. Herba Awan banyak tumbuh di Wilayah Berburu — atau tanya pedagang di Pasar. Aku menunggu.",
           "end": true
         },
         "node_offer_side": {

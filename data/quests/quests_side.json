@@ -31,13 +31,13 @@
       "title": "Belanja Ramuan Su Qing",
       "arc": "akademi",
       "kind": "side",
-      "summary": "Su Qing meminta bantuan mengumpulkan Herba Awan untuk persediaannya.",
-      "objective": {
-        "kind": "gather",
-        "item": "material_herba",
-        "target": 3,
-        "hint": "Kumpulkan 3 Herba Awan (bisa diburu atau dibeli di pasar)."
-      },
+      "summary": "Su Qing meminta bantuan mengumpulkan Herba Awan untuk persediaannya.", "objective": {
+  "kind": "gather",
+  "item": "material_herba",
+  "target": 3,
+  "report_to": "npc_suqing",
+  "hint": "Kumpulkan 3 Herba Awan, lalu serahkan ke Su Qing."
+ },
       "next": [],
       "repeatable": true,
       "cooldown": 2,
@@ -54,13 +54,13 @@
       "title": "Tugas Perpustakaan",
       "arc": "akademi",
       "kind": "side",
-      "summary": "Mo Yun meminta Herba Awan untuk persediaan perpustakaan.",
-      "objective": {
-        "kind": "gather",
-        "item": "material_herba",
-        "target": 2,
-        "hint": "Kumpulkan 2 Herba Awan untuk perpustakaan."
-      },
+      "summary": "Mo Yun meminta Herba Awan untuk persediaan perpustakaan.", "objective": {
+  "kind": "gather",
+  "item": "material_herba",
+  "target": 2,
+  "report_to": "npc_moyun",
+  "hint": "Kumpulkan 2 Herba Awan, lalu serahkan ke Mo Yun."
+ },
       "next": [],
       "repeatable": true,
       "cooldown": 2,

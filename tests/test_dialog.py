@@ -199,11 +199,19 @@ def test_side_quest_dimulai_dan_selesai(session, god_mode):
     finish_dialog(session, [0])  # "Aku bantu kumpulkan ramuannya." → start_quest
     assert "q_side_suqing" in session.state.active_side_quests, "side quest tidak aktif"
 
-    # kumpulkan 3 herba → selesai (notify_gather dipicu lewat use_item)
+    # kumpulkan 3 herba → BELUM selesai (report_to: harus lapor ke Su Qing)
     session.state.inventory["material_herba"] = 3
     session.apply_action({"type": "use_item", "item": "pil_qi"})
+    assert "q_side_suqing" in session.state.active_side_quests, "kumpul saja belum menyelesaikan (report_to)"
+
+    # bicara ke Su Qing → node lapor → serah → quest selesai + herba diambil
+    session.apply_action({"type": "talk", "npc": "npc_suqing"})
+    v = session.dialog.view()
+    assert v["node_id"] == "node_lapor_suqing"
+    finish_dialog(session, [0])  # "Ini, tiga ikat Herba Awan."
     assert "q_side_suqing" not in session.state.active_side_quests
     assert "q_side_suqing" in session.state.completed_quests
+    assert session.state.inventory.get("material_herba", 0) == 0  # herba diambil
     assert session.state.player.gold >= 30  # reward +10
 
     # repeatable: tidak bisa ditawarkan sebelum cooldown

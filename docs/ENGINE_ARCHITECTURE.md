@@ -198,7 +198,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 |---|---|---|
 | `talk` | `npc` (+ opsional `node`/`nodes`/`start_node`) | Buka dialog NPC; selesai saat dialog berakhir (atau setelah `target` kali). **A3 (2026-08-14)**: `node`/`nodes` = node dialog **WAJIB dimainkan** — quest selesai hanya bila salah satu node yang dikunjungi ∈ daftar; `start_node` = dialog dipaksa mulai dari node itu saat quest aktif (mis. konfrontasi 3aa terjadi SAAT quest berjalan, bukan setelah selesai). Validator aturan 4 memeriksa node ada di dialog default NPC |
 | `defeat` | `enemies` (list id), `target` | Kalahkan N musuh (dari data). **A7 (2026-08-14)**: main quest ikut memfilter `enemies` (hanya musuh dari daftar yang memenuhi) — tanpa `enemies` perilaku lama |
-| `gather` | `item`, `target` | Kumpulkan N item |
+| `gather` | `item`, `target` (+ opsional `report_to`) | Kumpulkan N item. **Tanpa `report_to`** selesai otomatis saat item cukup. **Dengan `report_to`**: item tidak "dimakan" saat dikumpul — quest selesai hanya saat **lapor ke NPC pemberi** (`quest.py::notify_dialog_ended` memeriksa `gather + report_to` → mengambil `target` item dari inventori lalu selesai), sehingga dua quest memakai item yang sama (mis. herba Su Qing & Mo Yun) tidak saling menyelesaikan sekaligus; dialog pemberi menyediakan node lapor (`quest_active` + pilihan bersyarat `has_items`) |
 | `reach` | `location` (+ opsional `time_window`) | Tiba di lokasi; jika `time_window` (`hour_start`/`hour_end`) ada, hanya sah pada waktu itu — **event terjadwal** |
 | `choose` | `options` (list) | Pilihan eksplisit (mis. pilih akademi, pilih jalur) |
 | `spar` | `npc` | Sparring wajib: bicara NPC ber-`combat` → battle; **menang = objektif selesai** (dipakai sparing ujian) |
@@ -266,6 +266,7 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 | `flag` | `{ "flag": { "key": "branch_3aa", "value": true } }` | Flag dunia bernilai tertentu |
 | `morality_min` / `morality_max` | `{ "morality_min": 10 }` | Batas skala moralitas |
 | `has_item` | `{ "has_item": "pil_qi" }` | Punya item (count ≥ 1) |
+| `has_items` | `{ "has_items": { "item": "material_herba", "value": 3 } }` | Punya item dengan jumlah spesifik (≥ value) — dipakai pilihan serah side quest gather |
 | `realm_min` | `{ "realm_min": "realm_pengumpul_qi" }` | Ranah minimum |
 | `academy` | `{ "academy": "akademi_elemen" }` | Akademi pilihan pemain |
 | `quest_active` / `quest_not_active` | `{ "quest_not_active": "q_side_suqing" }` | Status quest (dipakai penawaran side quest) |

@@ -522,6 +522,54 @@ def test_main_defeat_tanpa_enemies_perilaku_lama(dummy_session, monkeypatch):
     assert "q_synth_defeat2" in state.completed_quests
 
 
+def test_gather_report_to_dua_quest_herba_terpisah(dummy_session):
+    """Dua quest gather (Su Qing 3 / Mo Yun 2) memakai item sama TIDAK saling
+    memakan: kumpul 3 herba → belum ada yang selesai; serah ke Mo Yun ambil 2,
+    sisa 1; serah ke Su Qing ambil 3 (perlu kumpul lagi)."""
+    from conftest import finish_dialog
+    from src.engine.session import GameSession
+
+    s = GameSession.new(dummy_session.reg)
+    s.state.current_quest = None
+    s.state.flags["met_penjaga"] = True
+    s.state.flags["ujian_akar_selesai"] = True
+    s.state.flags["spar_ujian_selesai"] = True
+    s.state.flags["akademi_dipilih"] = True
+    s.state.flags["hari_pertama_selesai"] = True
+    s.state.player.academy = "akademi_elemen"
+    s.state.location = "loc_paviliun"
+    # aktifkan kedua quest (simulasi start_quest via dialog)
+    s.quest.start_side("q_side_suqing")
+    s.quest.start_side("q_side_moyun")
+    assert "q_side_suqing" in s.state.active_side_quests
+    assert "q_side_moyun" in s.state.active_side_quests
+
+    # kumpul 3 herba → TIDAK ada quest yang auto-selesai (report_to)
+    s.state.inventory["material_herba"] = 3
+    s.quest.notify_gather()
+    assert "q_side_suqing" in s.state.active_side_quests
+    assert "q_side_moyun" in s.state.active_side_quests
+
+    # serah ke Mo Yun (2 herba) → quest Mo Yun selesai, herba sisa 1
+    s.state.location = "loc_perpustakaan"
+    s.apply_action({"type": "talk", "npc": "npc_moyun"})
+    assert s.dialog.view()["node_id"] == "node_lapor_moyun"
+    finish_dialog(s, [0])
+    assert "q_side_moyun" not in s.state.active_side_quests
+    assert s.state.inventory.get("material_herba", 0) == 1
+    # Su Qing belum selesai — herba yang tersisa (1) tidak cukup untuk 3
+    assert "q_side_suqing" in s.state.active_side_quests
+
+    # kumpul 2 lagi → serah ke Su Qing (3) → selesai
+    s.state.inventory["material_herba"] = 3
+    s.state.location = "loc_paviliun"
+    s.apply_action({"type": "talk", "npc": "npc_suqing"})
+    assert s.dialog.view()["node_id"] == "node_lapor_suqing"
+    finish_dialog(s, [0])
+    assert "q_side_suqing" not in s.state.active_side_quests
+    assert s.state.inventory.get("material_herba", 0) == 0
+
+
 def test_complete_side_ignores_inactive(dummy_session):
     """_complete_side quest yang tidak aktif → tidak crash, tidak tercatat selesai."""
     qe = dummy_session.quest

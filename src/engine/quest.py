@@ -102,6 +102,21 @@ class QuestEngine:
                 prog["talk"] = prog.get("talk", 0) + 1
                 if prog.get("defeated", 0) >= obj.get("target", 1):
                     self._complete_side(qid)
+        # gather dengan `report_to`: saat lapor ke pemberi, ambil item dari inventori
+        # lalu selesaikan — satu set herba hanya untuk SATU quest (tidak sekaligus)
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if obj.get("kind") == "gather" and obj.get("report_to") == npc_id:
+                iid = obj.get("item", "")
+                target = obj.get("target", 1)
+                have = self.state.inventory.get(iid, 0)
+                if have >= target:
+                    self.state.inventory[iid] = have - target
+                    if self.state.inventory[iid] <= 0:
+                        del self.state.inventory[iid]
+                    add_log(self.state, "system", f"Menyerahkan {target} × {self.reg.item(iid)['name'] if self.reg.item(iid) else iid}.")
+                    self._complete_side(qid)
 
     def notify_spar_won(self, npc_id: str) -> None:
         """Objektif `spar` selesai saat pemain MENANG battle melawan NPC itu."""
@@ -156,10 +171,13 @@ class QuestEngine:
                     self._complete_side(qid)
 
     def notify_gather(self) -> None:
+        """Kumpul item — quest gather TANPA `report_to` selesai otomatis saat cukup;
+        quest dengan `report_to` menunggu lapor ke pemberi (pola q_side_berburu),
+        sehingga dua quest herba tidak "memakan" satu set item yang sama sekaligus."""
         for qid in list(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             obj = sq.get("objective", {})
-            if obj.get("kind") == "gather":
+            if obj.get("kind") == "gather" and not obj.get("report_to"):
                 have = self.state.inventory.get(obj.get("item", ""), 0)
                 if have >= obj.get("target", 1):
                     self._complete_side(qid)
