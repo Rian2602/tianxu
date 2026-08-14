@@ -298,7 +298,7 @@ class GameSession:
 
     def _spar(self, action: dict) -> dict:
         nid = action.get("npc")
-        npc = self.reg.npc(nid)
+        npc = self.reg.npc(nid) or self.reg.npc(f"npc_{nid}")  # terima id pendek ("hanxiu")
         if not npc or not npc.get("can_spar"):
             add_log(self.state, "system", "NPC itu tidak bisa diajak sparing.")
             return self.view()

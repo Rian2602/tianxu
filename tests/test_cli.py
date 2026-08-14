@@ -197,3 +197,52 @@ def test_battle_view_with_companion(session, capsys):
                            "exp_reward": 0, "drop_item": None, "drop_chance": 0}], "hunt")
     battle_view(session)                          # baris companion battle
     assert "otomatis" in capsys.readouterr().out
+
+
+def test_cli_load_valid_save(monkeypatch, capsys, tmp_path, registry):
+    monkeypatch.setattr("src.engine.session.SAVES_DIR", tmp_path)
+    s = GameSession.new(registry)
+    s.state.location = "loc_asrama"               # titik aman agar _save diizinkan
+    s._save({"save_name": "valid"})
+    assert (tmp_path / "valid.json").exists()
+    monkeypatch.setattr("sys.argv", ["src/cli.py", "-l", "valid"])
+    monkeypatch.setattr("builtins.input", lambda prompt="": (_ for _ in ()).throw(EOFError))
+
+    from src.cli import main
+
+    main()                                        # jalur memuat save sukses
+    assert "Memuat save 'valid'..." in capsys.readouterr().out
+
+
+def test_cli_boots_as_script():
+    proc = subprocess.run([sys.executable, "src/cli.py"], input="",
+                          capture_output=True, text=True, timeout=60, cwd=ROOT)
+    assert proc.returncode == 0                   # main() via __main__ berjalan
+    assert "TIAN XU: SECOND LIFE" in proc.stdout  # bootstrap sys.path (run as script)
+
+
+def test_cli_choose_digit_and_spar_arg(monkeypatch, capsys):
+    monkeypatch.setattr(BattleEngine, "_calc_damage", lambda self, a, d, ea, ed: (99999, False))
+    monkeypatch.setattr(BattleEngine, "_enemy_turn", lambda self, pc, b: None)
+    monkeypatch.setattr("src.engine.session.GameSession._is_npc_available", lambda self, npc: True)
+    script = [
+        "talk npc_penjaga", "1", "lanjut", "lanjut",
+        "pindah loc_aula_ujian",
+        "talk npc_gucanghai", "lanjut", "1", "lanjut", "lanjut", "lanjut",
+        "pindah loc_arena",
+        "talk npc_hanxiu", "lanjut", "lanjut",
+        "serang",                    # menang spar ujian
+        "1",                         # choose digit path → pilih akademi_elemen (232-234)
+        "spar hanxiu",               # spar dengan argumen NPC (278)
+        "serang",
+        "keluar",
+    ]
+    inputs = iter(script)
+    monkeypatch.setattr("builtins.input", lambda prompt="": next(inputs))
+
+    from src.cli import main
+
+    main()
+    out = capsys.readouterr().out
+    assert "Akademi Elemen" in out   # choose_view merender opsi
+    assert out.count("Aksi:") >= 2   # dua battle: spar ujian + spar hanxiu
