@@ -181,6 +181,44 @@ def test_aturan7_teknik_upgrade_config_tidak_valid():
     assert any("technique_upgrade_cost_base" in e for e in v.errors)
 
 
+def test_aturan7_month_length_dan_month_names_tidak_valid():
+    """C2: config.time.month_length_days ≤ 0 / month_names ≠ 12 ditolak (aturan 7)."""
+    d = _good()
+    d["config.json"]["time"] = {"month_length_days": 0}
+    v, ok = make(d)
+    assert not ok
+    assert any("month_length_days" in e for e in v.errors)
+
+    d = _good()
+    d["config.json"]["time"] = {"month_length_days": 30, "month_names": ["Satu", "Dua"]}
+    v, ok = make(d)
+    assert not ok
+    assert any("month_names" in e for e in v.errors)
+
+
+def test_aturan7_kondisi_month_dialog_tidak_valid():
+    """C2: kondisi dialog month_min/max di luar 1..12 ditolak (aturan 7)."""
+    d = _good()
+    d["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_m", "npc": "", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x",
+                         "condition": {"month_max": 13}, "end": True}},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("month_max" in e for e in v.errors)
+
+    # bulan valid (1..12) diterima
+    d = _good()
+    d["dialogs/dialogs_akademi.json"] = {"dialogs": [{
+        "id": "dlg_m", "npc": "", "start": "n0",
+        "nodes": {"n0": {"speaker": "narration", "text": "x",
+                         "condition": {"month_min": 3, "month_max": 5}, "end": True}},
+    }]}
+    v, ok = make(d)
+    assert ok
+
+
 def test_aturan13_unlock_arc_tidak_dikenal():
     """B4: techniques.csv unlock_arc harus merujuk config.arcs[].id (aturan 13)."""
     d = _good()

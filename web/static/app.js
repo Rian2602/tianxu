@@ -96,7 +96,7 @@ function render() {
 function renderHeader(v) {
   const loc = v.location;
   $("header-title").textContent =
-    `Hari ${v.day}, jam ${String(v.hour).padStart(2, "0")}:00 — ${loc.name}`;
+    `Bulan ${v.month} — Hari ${v.day}, jam ${String(v.hour).padStart(2, "0")}:00 — ${loc.name}`;
 }
 
 function statRow(label, value, cls) {

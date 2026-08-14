@@ -679,6 +679,30 @@ def test_upgrade_technique_hanya_di_titik_aman_dan_batas_slots(session):
     assert any("belum menguasai" in e["text"] for e in s.log[-1:])
 
 
+def test_view_month_derived_dari_day(session):
+    """C2: view().month & month_name dihitung dari day (derived, kompatibel save lama)."""
+    s = session.state
+    cfg = session.reg.config
+    cfg.setdefault("time", {})["month_length_days"] = 30
+    cfg["time"]["month_names"] = ["Bulan Satu", "Bulan Dua", "Bulan Tiga", "Bulan Empat"] + [f"Bulan {i}" for i in range(5, 13)]
+    # day 1 → Bulan 1; day 31 → Bulan 2; day 61 → Bulan 3 (derived, tidak diserialisasi)
+    s.day = 1
+    assert s.month(session.reg) == 1
+    assert s.month_name(session.reg) == "Bulan Satu"
+    s.day = 30
+    assert s.month(session.reg) == 1
+    s.day = 31
+    assert s.month(session.reg) == 2
+    assert s.month_name(session.reg) == "Bulan Dua"
+    s.day = 61
+    v = session.view()
+    assert v["month"] == 3
+    assert v["month_name"] == "Bulan Tiga"
+    # tanpa month_names → fallback "Bulan {n}"
+    cfg["time"].pop("month_names", None)
+    assert s.month_name(session.reg) == "Bulan 3"
+
+
 def test_talk_returns_view_during_battle(session):
     session.state.pending_battle = {"active": True}
     session._talk({"npc": "npc_penjaga"})

@@ -43,7 +43,9 @@ def print_header(session: GameSession) -> None:
     loc = v["location"]
     p = v["player"]
     print()
-    print(f"{BOLD}═══ Hari {v['day']}, jam {v['hour']:02d}:00 — {loc['name']} ═══{RESET}")
+    # C2: header tampil bulan (derived) — `Bulan X — Hari Y, jam Z`
+    bulan = v.get("month_name", f"Bulan {v.get('month', 1)}")
+    print(f"{BOLD}═══ {bulan} — Hari {v['day']}, jam {v['hour']:02d}:00 — {loc['name']} ═══{RESET}")
     print(DIM + loc["description"] + RESET)
     print()
     print(f"{BOLD}Chen Xu{RESET} — {p['realm']} Lv.{p['realm_level']} | "

@@ -198,6 +198,14 @@ class Validator:
         if roots.get("default") not in tier_ids:
             self.error(f"config.roots.default '{roots.get('default')}' tidak ada di tiers (aturan 13)")
 
+        tm = cfg.get("time", {})
+        mld = tm.get("month_length_days")
+        if mld is not None and (not isinstance(mld, int) or mld <= 0):
+            self.error("config.time.month_length_days: harus int > 0 (aturan 7)")
+        mn = tm.get("month_names")
+        if mn is not None and (not isinstance(mn, list) or len(mn) != 12 or not all(isinstance(x, str) and x for x in mn)):
+            self.error("config.time.month_names: harus list 12 nama string non-kosong (aturan 7)")
+
         cult = cfg.get("cultivation", {})
         tub = cult.get("technique_upgrade_cost_base")
         if tub is not None and (not isinstance(tub, (int, float)) or tub <= 0):
@@ -391,6 +399,11 @@ class Validator:
                 self.error(f"dialog {did} {where} {nid}: kondisi {ck} npc '{r['npc']}' tidak ada")
         if cond.get("memory") and not self.has("memory", cond["memory"]):
             self.error(f"dialog {did} {where} {nid}: kondisi memory '{cond['memory']}' tidak ada")
+        # C2: kondisi bulan — int 1..12 (12 bulan dalam setahun, month_length_days ≥ 1)
+        for ck in ("month_min", "month_max"):
+            m = cond.get(ck)
+            if m is not None and not (isinstance(m, int) and 1 <= m <= 12):
+                self.error(f"dialog {did} {where} {nid}: kondisi {ck} harus int 1..12 (aturan 7)")
 
     def _check_memories(self) -> None:
         for m in self.memories:

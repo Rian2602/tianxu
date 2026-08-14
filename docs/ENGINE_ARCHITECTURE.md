@@ -271,6 +271,7 @@ Percabangan quest **hanya** dipicu pilihan dialog eksplisit (GDD §4.2) — tida
 | `quest_active` / `quest_not_active` | `{ "quest_not_active": "q_side_suqing" }` | Status quest (dipakai penawaran side quest) |
 | `relation_min` / `relation_max` | `{ "relation_min": { "npc": "npc_hanxiu", "value": 20 } }` | Ambang hubungan NPC — P1-2 (GDD §7): sparring berulang & on_complete quest menaikkan/menurunkan `relations`, kondisi membuka/menutup node/opsi dialog |
 | `memory` | `{ "memory": "mem_02" }` | Ingatan tertentu sudah pulih — P1-1 (GDD §3.1, B3/#13): opsi dialog hanya muncul setelah `memory_unlock` quest terkait; ingatan tetap tanpa power mekanik |
+| `month_min` / `month_max` | `{ "month_min": 3, "month_max": 5 }` | C2 (GDD §7): batas bulan (derived dari `day`) — peristiwa dialog hanya muncul bulan tertentu; AND dengan kondisi lain (pola `_eval_condition` multi-kunci) |
 
 **Jenis efek** (`effects`, format type-based):
 
@@ -395,7 +396,7 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
     { "id": "akademi_senjata",  "name": "Akademi Senjata",   "hanzi": "兵锋院", "pinyin": "Bīngfēng Yuàn", "skill_pool": ["tek_senjata_*"] },
     { "id": "akademi_summoning","name": "Akademi Summoning", "hanzi": "御灵宗", "pinyin": "Yùlíng Zōng", "skill_pool": ["tek_summoning_*"] }
   ],
-  "time": { "day_length_hours": 24, "start_day": 1, "start_hour": 8 },
+  "time": { "day_length_hours": 24, "start_day": 1, "start_hour": 8, "month_length_days": 30, "month_names": ["Bulan Pertama", … 12 nama] },
   "elements_cycle": ["logam", "kayu", "tanah", "air", "api"],
   "element_advantage": { "logam": "kayu", "kayu": "tanah", "tanah": "air", "air": "api", "api": "logam" },
   "morality": { "min": -100, "max": 100 },
@@ -456,6 +457,7 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
 }
 ```
 
+- **`time.month_length_days` + `time.month_names` (C2, 2026-08-14)**: siklus bulan — `state.month(registry)` **derived** dari `day` (`(day−1) // month_length_days + 1`, day 1..30 = Bulan 1 — deviasi 1 baris dari formula plan `day // mld + 1` yang off-by-one di kelipatan persis), kompatibel save lama tanpa migrasi; `state.month_name(registry)` fallback `"Bulan {n}"`; `view().month`/`month_name`; kondisi dialog `month_min/max` (validator: int 1..12). Arc berikutnya: event bulan tertentu = isi data.
 - **Akademi = data**, bukan hardcode: engine membaca `academies` dari config. Pilihan akademi (quest `choose`) hanya membuka `skill_pool` akademi itu (GDD §5.2 — sejajar DAG, tidak berpotongan naratif).
 - **`arcs` (B1, 2026-08-14)**: metadata arc (final_quest, title, teaser, memories_total, branches) data-driven — `view().arc_summary` membaca `config.arcs` (arc TERAKHIR yang selesai yang ditampilkan). Arc berikutnya = tambah entri di list, tanpa ubah engine.
 - **`world.safe_fallback_location` (B2)**: lokasi respawn KO saat `last_safe_location` kosong — prioritas `last_safe_location` → config → lokasi `is_safe` pertama dari data → lokasi pertama data (validator aturan 7 memastikan fallback valid & aman; aturan 14 kini memastikan **minimal 1 lokasi `is_safe`** — respawn KO selalu punya titik aman).
@@ -752,7 +754,7 @@ player_action(menu):
 {
   "location": { "id": "loc_gerbang_akademi", "name": "Gerbang Akademi",
                 "description": "...", "is_safe": false, "connections": ["loc_aula_ujian"] },
-  "day": 1, "hour": 8,
+  "day": 1, "hour": 8, "month": 1, "month_name": "Bulan Pertama",
   "player": { "name": "Chen Xu", "realm": "Pengumpul Qi", "realm_level": 3, "exp": 45, "exp_next": 60,
               "roots": "Akar Menengah (中品)", "gold": 20, "equipment": { "weapon": "pedang_bambu" },
               "hp": 80, "hp_max": 80, "qi": 40, "qi_max": 40, "academy": null, "morality": 0 },

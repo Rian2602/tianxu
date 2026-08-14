@@ -506,6 +506,21 @@ def test_gucanghai_pilihan_ingatan_muncul(session, god_mode):
     assert len(labels) == 3
 
 
+def test_eval_condition_month_min_max(session):
+    """C2: kondisi dialog month_min/max menyaring opsi berdasarkan bulan (derived)."""
+    from src.engine.dialog import DialogEngine
+    s = session.state
+    s.day = 40  # month_length 30 → Bulan 2
+    # di dalam rentang → True; di luar → False
+    assert DialogEngine._eval_condition(s, {"month_min": 2, "month_max": 3}, session.reg) is True
+    assert DialogEngine._eval_condition(s, {"month_min": 3}, session.reg) is False
+    assert DialogEngine._eval_condition(s, {"month_max": 1}, session.reg) is False
+    # kombinasi AND dengan kondisi lain
+    s.player.morality = 50
+    assert DialogEngine._eval_condition(s, {"month_min": 2, "morality_min": 40}, session.reg) is True
+    assert DialogEngine._eval_condition(s, {"month_min": 2, "morality_min": 60}, session.reg) is False
+
+
 def test_dialog_engine_choose_no_next_ends(session):
     session.dialog.current = {
         "id": "dlg_mock_end",

@@ -105,6 +105,27 @@ class GameState:
     def absolute_hours(self) -> int:
         return self.day * 24 + self.hour
 
+    # ---------- waktu: bulan (derived — C2, GDD §7) ----------
+
+    def month(self, registry) -> int:
+        """Bulan (1-based) dihitung dari `day` — derived, tidak diserialisasi,
+        jadi save lama otomatis kompatibel tanpa migrasi. `month_length_days`
+        dari `config.time` (default 30)."""
+        mld = int((registry.config.get("time", {}) or {}).get("month_length_days", 30))
+        # `(day−1) // mld + 1`: day 1..30 = Bulan 1, day 31..60 = Bulan 2, dst.
+        # (deviasi 1 baris dari formula plan `day // mld + 1` — yang terakhir
+        # off-by-one di kelipatan persis: day 30 → Bulan 2 padahal masih Bulan 1;
+        # kasus plan day 1/31/61 tetap terpenuhi)
+        return max(1, (self.day - 1) // mld + 1)
+
+    def month_name(self, registry) -> str:
+        """Nama tampilan bulan — dari `config.time.month_names` (bila ada 12
+        nama); fallback `f"Bulan {month}"` (data arc berikutnya bisa isi nama)."""
+        names = (registry.config.get("time", {}) or {}).get("month_names")
+        if isinstance(names, list) and len(names) >= self.month(registry):
+            return names[self.month(registry) - 1]
+        return f"Bulan {self.month(registry)}"
+
     # ---------- batas stat ----------
 
     def max_hp(self, registry) -> int:

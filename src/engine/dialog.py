@@ -149,6 +149,16 @@ class DialogEngine:
             qid = cond["quest_not_active"]
             if qid == s.current_quest or qid in s.active_side_quests:
                 return False
+        if "month_min" in cond:
+            if registry is None:
+                return False
+            if s.month(registry) < int(cond["month_min"]):
+                return False
+        if "month_max" in cond:
+            if registry is None:
+                return False
+            if s.month(registry) > int(cond["month_max"]):
+                return False
         if "relation_min" in cond:
             r = cond["relation_min"]
             if s.relations.get(r["npc"], 0) < r["value"]:

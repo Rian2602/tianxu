@@ -602,6 +602,8 @@ class GameSession:
             },
             "day": s.day,
             "hour": s.hour,
+            "month": s.month(self.reg),
+            "month_name": s.month_name(self.reg),
             "player": {
                 "name": s.player.name,
                 "realm": realm["name_pinyin"],
