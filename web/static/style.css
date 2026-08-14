@@ -194,7 +194,7 @@ body {
   margin-bottom: 6px;
 }
 
-.dialog-text { font-size: 16px; line-height: 1.55; margin-bottom: 12px; }
+.dialog-text { font-size: 16px; line-height: 1.55; margin-bottom: 12px; white-space: pre-wrap; }
 
 .choice-btn {
   display: block;
@@ -315,4 +315,11 @@ select, input[type="text"], input[type="number"] {
   padding: 10px; margin-bottom: 16px;
   color: var(--gray); text-align: center;
   border-radius: 4px;
+}
+
+/* responsif dasar — desktop dulu (GDD §12.5): tumpuk kolom di bawah 1024px */
+@media (max-width: 1023px) {
+  #layout { grid-template-columns: 1fr; }
+  .col { overflow-y: visible; }
+  #log { max-height: none; }
 }

@@ -12,7 +12,6 @@ Endpoint:
 - POST /api/new              → mulai game baru
 - POST /api/load             → {name} muat save
 - POST /api/action           → {action} aksi pemain → view
-- POST /api/save             → {name} simpan (hanya di titik aman)
 
 Jalankan:  python3 web/app.py  →  http://localhost:8000
 """
@@ -22,6 +21,7 @@ from __future__ import annotations
 import json
 import mimetypes
 import sys
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -35,6 +35,7 @@ STATIC_DIR = ROOT / "web" / "static"
 
 registry = DataRegistry()
 session: GameSession | None = None  # sesi aktif (single-player lokal)
+_session_lock = threading.Lock()  # K4: defense-in-depth — satu mutasi sesi per waktu
 
 
 def _context() -> dict:
@@ -44,9 +45,9 @@ def _context() -> dict:
     loc = session.state.location
     npcs = [
         {"id": n["id"], "name": n["name"], "can_spar": n.get("can_spar"), "shop": bool(n.get("shop"))}
-        for n in registry.npcs if n.get("location") == loc
+        for n in registry.npcs if n.get("location") == loc and session._is_npc_available(n)
     ]
-    techniques = registry.player_techniques(session.state.player.academy or "")
+    techniques = registry.player_techniques(session.state.player.academy or "", session.state.player.realm)
     academy = next(
         (a["name"] for a in registry.config.get("academies", []) if a["id"] == session.state.player.academy),
         session.state.player.academy,
@@ -98,6 +99,7 @@ def _context() -> dict:
             for t in techniques
         ],
         "academy": academy,
+        "loc_names": {l["id"]: l["name"] for l in registry.locations},
         "item_names": {i["id"]: i["name"] for i in registry.items.values()},
     }
 
@@ -127,11 +129,11 @@ def _tianyuan_payload() -> dict:
         } if q else None,
         "side_quests": [
             {
-                "id": sq,
-                "title": registry.quest(sq)["title"],
-                "objective": session.quest.objective_text(registry.quest(sq)),
+                "id": qd["id"],
+                "title": qd["title"],
+                "objective": session.quest.objective_text(qd),
             }
-            for sq in session.state.active_side_quests
+            for qd in session.quest.active_side()
         ],
     }
 
@@ -185,9 +187,10 @@ class Handler(BaseHTTPRequestHandler):
         if not length:
             return {}
         try:
-            return json.loads(self.rfile.read(length))
+            data = json.loads(self.rfile.read(length))
         except json.JSONDecodeError:
             return {}
+        return data if isinstance(data, dict) else {}
 
     # ---------- GET ----------
 
@@ -197,12 +200,14 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path.startswith("/static/"):
             self._send_file(STATIC_DIR / self.path[len("/static/"):])
         elif self.path == "/api/state":
-            self._send_json({"ok": True, **_payload()})
+            with _session_lock:
+                self._send_json({"ok": True, **_payload()})
         elif self.path == "/api/saves":
             names = sorted(p.stem for p in (ROOT / "saves").glob("*.json"))
             self._send_json({"ok": True, "saves": names})
         elif self.path == "/api/tianyuan":
-            self._send_json({"ok": True, "tianyuan": _tianyuan_payload()})
+            with _session_lock:
+                self._send_json({"ok": True, "tianyuan": _tianyuan_payload()})
         else:
             self._send_json({"error": "endpoint tidak dikenal"}, 404)
 
@@ -211,40 +216,35 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         global session
         body = self._read_body()
-        if self.path == "/api/new":
-            session = GameSession.new(registry)
-            self._send_json({"ok": True, **_payload()})
-        elif self.path == "/api/load":
-            name = body.get("name", "save1")
-            try:
-                session = GameSession.load(registry, name)
+        with _session_lock:
+            if self.path == "/api/new":
+                session = GameSession.new(registry)
                 self._send_json({"ok": True, **_payload()})
-            except FileNotFoundError:
-                self._send_json({"ok": False, "error": f"Save '{name}' tidak ditemukan."}, 404)
-            except SaveError as e:
-                self._send_json({"ok": False, "error": f"Save '{name}' rusak: {e}"}, 400)
-        elif self.path == "/api/action":
-            if session is None:
-                self._send_json({"ok": False, "error": "Belum ada permainan. Mulai baru atau lanjut save."}, 400)
-                return
-            action = body.get("action")
-            if not isinstance(action, dict):
-                self._send_json({"ok": False, "error": "Format aksi tidak valid — butuh objek {type, ...}."}, 400)
-                return
-            try:
-                session.apply_action(action)
-            except Exception as exc:  # engine error → respons JSON, bukan koneksi mati diam-diam
-                self._send_json({"ok": False, "error": f"Terjadi kesalahan: {exc}"}, 500)
-                return
-            self._send_json({"ok": True, **_payload()})
-        elif self.path == "/api/save":
-            if session is None:
-                self._send_json({"ok": False, "error": "Belum ada permainan."}, 400)
-                return
-            session.apply_action({"type": "save", "save_name": body.get("name", "save1")})
-            self._send_json({"ok": True, **_payload()})
-        else:
-            self._send_json({"error": "endpoint tidak dikenal"}, 404)
+            elif self.path == "/api/load":
+                name = body.get("name", "save1")
+                try:
+                    session = GameSession.load(registry, name)
+                    self._send_json({"ok": True, **_payload()})
+                except FileNotFoundError:
+                    self._send_json({"ok": False, "error": f"Save '{name}' tidak ditemukan."}, 404)
+                except SaveError as e:
+                    self._send_json({"ok": False, "error": f"Save '{name}' rusak: {e}"}, 400)
+            elif self.path == "/api/action":
+                if session is None:
+                    self._send_json({"ok": False, "error": "Belum ada permainan. Mulai baru atau lanjut save."}, 400)
+                    return
+                action = body.get("action")
+                if not isinstance(action, dict):
+                    self._send_json({"ok": False, "error": "Format aksi tidak valid — butuh objek {type, ...}."}, 400)
+                    return
+                try:
+                    session.apply_action(action)
+                except Exception as exc:  # engine error → respons JSON, bukan koneksi mati diam-diam
+                    self._send_json({"ok": False, "error": f"Terjadi kesalahan: {exc}"}, 500)
+                    return
+                self._send_json({"ok": True, **_payload()})
+            else:
+                self._send_json({"error": "endpoint tidak dikenal"}, 404)
 
     def log_message(self, fmt: str, *args) -> None:  # tenang, tanpa spam
         pass
