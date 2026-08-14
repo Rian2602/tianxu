@@ -374,6 +374,35 @@ def test_advance_time_notes_start_when_missing(dummy_session):
     assert "q_akademi_3c" in state.active_side_quests
 
 
+def test_advance_time_overshoot_selesai(dummy_session):
+    """A5: tunggu MELEWATI target (overshoot) → quest tetap selesai, bukan molor
+    hampir satu hari. Start Hari 1 19:00, target day_offset 1 jam 20;
+    tunggu 30 jam (Hari 3 01:00) → sudah lewat target absolut → selesai."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_akademi_3c"
+    state.hour = 19
+    state.day = 1
+    state.active_side_quests["q_akademi_3c"] = {"start_day": 1, "start_hour": 19}
+    # lewati 30 jam → Hari 3 jam 01 (elapsed 30h >= 24h, tapi hour 1 < 20)
+    state.day = 3
+    state.hour = 1
+    qe.advance_time_target_met()
+    assert "q_akademi_3c" in state.completed_quests
+
+
+def test_advance_time_dalam_window_masih_selesai(dummy_session):
+    """A5: non-breaking — dalam window (elapsed cukup + jam >= target) tetap selesai."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_akademi_3c"
+    state.day = 2
+    state.hour = 20
+    state.active_side_quests["q_akademi_3c"] = {"start_day": 1, "start_hour": 19}
+    qe.advance_time_target_met()
+    assert "q_akademi_3c" in state.completed_quests
+
+
 def test_complete_main_ignores_wrong_quest(dummy_session):
     """_complete_main untuk quest yang bukan current → tidak terjadi apa-apa."""
     qe = dummy_session.quest

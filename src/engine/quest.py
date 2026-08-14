@@ -213,9 +213,12 @@ class QuestEngine:
         if prog is None:
             self._note_main_start(qid)
             prog = self.state.active_side_quests[qid]
-        elapsed_hours = (self.state.day - prog["start_day"]) * 24 + (self.state.hour - prog["start_hour"])
-        required_hours = obj.get("day_offset", 0) * 24
-        if elapsed_hours >= required_hours and self.state.hour >= obj.get("hour", 0):
+        # A5: bandingkan waktu ABSOLUT (day*24+hour), bukan `hour >= target` terpisah —
+        # overshoot (melewati target) otomatis memenuhi; tanpa ini pemain yang menunggu
+        # terlalu lama malah molor hampir satu hari penuh.
+        now_abs = self.state.day * 24 + self.state.hour
+        target_abs = (prog["start_day"] + obj.get("day_offset", 0)) * 24 + obj.get("hour", 0)
+        if now_abs >= target_abs:
             self._complete_main(qid)
 
     def _complete_main(self, qid: str) -> None:

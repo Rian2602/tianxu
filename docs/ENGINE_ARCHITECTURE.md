@@ -203,7 +203,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `choose` | `options` (list) | Pilihan eksplisit (mis. pilih akademi, pilih jalur) |
 | `spar` | `npc` | Sparring wajib: bicara NPC ber-`combat` → battle; **menang = objektif selesai** (dipakai sparing ujian) |
 | `defeat` (+opsional `report_to`) | `enemies`, `target`, `report_to` | Side quest: kalahkan `target` musuh dari `enemies`. **A2 (2026-08-14)**: dengan `report_to`, quest hanya selesai setelah **lapor ke NPC pemberi** (`npc`) — `quest.py::notify_dialog_ended` memeriksa `defeat + report_to`; validator aturan 2 memeriksa referensi npc |
-| `advance_time` | `hour` (+ opsional `day_offset`) | Tunggu hingga jam tertentu; `day_offset` = maju N hari |
+| `advance_time` | `hour` (+ opsional `day_offset`) | Tunggu hingga jam tertentu; `day_offset` = maju N hari. **A5 (2026-08-14)**: selesai saat waktu absolut `day*24+hour` ≥ target `(start_day+day_offset)*24+hour` — overshoot (menunggu terlalu lama) otomatis memenuhi, tidak molor |
 
 **Aturan sisi `next`**:
 
