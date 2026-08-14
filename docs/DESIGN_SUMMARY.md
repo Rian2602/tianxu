@@ -2,6 +2,8 @@
 
 > **Tujuan dokumen**: merangkum SEMUA keputusan yang sudah disahkan lewat wawancara, dalam satu halaman bahasa sederhana — agar Anda bisa review cepat sebelum pembangunan dimulai.
 > **Dokumen resmi (detail teknis)**: `GDD.md` · `STORY_FASE1.md` · `ENGINE_ARCHITECTURE.md`
+> **Status**: Fase 1 (Arc Akademi) **SELESAI & tervalidasi** — detail implementasi & status fitur: `ENGINE_ARCHITECTURE.md` §12-§17.
+> **Riwayat**: 2026-08-14 — sinkronisasi EP3-T2: catatan penyelesaian kriteria penerimaan Fase 1 (Arc Akademi).
 
 ---
 
@@ -90,8 +92,26 @@ Satu quest utama aktif; percabangan lewat pilihan dialog; cabang yang tak dipili
 | Nama Penatua | "An (安长老)" | Ya |
 | Nama Zhou Yan (korban) | "Zhou Yan (周炎)" | Ya |
 | Akar spiritual Chen Xu | 中品 (Akar Menengah) | Ya (atas/bawah) |
-| Angka balancing | exp, harga toko, stat musuh | Ya |
+| Angka balancing | sudah dikunci lewat rebalancing playtest (v0.1.0-alpha) | Tidak (verifikasi: ENGINE_ARCHITECTURE §9.1) |
 | Detail dialog & teks ingatan | sudah ditulis (`data/dialogs`, `data/memories.json`) | Ya |
+
+---
+
+## 8. Status Penyelesaian Fase 1
+
+Seluruh kriteria penerimaan Fase 1 (Arc Akademi) **selesai dan tervalidasi** — lihat `ENGINE_ARCHITECTURE.md` §16 (roadmap implementasi) & §17 (status fitur) untuk detail teknis.
+
+**Fitur yang diverifikasi selesai (SELESAI / Verified):**
+- **Toko Web** — modal beli/jual di Pasar Changfeng (dari `context.merchant_shop`).
+- **Dinamisasi Resep** — tombol racik dirender dari `context.recipes`.
+- **Cooldown Side Quest** — `state.side_quest_cooldowns` + penegakan `quest.py`.
+- **Timer Respawn Monster** — berburu ulang dibatasi `world.monster_respawn_hours` (5 jam).
+- **Jadwal Harian NPC** — `_is_npc_available` membatasi bicara/spar pada jam aktif NPC.
+- **Layar Penutup Arc 1** — `arc_summary` di `view()` + banner CLI + modal web.
+
+**Rebalancing (hasil playtest, disahkan v0.1.0-alpha)**: exp quest diturunkan ~40% & exp aktivitas dikurangi (grounding 2/jam, spar 8, hunt 6) — jalur quest saja ≈ Lv.5, pemain rajin ≈ Lv.6 (target GDD Lv4–6). Detail: ENGINE_ARCHITECTURE §9.1.
+
+**Keadaan teknis saat sinkronisasi (2026-08-14)**: 192 test lolos, coverage `src/` ≈ 99,9%, `tools/validate_data.py` exit 0.
 
 ---
 

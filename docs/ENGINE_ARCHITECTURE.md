@@ -3,6 +3,7 @@
 > **Status**: Kontrak teknis (draft kerja) — acuan implementasi engine & data
 > **Merujuk**: GDD.md versi 2.1 (keputusan §13 telah disahkan)
 > **Fase 1**: Arc Akademi — bukti konsep (quest DAG, dialog eksplisit, 3 akademi, pertarungan giliran, kultivasi dasar, panel Tianyuan Ling)
+> **Riwayat**: 2026-08-14 — sinkronisasi EP3-T2: endpoint API, kontrak state, status fitur Verified (toko web, resep dinamis, cooldown side quest, respawn monster, jadwal NPC, layar penutup Arc 1)
 
 ---
 
@@ -97,12 +98,15 @@ tian-xu-second-life/
 │       ├── app.js              # render state → DOM, kirim aksi
 │       └── style.css           # tema xianxia + panel Tianyuan Ling
 ├── tests/                      # pytest
+│   ├── conftest.py             # helper: finish_dialog, move_path, play_to_incident, god_mode
 │   ├── test_quest_dag.py       # invariant DAG, satu-aktif, konvergensi
 │   ├── test_dialog.py
 │   ├── test_battle.py
 │   ├── test_cultivation.py
 │   ├── test_validator.py
 │   ├── test_session.py
+│   ├── test_effects.py         # dispatcher efek quest/dialog
+│   ├── test_saveload.py        # round-trip save/load, save rusak
 │   ├── test_companion.py
 │   ├── test_cli.py
 │   └── test_web.py
@@ -183,7 +187,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `next` | array | ✓ | Sisi keluar DAG (boleh kosong = quest terakhir arc) |
 | `on_complete` | object | – | `effects` (list, format type-based §5.2), `memory_unlock`, `system_msg`, `rewards` (`exp`/`gold`) |
 | `repeatable` | bool | – | Hanya `kind: "side"` — bisa diambil ulang (grinding) |
-| `cooldown` | number | – | Jam tunggu sebelum bisa diambil lagi; divalidasi §14-8 (harus > 0 jika ada), belum diterapkan engine (§17) |
+| `cooldown` | number | – | Jam tunggu sebelum bisa diambil lagi; divalidasi §14-8 (harus > 0 jika ada), diterapkan engine (§6.4) |
 | `giver` | string | – | NPC pemberi side quest (opsi `start_quest` hanya tampil lewat giver) |
 | `requires` | object | – | Prasyarat: `flags`, `morality_min/max`, `realm_min` |
 | `available_from` | object | – | Waktu tersedia (hari/jam) — untuk quest sampingan |
@@ -673,13 +677,15 @@ player_action(menu):
 
 | Method & Path | Body | Balasan |
 |---|---|---|
-| `GET /api/health` | – | `{"ok": true}` |
-| `POST /api/game/new` | – | `{"game_id": "..."}` |
+| `GET /api/state` | – | View sesi aktif (kontrak §12.4) atau `null` (belum ada sesi) |
 | `GET /api/saves` | – | Daftar slot save (untuk menu utama "Lanjut") |
-| `POST /api/game/load` | `{"save_name": "..."}` | `{"game_id": "..."}` |
-| `POST /api/game/{id}/save` | `{"save_name": "..."}` | `{"ok": true}` |
-| `GET /api/game/{id}/state` | – | `StateJSON` (kontrak §12.4) |
-| `POST /api/game/{id}/action` | `ActionJSON` (§12.3) | `{"state": StateJSON, "log_delta": [...], "error": null}` |
+| `GET /api/tianyuan` | – | Payload panel Tianyuan Ling (mission/memories/system_log) |
+| `POST /api/new` | – | Mulai game baru → `{ok, view, context}` |
+| `POST /api/load` | `{"name": "..."}` | Muat save → `{ok, view, context}`; 404 jika save tidak ada, 400 jika save rusak |
+| `POST /api/action` | `{"action": ActionJSON (§12.3)}` | Proses aksi → `{ok, view, context}`; 400 jika format aksi salah |
+| `POST /api/save` | `{"name": "..."}` | Simpan (ditolak di luar titik aman) → `{ok, view, context}` |
+
+- Setiap respons (kecuali `GET /api/tianyuan` & `GET /api/saves`) = `{ok, view, context}`: `view` = output `session.view()` (kontrak §12.4), `context` = data UI dari `web/app.py::_context()` (§12.5). Tidak ada `log_delta` terpisah — entri log baru terlihat di `view.log` (UI merender ulang penuh per aksi).
 
 ### 12.3 Aksi (discriminated union pada `type`)
 
@@ -694,37 +700,49 @@ player_action(menu):
 | `advance_time` | `{"hours": 8}` | Majukan waktu (kemungkinan memicu event) |
 | `grounding` | `{"hours": 4}` | Berkultivasi di lokasi aman: waktu maju, dapat exp (sesuai `cultivation.grounding_exp_per_hour`) + pulih Qi pelan |
 | `spar` | `{"npc": "<id>"}` | Tantang NPC sparing → masuk battle; menang/kalah memberi exp (§9.1) |
+| `hunt` | – | Berburu monster di wilayah berburu; ditolak selama cooldown respawn (§9.2) |
+| `search` | – | Cari herba material di lokasi berburu |
+| `choose` | `{"value": "<option_value>"}` | Pilih opsi objektif `choose` (mis. pilih akademi) |
 | `shop_buy` | `{"item": "<id>", "count": 1}` | Beli item di toko NPC (cek uang & stok) |
 | `shop_sell` | `{"item": "<id>", "count": 1}` | Jual item ke toko (dapat uang) |
 | `craft` | `{"recipe": "<id>"}` | Racik item dari resep (konsumsi material) — **hanya di titik aman** (lokasi `is_safe`) |
 | `rest` | `{"hours": 8}` | Istirahat di **titik aman**: pulihkan HP/Qi penuh, bangkitkan kompanion, waktu maju |
-| `open_tianyuan` / `close_tianyuan` | – | Buka/tutup panel |
+| `save` | `{"save_name": "..."}` | Simpan game — **hanya di titik aman** (§13) |
+
+> **Catatan**: panel Tianyuan Ling **bukan** aksi mutasi sesi — tidak ada handler `open_tianyuan`/`close_tianyuan` di `session.py`. Panel dibuka/tutup sepenuhnya di frontend: data dimuat via `GET /api/tianyuan` (modal penampil) dan status terbuka/tertutup dikelola `app.js`; `view()` menyediakan data ingatan & log yang dibutuhkan panel.
 
 ### 12.4 Kontrak State (potongan utama `StateJSON`)
 
 ```json
 {
+  "location": { "id": "loc_gerbang_akademi", "name": "Gerbang Akademi",
+                "description": "...", "is_safe": false, "connections": ["loc_aula_ujian"] },
+  "day": 1, "hour": 8,
   "player": { "name": "Chen Xu", "realm": "Pengumpul Qi", "realm_level": 3, "exp": 45, "exp_next": 60,
               "roots": "akar_mid", "gold": 20, "equipment": { "weapon": "pedang_bambu" },
               "hp": 80, "hp_max": 80, "qi": 40, "qi_max": 40, "academy": null, "morality": 0 },
-  "location": "loc_gerbang_akademi",
-  "time": { "day": 1, "hour": 8 },
-  "quest": { "current": "q_akademi_01", "objective_text": "Bicaralah dengan Penjaga Gerbang.",
-             "progress": "0/1", "side": [] },
-  "inventory": [ { "id": "pil_qi", "name": "Pil Qi", "count": 3 } ],
-  "flags": { "hari_pertama": true },
+  "current_quest": { "id": "q_akademi_01", "title": "Pintu Gerbang Akademi",
+                     "objective": "Bicaralah dengan Penjaga Gerbang." } | null,
+  "side_quests": [ { "id": "q_side_suqing", "title": "...", "objective": "..." } ],
+  "inventory": [ { "id": "pil_qi", "name": "Pil Qi", "count": 3, "type": "consumable" } ],
+  "memories": [ { "id": "mem_01", "title": "Istana yang Sunyi" } ],
+  "companion": { "id": "komp_roh_awan", "name": "Roh Awan", "element": "kayu", "hp": 30, "hp_max": 30,
+                 "attack": 7, "defense": 3, "speed": 9 } | null,
+  "mode": "explore|dialog|battle|choose",
+  "dialog": { "dialog_id": "dlg_penjaga", "node_id": "node_awal", "speaker": "npc_penjaga",
+              "text": "...", "choices": [ { "index": 0, "label": "..." } ], "ended": false } | null,
+  "battle": { "mode": "battle", "player": { "hp": 80, "hp_max": 80, "qi": 40, "qi_max": 40 },
+              "foes": [ { "name": "Serigala Qi", "hp": 40, "hp_max": 40, "element": "tanah" } ],
+              "companion": null, "over": false, "won": false, "fled": false } | null,
+  "choose": { "prompt": "Pilih salah satu.", "options": [ { "value": "akademi_elemen", "label": "..." } ] } | null,
   "log": [ { "type": "narration|npc|system|battle", "text": "...", "day": 1, "hour": 8 } ],
-  "tianyuan": { "open": false, "memories": [ { "id": "mem_01", "title": "Istana yang Sunyi", "unlocked": true } ],
-                "system_log": [ "...", "..." ] },
-  "companion": { "id": "komp_roh_awan", "name": "Roh Awan", "hp": 30, "hp_max": 30,
-                 "level": 1, "active": true } | null,
-  "ui": { "mode": "explore|dialog|battle|tianyuan",
-          "dialog": null, "battle": null, "options": [] }
+  "arc_summary": null
 }
 ```
 
-- `ui.mode` + `ui.options` menentukan panel yang dirender (mis. `dialog` → tampilkan `ui.dialog`; `battle` → tampilkan menu battle + status musuh).
-- `log_delta` pada respons aksi = entri log baru sejak aksi (UI append, tidak render ulang seluruh log).
+- `mode` menentukan panel yang dirender: `dialog` → render `dialog` (node aktif + opsi); `battle` → render `battle` (menu battle + status musuh); `choose` → render `choose` (objektif pilih, mis. pilih akademi). Panel Tianyuan Ling memakai `GET /api/tianyuan`, bukan `view()`.
+- `companion` = `null` untuk non-Summoning atau kompanion KO; `arc_summary` terisi saat `q_akademi_07` selesai (layar penutup Arc 1).
+- `view.log` memuat seluruh log; UI merender ulang penuh per aksi — tidak ada `log_delta` terpisah.
 
 ### 12.5 Frontend (Fase 1 — tanpa build step)
 
@@ -735,15 +753,15 @@ player_action(menu):
 - **Statis (disahkan)**: tanpa animasi — fade/glow/efek gerak ditiadakan; tema gelap + emas tetap lewat warna & tipografi.
 - **Lokasi (disahkan)**: nama lokasi + deskripsi teks + tombol daftar tempat tujuan (`connections`); tanpa mini-peta.
 - **Desktop dulu (disahkan)**: tidak dioptimalkan untuk layar HP (responsif ditunda).
-- Panel: **Teks utama** (narasi/dialog/log), **Action bar** (kontekstual: Bicara/Pindah/Serang/Item), **Panel statistik** (HP/Qi/ranah/inventori, selalu terlihat), **Panel Tianyuan Ling** (toggle).
+- Panel: **Teks utama** (narasi/dialog/log), **Action bar** (kontekstual: Bicara/Pindah/Serang/Item), **Panel statistik** (HP/Qi/ranah/inventori, selalu terlihat), **Panel Tianyuan Ling** (modal — tombol "Baca Ingatan" / tombol panel membukanya, ✕ menutupnya).
 - **Tema (disahkan)**: xianxia **gelap + emas** — latar gelap, aksen emas, font serif untuk narasi.
 
 **Detail implementasi (engine web, disepakati saat pembangunan):**
 - `web/app.py` — server **stdlib-only** (`http.server.ThreadingHTTPServer`), satu sesi aktif per proses (single-player lokal); jalankan `python3 web/app.py [port]`.
 - Endpoint API: `GET /` · `GET /static/*` · `GET /api/state` · `GET /api/saves` · `GET /api/tianyuan` (ingatan + log sistem) · `POST /api/new` · `POST /api/load {name}` · `POST /api/action {action}` · `POST /api/save {name}`.
-- Setiap respons state = `{view, context}`: `view` = output engine `session.view()` (kontrak §12.4); `context` = data UI yang tidak ada di view (NPC di lokasi, teknik akademi, nama tampilan akademi, peta nama item).
+- Setiap respons state = `{ok, view, context}`: `view` = output engine `session.view()` (kontrak §12.4); `context` = data UI yang tidak ada di view — dari `web/app.py::_context()`: `npcs` (di lokasi, dengan `can_spar` & `shop`), `merchant_shop` (isi toko buy/sell di lokasi), `recipes` (daftar resep), `npc_names` / `item_names` (peta nama tampilan), `techniques` (skill_pool akademi), `academy` (nama tampilan akademi terpilih).
 - `view.inventory` menyertakan `type` item (consumable/weapon/material) agar UI bisa memfilter aksi (pakai/racik/pasang).
-- Frontend `web/static/` (index.html + style.css + app.js, vanilla, tanpa build): render ulang penuh per aksi (statis — sesuai keputusan visual); mode explore/dialog/battle/choose dirender dari `view.mode`; panel Tianyuan Ling toggle di kanan.
+- Frontend `web/static/` (index.html + style.css + app.js, vanilla, tanpa build): render ulang penuh per aksi (statis — sesuai keputusan visual); mode explore/dialog/battle/choose dirender dari `view.mode`; panel Tianyuan Ling = modal yang fetch `GET /api/tianyuan` (bukan aksi mutasi sesi, lihat §12.3).
 
 ---
 
@@ -753,7 +771,7 @@ player_action(menu):
 - Format: **JSON** per playthrough di `saves/` (gitignored).
 - Isi save = `GameState` lengkap (player, quest, dialog aktif, battle aktif, inventori, waktu, moralitas, reputasi, flag, memories, tianyuan log, kompanion).
 - `src/engine/state.py`: `GameState.to_dict()` / `from_dict()` + validasi minimal saat load (reject save rusak → pesan jelas, bukan crash). Entrypoint save/load ada di `src/engine/session.py` (`GameSession.load` & aksi `save`).
-- Multi-slot: nama save bebas; `POST /api/game/load` membaca daftar save.
+- Multi-slot: nama save bebas; `POST /api/load {name}` memuat save, `GET /api/saves` membaca daftar slot.
 
 ---
 
@@ -791,7 +809,9 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 | `test_battle.py` | Urutan giliran tetap; damage persentase (attack × 100/(100+defense)); elemen (1.5×/0.67×); regen Qi per giliran; kritikal; KO → respawn titik aman + penalti exp 10%; kabur; sparing kalah = penalti KO; teknik terkunci akademi |
 | `test_validator.py` | Setiap aturan §14 (16 aturan) menolak data yang sengaja dirusak |
 | `test_cultivation.py` | **multiplier akar spiritual**; breakthrough level 10 → ranah berikutnya; ranah tertinggi tidak breakthrough |
-| `test_session.py` | Pergerakan via `connections`; grounding/save/rest/craft hanya di titik aman; ekonomi toko (beli/jual, uang tak cukup ditolak); round-trip save/load; pakai item; racik; gate battle; equip senjata; waktu maju |
+| `test_session.py` | Pergerakan via `connections`; grounding/save/rest/craft hanya di titik aman; ekonomi toko (beli/jual, uang tak cukup ditolak); round-trip save/load; pakai item; racik; gate battle; equip senjata; waktu maju; respawn timer berburu; jadwal NPC |
+| `test_effects.py` | Dispatcher efek: tiap jenis efek quest/dialog diterapkan benar pada state |
+| `test_saveload.py` | Round-trip `to_dict`/`from_dict`; save rusak ditolak dengan pesan jelas |
 | `test_companion.py` | Kompanion jalur Summoning ikut battle otomatis; KO → istirahat di titik aman; scaling level; musuh bisa menyerang kompanion |
 | `test_cli.py` | Playthrough CLI penuh cabang 3aa dari awal sampai selesai |
 | `test_web.py` | Endpoint API: new/load/action/save/tianyuan; aksi tanpa sesi & format salah ditolak (400); save di luar titik aman ditolak |
@@ -824,7 +844,14 @@ Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data 
 - **Durasi Fase 1** (disahkan): 1–2 jam per playthrough — volume konten quest disesuaikan target ini.
 - **Ending** (disahkan): 3 tematik; mekanisme penentu final (bobot pilihan kunci + moralitas) dijabarkan lebih rinci saat konten arc final.
 - **Engine adaptif**: arc baru (Sekte/Kekaisaran/Final) = tambah data + field skema bila perlu, bukan rombak engine. Jika mekanik baru butuh field skema baru → wajib update dokumen ini + validator + test.
-- **Cooldown side quest**: field `cooldown` divalidasi validator (§14-8) tetapi **belum diterapkan engine** — quest repeatable langsung tersedia lagi. Terapkan saat quest pertama memakainya (perlu mencatat waktu selesai di state).
+- **Cooldown side quest — SELESAI (Verified)**: field `cooldown` divalidasi validator (§14-8) dan **diterapkan engine** — quest repeatable tidak langsung tersedia lagi selama cooldown. Implementasi: `GameState.side_quest_cooldowns` (peta `qid → absolute hour`) menyimpan waktu selesai; `quest.py` menolak penawaran ulang jika `(jam_sekarang − waktu_selesai) < cooldown`.
+- **Fitur Fase 1 — SELESAI (Verified)** (diverifikasi terhadap `web/app.py` & `src/engine/`, 2026-08-14):
+  - **Toko Web**: modal beli/jual di Pasar Changfeng — data dari `context.merchant_shop`, aksi `shop_buy`/`shop_sell`.
+  - **Dinamisasi Resep**: tombol racik dirender dari `context.recipes` (hanya resep yang bahan terpenuhi) — bukan list hardcode.
+  - **Cooldown Side Quest**: lihat catatan di atas (`side_quest_cooldowns` + `quest.py`).
+  - **Timer Respawn Monster**: `_hunt()` menolak berburu ulang sebelum `world.monster_respawn_hours` (5 jam) sejak `last_hunt_time` (log sistem informatif).
+  - **Jadwal Harian NPC**: `_is_npc_available(npc)` membatasi `_talk`/`_spar` pada `schedule.hour_start..hour_end` — NPC aktif tiap hari, tanpa softlock.
+  - **Layar Penutup Arc 1**: `view().arc_summary` saat `q_akademi_07` selesai → banner ANSI emas di CLI + modal penutup di web (`modal-arc-summary`).
 - **Playtest putaran 2 — observasi (open, keputusan desain Fase 2, belum diubah data)**:
   - Han Xiu undertuned: menang ≥85% di Lv1 (full HP), 100% Lv2+; `speed` tak berfungsi karena `turn_order: fixed_alternate` (pemain selalu duluan). Naikkan stat bila gate ujian (q3) ingin lebih menantang — hati-hati tidak menyumbat jalur utama.
   - Reward ganda spar saat q3: `spar_win_exp` 8 + reward quest +8 exp/+10 koin = 16 exp sekali menang → Lv1→Lv2 + sisa 6/12 (bukan loncat 2 level). Overlap by-design (spar selalu kasih exp + reward quest); terima atau turunkan salah satu.

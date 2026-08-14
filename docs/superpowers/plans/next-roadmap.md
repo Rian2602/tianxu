@@ -31,6 +31,9 @@ Berdasarkan hasil investigasi teknis, eksekusi pengujian, dan audit adversarial 
 7. **Keamanan Save/Load**: Mekanisme simpan eksklusif di titik aman (`is_safe: true`), serialisasi JSON berbasis `copy.deepcopy`, dan penolakan payload berbahaya.
 
 #### Kesenjangan yang Wajib Diselesaikan (Gaps to Address)
+
+> **Status 2026-08-14**: seluruh gap di bawah telah **dieksekusi dan diverifikasi** melalui Epic 1 (Web UI), Epic 2 (Simulasi Engine), dan EP3-T1 (QA hardening) — baseline ini historis. Verifikasi implementasi: `docs/ENGINE_ARCHITECTURE.md` §17 (fitur `SELESAI (Verified)`).
+
 1. **Paritas Web UI (P0 - Blokir Fungsional Frontend)**:
    - Antarmuka Toko Pedagang (Beli/Jual) belum tersedia di Web UI (`app.js`), sehingga pemain di web tidak bisa membeli pil/senjata atau menjual material buruan.
    - Menu peracikan pil di Web UI masih men-hardcode pengecekan Herba saja, mengabaikan resep Pil Pemulihan berbasis Tulang.
