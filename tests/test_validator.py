@@ -529,6 +529,46 @@ def test_aturan8_quest_timeout_valid_lolos():
     assert ok, v.errors
 
 
+# ---------- Task 3: gating side quest by relation (aturan 8) ----------
+
+def test_aturan8_relation_min_npc_tidak_ada():
+    """available_from.relation_min harus merujuk npc yang ada."""
+    d = _good()
+    d["quests/quests_side.json"] = {"quests": [{
+        "id": "qs", "kind": "side", "next": [], "repeatable": True,
+        "available_from": {"day": 1, "hour": 8, "relation_min": {"npc": "npc_hantu", "value": 5}},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("relation_min" in e and "npc_hantu" in e for e in v.errors)
+
+
+def test_aturan8_relation_min_value_bukan_int():
+    """available_from.relation_min.value harus int."""
+    d = _good()
+    d["npcs.json"] = {"npcs": [{"id": "n1"}]}
+    d["quests/quests_side.json"] = {"quests": [{
+        "id": "qs", "kind": "side", "next": [], "repeatable": True,
+        "available_from": {"day": 1, "hour": 8, "relation_min": {"npc": "n1", "value": "banyak"}},
+    }]}
+    v, ok = make(d)
+    assert not ok
+    assert any("relation_min.value harus int" in e for e in v.errors)
+
+
+def test_aturan8_relation_min_valid_lolos():
+    """available_from.relation_min yang konsisten diterima (non-breaking arc 1)."""
+    d = _good()
+    d["npcs.json"] = {"npcs": [{"id": "n1"}]}
+    d["quests/quests_side.json"] = {"quests": [{
+        "id": "qs", "kind": "side", "next": [], "repeatable": True,
+        "objective": {"kind": "reach"},
+        "available_from": {"day": 1, "hour": 8, "relation_min": {"npc": "n1", "value": 5}},
+    }]}
+    v, ok = make(d)
+    assert ok, v.errors
+
+
 # ---------- aturan 9: repeatable hanya side ----------
 
 def test_aturan9_repeatable_pada_main():

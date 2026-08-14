@@ -535,6 +535,28 @@ def test_is_offerable_available_from_hour(dummy_session, monkeypatch):
     assert qe.is_offerable("q_synth_side") is False
 
 
+def test_is_offerable_relation_min_gate(dummy_session, monkeypatch):
+    """Gating side quest by relation: quest hanya ditawarkan bila relation >= value."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.day, state.hour = 1, 8
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_side_rel", "kind": "side", "repeatable": True,
+            "available_from": {"day": 1, "hour": 0, "relation_min": {"npc": "npc_hanxiu", "value": 20}},
+        },
+    )
+    # relation 0 → tidak ditawarkan
+    assert qe.is_offerable("q_synth_side_rel") is False
+    # relation pas batas → ditawarkan
+    state.relations["npc_hanxiu"] = 20
+    assert qe.is_offerable("q_synth_side_rel") is True
+    # relation di bawah batas → tidak ditawarkan
+    state.relations["npc_hanxiu"] = 19
+    assert qe.is_offerable("q_synth_side_rel") is False
+
+
 def test_start_side_rejects_unofferable(dummy_session):
     """start_side quest yang tak dapat ditawarkan → False, tidak aktif."""
     qe = dummy_session.quest

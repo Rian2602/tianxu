@@ -394,6 +394,10 @@ class QuestEngine:
                 return False
             if self.state.day == af.get("day", 1) and self.state.hour < af.get("hour", 0):
                 return False
+            # Task 3: gating by relation — quest hanya ditawarkan bila relation >= value
+            rel = af.get("relation_min")
+            if rel and self.state.relations.get(rel.get("npc"), 0) < rel.get("value", 0):
+                return False
         return True
 
     def start_side(self, qid: str) -> bool:

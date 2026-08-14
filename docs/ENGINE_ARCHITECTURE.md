@@ -193,7 +193,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `fail_effects` | array | – | **G3-T1**: efek (format §5.2) diterapkan saat quest GAGAL — divalidasi seperti `on_complete.effects` |
 | `giver` | string | – | NPC pemberi side quest (opsi `start_quest` hanya tampil lewat giver) |
 | `requires` | object | – | Prasyarat: `flags`, `morality_min/max`, `realm_min` |
-| `available_from` | object | – | Waktu tersedia (hari/jam) — untuk quest sampingan |
+| `available_from` | object | – | Waktu tersedia (hari/jam) — untuk quest sampingan; opsional `relation_min: {npc, value}` = quest hanya ditawarkan bila hubungan NPC ≥ value (Task 3, 2026-08-15; divalidasi §14-8) |
 
 **Jenis objektif** (`objective.kind`):
 
@@ -623,10 +623,10 @@ Urutan pengerjaan arc baru:
    perluasan schema (`hunt_zones` per-lokasi atau `world.hunt` per-arc) HANYA
    bila outline cerita arc 2 menuntut wilayah berburu baru. Prinsip: jangan
    bangun skema tanpa konsumen.
-2. **Gating quest by relation — DITUNDA.** Dialog sudah punya `relation_min`;
-   quest `available_from` belum. Bila arc 2 butuh "quest hanya muncul bila
-   relation ≥ X" → tambah key `relation_min` di `available_from` (pola kondisi
-   dialog + validator). Menunggu outline cerita.
+2. **Gating quest by relation — SELESAI (Task 3, 2026-08-15).** Quest
+   `available_from.relation_min: {npc, value}` — `is_offerable` menolak quest
+   bila `state.relations[npc] < value` (pola kondisi dialog); validator aturan
+   8 memeriksa referensi npc & tipe value int. Arc 1 tanpa field → non-breaking.
 3. **Scoping memory per arc — KONVENSI DITETAPKAN.** Id ingatan memakai
    prefiks arc: `mem_1_*` (arc 1: `mem_01`..`mem_04` — lama, tidak diubah),
    `mem_2_*` untuk arc 2 dst. `arcs[].memories_total` tetap sumber jumlah.

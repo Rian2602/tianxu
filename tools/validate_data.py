@@ -422,6 +422,14 @@ class Validator:
                 af = q.get("available_from")
                 if not (isinstance(af, dict) and isinstance(af.get("day"), int) and isinstance(af.get("hour"), int)):
                     self.error(f"quest {qid}: side quest butuh available_from {{day, hour}} (aturan 8)")
+                else:
+                    # Task 3: gating by relation — npc harus ada, value int
+                    rel = af.get("relation_min")
+                    if rel is not None:
+                        if not isinstance(rel, dict) or not rel.get("npc") or not self.has("npc", rel["npc"]):
+                            self.error(f"quest {qid}: available_from.relation_min npc '{rel.get('npc')}' tidak ada (aturan 8)")
+                        if not isinstance(rel.get("value"), int):
+                            self.error(f"quest {qid}: available_from.relation_min.value harus int (aturan 8)")
                 cd = q.get("cooldown")
                 if cd is not None and (not isinstance(cd, (int, float)) or cd <= 0):
                     self.error(f"quest {qid}: cooldown harus > 0 (aturan 8)")
