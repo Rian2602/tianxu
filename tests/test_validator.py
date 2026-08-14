@@ -170,6 +170,17 @@ def test_aturan13_unlock_arc_tidak_dikenal():
     assert any("unlock_arc" in e for e in v.errors)
 
 
+def test_aturan14_wajib_minimal_satu_lokasi_aman():
+    """B2-fix: lokasi harus punya minimal 1 is_safe: true (respawn KO butuh titik aman)."""
+    d = _good()
+    d["locations.json"] = {"locations": [
+        {"id": "loc_x", "name": "X", "description": "", "is_safe": False, "connections": []},
+    ]}
+    v, ok = make(d)
+    assert not ok
+    assert any("is_safe" in e and "minimal" in e for e in v.errors)
+
+
 def test_aturan7_night_window_tidak_valid():
     d = _good()
     d["config.json"]["world"] = {"hunt": {"pool": [], "night_window": {"hour_start": 30, "hour_end": 6}}}

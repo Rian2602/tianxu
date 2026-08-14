@@ -456,7 +456,7 @@ tek_elemen_bola_api,Bola Api,elemen,api,realm_pengumpul_qi,8,15,attack,Serangan 
 
 - **Akademi = data**, bukan hardcode: engine membaca `academies` dari config. Pilihan akademi (quest `choose`) hanya membuka `skill_pool` akademi itu (GDD §5.2 — sejajar DAG, tidak berpotongan naratif).
 - **`arcs` (B1, 2026-08-14)**: metadata arc (final_quest, title, teaser, memories_total, branches) data-driven — `view().arc_summary` membaca `config.arcs` (arc TERAKHIR yang selesai yang ditampilkan). Arc berikutnya = tambah entri di list, tanpa ubah engine.
-- **`world.safe_fallback_location` (B2)**: lokasi respawn KO saat `last_safe_location` kosong — prioritas `last_safe_location` → config → lokasi `is_safe` pertama dari data (validator aturan 7 memastikan lokasi valid & aman).
+- **`world.safe_fallback_location` (B2)**: lokasi respawn KO saat `last_safe_location` kosong — prioritas `last_safe_location` → config → lokasi `is_safe` pertama dari data → lokasi pertama data (validator aturan 7 memastikan fallback valid & aman; aturan 14 kini memastikan **minimal 1 lokasi `is_safe`** — respawn KO selalu punya titik aman).
 - **Teknik lintas akademi (B4, GDD §5.2)**: `techniques.csv` punya kolom opsional `unlock_arc` — teknik dengan `unlock_arc` terisi ikut tampil untuk akademi mana pun setelah quest final arc itu selesai (`player_techniques(..., completed_quests)`); tanpa data baru perilaku identik (non-breaking).
 - `element_advantage` = siklus 五行 (克制): logam克kayu, kayu克tanah, tanah克air, air克api, api克logam — dipakai battle engine dengan multiplier.
 - `roots.tiers` = tier akar spiritual + `exp_multiplier`; `ko_penalty.exp_loss_ratio` = penalti KO ringan (10% exp progres tingkat).
@@ -826,7 +826,7 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 | 11 | Resep alkimia: hasil & bahan valid, bahan ≠ hasil | `rc_pil_qi: bahan 'x' tidak ada di items.csv` |
 | 12 | Toko NPC: item `buy`/`sell` valid | `npc_pedagang: shop.buy[0].item 'x' tidak ada` |
 | 13 | Item `weapon` punya `power`; `config.roots.tiers` valid & `default` ada; `techniques.unlock_arc` merujuk `config.arcs` (B4) | `items.csv: weapon tanpa power` / `techniques.csv: unlock_arc ...` |
-| 14 | Lokasi: `is_safe` bool; `connections` merujuk lokasi yang ada | `loc_x: connections[0] 'loc_y' tidak ditemukan` |
+| 14 | Lokasi: `is_safe` bool; `connections` merujuk lokasi yang ada; **minimal 1 lokasi `is_safe: true`** | `loc_x: connections[0] 'loc_y' tidak ditemukan` / `tidak ada lokasi dengan is_safe: true` |
 | 15 | Kompanion: id unik, base stat valid, referensi elemen valid | `companions.json: id duplikat` |
 | 16 | `config.battle`: `crit_chance` 0–1, `turn_order` valid, `damage_formula` valid | `config.battle.crit_chance: harus 0–1` |
 

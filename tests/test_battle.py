@@ -156,6 +156,16 @@ def test_ko_respawn_fallback_config_dan_data(session):
     session.apply_action({"type": "battle_action", "action": "attack"})
     assert session.state.location == "loc_aula_ujian", "last_safe_location prioritas utama"
 
+    # (d) tanpa lokasi safe sama sekali → lokasi pertama data (bukan hardcode nama)
+    session.reg.config["world"].pop("safe_fallback_location", None)
+    session.state.last_safe_location = None
+    aman = [l for l in session.reg.locations if l.get("is_safe")]
+    for l in aman:
+        l["is_safe"] = False
+    session.battle.start([foe], "hunt")
+    session.apply_action({"type": "battle_action", "action": "attack"})
+    assert session.state.location == session.reg.locations[0]["id"], "fallback akhir = lokasi pertama data"
+
 
 def test_teknik_serang_di_battle(session, god_mode):
     session.state.player.academy = "akademi_elemen"

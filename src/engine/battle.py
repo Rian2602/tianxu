@@ -358,7 +358,9 @@ class BattleEngine:
         if not safe:
             safe = self.reg.config.get("world", {}).get("safe_fallback_location")
         if not safe:
-            safe = next((l["id"] for l in self.reg.locations if l.get("is_safe")), "loc_gerbang_akademi")
+            safe = next((l["id"] for l in self.reg.locations if l.get("is_safe")), None)
+        if not safe and self.reg.locations:
+            safe = self.reg.locations[0]["id"]  # lokasi pertama data (validator jamin ≥1 aman)
         self.state.location = safe
         self.state.player.hp = self.state.max_hp(self.reg)
         self.state.player.qi = self.state.max_qi(self.reg)

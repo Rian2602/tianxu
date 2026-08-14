@@ -19,8 +19,8 @@ Semua perubahan penting pada **Tian Xu: Second Life**.
 - Dokumentasi: `docs/list_bug.md` (status perbaikan terverifikasi + fitur P1), 5 plan implementasi (`docs/superpowers/plans/`), sinkronisasi ENGINE_ARCHITECTURE / STORY_FASE1 / DESIGN_SUMMARY / README / PROJECT.
 
 ### Changed
-- Jumlah test: 192 → **238**; validator 16 aturan tetap exit 0 (aturan 7 & 13 diperluas untuk `arcs`/`safe_fallback_location`/`unlock_arc`).
-- `README.md` & `PROJECT.md`: jumlah test disinkronkan (238).
+- Jumlah test: 192 → **239**; validator 16 aturan tetap exit 0 (aturan 7 & 13 diperluas untuk `arcs`/`safe_fallback_location`/`unlock_arc`; aturan 14 kini wajib minimal 1 lokasi `is_safe` — temuan evaluasi Tahap B: fallback KO terakhir sempat memakai literal `loc_gerbang_akademi`, kini lokasi pertama data).
+- `README.md` & `PROJECT.md`: jumlah test disinkronkan (239).
 
 ## [0.1.0-alpha] — 2026-08-14
 

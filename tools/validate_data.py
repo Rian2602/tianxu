@@ -411,6 +411,8 @@ class Validator:
                     self.error(f"npc {n['id']}: combat.element tidak valid")
 
         loc_by_id = {l["id"]: l for l in self.locations}
+        if self.locations and not any(l.get("is_safe") for l in self.locations):
+            self.error("tidak ada lokasi dengan is_safe: true — respawn KO butuh minimal 1 titik aman (aturan 14)")
         for l in self.locations:  # aturan 14
             if not isinstance(l.get("is_safe"), bool):
                 self.error(f"lokasi {l['id']}: is_safe harus bool (aturan 14)")
