@@ -2,6 +2,17 @@
 
 "use strict";
 
+window.arcSummaryDismissed = false;
+
+function showModal(id) {
+  $(id).classList.remove("hidden");
+  $("modal-overlay").classList.remove("hidden");
+}
+function closeModal(id) {
+  $(id).classList.add("hidden");
+  $("modal-overlay").classList.add("hidden");
+}
+
 const $ = (id) => document.getElementById(id);
 
 let view = null;      // respons /api/state → {view, context}
@@ -69,6 +80,10 @@ function render() {
   renderCenter(view, ctx);
   const logEl = $("log");
   logEl.scrollTop = logEl.scrollHeight;
+
+  if (view.arc_summary && !window.arcSummaryDismissed) {
+    openArcSummaryModal(view.arc_summary);
+  }
 }
 
 function renderHeader(v) {
@@ -183,6 +198,11 @@ function renderExplore(v, c, box) {
     }
   });
 
+  // Toko Pedagang (jika ada)
+  if (c.merchant_shop) {
+    html += `<div class="action-row"><button class="btn btn-gold" onclick="openShop()">Buka Toko Pedagang</button></div>`;
+  }
+
   // tujuan
   (loc.connections || []).forEach((cid) => {
     html += `<div class="action-row"><button class="btn" onclick='act({type:"move",to:"${cid}"})'>Pindah → ${esc(cid)}</button></div>`;
@@ -219,10 +239,24 @@ function renderExplore(v, c, box) {
   }
 
   // racik (hanya di lokasi aman)
-  const herb = (v.inventory || []).find((i) => i.id === "material_herba");
-  if (loc.is_safe && herb && herb.count >= 2) {
-    html += `<div class="action-row"><button class="btn" onclick='act({type:"craft",recipe:"rc_pil_qi"})'>Racik Pil Qi (2 Herba)</button>` +
-            `<button class="btn" onclick='act({type:"craft",recipe:"rc_pil_pemulihan"})'>Racik Pil Pemulihan (2 Tulang)</button></div>`;
+  if (loc.is_safe && c.recipes && c.recipes.length) {
+    const invMap = {};
+    (v.inventory || []).forEach((i) => { invMap[i.id] = i.count; });
+
+    const availableRecipes = c.recipes.filter((r) => {
+      return r.ingredients.every((ing) => (invMap[ing.item] || 0) >= ing.count);
+    });
+
+    if (availableRecipes.length) {
+      let craftHtml = `<div class="action-row"><span class="action-label">Racik:</span>`;
+      availableRecipes.forEach((r) => {
+        const ingText = r.ingredients.map((ing) => `${ing.count} ${ing.name}`).join(", ");
+        craftHtml += `<button class="btn" onclick='act({type:"craft",recipe:"${r.id}"})'>` +
+                     `Racik ${esc(r.result_name)} (${esc(ingText)})</button> `;
+      });
+      craftHtml += `</div>`;
+      html += craftHtml;
+    }
   }
 
   // pasang senjata
@@ -320,25 +354,129 @@ function renderChoose(v, box) {
   box.innerHTML = html;
 }
 
+// ---------- Modals (Shop & Arc Summary) ----------
+
+let currentShopTab = "buy";
+
+function openShop() {
+  currentShopTab = "buy";
+  renderShop();
+  showModal("modal-shop");
+}
+
+function renderShop() {
+  if (!ctx || !ctx.merchant_shop) return;
+  const s = ctx.merchant_shop;
+  const p = view.player;
+  const invMap = {};
+  (view.inventory || []).forEach((i) => { invMap[i.id] = i.count; });
+  
+  let html = `<h3>Toko: ${esc(s.merchant_name)}</h3>`;
+  html += `<div style="margin-bottom: 12px; font-size: 14px;">Koin Emas: <span style="color:var(--gold)">${p.gold}</span></div>`;
+  
+  html += `<div class="shop-tabs">
+    <div class="shop-tab ${currentShopTab === 'buy' ? 'active' : ''}" onclick="currentShopTab='buy';renderShop()">Beli</div>
+    <div class="shop-tab ${currentShopTab === 'sell' ? 'active' : ''}" onclick="currentShopTab='sell';renderShop()">Jual</div>
+  </div>`;
+  
+  html += `<div class="shop-content">`;
+  if (currentShopTab === "buy") {
+    s.buy.forEach(item => {
+      const disabled = p.gold < item.price ? "disabled" : "";
+      html += `<div class="shop-item-row">
+        <div class="shop-item-info">
+          <span class="item-name">${esc(item.name)}</span>
+          <span class="shop-item-price">${item.price} Emas</span>
+        </div>
+        <button class="btn btn-small" ${disabled} onclick="actShop('shop_buy', '${item.item}')">Beli (1×)</button>
+      </div>`;
+    });
+  } else {
+    s.sell.forEach(item => {
+      const count = invMap[item.item] || 0;
+      const disabled = count < 1 ? "disabled" : "";
+      html += `<div class="shop-item-row">
+        <div class="shop-item-info">
+          <span class="item-name">${esc(item.name)} (Punya: ${count})</span>
+          <span class="shop-item-price">${item.price} Emas</span>
+        </div>
+        <button class="btn btn-small" ${disabled} onclick="actShop('shop_sell', '${item.item}')">Jual (1×)</button>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+  html += `<div style="margin-top:20px; text-align:right;"><button class="btn" onclick="closeModal('modal-shop')">Tutup</button></div>`;
+  
+  $("modal-shop").innerHTML = html;
+}
+
+async function actShop(type, itemId) {
+  const data = await api("/api/action", { body: { action: { type: type, item: itemId, count: 1 } } });
+  if (data.ok) { view = data.view; ctx = data.context; render(); renderShop(); }
+}
+
+function openArcSummaryModal(s) {
+  let html = `<h3 style="text-align:center; font-size: 24px;">${esc(s.title)}</h3>`;
+  html += `<div style="margin-bottom: 20px;">
+    ${statRow("Kultivator", s.player_name)}
+    ${statRow("Ranah", `${s.realm} Lv.${s.realm_level}`)}
+    ${statRow("Akademi", s.academy || "—")}
+    ${statRow("Moralitas", s.morality)}
+    ${statRow("Ingatan Terbuka", s.memories_unlocked)}
+    ${statRow("Waktu Berlalu", `Hari ${s.day}`)}
+    ${statRow("Pilihan Akhir", s.branch, "gold")}
+  </div>`;
+  html += `<div class="dialog-text" style="font-style:italic; color:var(--gray); text-align:center; margin-bottom: 24px;">"${esc(s.teaser)}"</div>`;
+  html += `<button class="btn btn-gold" style="width:100%" onclick="dismissArcSummary()">Lanjut Eksplorasi Bebas</button>`;
+  
+  $("modal-arc-summary").innerHTML = html;
+  showModal("modal-arc-summary");
+}
+
+function dismissArcSummary() {
+  window.arcSummaryDismissed = true;
+  closeModal("modal-arc-summary");
+  render();
+}
+
 // ---------- panel Tianyuan Ling ----------
 
 async function openTianyuan() {
   const data = await api("/api/tianyuan", { method: "GET" });
   const t = data.tianyuan;
   let html = `<h3>天缘灵 · Tianyuan Ling</h3>`;
-  html += `<h3 style="margin-top:18px;font-size:15px">Ingatan</h3>`;
+  
+  html += `<h3 style="margin-top:18px;font-size:15px">Status Misi</h3>`;
+  if (t.mission.main) {
+    html += `<div class="mem-full"><div class="mem-title">[Misi Utama] ${esc(t.mission.main.title)}</div>` +
+            `<div class="mem-text">${esc(t.mission.main.objective)}</div></div>`;
+  } else {
+    html += `<p class="hint">[Misi Utama] Belum ada misi utama aktif (Arc 1 Tamat / Eksplorasi Bebas).</p>`;
+  }
+  if (t.mission.side_quests && t.mission.side_quests.length) {
+    t.mission.side_quests.forEach(sq => {
+      html += `<div class="mem-full"><div class="mem-title" style="color:var(--blue)">[Misi Sampingan] ${esc(sq.title)}</div>` +
+              `<div class="mem-text">${esc(sq.objective)}</div></div>`;
+    });
+  }
+  
+  html += `<h3 style="margin-top:18px;font-size:15px">Ingatan (${t.unlocked_count}/${t.total_count})</h3>`;
   if (t.memories && t.memories.length) {
     t.memories.forEach((m) => {
-      html += `<div class="mem-full"><div class="mem-title">${esc(m.title)}</div>` +
-              `<div class="mem-text">${esc(m.text)}</div></div>`;
+      if (m.unlocked) {
+        html += `<div class="mem-full"><div class="mem-title">${esc(m.title)}</div>` +
+                `<div class="mem-text">${esc(m.text)}</div></div>`;
+      } else {
+        html += `<div class="mem-locked">• ${esc(m.title)} (Belum Terbuka)</div>`;
+      }
     });
-  } else {
-    html += `<p class="hint">Belum ada ingatan yang terbuka.</p>`;
   }
+  
   html += `<h3 style="margin-top:18px;font-size:15px">Log Sistem</h3>`;
-  (t.system_log || []).slice(-30).reverse().forEach((s) => {
+  (t.system_log || []).reverse().forEach((s) => {
     html += `<div class="sys-log-entry">${esc(s)}</div>`;
   });
+  
   html += `<div style="margin-top:20px"><button class="btn btn-gold" onclick="closeTianyuan()">Tutup</button></div>`;
   $("tianyuan").innerHTML = html;
   $("tianyuan").classList.remove("hidden");

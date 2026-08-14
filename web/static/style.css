@@ -283,3 +283,36 @@ select, input[type="text"], input[type="number"] {
 .mem-full .mem-text { color: var(--cream); font-style: italic; line-height: 1.6; white-space: pre-wrap; }
 
 .sys-log-entry { color: var(--gold); font-size: 13px; padding: 2px 0; border-bottom: 1px dotted #2a2530; }
+
+/* ═══ Modals ═══ */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.75); z-index: 99;
+}
+
+.modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: var(--bg-panel); border: 1px solid var(--gold);
+  border-radius: 6px; padding: 20px; z-index: 100;
+  max-width: 90vw; width: 500px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+}
+
+.modal h3 {
+  color: var(--gold); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px;
+}
+
+.shop-tabs { display: flex; gap: 10px; margin-bottom: 16px; }
+.shop-tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-input); color: var(--gray); border-radius: 4px; }
+.shop-tab.active { border-color: var(--gold); color: var(--gold); background: transparent; }
+
+.shop-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dotted #2a2530; }
+.shop-item-info { display: flex; flex-direction: column; }
+.shop-item-price { color: var(--gold); font-size: 13px; }
+
+.mem-locked {
+  border: 1px dashed var(--gold-dim);
+  padding: 10px; margin-bottom: 16px;
+  color: var(--gray); text-align: center;
+  border-radius: 4px;
+}
