@@ -119,7 +119,7 @@ def test_tianyuan_panel_side_quest(base_url: str) -> None:
     post(base_url, "/api/new")
     app.session.state.active_side_quests = {"sq_dummy": 0}
     # Mock the quest in registry just for the test to avoid KeyError
-    app.registry.quest_by_id["sq_dummy"] = {"id": "sq_dummy", "title": "Dummy SQ", "objectives": [{"id": "obj1", "desc": "Test"}]}
+    app.registry.quest_by_id["sq_dummy"] = {"id": "sq_dummy", "kind": "side", "title": "Dummy SQ", "objectives": [{"id": "obj1", "desc": "Test"}]}
     
     try:
         body, status = get(base_url, "/api/tianyuan")
@@ -229,3 +229,39 @@ def test_aksi_format_salah_ditolak_400(base_url: str) -> None:
         data = json.loads(e.read())
         assert data["ok"] is False
         assert "Format aksi" in data["error"]
+
+
+def test_body_non_dict_tidak_crash(base_url: str) -> None:
+    """Body JSON top-level non-dict (array) → respons JSON 400, bukan koneksi mati (F1)."""
+    post(base_url, "/api/new")
+    req = urllib.request.Request(
+        base_url + "/api/action",
+        data=json.dumps(["bukan", "dict"]).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        urllib.request.urlopen(req)
+        assert False, "harusnya ditolak dengan 400"
+    except urllib.error.HTTPError as e:
+        assert e.code == 400
+        data = json.loads(e.read())
+        assert data["ok"] is False
+        assert "Format aksi" in data["error"]
+
+
+def test_tianyuan_tidak_menampilkan_main_quest_sebagai_side(base_url: str) -> None:
+    """Quest utama yang tercatat di active_side_quests tidak boleh tampil sebagai side (G3b)."""
+    post(base_url, "/api/new")
+    app.session.state.active_side_quests["q_akademi_01"] = {"talk": 0}
+    body, status = get(base_url, "/api/tianyuan")
+    assert status == 200
+    data = json.loads(body)
+    side_ids = [s["id"] for s in data["tianyuan"]["mission"]["side_quests"]]
+    assert "q_akademi_01" not in side_ids
+
+
+def test_context_loc_names(base_url: str) -> None:
+    """Konteks menyediakan peta id lokasi → nama untuk tombol Pindah (G3a)."""
+    data = post(base_url, "/api/new")
+    assert data["context"]["loc_names"]["loc_aula_ujian"] == "Aula Ujian"

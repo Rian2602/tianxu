@@ -204,3 +204,14 @@ def test_max_qi_unknown_realm_returns_current(dummy_session, registry):
     assert state.max_qi(registry) == 33
 
 
+def test_pending_dialog_tidak_diserialisasi(dummy_session):
+    """pending_dialog tak ikut to_dict; field stale dari save lama diabaikan (H3)."""
+    state = dummy_session.state
+    state.pending_dialog = "dlg_x"
+    d = state.to_dict()
+    assert "pending_dialog" not in d
+    d["pending_dialog"] = "dlg_x"  # save lama (pra-fix) yang masih membawa field
+    restored = GameState.from_dict(d)
+    assert restored.pending_dialog is None
+
+

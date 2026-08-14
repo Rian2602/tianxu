@@ -6,14 +6,14 @@ RPG kultivasi (wuxia) berbasis teks — vertical slice Fase 1, Arc Akademi. Pyth
 
 - `python3 src/cli.py` — jalankan game CLI (`-l <nama>` untuk lanjut dari save)
 - `python3 -m pytest -q` — semua test, dijalankan dari root repo (pyproject `[tool.pytest.ini_options] pythonpath=["."]` menjaga `import src`).
-- `python3 tools/validate_data.py` — validasi konsistensi data (16 aturan = ENGINE_ARCHITECTURE §14). Exit non-zero jika error. **WAJIB** jalan dan exit 0 setelah menyentuh `data/`.
+- `python3 tools/validate_data.py` — validasi konsistensi data (16 aturan = ENGINE_ARCHITECTURE §14). Exit non-zero jika error. **WAJIB** jalan dan exit 0 setelah menyentuh `data/`. Urutan baku (sama dengan CI `.github/workflows/ci.yml`): validate → pytest.
 
 ## Arsitektur
 
 - **Data-driven**: semua konten di `data/` (JSON untuk struktur, CSV untuk tabel datar lewat `csv.DictReader`). Tambah konten = edit data, bukan kode. `src/loader.py::DataRegistry` memuat semua dan membuat index lookup sekali saat startup.
 - **Alur aksi**: `src/cli.py` memetakan input teks → dict aksi → `GameSession.apply_action()` (`src/engine/session.py`). Fitur baru lewat engine, jangan langsung menulis ke state.
-- **Engine** (`src/engine/`): session (orchestrator) · state · battle · dialog · cultivation · morality · memory · quest · events · effects. Catatan: ENGINE_ARCHITECTURE menyebut `save.py`/`items.py`/`npc.py`/`world.py` yang **tidak ada** di kode — save/load di `session.py` (`GameSession.load`/`_save`) + `state.py` (`to_dict`/`from_dict`); item/NPC/world inline di `session.py`.
-- **Quest**: satu quest utama aktif; percabangan lewat pilihan dialog (`choice_id`/options → dialog). Graf quest harus DAG — ditegakkan `tests/test_quest_dag.py` + validator. Side quest (repeatable) data terpisah dan tak boleh memakai NPC/lokasi/objek quest utama.
+- **Engine** (`src/engine/`): session (orchestrator) · state · battle · dialog · cultivation · morality · memory · quest · events · effects. Catatan: `docs/ENGINE_ARCHITECTURE.md` masih menyebut modul `world.py` yang **tidak ada** di kode — world sim (monster respawn default 5 jam via `config.json` → `world.monster_respawn_hours`, jadwal NPC `_is_npc_available`) dan item/NPC inline di `session.py`; save/load di `session.py` (`GameSession.load`/`_save`) + `state.py` (`to_dict`/`from_dict`).
+- **Quest**: satu quest utama aktif; percabangan lewat pilihan dialog (`choice_id`/options → dialog). Graf quest harus DAG — ditegakkan `tests/test_quest_dag.py` + validator. Side quest (repeatable) data terpisah, wajib punya `available_from {day, hour}` + `cooldown` > 0 (validator aturan 8), dan tak boleh memakai NPC/lokasi/objek quest utama.
 - **web/** = server stdlib-only (`python3 web/app.py` → `http://localhost:8000`) + halaman statis. Satu sesi aktif per proses; v1 tersedia lewat CLI & web.
 - **Save**: `saves/*.json`, hanya di lokasi aman, di-gitignore. Path `__file__`-relative → cwd-independen.
 

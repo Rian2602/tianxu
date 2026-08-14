@@ -163,7 +163,6 @@ class GameState:
             "last_hunt_time": self.last_hunt_time,
             "grounding_hours_today": self.grounding_hours_today,
             "branch_pending": self.branch_pending,
-            "pending_dialog": self.pending_dialog,
             "pending_battle": copy.deepcopy(self.pending_battle) if self.pending_battle else None,
             "companion": copy.deepcopy(self.companion) if self.companion else None,
         }
@@ -200,7 +199,6 @@ class GameState:
             last_hunt_time=d.get("last_hunt_time"),
             grounding_hours_today=d.get("grounding_hours_today", 0),
             branch_pending=d.get("branch_pending"),
-            pending_dialog=d.get("pending_dialog"),
             pending_battle=copy.deepcopy(d.get("pending_battle")),
             companion=copy.deepcopy(d.get("companion")),
         )

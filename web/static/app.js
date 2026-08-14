@@ -2,7 +2,7 @@
 
 "use strict";
 
-window.arcSummaryDismissed = false;
+let currentSave = "save1";
 
 function showModal(id) {
   $(id).classList.remove("hidden");
@@ -20,11 +20,17 @@ let ctx = null;
 
 // ---------- API ----------
 
+let busy = false;
+
 async function api(path, opts) {
   const opt = { method: (opts && opts.method) || "POST", headers: { "Content-Type": "application/json" } };
   if (opts && opts.body !== undefined) opt.body = JSON.stringify(opts.body);
-  const res = await fetch(path, opt);
-  return res.json();
+  try {
+    const res = await fetch(path, opt);
+    return await res.json();
+  } catch (e) {
+    return { ok: false, error: "Koneksi gagal: " + (e.message || e) };
+  }
 }
 
 // ---------- aman HTML ----------
@@ -61,13 +67,14 @@ function showGame() {
 
 async function startNew() {
   const data = await api("/api/new");
-  if (data.ok) { view = data.view; ctx = data.context; showGame(); render(); }
+  if (data.ok) { currentSave = "save1"; view = data.view; ctx = data.context; showGame(); render(); }
+  else { window.alert(data.error || "Gagal memulai."); }
 }
 
 async function loadGame(name) {
   const data = await api("/api/load", { body: { name } });
   if (!data.ok) { $("title-msg").textContent = data.error || "Gagal memuat."; return; }
-  view = data.view; ctx = data.context; showGame(); render();
+  currentSave = name; view = data.view; ctx = data.context; showGame(); render();
 }
 
 // ---------- render utama ----------
@@ -81,7 +88,7 @@ function render() {
   const logEl = $("log");
   logEl.scrollTop = logEl.scrollHeight;
 
-  if (view.arc_summary && !window.arcSummaryDismissed) {
+  if (view.arc_summary && localStorage.getItem("arc-seen:" + currentSave) !== "1") {
     openArcSummaryModal(view.arc_summary);
   }
 }
@@ -178,8 +185,14 @@ function renderCenter(v, c) {
 }
 
 async function act(action) {
-  const data = await api("/api/action", { body: { action } });
-  if (data.ok) { view = data.view; ctx = data.context; render(); }
+  if (busy) return;
+  busy = true;
+  closeTianyuan();
+  try {
+    const data = await api("/api/action", { body: { action } });
+    if (data.ok) { view = data.view; ctx = data.context; render(); }
+    else { window.alert(data.error || "Aksi ditolak."); }
+  } finally { busy = false; }
 }
 
 // ---------- explore ----------
@@ -205,7 +218,7 @@ function renderExplore(v, c, box) {
 
   // tujuan
   (loc.connections || []).forEach((cid) => {
-    html += `<div class="action-row"><button class="btn" onclick='act({type:"move",to:"${cid}"})'>Pindah → ${esc(cid)}</button></div>`;
+    html += `<div class="action-row"><button class="btn" onclick='act({type:"move",to:"${cid}"})'>Pindah → ${esc(ctx.loc_names[cid] || cid)}</button></div>`;
   });
 
   // wilayah berburu
@@ -379,7 +392,7 @@ function renderShop() {
     <div class="shop-tab ${currentShopTab === 'sell' ? 'active' : ''}" onclick="currentShopTab='sell';renderShop()">Jual</div>
   </div>`;
   
-  html += `<div class="shop-content">`;
+  html += `<div>`;
   if (currentShopTab === "buy") {
     s.buy.forEach(item => {
       const disabled = p.gold < item.price ? "disabled" : "";
@@ -411,8 +424,13 @@ function renderShop() {
 }
 
 async function actShop(type, itemId) {
-  const data = await api("/api/action", { body: { action: { type: type, item: itemId, count: 1 } } });
-  if (data.ok) { view = data.view; ctx = data.context; render(); renderShop(); }
+  if (busy) return;
+  busy = true;
+  try {
+    const data = await api("/api/action", { body: { action: { type: type, item: itemId, count: 1 } } });
+    if (data.ok) { view = data.view; ctx = data.context; render(); renderShop(); }
+    else { window.alert(data.error || "Aksi ditolak."); }
+  } finally { busy = false; }
 }
 
 function openArcSummaryModal(s) {
@@ -434,7 +452,7 @@ function openArcSummaryModal(s) {
 }
 
 function dismissArcSummary() {
-  window.arcSummaryDismissed = true;
+  localStorage.setItem("arc-seen:" + currentSave, "1");
   closeModal("modal-arc-summary");
   render();
 }
