@@ -828,7 +828,8 @@ Dijalankan **sebelum server/CLI jalan** (`tools/validate_data.py` atau engine sa
 | `test_effects.py` | Dispatcher efek: tiap jenis efek quest/dialog diterapkan benar pada state |
 | `test_saveload.py` | Round-trip `to_dict`/`from_dict`; save rusak ditolak dengan pesan jelas |
 | `test_companion.py` | Kompanion jalur Summoning ikut battle otomatis; KO → istirahat di titik aman; scaling level; musuh bisa menyerang kompanion |
-| `test_cli.py` | Playthrough CLI penuh cabang 3aa dari awal sampai selesai |
+| `test_cli.py` | Playthrough CLI penuh cabang 3aa dari awal sampai selesai — **parametrize 3 akademi (elemen/senjata/summoning)** (A1, 2026-08-14, tutup DoD §11.2 #1): assert banner arc, cabang, header akademi, kompanion "Roh" (summoning), dan **arc-end `realm_level` Lv 4–6** (baseline pacing — guardrail rebalancing A2) |
+| `test_battle.py` | (+A1) `test_teknik_akademi_dipakai_di_battle` — teknik khas tiap akademi (elemen/senjata/summoning) tereksekusi di battle |
 | `test_web.py` | Endpoint API: new/load/action/save/tianyuan; aksi tanpa sesi & format salah ditolak (400); save di luar titik aman ditolak |
 
 Kriteria selesai tambahan: `tools/validate_data.py` lolos tanpa error pada data Fase 1; minimal 1 pertarungan nyata melawan musuh dari data; panel statistik menampilkan HP/Qi/ranah/inventori.

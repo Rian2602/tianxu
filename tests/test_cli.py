@@ -8,9 +8,12 @@ quest-dialog-battle-choose, dan deteksi akhir arc bekerja end-to-end.
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 from src.cli import battle_view, choose_view, dialog_view, explore_menu, print_header
 from src.engine.battle import BattleEngine
@@ -19,7 +22,17 @@ from src.engine.session import GameSession
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def test_cli_playthrough_3aa(monkeypatch, capsys):
+# Tahap A (DoD §11.2 #1): playthrough end-to-end 3 akademi — satu body, 3 varian
+PLAYTHROUGH_AKADEMI = [
+    pytest.param("akademi_elemen", "Akademi Elemen", False, id="elemen"),
+    pytest.param("akademi_senjata", "Akademi Senjata", False, id="senjata"),
+    pytest.param("akademi_summoning", "Akademi Summoning", True, id="summoning"),
+]
+
+
+@pytest.mark.parametrize("akademi, nama_akademi, pakai_roh", PLAYTHROUGH_AKADEMI)
+def test_cli_playthrough_3aa(monkeypatch, capsys, akademi, nama_akademi, pakai_roh):
+    """Playthrough penuh q01–q07 (cabang 3aa) untuk tiap akademi."""
     # battle selalu menang dalam 1 serangan (deterministik)
     monkeypatch.setattr(BattleEngine, "_calc_damage", lambda self, a, d, ea, ed: (99999, False))
     monkeypatch.setattr("src.engine.session.GameSession._is_npc_available", lambda self, npc: True)
@@ -31,7 +44,7 @@ def test_cli_playthrough_3aa(monkeypatch, capsys):
         "pindah loc_arena",
         "talk npc_hanxiu", "lanjut", "lanjut",
         "serang",                       # menang spar
-        "pilih akademi_elemen",
+        "pilih " + akademi,
         "pindah loc_aula_ujian", "pindah loc_paviliun",
         "talk npc_suqing", "1", "lanjut",
         "pindah loc_perpustakaan", "tunggu 12", "pindah loc_ruang_lonceng",
@@ -55,6 +68,14 @@ def test_cli_playthrough_3aa(monkeypatch, capsys):
     assert "Konfrontasi Terbuka Penatua An" in out, "branch tidak ada di CLI"
     assert "Ingatan" in out, "ingatan tidak ditampilkan di CLI"
     assert "Moral" in out
+    assert f"Akademi: {nama_akademi}" in out, f"akademi {akademi} tidak tampil di header"
+    if pakai_roh:
+        assert "Roh" in out, "kompanion summoning tidak tampil di CLI"
+    # baseline pacing (guardrail A2): level akhir arc dalam target Lv 4–6
+    levels = re.findall(r"Lv\.(\d+)", out)
+    assert levels, "tidak ada baris level di output CLI"
+    end_lv = int(levels[-1])
+    assert 4 <= end_lv <= 6, f"arc-end level {end_lv} di luar target Lv 4–6 (baseline pacing)"
     save_path = ROOT / "saves" / "test_arc_end.json"
     assert save_path.exists(), "loop CLI berhenti sebelum pemain bisa menyimpan"
     os.remove(save_path)

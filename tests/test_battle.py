@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from src.engine.battle import BattleEngine, _calc_damage
 
 
@@ -423,6 +425,27 @@ def test_battle_multiple_foes_with_dead_foe(session, monkeypatch):
     # Serang musuh pertama
     session.apply_action({"type": "battle_action", "action": "guard"})
     assert session.state.pending_battle is not None
+    session.state.pending_battle = None
+
+
+@pytest.mark.parametrize("akademi, teknik_id, nama_teknik", [
+    ("akademi_elemen", "tek_elemen_bola_api", "Bola Api"),
+    ("akademi_senjata", "tek_senjata_tebasan_angin", "Tebasan Angin"),
+    ("akademi_summoning", "tek_summoning_roh_api", "Roh Api"),
+])
+def test_teknik_akademi_dipakai_di_battle(session, monkeypatch, akademi, teknik_id, nama_teknik):
+    """A1: teknik khas tiap akademi (elemen/senjata/summoning) bisa dieksekusi di battle."""
+    monkeypatch.setattr("src.engine.battle.random.uniform", lambda a, z: 1.0)
+    monkeypatch.setattr("src.engine.battle.random.random", lambda: 1.0)  # no crit
+    session.state.player.academy = akademi
+    session.state.player.qi = 50  # cukup untuk biaya teknik apa pun
+    session.state.location = "loc_wilayah_berburu"
+    session.state.last_hunt_time = None
+    session.apply_action({"type": "hunt"})
+    assert session.state.pending_battle is not None
+    session.apply_action({"type": "battle_action", "action": "technique", "technique": teknik_id})
+    assert any(nama_teknik in e["text"] for e in session.state.log), \
+        f"teknik {teknik_id} tidak tereksekusi untuk {akademi}"
     session.state.pending_battle = None
 
 
