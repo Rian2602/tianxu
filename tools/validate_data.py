@@ -84,6 +84,14 @@ class Validator:
     def has(self, kind: str, id_: str) -> bool:
         return id_ in self.id_sets.get(kind, set())
 
+    def _npc_default_dialog(self, npc_id: str) -> str:
+        npc = next((n for n in self.npcs if n.get("id") == npc_id), None)
+        return (npc or {}).get("default_dialog", "")
+
+    def _dialog_nodes(self, dialog_id: str) -> set:
+        dlg = next((d for d in self.dialogs if d.get("id") == dialog_id), None)
+        return set((dlg or {}).get("nodes", {}).keys())
+
     # ---------- aturan ----------
 
     def validate(self) -> bool:
@@ -315,6 +323,18 @@ class Validator:
                 self.error(f"quest {qid}: objective.kind '{kind}' tidak dikenal")
             if kind in {"talk", "spar"} and obj.get("npc") and not self.has("npc", obj["npc"]):
                 self.error(f"quest {qid}: objective.npc '{obj['npc']}' tidak ada")
+            # A3: objective talk dengan `node`/`nodes`/`start_node` — node wajib ada di
+            # dialog default NPC tsb (aturan 4)
+            if kind == "talk" and obj.get("npc"):
+                dlg_id = self._npc_default_dialog(obj["npc"])
+                dlg_nodes = self._dialog_nodes(dlg_id)
+                for field in ("node", "start_node"):
+                    req = obj.get(field)
+                    if req and req not in dlg_nodes:
+                        self.error(f"quest {qid}: objective.{field} '{req}' tidak ada di dialog {dlg_id}")
+                for n in obj.get("nodes", []):
+                    if n not in dlg_nodes:
+                        self.error(f"quest {qid}: objective.nodes '{n}' tidak ada di dialog {dlg_id}")
             if kind == "defeat":
                 for e in obj.get("enemies", []):
                     if not self.has("enemy", e):

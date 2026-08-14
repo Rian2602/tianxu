@@ -561,3 +561,73 @@ def test_dialog_engine_choose_no_next_ends(session):
     assert session.dialog.chosen_option == "opt_selesai"
 
 
+def test_dialog_start_node_dipaksa(session):
+    """A3: `start(forced_node)` memaksa dialog mulai dari node itu (bukan `start`)."""
+    dlg = session.dialog.start("dlg_penatua", forced_node="node_konfrontasi")
+    assert dlg["node_id"] == "node_konfrontasi"
+    assert dlg["speaker"] == "npc:npc_penatua"
+    # tanpa forced → node default (start)
+    dlg2 = session.dialog.start("dlg_penatua")
+    assert dlg2["node_id"] == "node_umum"
+    # forced node yang tidak ada → fallback start (tidak crash)
+    dlg3 = session.dialog.start("dlg_penatua", forced_node="node_tidak_ada")
+    assert dlg3["node_id"] == "node_umum"
+    session.state.pending_dialog = None
+
+
+def test_quest_talk_node_wajib(session, monkeypatch):
+    """A3: objective talk dengan `node` wajib — quest selesai HANYA bila node
+    wajib dimainkan; node lain → belum selesai."""
+    qe = session.quest
+    state = session.state
+    state.current_quest = "q_synth_talk_node"
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_talk_node", "title": "Talk Node Synth", "kind": "main",
+            "objective": {"kind": "talk", "npc": "npc_penatua", "node": "node_konfrontasi", "target": 1},
+            "next": [], "on_complete": {"rewards": {"exp": 1}},
+        },
+    )
+    # node salah (node_umum) → quest TIDAK selesai
+    qe.notify_dialog_ended("npc_penatua", "node_umum")
+    assert state.current_quest == "q_synth_talk_node"
+    # node benar (node_konfrontasi) → quest selesai
+    qe.notify_dialog_ended("npc_penatua", "node_konfrontasi")
+    assert "q_synth_talk_node" in state.completed_quests
+
+
+def test_quest_talk_tanpa_node_perilaku_lama(session, monkeypatch):
+    """A3: objective talk TANPA `node` — perilaku lama (asalkan NPC benar), non-breaking."""
+    qe = session.quest
+    state = session.state
+    state.current_quest = "q_synth_talk_lama"
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_talk_lama", "title": "Talk Lama", "kind": "main",
+            "objective": {"kind": "talk", "npc": "npc_penatua", "target": 1},
+            "next": [], "on_complete": {"rewards": {"exp": 1}},
+        },
+    )
+    qe.notify_dialog_ended("npc_penatua", "node_umum")
+    assert "q_synth_talk_lama" in state.completed_quests
+
+
+def test_3aa_konfrontasi_saat_quest_aktif(session, god_mode):
+    """A2+A3: saat q_akademi_3aa aktif, bicara Penatua langsung membuka
+    node_konfrontasi (bukan node_umum) — urutan naratif cabang benar."""
+    from conftest import play_to_incident
+
+    play_to_incident(session)
+    finish_dialog(session, [0, 0])  # membongkar → konfrontasi langsung = opt_3aa
+    assert session.state.current_quest == "q_akademi_3aa"
+    move_path(session, ["loc_perpustakaan", "loc_paviliun"])
+    session.apply_action({"type": "talk", "npc": "npc_penatua"})
+    v = session.dialog.view()
+    assert v["node_id"] == "node_konfrontasi"  # bukan node_umum
+    finish_dialog(session, [0])  # selesaikan konfrontasi
+    assert session.state.current_quest == "q_akademi_07" or "q_akademi_3aa" in session.state.completed_quests
+    assert session.state.flags.get("branch_3aa") is True
+
+

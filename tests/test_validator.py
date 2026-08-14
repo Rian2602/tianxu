@@ -51,6 +51,36 @@ def test_data_baik_lolos():
     assert ok, v.errors
 
 
+def test_aturan4_talk_node_wajib_harus_ada_di_dialog():
+    """A3: objective talk `node`/`start_node`/`nodes` harus ada di dialog default NPC."""
+    good = _good()
+    good["npcs.json"] = {"npcs": [{"id": "n1", "default_dialog": "dlg1"}]}
+    good["dialogs/dialogs_akademi.json"] = {"dialogs": [{"id": "dlg1", "start": "node_a", "nodes": {"node_a": {}}}]}
+    # valid: node & start_node ada di dialog
+    good["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main", "next": [],
+        "objective": {"kind": "talk", "npc": "n1", "node": "node_a", "start_node": "node_a"},
+    }]}
+    v, ok = make(good)
+    assert ok, v.errors
+    # invalid: node tidak ada di dialog
+    good["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main", "next": [],
+        "objective": {"kind": "talk", "npc": "n1", "node": "node_tidak_ada"},
+    }]}
+    v, ok = make(good)
+    assert not ok
+    assert any("node_tidak_ada" in e for e in v.errors)
+    # invalid: start_node tidak ada di dialog
+    good["quests/quests_akademi.json"] = {"quests": [{
+        "id": "q1", "kind": "main", "next": [],
+        "objective": {"kind": "talk", "npc": "n1", "start_node": "node_tidak_ada"},
+    }]}
+    v, ok = make(good)
+    assert not ok
+    assert any("node_tidak_ada" in e for e in v.errors)
+
+
 # ---------- aturan 1: JSON/CSV well-formed ----------
 
 def test_aturan1_json_rusak(tmp_path, monkeypatch):

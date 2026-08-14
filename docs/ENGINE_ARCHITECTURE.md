@@ -196,7 +196,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 
 | `kind` | Data tambahan | Perilaku |
 |---|---|---|
-| `talk` | `npc` | Buka dialog NPC; selesai saat dialog berakhir (atau setelah `target` kali) |
+| `talk` | `npc` (+ opsional `node`/`nodes`/`start_node`) | Buka dialog NPC; selesai saat dialog berakhir (atau setelah `target` kali). **A3 (2026-08-14)**: `node`/`nodes` = node dialog **WAJIB dimainkan** — quest selesai hanya bila salah satu node yang dikunjungi ∈ daftar; `start_node` = dialog dipaksa mulai dari node itu saat quest aktif (mis. konfrontasi 3aa terjadi SAAT quest berjalan, bukan setelah selesai). Validator aturan 4 memeriksa node ada di dialog default NPC |
 | `defeat` | `enemies` (list id), `target` | Kalahkan N musuh (dari data) |
 | `gather` | `item`, `target` | Kumpulkan N item |
 | `reach` | `location` (+ opsional `time_window`) | Tiba di lokasi; jika `time_window` (`hour_start`/`hour_end`) ada, hanya sah pada waktu itu — **event terjadwal** |
@@ -560,9 +560,9 @@ selesaikan_quest(q):
 ## 7. Dialog Engine
 
 - Sesi dialog = stateful (`dialog_id` + `current_node`), disimpan di `GameState`.
-- `start(dialog_id)` → node `start`. `choose(choice_index)` → terapkan `effects` → pindah `next` / `end`.
+- `start(dialog_id, forced_node=None)` → node `start` (atau `forced_node` bila ada — dipakai objective talk `start_node`); `choose(choice_index)` → terapkan `effects` → pindah `next` / `end`. Engine mencatat **semua node yang dikunjungi** (`visited`) — quest talk dengan node wajib (A3) memeriksa keanggotaan, bukan hanya node terakhir.
 - Opsi dengan `condition` yang tidak terpenuhi **disembunyikan** dari UI (GDD §3.4: skala moralitas membuka/menutup pilihan dialog).
-- Saat dialog berakhir, engine memeriksa apakah quest aktif `objective.kind == "talk"` dengan NPC itu → selesaikan objektif → jalankan transisi quest (§6.2).
+- Saat dialog berakhir, engine memeriksa apakah quest aktif `objective.kind == "talk"` dengan NPC itu → selesaikan objektif (A3: wajib memainkan node bila `node`/`nodes` didefinisikan) → jalankan transisi quest (§6.2).
 - `option` pada opsi dialog dicocokkan dengan `option` pada sisi `next` quest → **pemilihan cabang** (transparan untuk pemain: label opsi menjelaskan jalurnya).
 
 ---

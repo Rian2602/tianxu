@@ -25,17 +25,26 @@ class DialogEngine:
         self.node_id: str | None = None
         self.last_npc: str | None = None
         self.chosen_option: str | None = None
+        self.visited: set[str] = set()  # A3: semua node yang dimainkan
 
     # ---------- mulai / lanjut ----------
 
-    def start(self, dialog_id: str) -> dict | None:
+    def start(self, dialog_id: str, forced_node: str | None = None) -> dict | None:
+        """Mulai dialog. `forced_node` (A3: objective talk quest) memaksa node awal
+        bila node itu ada di dialog; jika tidak ada → fallback `_resolve_entry`."""
         dlg = self.reg.dialog(dialog_id)
         if not dlg:
             return None
         self.current = dlg
         self.last_npc = dlg.get("npc") or None
         self.chosen_option = None
-        self.node_id = self._resolve_entry(dlg)
+        self.visited = set()  # reset per dialog
+        nodes = dlg.get("nodes", {})
+        if forced_node and forced_node in nodes:
+            self.node_id = forced_node
+        else:
+            self.node_id = self._resolve_entry(dlg)
+        self.visited.add(self.node_id)
         self.state.pending_dialog = dialog_id
         return self.view()
 
@@ -57,6 +66,7 @@ class DialogEngine:
         nxt = ch.get("next")
         if nxt:
             self.node_id = nxt
+            self.visited.add(nxt)
             return self.view()
         return self._end()
 
@@ -70,6 +80,7 @@ class DialogEngine:
         nxt = node.get("next")
         if nxt:
             self.node_id = nxt
+            self.visited.add(nxt)
             return self.view()
         return self._end()
 
@@ -96,6 +107,8 @@ class DialogEngine:
         return out
 
     def _end(self) -> dict | None:
+        self.last_node = self.node_id
+        self.last_nodes = set(self.visited)  # A3: snapshot semua node yang dimainkan
         self.node_id = None
         self.current = None
         self.state.pending_dialog = None

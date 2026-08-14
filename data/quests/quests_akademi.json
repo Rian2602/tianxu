@@ -107,12 +107,28 @@
       "title": "Konfrontasi Langsung",
       "arc": "akademi",
       "kind": "main",
-      "summary": "Chen Xu menghadapi Penatua An dan menuntut jawaban atas tuduhan Zhou Yan.",
-      "objective": { "kind": "talk", "npc": "npc_penatua", "target": 1, "hint": "Hadapi Penatua An." },
-      "next": [ { "quest": "q_akademi_07", "branch": "b_3aa_conv", "label": "Konvergen" } ],
-      "on_complete": {
-        "effects": [
-          { "type": "flag", "key": "branch_3aa", "value": true },
+      "summary": "Chen Xu menghadapi Penatua An dan menuntut jawaban atas tuduhan Zhou Yan.", "objective": {
+  "kind": "talk",
+  "npc": "npc_penatua",
+  "node": "node_konfrontasi",
+  "start_node": "node_konfrontasi",
+  "target": 1,
+  "hint": "Hadapi Penatua An."
+ },
+ "next": [
+  {
+   "quest": "q_akademi_07",
+   "branch": "b_3aa_conv",
+   "label": "Konvergen"
+  }
+ ],
+ "on_complete": {
+  "effects": [
+   {
+    "type": "flag",
+    "key": "branch_3aa",
+    "value": true
+   },
           { "type": "flag", "key": "zhouyan_status", "value": "bebas" },
           { "type": "flag", "key": "elder_exposed", "value": true },
           { "type": "flag", "key": "academy_knows_truth", "value": true },

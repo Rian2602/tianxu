@@ -186,7 +186,13 @@ class GameSession:
         if npc.get("location") != self.state.location:
             add_log(self.state, "system", f"{npc['name']} tidak ada di sini.")
             return self.view()
-        dlg = self.dialog.start(npc.get("default_dialog", ""))
+        # A3: quest talk aktif dengan `start_node` → dialog dipaksa mulai dari node itu
+        # (mis. konfrontasi 3aa terjadi SAAT quest berjalan, bukan setelah selesai)
+        forced = None
+        q = self.quest.current_main()
+        if q and q.get("objective", {}).get("kind") == "talk" and q["objective"].get("npc") == nid:
+            forced = q["objective"].get("start_node")
+        dlg = self.dialog.start(npc.get("default_dialog", ""), forced_node=forced)
         if not dlg:
             add_log(self.state, "system", f"{npc['name']} tidak ingin bicara.")
         return self.view()
@@ -203,8 +209,8 @@ class GameSession:
 
     def _after_dialog(self) -> None:
         npc_id = self.dialog.last_npc
-        # objektif talk
-        self.quest.notify_dialog_ended(npc_id or "")
+        # objektif talk — A3: laporkan semua node yang dimainkan (node wajib)
+        self.quest.notify_dialog_ended(npc_id or "", getattr(self.dialog, "last_nodes", None))
         # objektif spar: mulai battle melawan NPC
         q = self.quest.current_main()
         if q and q.get("objective", {}).get("kind") == "spar" and q["objective"].get("npc") == npc_id:

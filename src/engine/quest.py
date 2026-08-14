@@ -72,14 +72,26 @@ class QuestEngine:
 
     # ---------- selesaikan quest utama ----------
 
-    def notify_dialog_ended(self, npc_id: str) -> None:
-        """Dipanggil sesi saat dialog berakhir — memeriksa objektif talk & lapor side quest."""
+    def notify_dialog_ended(self, npc_id: str, node_ids: str | list | set | None = None) -> None:
+        """Dipanggil sesi saat dialog berakhir — memeriksa objektif talk & lapor side quest.
+
+        A3: objective talk bisa punya `node`/`nodes` (node WAJIB dimainkan).
+        Quest selesai hanya bila SALAH SATU node yang dikunjungi ∈ daftar wajib;
+        tanpa field itu → perilaku lama (asalkan NPC benar)."""
         q = self.current_main()
         if q and q.get("objective", {}).get("kind") == "talk" and q.get("objective", {}).get("npc") == npc_id:
+            obj = q["objective"]
+            required = obj.get("node") or obj.get("nodes")
+            if required:
+                if isinstance(required, str):
+                    required = [required]
+                visited = node_ids if isinstance(node_ids, (list, set)) else ([] if node_ids is None else [node_ids])
+                if not any(n in visited for n in required):
+                    return  # node wajib belum dimainkan — quest belum selesai
             qid = q["id"]
             prog = self.state.active_side_quests.setdefault(qid, {})
             prog["talk"] = prog.get("talk", 0) + 1
-            if prog["talk"] >= q["objective"].get("target", 1):
+            if prog["talk"] >= obj.get("target", 1):
                 self._complete_main(qid)
         # A2 (keputusan §17): side quest defeat dengan `report_to` selesai saat lapor ke pemberi
         for qid in list(self.state.active_side_quests):
