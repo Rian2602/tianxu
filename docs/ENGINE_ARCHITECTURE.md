@@ -197,7 +197,7 @@ Struktur graf: **Directed Acyclic Graph**. Setiap quest punya daftar `next` (sis
 | `kind` | Data tambahan | Perilaku |
 |---|---|---|
 | `talk` | `npc` (+ opsional `node`/`nodes`/`start_node`) | Buka dialog NPC; selesai saat dialog berakhir (atau setelah `target` kali). **A3 (2026-08-14)**: `node`/`nodes` = node dialog **WAJIB dimainkan** — quest selesai hanya bila salah satu node yang dikunjungi ∈ daftar; `start_node` = dialog dipaksa mulai dari node itu saat quest aktif (mis. konfrontasi 3aa terjadi SAAT quest berjalan, bukan setelah selesai). Validator aturan 4 memeriksa node ada di dialog default NPC |
-| `defeat` | `enemies` (list id), `target` | Kalahkan N musuh (dari data) |
+| `defeat` | `enemies` (list id), `target` | Kalahkan N musuh (dari data). **A7 (2026-08-14)**: main quest ikut memfilter `enemies` (hanya musuh dari daftar yang memenuhi) — tanpa `enemies` perilaku lama |
 | `gather` | `item`, `target` | Kumpulkan N item |
 | `reach` | `location` (+ opsional `time_window`) | Tiba di lokasi; jika `time_window` (`hour_start`/`hour_end`) ada, hanya sah pada waktu itu — **event terjadwal** |
 | `choose` | `options` (list) | Pilihan eksplisit (mis. pilih akademi, pilih jalur) |

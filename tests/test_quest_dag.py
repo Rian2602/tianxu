@@ -481,6 +481,46 @@ def test_start_side_rejects_unofferable(dummy_session):
     assert "q_akademi_01" not in dummy_session.state.active_side_quests
 
 
+def test_main_defeat_filter_enemies(dummy_session, monkeypatch):
+    """A7: main quest `defeat` dengan `enemies` — hanya musuh dari daftar yang
+    menyelesaikan quest; musuh lain tidak (mengikuti pola side quest)."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_synth_defeat"
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_defeat", "title": "Defeat Synth", "kind": "main",
+            "objective": {"kind": "defeat", "enemies": ["eno_boss_x"], "target": 1},
+            "next": [], "on_complete": {"rewards": {"exp": 1}},
+        },
+    )
+    # musuh lain → tidak selesai
+    qe.notify_battle_won(["eno_serigala_qi"])
+    assert state.current_quest == "q_synth_defeat"
+    # musuh dari daftar → selesai
+    qe.notify_battle_won(["eno_boss_x"])
+    assert "q_synth_defeat" in state.completed_quests
+
+
+def test_main_defeat_tanpa_enemies_perilaku_lama(dummy_session, monkeypatch):
+    """A7: main `defeat` tanpa `enemies` → perilaku lama (musuh apa pun selesai),
+    non-breaking."""
+    qe = dummy_session.quest
+    state = dummy_session.state
+    state.current_quest = "q_synth_defeat2"
+    monkeypatch.setattr(
+        qe.reg, "quest",
+        lambda qid: {
+            "id": "q_synth_defeat2", "title": "Defeat Lama", "kind": "main",
+            "objective": {"kind": "defeat"},
+            "next": [], "on_complete": {"rewards": {"exp": 1}},
+        },
+    )
+    qe.notify_battle_won(["eno_apa_saja"])
+    assert "q_synth_defeat2" in state.completed_quests
+
+
 def test_complete_side_ignores_inactive(dummy_session):
     """_complete_side quest yang tidak aktif → tidak crash, tidak tercatat selesai."""
     qe = dummy_session.quest

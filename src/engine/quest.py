@@ -130,10 +130,17 @@ class QuestEngine:
         self._complete_main(q["id"])
 
     def notify_battle_won(self, defeated_enemy_ids: list[str]) -> None:
-        """Pembunuhan musuh (berburu) — progres objektif defeat side quest."""
+        """Pembunuhan musuh (berburu) — progres objektif defeat.
+
+        A7: main quest `defeat` ikut pola side quest — bila `enemies`
+        didefinisikan, hanya musuh dari daftar yang memenuhi; tanpa field itu
+        perilaku lama (musuh apa pun selesai), non-breaking."""
         q = self.current_main()
         if q and q.get("objective", {}).get("kind") == "defeat":
-            self._complete_main(q["id"])
+            obj = q["objective"]
+            allowed = obj.get("enemies", [])
+            if not allowed or any(e in allowed for e in defeated_enemy_ids):
+                self._complete_main(q["id"])
         for qid in list(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             obj = sq.get("objective", {})
