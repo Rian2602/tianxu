@@ -1,0 +1,29 @@
+id,name,element,base_hp,base_attack,base_defense,base_speed,exp_reward,gold_drop,techniques,items,rare_drops
+enemy_sekte_guard_1,Penjaga Sekte Pedang,logam,120,35,28,22,150,45,tek_basic_slash,item_sword_iron,scroll_technique_rare
+enemy_sekte_guard_2,Penjaga Sekte Alkimia,api,110,32,24,25,140,40,tek_fire_ball,item_pill_heal_minor,essence_fire
+enemy_sekte_guard_3,Penjaga Sekte Roh,tanah,130,30,30,20,145,42,tek_earth_spike,item_stone_spirit,spirit_fragment
+enemy_sekte_elite_1,Kadet Elite Pedang,logam,160,45,32,28,250,70,tek_pedang_awan_terbelah,item_sword_steel,manual_sword_art
+enemy_sekte_elite_2,Kadet Elite Alkimia,api,150,42,28,30,240,65,tek_alchemy_ekstraksi_sembilan,item_pill_heal_major,essence_flame_pure
+enemy_sekte_elite_3,Kadet Elite Roh,tanah,170,40,35,25,245,68,tek_roh_ikatan_jiwa,item_talisman_binding,soul_crystal
+enemy_istana_soldier_1,Prajurit Istana,logam,140,38,30,24,180,50,tek_spear_thrust,item_armor_chain,insignia_imperial
+enemy_istana_soldier_2,Pengawal Pangeran,logam,155,42,34,26,200,60,tek_defend_formation,item_shield_steel,order_secret
+enemy_istana_assassin_1,Assassin Bayangan,air,125,48,22,38,220,55,tek_shadow_strike,item_dagger_poison,mask_darkness
+enemy_istana_mage_1,Kultivator Istana,api,135,50,20,28,210,58,tek_firestorm,item_staff_crystal,spell_scroll_ancient
+enemy_benua_gelap_1,Prajurit Gelap,air,150,44,26,30,230,62,tek_dark_bolt,item_cloak_shadow,fragment_darkness
+enemy_benua_gelap_2,Cultivator Iblis,api,165,52,24,26,260,75,tek_hellfire_summon,item_orb_corruption,heart_demon
+enemy_benua_gelap_3,Pengikat Jiwa,tanah,175,46,32,22,255,72,tek_soul_drain,item_totem_cursed,soul_bound_chain
+enemy_boss_miniboss_1,Komandan Sekte Korup,logam,280,62,45,32,500,150,tek_metal_crush,item_sword_cursed,seal_authority_fake
+enemy_boss_miniboss_2,Alkimis Gila,api,250,68,35,30,480,140,tek_explode_unstable,item_furnace_corrupted,formula_forbidden
+enemy_boss_miniboss_3,Roh Terkutuk,tanah,300,58,50,25,520,160,tek_curse_decay,item_bone_ancient,grudge_centuries
+enemy_boss_liufeng_battle,Jenderal Liu Feng (Mind Controlled),logam,350,70,55,35,800,250,tek_general_command,item_armor_general_broken,edict_fake
+enemy_boss_selirmei_minion,Prajurit Selir,air,200,55,38,32,400,120,tek_shadow_servant,item_talisman_control,blood_contract
+enemy_boss_bayangan_merah,Bayangan Merah (Final Boss),api,500,85,45,40,1500,500,tek_crimson_devastation,item_mask_crimson_broken,truth_fragment
+enemy_adaptivity_1,Musuh Adaptif Rendah,logam,100,30,25,20,100,30,tek_basic_attack,item_common,none
+enemy_adaptivity_2,Musuh Adaptif Sedang,api,180,48,32,28,300,80,tek_elemental_burst,item_uncommon,crafting_material_mid
+enemy_adaptivity_3,Musuh Adaptif Tinggi,tanah,280,65,48,35,600,180,tek_advanced_combo,item_rare,legendary_fragment
+enemy_event_night_1,Penyergap Malam,air,145,46,24,36,190,52,tek_night_strike,item_cloak_dark,moonstone
+enemy_event_night_2,Roh Gentayangan,tanah,160,42,30,24,205,58,tek_soul_touch,item_ectoplasm,spectral_tear
+enemy_event_raid_1,Perampok Jalanan,logam,135,40,28,26,170,48,tek_bandit_swipe,item_loot_bag,map_treasure_hint
+enemy_event_raid_2,Kultivator Liar,api,155,48,26,30,215,60,tek_wildfire,item_seed_chaos,windfall_luck
+enemy_patrol_1,Patroli Perbatasan,logam,125,36,30,24,160,45,tek_patrol_strike,item_uniform_torn,patrol_schedule
+enemy_patrol_2,Scout Pengintai,air,115,34,22,38,155,42,tek_scout_mark,item_compass,survey_map

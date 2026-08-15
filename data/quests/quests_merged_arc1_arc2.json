@@ -1,0 +1,654 @@
+{
+  "quests": [
+    {
+      "id": "q_akademi_01",
+      "title": "Pintu Gerbang Akademi",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Chen Xu tiba di gerbang Akademi Changfeng dan disambut Penjaga Gerbang.",
+      "objective": { "kind": "talk", "npc": "npc_penjaga", "target": 1, "hint": "Bicaralah dengan Penjaga Gerbang di depan akademi." },
+      "next": [ { "quest": "q_akademi_02", "branch": "b1", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "met_penjaga", "value": true } ],
+        "system_msg": "Quest utama diperbarui: Ujian Masuk.",
+        "rewards": { "exp": 3 }
+      }
+    },
+    {
+      "id": "q_akademi_02",
+      "title": "Ujian Masuk: Akar Spiritual",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Gu Canghai menguji akar spiritual Chen Xu di Aula Ujian.",
+      "objective": { "kind": "talk", "npc": "npc_gucanghai", "target": 1, "hint": "Temui Gu Canghai di Aula Ujian." },
+      "next": [ { "quest": "q_akademi_03", "branch": "b2", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "ujian_akar_selesai", "value": true } ],
+        "system_msg": "Hasil ujian: Akar Menengah (中品).",
+        "rewards": { "exp": 5 }
+      }
+    },
+    {
+      "id": "q_akademi_03",
+      "title": "Ujian Masuk: Sparing",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Han Xiu menantang Chen Xu sparing sebagai bagian ujian masuk.",
+      "objective": { "kind": "spar", "npc": "npc_hanxiu", "hint": "Kalahkan Han Xiu di sparing ujian." },
+      "next": [ { "quest": "q_akademi_04", "branch": "b3", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "spar_ujian_selesai", "value": true } ],
+        "system_msg": "Sparing selesai. Han Xiu mengangguk pelan.",
+        "rewards": { "exp": 4, "gold": 10 }
+      }
+    },
+    {
+      "id": "q_akademi_04",
+      "title": "Pilih Paviliun",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Gu Canghai mempersilakan Chen Xu memilih salah satu dari tiga paviliun Akademi Changfeng.",
+      "objective": {
+        "kind": "choose",
+        "options": [
+          { "label": "Paviliun Pedang (剑阁 Jiàn Gé)", "value": "paviliun_pedang" },
+          { "label": "Paviliun Alkimia (丹阁 Dān Gé)", "value": "paviliun_alchemy" },
+          { "label": "Pavilion Roh (灵阁 Líng Gé)", "value": "paviliun_roh" }
+        ],
+        "hint": "Pilihan ini mempengaruhi teknik awal dan NPC yang bisa diajak interaksi."
+      },
+      "next": [
+        { "quest": "q_akademi_05a", "branch": "b_pedang", "choice_id": "dlg_pilih_paviliun", "option": "opt_pedang", "label": "Jalan Pedang" },
+        { "quest": "q_akademi_05b", "branch": "b_alchemy", "choice_id": "dlg_pilih_paviliun", "option": "opt_alchemy", "label": "Jalan Alkimia" },
+        { "quest": "q_akademi_05c", "branch": "b_roh", "choice_id": "dlg_pilih_paviliun", "option": "opt_roh", "label": "Jalan Roh" }
+      ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "paviliun_dipilih", "value": true } ],
+        "system_msg": "Kau resmi menjadi murid Akademi Changfeng.",
+        "rewards": { "exp": 5, "gold": 20 }
+      }
+    },
+    {
+      "id": "q_akademi_05a",
+      "title": "Latihan Dasar Pedang",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Instruktur Pavilion Pedang mengajarkan bentuk dasar pedang.",
+      "objective": { "kind": "train", "technique": "tek_pedang_dasar", "target_level": 2, "hint": "Latih teknik pedang dasar hingga level 2." },
+      "next": [ { "quest": "q_akademi_06", "branch": "b_conv_pedang", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [ { "type": "technique_level", "id": "tek_pedang_dasar", "level": 2 } ],
+        "rewards": { "exp": 8 }
+      }
+    },
+    {
+      "id": "q_akademi_05b",
+      "title": "Pengenalan Ramuan",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Instruktur Pavilion Alkimia mengajarkan identifikasi herb.",
+      "objective": { "kind": "gather", "items": [ "herb_qi_minor", "herb_detox", "herb_stamina" ], "hint": "Kumpulkan 3 jenis herb dasar." },
+      "next": [ { "quest": "q_akademi_06", "branch": "b_conv_alchemy", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [ { "type": "item", "id": "pil_qi_minor", "qty": 3 } ],
+        "rewards": { "exp": 8, "gold": 15 }
+      }
+    },
+    {
+      "id": "q_akademi_05c",
+      "title": "Meditasi Roh",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Instruktur Pavilion Roh membimbing meditasi pertama.",
+      "objective": { "kind": "meditate", "duration_days": 3, "hint": "Meditasi selama 3 hari untuk merasakan aliran Qi." },
+      "next": [ { "quest": "q_akademi_06", "branch": "b_conv_roh", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [ { "type": "cultivation_exp", "amount": 10 } ],
+        "rewards": { "exp": 8 }
+      }
+    },
+    {
+      "id": "q_akademi_06",
+      "title": "Misi Pertama: Escort Merchant",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Pedagang membutuhkan pengawalan melalui hutan bermonster.",
+      "objective": { "kind": "escort", "npc": "npc_merchant_chen", "route": [ "gerbang_akademi", "hutan_barat", "desa_tetangga" ], "hint": "Antar merchant ke desa tetangga tanpa casualty." },
+      "next": [ { "quest": "q_akademi_07", "branch": "b4", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "misi_escort_selesai", "value": true } ],
+        "system_msg": "Merchant Chen berterima kasih dan memberikan bonus.",
+        "rewards": { "exp": 12, "gold": 50 }
+      }
+    },
+    {
+      "id": "q_akademi_07",
+      "title": "Penyelidikan: Monster Marah",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Monster di hutan barat tiba-tiba menjadi agresif. Selidiki penyebabnya.",
+      "objective": { "kind": "investigate", "location": "hutan_barat", "clues_required": 3, "hint": "Cari 3 petunjuk tentang kemarahan monster." },
+      "next": [ { "quest": "q_akademi_08", "branch": "b5", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "penyebab_monster_diketahui", "value": true }, { "type": "memory", "key": "mem_01", "unlock": true } ],
+        "system_msg": "Kau menemukan jejak kultivator gelap...",
+        "rewards": { "exp": 15 }
+      }
+    },
+    {
+      "id": "q_akademi_08",
+      "title": "Konfrontasi: Kultivator Gelap",
+      "arc": "akademi",
+      "kind": "main",
+      "summary": "Hadapi kultivator gelap yang memanipulasi monster hutan.",
+      "objective": { "kind": "battle", "enemy_group": "kultivator_gelap_akademi", "hint": "Kalahkan kultivator gelap dan hentikan ritualnya." },
+      "next": [ { "quest": "q_sekte_01", "branch": "b_arc2_transition", "label": "Transisi ke Arc 2" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "arc_akademi_selesai", "value": true },
+          { "type": "flag", "key": "nama_terkenal", "value": true },
+          { "type": "memory", "key": "mem_02", "unlock": true }
+        ],
+        "system_msg": "[ARC 1 SELESAI] Berita kemenanganmu menyebar. Tiga sekte besar mulai memperhatikan...",
+        "rewards": { "exp": 25, "gold": 100, "items": [ "bukti_kultivator_gelap" ] }
+      }
+    },
+    {
+      "id": "q_sekte_01",
+      "title": "Undangan Tiga Sekte",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Tiga utusan sekte besar tiba di Changfeng, membawa undangan resmi untuk Chen Xu.",
+      "prerequisites": [ "q_akademi_08" ],
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_utusan_gabung",
+        "target": 3,
+        "hint": "Bicaralah dengan ketiga utusan sekte di Aula Ujian."
+      },
+      "next": [ { "quest": "q_sekte_02", "branch": "b1", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "met_utusan", "value": true } ],
+        "system_msg": "[Sistem] Jalanmu mulai menarik perhatian para kuat.",
+        "rewards": { "exp": 10, "gold": 20 }
+      }
+    },
+    {
+      "id": "q_sekte_02",
+      "title": "Pilih Jalan Sekte",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Chen Xu harus memilih salah satu dari tiga sekte besar untuk bergabung.",
+      "objective": {
+        "kind": "choose",
+        "options": [
+          { "label": "Sekte Pedang Langit (天剑宗 Tiānjiàn Zōng)", "value": "sekte_tianjian" },
+          { "label": "Sekte Alkimia Surgawi (天丹阁 Tiāndān Gé)", "value": "sekte_tiandan" },
+          { "label": "Sekte Roh Kuno (古灵宗 Gǔlíng Zōng)", "value": "sekte_guling" }
+        ],
+        "hint": "Pilihan ini menentukan teknik, companion, dan alur quest berikutnya."
+      },
+      "next": [
+        { "quest": "q_sekte_03a", "branch": "b_tj", "choice_id": "dlg_pilih_sekte", "option": "opt_tj", "label": "Jalan Pedang" },
+        { "quest": "q_sekte_03b", "branch": "b_td", "choice_id": "dlg_pilih_sekte", "option": "opt_td", "label": "Jalan Alkimia" },
+        { "quest": "q_sekte_03c", "branch": "b_gl", "choice_id": "dlg_pilih_sekte", "option": "opt_gl", "label": "Jalan Roh" }
+      ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "sekte_dipilih", "value": true },
+          { "type": "flag", "key": "arc_akademi_selesai", "value": true }
+        ],
+        "system_msg": "Kau memilih jalanmu. Tidak ada jalan kembali.",
+        "rewards": { "exp": 15 }
+      }
+    },
+    {
+      "id": "q_sekte_03a",
+      "title": "Ujian Pedang Langit",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Sekte Pedang Langit menguji Chen Xu dengan duel melawan 3 senior.",
+      "objective": {
+        "kind": "battle_sequence",
+        "enemies": [ "eno_senior_pedang_1", "eno_senior_pedang_2", "eno_senior_pedang_3" ],
+        "hint": "Kalahkan 3 senior secara beruntun di Arena Pedang Langit."
+      },
+      "next": [ { "quest": "q_sekte_04", "branch": "b_tj_conv", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "sekte_tianjian_masuk", "value": true },
+          { "type": "technique", "id": "tek_tj_langit_terbelah" },
+          { "type": "companion", "id": "comp_liuyan" }
+        ],
+        "rewards": { "exp": 25, "gold": 30 }
+      }
+    },
+    {
+      "id": "q_sekte_03b",
+      "title": "Ujian Alkimia Surgawi",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Sekte Alkimia Surgawi menguji Chen Xu dengan meracik 3 pil langka.",
+      "objective": {
+        "kind": "craft",
+        "recipes": [ "pil_qi_langka", "pil_pemulihan_master", "pil_detoksifikasi" ],
+        "hint": "Racik 3 pil langka di Laboratorium Alkimia dalam waktu terbatas."
+      },
+      "next": [ { "quest": "q_sekte_04", "branch": "b_td_conv", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "sekte_tiandan_masuk", "value": true },
+          { "type": "technique", "id": "tek_td_emberlian_suci" },
+          { "type": "companion", "id": "comp_danmo" }
+        ],
+        "rewards": { "exp": 25, "gold": 30 }
+      }
+    },
+    {
+      "id": "q_sekte_03c",
+      "title": "Ujian Roh Kuno",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Sekte Roh Kuno menguji Chen Xu dengan ritual pemanggilan roh leluhur.",
+      "objective": {
+        "kind": "ritual",
+        "components": [ "crystal_roh", "herb_spiritual", "scroll_pemanggil" ],
+        "hint": "Lengkapi ritual pemanggilan roh di Altar Roh Kuno."
+      },
+      "next": [ { "quest": "q_sekte_04", "branch": "b_gl_conv", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "sekte_guling_masuk", "value": true },
+          { "type": "technique", "id": "tek_gl_ikatan_jiwa" },
+          { "type": "companion", "id": "comp_linghu" }
+        ],
+        "rewards": { "exp": 25, "gold": 30 }
+      }
+    },
+    {
+      "id": "q_sekte_04",
+      "title": "Pelatihan Intensif",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "30 hari pelatihan intensif di sekte pilihan. Time skip otomatis.",
+      "objective": {
+        "kind": "time_skip",
+        "days": 30,
+        "hint": "Jalani pelatihan intensif sekte."
+      },
+      "next": [ { "quest": "q_sekte_05", "branch": "b6", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "cultivation_exp", "amount": 50 },
+          { "type": "technique_level_all", "amount": 2 },
+          { "type": "flag", "key": "pelatihan_sekte_selesai", "value": true }
+        ],
+        "system_msg": "30 hari berlalu. Kau merasa kekuatan baru mengalir dalam tubuhmu.",
+        "rewards": { "exp": 40 }
+      }
+    },
+    {
+      "id": "q_sekte_05",
+      "title": "Eksperimen Terlarang",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Senior di sektimu melakukan eksperimen terlarang. Kau harus memilih sikap.",
+      "objective": {
+        "kind": "choose",
+        "options": [
+          { "label": "Laporkan ke elder (Heaven Path)", "value": "lapor_elder" },
+          { "label": "Hentikan sendiri (Human Path)", "value": "hentikan_sendiri" },
+          { "label": "Bantu diam-diam (Earth Path)", "value": "bantu_diam" }
+        ],
+        "hint": "Pilihan moral ini mempengaruhi alignment dan ending."
+      },
+      "next": [
+        { "quest": "q_sekte_06a", "branch": "b_lapor", "choice_id": "dlg_eksperimen", "option": "opt_lapor", "label": "Lapor" },
+        { "quest": "q_sekte_06b", "branch": "b_hentikan", "choice_id": "dlg_eksperimen", "option": "opt_hentikan", "label": "Hentikan" },
+        { "quest": "q_sekte_06c", "branch": "b_bantu", "choice_id": "dlg_eksperimen", "option": "opt_bantu", "label": "Bantu" }
+      ],
+      "on_complete": {
+        "effects": [
+          { "type": "morality", "heaven": 10, "earth": -5, "human": 5 },
+          { "type": "flag", "key": "eksperimen_terlarang_diketahui", "value": true }
+        ],
+        "rewards": { "exp": 20 }
+      }
+    },
+    {
+      "id": "q_sekte_06a",
+      "title": "Investigasi Internal",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Elder meminta bantuanmu menyelidiki jaringan kultivator gelap di dalam sekte.",
+      "objective": {
+        "kind": "investigate",
+        "location": "sekte_internal",
+        "clues_required": 4,
+        "hint": "Kumpulkan 4 bukti keterlibatan senior."
+      },
+      "next": [ { "quest": "q_sekte_07", "branch": "b_conv_investigasi", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "bukti_kumpul", "value": true } ],
+        "rewards": { "exp": 30, "gold": 50 }
+      }
+    },
+    {
+      "id": "q_sekte_06b",
+      "title": "Konfrontasi Senior",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Hadapi senior yang melakukan eksperimen terlarang.",
+      "objective": {
+        "kind": "battle",
+        "enemy_group": "senior_pengkhianat",
+        "hint": "Kalahkan senior dalam duel satu lawan satu."
+      },
+      "next": [ { "quest": "q_sekte_07", "branch": "b_conv_konfrontasi", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "senior_dikalahkan", "value": true } ],
+        "rewards": { "exp": 35, "gold": 40, "items": [ "catatan_eksperimen" ] }
+      }
+    },
+    {
+      "id": "q_sekte_06c",
+      "title": "Manipulasi Politik",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Bantu senior menutupi jejak dengan memanipulasi bukti.",
+      "objective": {
+        "kind": "stealth",
+        "actions": [ "hapus_catatan", "alihkan_curiga", "suap_saksi" ],
+        "hint": "Selesaikan 3 tindakan tanpa tertangkap."
+      },
+      "next": [ { "quest": "q_sekte_07", "branch": "b_conv_manipulasi", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "morality", "heaven": -15, "earth": 10, "human": -5 },
+          { "type": "flag", "key": "jejak_terhapus", "value": true }
+        ],
+        "rewards": { "exp": 25, "gold": 80, "items": [ "janji_senioir" ] }
+      }
+    },
+    {
+      "id": "q_sekte_07",
+      "title": "Kolusi Terungkap",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Ternyata eksperimen terlarang hanyalah puncak gunung es. Konspirasi更大 melibatkan menteri kekaisaran.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_guru_sekte",
+        "hint": "Laporkan temuan kepada guru sektimu."
+      },
+      "next": [ { "quest": "q_sekte_08", "branch": "b7", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "kolusi_terungkap", "value": true }, { "type": "memory", "key": "mem_05", "unlock": true } ],
+        "system_msg": "Gurumu terkejut. 'Ini lebih besar dari yang kita kira...'",
+        "rewards": { "exp": 30 }
+      }
+    },
+    {
+      "id": "q_sekte_08",
+      "title": "Jalan yang Kau Pilih",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Sekte mendukung penuh keputusanmu untuk membawa kasus ini ke Istana Naga.",
+      "objective": {
+        "kind": "move",
+        "location": "istana_naga_gate",
+        "hint": "Perjalanan ke ibu kota kekaisaran."
+      },
+      "next": [ { "quest": "q_kaisar_01", "branch": "b_arc3_transition", "label": "Transisi ke Arc Kekaisaran" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "arc_sekte_selesai", "value": true },
+          { "type": "flag", "key": "dukungan_sekte", "value": true }
+        ],
+        "system_msg": "[ARC 2 SESESAI - BAGIAN 1] Perjalanan ke ibuota dimulai. Kaisar menantimu...",
+        "rewards": { "exp": 50, "gold": 100, "items": [ "surat_pengantar_sekte" ] }
+      }
+    },
+    {
+      "id": "q_kaisar_01",
+      "title": "Panggilan Istana Naga",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Kaisar memanggilmu ke Istana Naga untuk membahas ancaman yang mengguncang seluruh benua.",
+      "prerequisites": [ "q_sekte_08" ],
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_kaisar_long",
+        "target": 1,
+        "hint": "Masuki ruang tahta dan temui Kaisar Long."
+      },
+      "next": [ { "quest": "q_kaisar_02", "branch": "b8", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "met_kaisar", "value": true }, { "type": "reputation", "faction": "kaisar", "amount": 20 } ],
+        "system_msg": "Kaisar mengangkatmu sebagai Penyelidik Kerajaan.",
+        "rewards": { "exp": 60, "gold": 200, "items": [ "lencana_penyelidik" ] }
+      }
+    },
+    {
+      "id": "q_kaisar_02",
+      "title": "Konspirasi di Balik Tirai",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Selidiki kabar burung tentang menteri yang bersekongkol dengan kultivator gelap dari Benua Gelap.",
+      "objective": {
+        "kind": "investigate",
+        "location": "distrik_menteri",
+        "clues_required": 3,
+        "hint": "Cari 3 bukti konspirasi menteri."
+      },
+      "next": [ { "quest": "q_kaisar_03", "branch": "b9", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "konspirasi_terbukti", "value": true } ],
+        "rewards": { "exp": 70, "gold": 150, "items": [ "surat_konspirasi" ] }
+      }
+    },
+    {
+      "id": "q_kaisar_03",
+      "title": "Ujian Kesetiaan",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Kaisar mengujimu: selamatkan rakyat atau tangkap konspirator?",
+      "objective": {
+        "kind": "choose",
+        "options": [
+          { "label": "Selamatkan rakyat desa (Heaven)", "value": "save_villagers" },
+          { "label": "Tangkap konspirator (Earth)", "value": "catch_conspirator" },
+          { "label": "Coba keduanya (Risk)", "value": "both_attempt" }
+        ],
+        "hint": "Pilihan ini mempengaruhi moral alignment."
+      },
+      "next": [
+        { "quest": "q_kaisar_04a", "branch": "b_save", "choice_id": "dlg_ujian_setia", "option": "opt_save", "label": "Selamatkan Rakyat" },
+        { "quest": "q_kaisar_04b", "branch": "b_catch", "choice_id": "dlg_ujian_setia", "option": "opt_catch", "label": "Tangkap Pengkhianat" },
+        { "quest": "q_kaisar_04c", "branch": "b_both", "choice_id": "dlg_ujian_setia", "option": "opt_both", "label": "Keduanya" }
+      ],
+      "on_complete": {
+        "effects": [
+          { "type": "morality", "heaven": 10, "earth": -5, "human": 5 },
+          { "type": "memory", "key": "mem_06", "unlock": true }
+        ],
+        "rewards": { "exp": 50 }
+      }
+    },
+    {
+      "id": "q_kaisar_04a",
+      "title": "Jejak Pengkhianat (Cabang Rakyat)",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Setelah menyelamatkan rakyat, lacak pengkhianat yang lolos ke perbatasan utara.",
+      "objective": {
+        "kind": "travel",
+        "destination": "perbatasan_utara",
+        "encounters": 2,
+        "hint": "Perjalanan ke perbatasan dengan 2 random encounter."
+      },
+      "next": [ { "quest": "q_kaisar_05", "branch": "b_conv_utara", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "tiba_utara", "value": true } ],
+        "rewards": { "exp": 40, "gold": 60 }
+      }
+    },
+    {
+      "id": "q_kaisar_04b",
+      "title": "Pengejaran Cepat",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Kejar konspirator yang mencoba melarikan diri ke luar negeri.",
+      "objective": {
+        "kind": "chase",
+        "target": "menteri_pengkhianat",
+        "time_limit_days": 10,
+        "hint": "Tangkap sebelum 10 hari berlalu."
+      },
+      "next": [ { "quest": "q_kaisar_05", "branch": "b_conv_kejar", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "konspiratortertangkap", "value": true } ],
+        "rewards": { "exp": 60, "gold": 100 }
+      }
+    },
+    {
+      "id": "q_kaisar_04c",
+      "title": "Pertaruhan Ganda",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Coba lakukan keduanya dengan risiko tinggi. Butuh quick time event.",
+      "objective": {
+        "kind": "multitask",
+        "tasks": [ "save_villagers", "catch_conspirator" ],
+        "success_threshold": 2,
+        "hint": "Selesaikan 2/2 tugas untuk sukses sempurna."
+      },
+      "next": [ { "quest": "q_kaisar_05", "branch": "b_conv_ganda", "label": "Konvergen" } ],
+      "on_complete": {
+        "effects": [
+          { "type": "morality", "heaven": 5, "earth": 5, "human": 5 },
+          { "type": "flag", "key": "hero_ganda", "value": true }
+        ],
+        "rewards": { "exp": 80, "gold": 150, "items": [ "medali_pahlawan" ] }
+      }
+    },
+    {
+      "id": "q_kaisar_05",
+      "title": "Identitas Lin Yue",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Temukan Lin Yue, kekasih masa lalumu yang ternyata terlibat dalam konspirasi.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_linyue",
+        "hint": "Hadapi Lin Yue di taman istana malam hari."
+      },
+      "next": [ { "quest": "q_kaisar_06", "branch": "b10", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "memory", "key": "mem_07", "unlock": true }, { "type": "flag", "key": "lin_yue_ditemukan", "value": true } ],
+        "system_msg": "Lin Yue menatapmu dengan mata berkaca-kaca. 'Maafkan aku...'",
+        "rewards": { "exp": 50 }
+      }
+    },
+    {
+      "id": "q_kaisar_06",
+      "title": "Pengakuan Lin Yue",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Dengarkan pengakuan Lin Yue tentang paksaan Selir Mei.",
+      "objective": {
+        "kind": "dialog_branch",
+        "dialog_id": "dlg_linyue_pengakuan",
+        "hint": "Pilih: percaya, ragu, atau tolak."
+      },
+      "next": [ { "quest": "q_kaisar_07", "branch": "b11", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "pengakuan_didengar", "value": true } ],
+        "rewards": { "exp": 40 }
+      }
+    },
+    {
+      "id": "q_kaisar_07",
+      "title": "Menghadapi Selir Mei",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Konfrontasi Selir Mei di istananya. Boss battle mental.",
+      "objective": {
+        "kind": "battle",
+        "enemy_group": "selir_mei_boss",
+        "special_condition": "mental_battle",
+        "hint": "Kalahkan ilusi Selir Mei dengan kekuatan mental."
+      },
+      "next": [ { "quest": "q_kaisar_08", "branch": "b12", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "memory", "key": "mem_08", "unlock": true }, { "type": "flag", "key": "selir_mei_dikalahkan", "value": true } ],
+        "system_msg": "Selir Mei terjatuh. 'Kau tidak tahu apa yang sebenarnya terjadi...'",
+        "rewards": { "exp": 100, "gold": 300, "items": [ "kalung_selir_mei" ] }
+      }
+    },
+    {
+      "id": "q_kaisar_08",
+      "title": "Kebenaran Long Tianxu",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Kaisar mengungkapkan kebenaran tentang ayahmu, Long Tianxu.",
+      "objective": {
+        "kind": "cutscene",
+        "cutscene_id": "cs_kebenaran_ayah",
+        "hint": "Saksikan cutscene pengungkapan kebenaran."
+      },
+      "next": [ { "quest": "q_kaisar_09", "branch": "b13", "label": "Lanjut" } ],
+      "on_complete": {
+        "effects": [ { "type": "memory", "key": "mem_01", "upgrade": true }, { "type": "flag", "key": "kebenaran_diketahui", "value": true } ],
+        "system_msg": "Dunia seolah berputar. Ayahmu... pahlawan atau pengkhianat?",
+        "rewards": { "exp": 80 }
+      }
+    },
+    {
+      "id": "q_kaisar_09",
+      "title": "Bayangan Merah Muncul",
+      "arc": "kekaisaran",
+      "kind": "main",
+      "summary": "Identitas Bayangan Merah terungkap: mantan murid ayahmu yang dengki.",
+      "objective": {
+        "kind": "battle",
+        "enemy_group": "bayangan_merah_final",
+        "hint": "Boss fight final Arc Kekaisaran."
+      },
+      "next": [ { "quest": "q_f2_final", "branch": "b14", "label": "Quest Final" } ],
+      "on_complete": {
+        "effects": [ { "type": "flag", "key": "bayangan_merah_kalah", "value": true }, { "type": "flag", "key": "arc_kekaisaran_selesai", "value": true } ],
+        "system_msg": "[ARC 2 SELESAI] Bayangan Merah terjatuh. Portal ke Benua Gelap mulai terbuka...",
+        "rewards": { "exp": 150, "gold": 500, "items": [ "pedang_bayangan" ] }
+      }
+    },
+    {
+      "id": "q_f2_final",
+      "title": "Takdir Benua: Pilihan Terakhir",
+      "arc": "final_fase2",
+      "kind": "main",
+      "summary": "Portal ke Benua Gelap terbuka. Pilih takdir benua.",
+      "prerequisites": [ "q_kaisar_09" ],
+      "requirements": { "min_level": 6, "cultivation_realm": "jindan" },
+      "objective": {
+        "kind": "choose_ending",
+        "options": [
+          { "label": "Serbu Benua Gelap (Heaven Conqueror)", "value": "ending_heaven", "req_morality": "heaven" },
+          { "label": "Tutup Portal (Earth Guardian)", "value": "ending_earth", "req_morality": "earth" },
+          { "label": "Negosiasi Damai (Human Diplomat)", "value": "ending_human", "req_morality": "human" },
+          { "label": "Korban Diri (Balance Legend)", "value": "ending_balance", "req_special": "all_stats_max" }
+        ],
+        "hint": "Pilihan ini menentukan ending game Fase 2."
+      },
+      "next": [],
+      "on_complete": {
+        "effects": [
+          { "type": "flag", "key": "fase2_complete", "value": true },
+          { "type": "unlock_fase3", "value": true }
+        ],
+        "system_msg": "[FASE 2 SELESAI] Terima kasih telah bermain! Fase 3 akan datang...",
+        "rewards": { "exp": 1000, "gold": 5000, "items": [ "trofi_pahlawan_benua" ] }
+      }
+    }
+  ]
+}

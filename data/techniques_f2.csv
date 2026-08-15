@@ -1,0 +1,31 @@
+id,name,element,type,power,energy_cost,cooldown,unlock_requirement,description,scaling_stat
+tek_pedang_awan_terbelah,Pedang Awan Terbelah,logam,attack,85,15,2,quest_q_sekte_03a,Tebasan pedang yang membelah awan.,attack
+tek_alchemy_ekstraksi_sembilan,Ekstraksi Sembilan Lipat,api,support,60,20,3,quest_q_sekte_03b,Ekstraksi esensi dengan 9 tahap refinement.,intelligence
+tek_roh_ikatan_jiwa,Ikatan Jiwa Roh,tanah,control,70,18,3,quest_q_sekte_03c,Mengikat roh untuk membantu pertempuran.,spirit
+tek_moonlight_heal,Healing Cahaya Bulan,air,support,0,12,2,mem_06_unlock,Memulihkan HP dengan energi rembulan.,intelligence
+tek_shadow_strike,Serangan Bayangan,air,attack,75,14,2,companion_xue_recruit,Serangan cepat dari dimensi bayangan.,speed
+tek_water_veil,Tirai Air,air,defend,50,10,2,companion_xue_recruit,Perisai air yang mengurangi damage.,defense
+tek_flame_strike,Serangan Api,api,attack,80,16,2,faction_tianjian_rep_50,Ledakan api terkonsentrasi.,attack
+tek_fire_heal,Pemulihan Api,api,support,0,15,3,faction_tiandan_rep_50,Membakar racun dan memulihkan kondisi.,intelligence
+tek_earth_shield,Perisai Bumi,tanah,defend,65,12,2,faction_guling_rep_50,Perisai tanah yang sangat kuat.,defense
+tek_crimson_devastation,Kehancuran Merah Darah,api,ultimate,150,40,5,boss_bayangan_merah_defeated,Serangan终极 Bayangan Merah.,attack
+tek_general_command,Komando Jenderal,logam,buff,0,25,4,quest_q_kek_05_complete,Meningkatkan semua stat ally.,leadership
+tek_spear_thrust,Tusukan Tombak,logam,attack,70,12,2,enemy_drop_insignia_imperial,Tusukan tombak presisi tinggi.,attack
+tek_defend_formation,Formasi Pertahanan,logam,defend,55,10,2,quest_q_kek_02_complete,Formasi defensif kelompok.,defense
+tek_hellfire_summon,Pemanggilan Api Neraka,api,summon,90,30,4,cultivation_realm_5,Memanggil iblis api neraka.,spirit
+tek_dark_bolt,Sambar Gelap,air,attack,72,14,2,enemy_benua_gelap_drop,Sambar energi gelap yang melumpuhkan.,attack
+tek_soul_drain,Hisapan Jiwa,tanah,special,80,22,3,cultivation_realm_4,Menghisap jiwa musuh untuk HP.,intelligence
+tek_night_strike,Serangan Malam,air,attack,78,15,2,time_night_only,Serangan yang lebih kuat di malam hari.,speed
+tek_soul_touch,Sentuhan Jiwa,tanah,special,65,18,3,location_haunted_access,Menyentuh jiwa untuk info atau damage.,spirit
+tek_bandit_swipe,Goresan Perampok,logam,attack,55,10,1,enemy_raid_drop,Serangan cepat perampok jalanan.,attack
+tek_wildfire,Kebakaran Liar,api,attack,88,20,3,location_forest_access,Api yang menyebar tak terkendali.,intelligence
+tek_patrol_strike,Serangan Patroli,logam,attack,62,11,2,faction_imperial_rep_30,Serangan standar patroli.,attack
+tek_scout_mark,Tanda Scout,air,debuff,40,8,2,enemy_scout_drop,Markir musuh untuk damage bonus.,speed
+tek_elemental_burst,Ledakan Elemen,api,attack,95,25,3,adaptivity_high_trigger,Ledakan semua elemen sekaligus.,all_stats
+tek_advanced_combo,Kombo Tingkat Lanjut,logam,attack,110,30,4,cultivation_realm_6,Kombinasi teknik tingkat master.,attack
+tek_curse_decay,Kutukan Pembusukan,tanah,debuff,70,20,3,boss_miniboss_3_drop,Mengurangi stat musuh secara bertahap.,intelligence
+tek_explode_unstable,Ledakan Tidak Stabil,api,attack,120,35,4,boss_miniboss_2_drop,Ledakan besar dengan risiko collateral.,attack
+tek_metal_crush,Hancuran Logam,logam,attack,100,28,3,boss_miniboss_1_drop,Menghancurkan dengan tekanan logam.,attack
+tek_shadow_servant,Pelayan Bayangan,air,summon,75,24,3,selir_mei_faction_access,Memanggil pelayan dari dimensi gelap.,spirit
+tek_cultivate_dark,Kultivasi Gelap,tanah,buff,0,30,5,benua_gelap_access,Meningkatkan power dengan risiko corruption.,all_stats
+tek_truth_reveal,Pengungkapan Kebenaran,air,special,0,50,1,mem_08_unlock,Mengungkap kebenaran untuk ending.,wisdom

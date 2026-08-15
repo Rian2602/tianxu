@@ -1,0 +1,122 @@
+[
+  {
+    "id": "sekte_tianjian",
+    "name": "Sekte Pedang Langit",
+    "type": "sect",
+    "faction": "tianjian",
+    "connections": ["gerbang_sekte", "latihan_pedang", "puncak_awan"],
+    "danger_level": 1,
+    "ambient_desc": "Pegunungan tinggi dengan aura pedang tajam di udara.",
+    "events": ["tournament_pedang", "meditasi_massal"]
+  },
+  {
+    "id": "sekte_tiandan",
+    "name": "Sekte Alkimia Surgawi",
+    "type": "sect",
+    "faction": "tiandan",
+    "connections": ["gerbang_sekte", "ruang_alchemy", "kebun_herb"],
+    "danger_level": 1,
+    "ambient_desc": "Kompleks dengan aroma herbal dan asap tungku alkimia.",
+    "events": ["eksperimen_alchemy", "panen_herb_langka"]
+  },
+  {
+    "id": "sekte_guling",
+    "name": "Sekte Roh Kuno",
+    "type": "sect",
+    "faction": "guling",
+    "connections": ["gerbang_sekte", "altar_roh", "hutan_keramat"],
+    "danger_level": 2,
+    "ambient_desc": "Hutan keramat dengan energi roh mengalir deras.",
+    "events": ["ritual_pemanggilan", "komunikasi_roh_leluhur"]
+  },
+  {
+    "id": "istana_utama",
+    "name": "Istana Naga Emas",
+    "type": "capital",
+    "faction": "kekaisaran",
+    "connections": ["aula_tahta", "taman_terlarang", "asrama_pangeran", "paviliun_bulan"],
+    "danger_level": 3,
+    "ambient_desc": "Istana megah dengan intrik politik di setiap sudut.",
+    "events": ["audiensi_kaisar", "konspirasi_malam"]
+  },
+  {
+    "id": "taman_terlarang",
+    "name": "Taman Terlarang",
+    "type": "secret",
+    "faction": "istana_dark",
+    "connections": ["istana_utama", "ruang_ritual_rahasia"],
+    "danger_level": 4,
+    "ambient_desc": "Taman indah yang menyembunyikan ritual gelap.",
+    "events": ["pertemuan_rahasia", "penanaman_ramuan_beracun"]
+  },
+  {
+    "id": "asrama_pangeran",
+    "name": "Asrama Pangeran",
+    "type": "residential",
+    "faction": "kekaisaran",
+    "connections": ["istana_utama", "perpustakaan_istana"],
+    "danger_level": 2,
+    "ambient_desc": "Tempat tinggal para pangeran dengan penjagaan ketat.",
+    "events": ["diskusi_politik", "pelatihan_silat"]
+  },
+  {
+    "id": "paviliun_bulan",
+    "name": "Paviliun Bulan",
+    "type": "residential",
+    "faction": "kekaisaran",
+    "connections": ["istana_utama", "taman_terlarang"],
+    "danger_level": 2,
+    "ambient_desc": "Paviliun tenang tempat dayang istana beristirahat.",
+    "events": ["pertemuan_romantis", "kenangan_masa_lalu"]
+  },
+  {
+    "id": "ruang_ritual_rahasia",
+    "name": "Ruang Ritual Rahasia",
+    "type": "dungeon",
+    "faction": "benua_gelap",
+    "connections": ["taman_terlarang", "terowongan_gelap"],
+    "danger_level": 5,
+    "ambient_desc": "Ruang bawah tanah dengan simbol-simbol kultivasi gelap.",
+    "events": ["ritual_pemanggilan_iblis", "boss_battle"]
+  },
+  {
+    "id": "pasar_perbatasan",
+    "name": "Pasar Perbatasan",
+    "type": "town",
+    "faction": "netral",
+    "connections": ["jalur_perdagangan", "pos_penjagaan"],
+    "danger_level": 2,
+    "ambient_desc": "Pasar ramai di perbatasan antara sekte dan kekaisaran.",
+    "events": ["trade_barang_langka", "info_rumor"]
+  },
+  {
+    "id": "gerbang_sekte",
+    "name": "Gerbang Utama Sekte",
+    "type": "entrance",
+    "faction": "multi",
+    "connections": ["sekte_tianjian", "sekte_tiandan", "sekte_guling", "jalan_utama"],
+    "danger_level": 1,
+    "ambient_desc": "Gerbang megah menuju kompleks sekte.",
+    "events": ["penyambutan_pengunjung", "ujian_masuk"]
+  },
+  {
+    "id": "latihan_pedang",
+    "name": "Arena Latihan Pedang",
+    "type": "training",
+    "faction": "tianjian",
+    "connections": ["sekte_tianjian", "puncak_awan"],
+    "danger_level": 2,
+    "ambient_desc": "Arena dengan target latihan dan bekas tebasan pedang.",
+    "events": ["spar_session", "turnamen_internal"]
+  },
+  {
+    "id": "ruang_alchemy",
+    "name": "Ruang Alkimia Utama",
+    "type": "crafting",
+    "faction": "tiandan",
+    "connections": ["sekte_tiandan", "gudang_bahan"],
+    "danger_level": 1,
+    "ambient_desc": "Laboratorium dengan puluhan tungku alkimia aktif.",
+    "events": ["refining_pill", "eksperimen_baru"]
+  }
+]

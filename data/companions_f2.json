@@ -1,0 +1,70 @@
+[
+  {
+    "id": "comp_liuyan",
+    "name": "Liu Yan",
+    "title": "Swordmaster Muda",
+    "faction": "tianjian",
+    "recruit_quest": "q_sekte_03a",
+    "base_stats": { "hp": 180, "attack": 45, "defense": 25, "speed": 35 },
+    "element": "logam",
+    "techniques": ["tek_pedang_awan_terbelah", "tek_flame_strike"],
+    "battle_ai": { "priority": "attack_weakest", "skill_use_threshold": 0.7, "defend_when_hp_below": 0.3 },
+    "bond_levels": [
+      { "level": 1, "req_points": 0, "bonus": "+5 attack", "dialog_unlock": null },
+      { "level": 2, "req_points": 50, "bonus": "+10 attack, unlock combo move", "dialog_unlock": "dlg_liuyan_bond2" },
+      { "level": 3, "req_points": 150, "bonus": "+20 attack, auto-counter chance 15%", "dialog_unlock": "dlg_liuyan_bond3" }
+    ],
+    "description": "Ahli pedang berbakat dari Sekte Pedang Langit. Setia pada keadilan."
+  },
+  {
+    "id": "comp_danmo",
+    "name": "Dan Mo",
+    "title": "Alkimis Pengembara",
+    "faction": "tiandan",
+    "recruit_quest": "q_sekte_03b",
+    "base_stats": { "hp": 140, "attack": 25, "defense": 20, "speed": 25 },
+    "element": "api",
+    "techniques": ["tek_alchemy_ekstraksi_sembilan", "tek_fire_heal"],
+    "battle_ai": { "priority": "support", "skill_use_threshold": 0.5, "defend_when_hp_below": 0.4 },
+    "bond_levels": [
+      { "level": 1, "req_points": 0, "bonus": "+5 defense", "dialog_unlock": null },
+      { "level": 2, "req_points": 50, "bonus": "+10 defense, craft pill 20% cheaper", "dialog_unlock": "dlg_danmo_bond2" },
+      { "level": 3, "req_points": 150, "bonus": "+20 defense, auto-heal 5% per turn", "dialog_unlock": "dlg_danmo_bond3" }
+    ],
+    "description": "Alkimis jenius yang mengembara mencari bahan langka untuk eksperimen."
+  },
+  {
+    "id": "comp_linghu",
+    "name": "Ling Hu",
+    "title": "Pengikat Roh",
+    "faction": "guling",
+    "recruit_quest": "q_sekte_03c",
+    "base_stats": { "hp": 160, "attack": 30, "defense": 22, "speed": 28 },
+    "element": "tanah",
+    "techniques": ["tek_roh_ikatan_jiwa", "tek_earth_shield"],
+    "battle_ai": { "priority": "control", "skill_use_threshold": 0.6, "defend_when_hp_below": 0.35 },
+    "bond_levels": [
+      { "level": 1, "req_points": 0, "bonus": "+5 speed", "dialog_unlock": null },
+      { "level": 2, "req_points": 50, "bonus": "+10 speed, spirit summon duration +1 turn", "dialog_unlock": "dlg_linghu_bond2" },
+      { "level": 3, "req_points": 150, "bonus": "+20 speed, 20% chance double cast", "dialog_unlock": "dlg_linghu_bond3" }
+    ],
+    "description": "Spesialis pengikatan roh dari Sekte Roh Kuno. Bijaksana dan tenang."
+  },
+  {
+    "id": "comp_xue",
+    "name": "Xue",
+    "title": "Assassin Bayangan",
+    "faction": "benua_gelap_defector",
+    "recruit_quest": "q_kek_06",
+    "base_stats": { "hp": 150, "attack": 40, "defense": 18, "speed": 45 },
+    "element": "air",
+    "techniques": ["tek_shadow_strike", "tek_water_veil"],
+    "battle_ai": { "priority": "assassinate_backline", "skill_use_threshold": 0.8, "defend_when_hp_below": 0.25 },
+    "bond_levels": [
+      { "level": 1, "req_points": 0, "bonus": "+5 speed", "dialog_unlock": null },
+      { "level": 2, "req_points": 50, "bonus": "+10 speed, first strike guaranteed crit", "dialog_unlock": "dlg_xue_bond2" },
+      { "level": 3, "req_points": 150, "bonus": "+20 speed, 25% dodge chance", "dialog_unlock": "dlg_xue_bond3" }
+    ],
+    "description": "Pembunuh bayaran yang membelot dari Benua Gelap. Misterius dan efisien."
+  }
+]

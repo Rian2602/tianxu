@@ -1,0 +1,38 @@
+id,name,type,rarity,effect_value,effect_type,price,description,unlock_requirement
+item_sword_heavenly,weapon,legendary,95,attack,2500,Pedang langit dengan aura tajam.,faction_tianjian_rep_100
+item_pill_sword_essence,consumable,epic,50,temp_attack,800,Essensi pedang untuk boost sementara.,quest_q_sekte_03a
+item_furnace_divine,tool,legendary,40,crafting_bonus,3000,Tungku alkimia dewa.,faction_tiandan_rep_100
+item_pill_golden_elixir,consumable,legendary,100,exp_boost,5000,Elixir emas untuk cultivation.,boss_miniboss_2_drop
+item_spirit_bond_stone,tool,epic,30,spirit_bind,1200,Batu untuk mengikat roh.,faction_guling_rep_80
+item_essence_soul,material,epic,0,soul_craft,600,Esensi jiwa untuk crafting.,enemy_benua_gelap_drop
+item_armor_general,armor,epic,55,defense,1800,Baju zirah jenderal.,quest_q_kek_05_complete
+item_edict_imperial,key_item,unique,0,plot,0,Edikt kekaisaran rahasia.,quest_q_kek_01_reward
+item_poison_shadow,consumable,rare,40,poison_damage,400,Racun bayangan mematikan.,selir_mei_shop
+item_talisman_control,key_item,unique,0,mind_control,0,Talisman kontrol pikiran.,boss_selirmei_drop
+item_seal_prince,key_item,unique,0,authority,0,Stempel pangeran.,npc_pangeranhao_gift
+item_letter_secret,key_item,rare,0,evidence,0,Surat rahasia konspirasi.,quest_q_kek_04_reward
+item_hairpin_jade,accessory,rare,15,charm,300,Jepit rambut giok Lin Yue.,npc_linyue_gift
+item_token_past,key_item,unique,0,memory_trigger,0,Token masa lalu.,mem_06_unlock
+item_mask_crimson,armor,legendary,70,shadow_resist,4000,Topeng merah Bayangan Merah.,boss_bayangan_merah_drop
+item_blade_betrayal,weapon,epic,80,dark_damage,2200,Pisau pengkhianatan.,boss_bayangan_merah_drop
+item_scroll_rumor,consumable,common,0,info,50,Gulungan rumor.,npc_mata_mata_shop
+item_coin_gold,currency,common,1,gold,1,Koin emas standar.,general_drop
+item_misc_supplies,material,common,5,crafting,20,Suplai miscellaneous.,merchant_shop
+item_map_region,key_item,rare,0,exploration,150,Peta wilayah.,quest_q_sekte_01_reward
+item_sword_flame,weapon,epic,75,fire_damage,2000,Pedang api Liu Yan.,companion_liuyan_start
+item_armor_light,armor,rare,35,speed_boost,600,Baju zirah ringan.,companion_liuyan_start
+item_furnace_portable,tool,rare,25,mobile_craft,900,Tungku portable Dan Mo.,companion_danmo_start
+item_herb_rare,material,epic,0,alchemy,400,Herbal langka.,companion_danmo_start
+item_stone_spirit,tool,rare,20,spirit_commune,700,Batu roh Ling Hu.,companion_linghu_start
+item_talisman_binding,consumable,epic,0,summon,500,Talisman pengikatan.,companion_linghu_start
+item_dagger_shadow,weapon,epic,70,assassinate,1900,Dagger bayangan Xue.,companion_xue_start
+item_smoke_bomb,consumable,rare,0,escape,150,Bom asap untuk kabur.,companion_xue_start
+item_evidence_scroll,key_item,unique,0,proof,0,Gulungan bukti Selir Mei.,mem_07_reward
+item_cloak_darkness,armor,rare,40,stealth,800,Jubah kegelapan.,enemy_assassin_drop
+item_crystal_ice,material,epic,0,frost_craft,550,Kristal es murni.,location_north_exploration
+item_wing_phoenix,material,legendary,0,resurrection,10000,Bulu phoenix.,rare_boss_drop
+item_core_dragon,material,legendary,0,power_amplify,12000,Inti naga.,final_boss_drop
+item_pill_immortality,consumable,legendary,1,immunity_death,20000,Pill keabadian.,endgame_craft
+item_manual_sword_art,key_item,epic,0,technique_learn,1500,Manual teknik pedang.,enemy_elite_drop
+item_formula_forbidden,key_item,unique,0,recipe_unlock,0,Formula terlarang.,boss_miniboss_2_drop
+item_grudge_centuries,material,unique,0,curse_power,0,Dendam berabad-abad.,boss_miniboss_3_drop

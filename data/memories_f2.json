@@ -1,0 +1,47 @@
+[
+  {
+    "id": "mem_05",
+    "title": "Pengorbanan Ayah",
+    "unlock_condition": { "quest_completed": "q_sekte_04" },
+    "gates": ["dlg_liufeng"],
+    "effects": [
+      { "type": "stat", "stat": "max_hp", "value": 50 },
+      { "type": "morality", "heaven": 10, "human": 5 }
+    ],
+    "text": "Kau mengingat kembali malam itu. Ayahmu berdiri di depan gerbang akademi, menahan puluhan kultivator gelap sendirian. 'Lari, Xu!' teriaknya sebelum pedang energi menembus dadanya. Darahnya membentuk formasi pelindung yang memungkinkannya lolos. Pengorbanan itu bukan sekadar kematian—itu adalah ritual transfer kekuatan terakhir ke dalam darahmu."
+  },
+  {
+    "id": "mem_06",
+    "title": "Identitas Lin Yue",
+    "unlock_condition": { "quest_completed": "q_kek_04", "moral_threshold": { "human": 20 } },
+    "gates": ["dlg_linyue"],
+    "effects": [
+      { "type": "relationship", "npc": "npc_linyue", "change": 30 },
+      { "type": "technique", "id": "tek_moonlight_heal" }
+    ],
+    "text": "Di paviliun bulan, Lin Yue menatap rembulan dengan air mata. 'Aku adik seperguruanmu di Akademi Angin Panjang,' bisiknya. 'Malam ketika Lonceng berbunyi, aku mencoba menyelamatkanmu tapi terjebak ledakan. Wajahku berubah, suaraku hilang. Hanya kau yang bisa mengenaliku dari cara berjalan ini.' Ia membuka jubah, memperlihatkan luka bakar berbentuk lonceng di punggungnya—luka yang sama seperti milikmu."
+  },
+  {
+    "id": "mem_07",
+    "title": "Konspirasi Selir Mei",
+    "unlock_condition": { "quest_completed": "q_kek_07", "flag": "selir_mei_suspicious" },
+    "gates": ["dlg_selirmei", "dlg_bayanganmerah"],
+    "effects": [
+      { "type": "morality", "heaven": -15, "earth": 10 },
+      { "type": "item", "id": "item_evidence_scroll", "quantity": 1 }
+    ],
+    "text": "Dokumen rahasia mengungkapkan kebenaran mengerikan. Selir Mei bukan hanya berambisi—ia adalah agen Benua Gelap yang menyusup 15 tahun lalu. Ritual Lonceng Angin Panjang? Itu adalah karyanya, dirancang untuk melemahkan pertahanan benua agar invasi mudah. Kematian ayahmu, kehancuran akademi, bahkan pertemuanmu dengan Chen Xu—semua adalah bagian dari rencana besar yang sudah disusun sejak awal."
+  },
+  {
+    "id": "mem_08",
+    "title": "Wajah di Balik Topeng",
+    "unlock_condition": { "battle_won": "boss_bayangan_merah" },
+    "gates": [],
+    "effects": [
+      { "type": "exp", "value": 5000 },
+      { "type": "morality", "heaven": 20, "human": 20, "earth": 20 },
+      { "type": "ending_unlock", "ending": "truth_revealed" }
+    ],
+    "text": "Topeng merah retak dan jatuh. Di baliknya... wajah yang tak pernah kau duga. 'Maafkan aku, Xu,' suara itu familiar. 'Aku juga korban ritual itu. Jiwa ku terikat pada topeng ini, dipaksa melayani kegelapan.' Ini adalah mantan gurumu, orang yang mengajarimu teknik pertama. Matanya penuh penyesalan. 'Satu-satunya cara memutus kutukan ini... adalah menghancurkan sumbernya. Kau harus pergi ke Benua Gelap.' Dengan napas terakhir, ia memberikan koordinat portal."
+  }
+]

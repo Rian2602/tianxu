@@ -1,0 +1,75 @@
+[
+  {
+    "id": "q_f2_final",
+    "title": "Takdir Benua: Pilihan Terakhir",
+    "description": "Setelah mengungkap kebenaran Selir Mei dan mengalahkan Bayangan Merah, kau berdiri di persimpangan takdir. Portal ke Benua Gelap terbuka. Apa yang akan kau lakukan?",
+    "prerequisites": ["q_kek_10"],
+    "requirements": { "min_level": 6, "cultivation_realm": "jindan" },
+    "time_window": null,
+    "rewards": { "exp": 10000, "gold": 5000, "items": [], "flags": ["faze2_complete"] },
+    "fail_conditions": [],
+    "nodes": [
+      {
+        "id": "start",
+        "type": "dialog",
+        "text": "Portal berputar di depanmu. Liu Feng, Lin Yue, dan companionmu menunggu keputusan.",
+        "choices": [
+          { "text": "Serbu Benua Gelap - Hancurkan sumber kegelapan (Heaven Path)", "next": "heaven_path", "condition": { "morality": { "heaven": 30 } } },
+          { "text": "Tutup portal - Lindungi benua sekarang (Earth Path)", "next": "earth_path", "condition": { "morality": { "earth": 30 } } },
+          { "text": "Negosiasi dengan Benua Gelap (Human Path)", "next": "human_path", "condition": { "morality": { "human": 30 } } },
+          { "text": "Gunakan kekuatan sendiri untuk segel abadi (Balance Path)", "next": "balance_path", "condition": { "moral_balance": true } }
+        ]
+      },
+      {
+        "id": "heaven_path",
+        "type": "battle",
+        "enemy_group": "benua_gelap_invasion",
+        "on_win": "heaven_ending",
+        "on_lose": "game_over"
+      },
+      {
+        "id": "heaven_ending",
+        "type": "ending",
+        "ending_id": "heaven_conqueror",
+        "text": "Kau memimpin invasi ke Benua Gelap, menghancurkan sumber kegelapan selamanya. Namun harga yang dibayar mahal - separuh benua hancur dalam perang. Kau dipuja sebagai pahlawan, tapi juga ditakuti sebagai dewa perang."
+      },
+      {
+        "id": "earth_path",
+        "type": "cutscene",
+        "text": "Dengan teknik segel kuno, kau menutup portal secara permanen. Benua Gelap terisolasi selamanya. Perdamaian kembali, tapi bayang-bayang ancaman tetap ada di luar segel.",
+        "next": "earth_ending"
+      },
+      {
+        "id": "earth_ending",
+        "type": "ending",
+        "ending_id": "earth_guardian",
+        "text": "Kau menjadi Penjaga Segel, menghabiskan sisa hidupmu memastikan portal tak pernah terbuka lagi. Generasi mendatang mengenalimu sebagai pelindung tak terlihat."
+      },
+      {
+        "id": "human_path",
+        "type": "dialog",
+        "text": "Kau memasuki portal sendirian, menemui pemimpin Benua Gelap. Setelah negosiasi alot, perjanjian damai tercapai - pertukaran budaya dan sumber daya.",
+        "next": "human_ending"
+      },
+      {
+        "id": "human_ending",
+        "type": "ending",
+        "ending_id": "human_diplomat",
+        "text": "Perdamaian abadi tercapai bukan dengan pedang, tapi dengan kata-kata. Kau menjadi duta pertama antara dua benua. Era baru kerjasama dimulai."
+      },
+      {
+        "id": "balance_path",
+        "type": "special",
+        "requirement": { "all_companions_bond3": true, "all_techniques_mastered": true },
+        "effect": "sacrifice_power",
+        "next": "balance_ending"
+      },
+      {
+        "id": "balance_ending",
+        "type": "ending",
+        "ending_id": "balance_legend",
+        "text": "Kau mengorbankan seluruh cultivation-mu untuk menciptakan segel sempurna yang menyeimbangkan cahaya dan kegelapan. Kekuatanmu hilang, tapi benua selamat. Companionmu berjanji melindungimu, seperti kau melindungi mereka."
+      }
+    ]
+  }
+]
