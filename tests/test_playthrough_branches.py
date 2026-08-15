@@ -21,7 +21,7 @@ import pytest
 
 from src.engine.session import GameSession
 
-from conftest import finish_dialog, move_path, play_to_incident  # noqa: F401
+from tests.conftest import finish_dialog, move_path, play_to_incident  # noqa: F401
 
 
 def _finish_truth(session: GameSession) -> None:

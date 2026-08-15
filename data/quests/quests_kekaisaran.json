@@ -1,0 +1,233 @@
+{
+  "quests": [
+    {
+      "id": "q_kaisar_01",
+      "title": "Panggilan Istana Naga",
+      "description": "Kaisar memanggilmu ke Istana Naga untuk membahas ancaman yang mengguncang seluruh benua.",
+      "type": "main",
+      "prerequisites": ["q_sekte_08"],
+      "rewards": {
+        "exp": 800,
+        "gold": 500,
+        "items": ["surat_undangan_istana"],
+        "reputation": {"kaisar": 20}
+      },
+      "steps": [
+        {"type": "talk", "target": "utusan_kaisar", "dialog_id": "d_kaisar_01_start"},
+        {"type": "move", "location": "istanat_naga_gate"},
+        {"type": "talk", "target": "penjaga_istana", "dialog_id": "d_kaisar_01_entry"},
+        {"type": "complete"}
+      ],
+      "branch": null,
+      "converges_to": null,
+      "time_limit_days": null,
+      "failure_conditions": [],
+      "moral_alignment": {"heaven": 0, "earth": 0, "human": 0}
+    },
+    {
+      "id": "q_kaisar_02",
+      "title": "Konspirasi di Balik Tirai",
+      "description": "Selidiki kabar burung tentang menteri yang bersekongkol dengan kultivator gelap dari luar benua.",
+      "type": "main",
+      "prerequisites": ["q_kaisar_01"],
+      "rewards": {
+        "exp": 1000,
+        "gold": 300,
+        "items": ["bukti_konspirasi"],
+        "reputation": {"kaisar": 15, "menteri_liu": -20}
+      },
+      "steps": [
+        {"type": "talk", "target": "mata_mata_kaisar", "dialog_id": "d_kaisar_02_brief"},
+        {"type": "search", "location": "distrik_menteri", "required_items": []},
+        {"type": "battle", "enemy_group": "pengawal_korup", "min_enemies": 2},
+        {"type": "talk", "target": "saksi_bisu", "dialog_id": "d_kaisar_02_testimony"},
+        {"type": "complete"}
+      ],
+      "branch": null,
+      "converges_to": null,
+      "time_limit_days": 60,
+      "failure_conditions": ["time_expired"],
+      "moral_alignment": {"heaven": 5, "earth": 0, "human": -3}
+    },
+    {
+      "id": "q_kaisar_03",
+      "title": "Ujian Kesetiaan",
+      "description": "Kaisar mengujimu dengan meminta memilih antara menyelamatkan rakyat atau menangkap konspirator.",
+      "type": "main",
+      "prerequisites": ["q_kaisar_02"],
+      "rewards": {
+        "exp": 1200,
+        "gold": 0,
+        "items": [],
+        "reputation": {"kaisar": 10}
+      },
+      "steps": [
+        {"type": "talk", "target": "kaisar_long", "dialog_id": "d_kaisar_03_trial"},
+        {"type": "choice", "options": [
+          {"label": "Selamatkan rakyat desa", "next_step": "step_save_villagers", "moral_shift": {"heaven": 10, "earth": -5, "human": 5}},
+          {"label": "Tangkap konspirator", "next_step": "step_catch_conspirator", "moral_shift": {"heaven": -5, "earth": 10, "human": -5}},
+          {"label": "Coba lakukan keduanya", "next_step": "step_both_attempt", "moral_shift": {"heaven": 5, "earth": 5, "human": 0}}
+        ]},
+        {"type": "complete"}
+      ],
+      "branch": "loyalty_test",
+      "branch_options": ["save_villagers", "catch_conspirator", "both_attempt"],
+      "converges_to": "q_kaisar_04",
+      "time_limit_days": null,
+      "failure_conditions": [],
+      "moral_alignment": {"heaven": 0, "earth": 0, "human": 0}
+    },
+    {
+      "id": "q_kaisar_04a",
+      "title": "Jejak Pengkhianat (Cabang Rakyat)",
+      "description": "Setelah menyelamatkan rakyat, lacak pengkhianat yang lolos ke perbatasan utara.",
+      "type": "main",
+      "prerequisites": ["q_kaisar_03"],
+      "branch_parent": "q_kaisar_03",
+      "branch": "save_villagers",
+      "rewards": {
+        "exp": 900,
+        "gold": 200,
+        "items": ["peta_perbatasan_utara"],
+        "reputation": {"rakyat_utara": 25, "kaisar": 5}
+      },
+      "steps": [
+        {"type": "move", "location": "perbatasan_utara"},
+        {"type": "search", "location": "kamp_pengungsi", "required_items": []},
+        {"type": "battle", "enemy_group": "prajurit_pengkhianat", "min_enemies": 3},
+        {"type": "talk", "target": "kepala_suku_utara", "dialog_id": "d_kaisar_04a_alliance"},
+        {"type": "complete"}
+      ],
+      "converges_to": "q_kaisar_05",
+      "time_limit_days": 45,
+      "failure_conditions": ["time_expired"],
+      "moral_alignment": {"heaven": 8, "earth": -2, "human": 6}
+    },
+    {
+      "id": "q_kaisar_04b",
+      "title": "Jaringan Bawah Tanah (Cabang Konspirator)",
+      "description": "Setelah menangkap konspirator, bongkar jaringan bawah tanah mereka di ibu kota.",
+      "type": "main",
+      "prerequisites": ["q_kaisar_03"],
+      "branch_parent": "q_kaisar_03",
+      "branch": "catch_conspirator",
+      "rewards": {
+        "exp": 1100,
+        "gold": 400,
+        "items": ["daftar_jaringan_rahasia"],
+        "reputation": {"kaisar": 20, "bangsawan": -15}
+      },
+      "steps": [
+        {"type": "talk", "target": "tahanan_konspirator", "dialog_id": "d_kaisar_04b_interrogation"},
+        {"type": "move", "location": "distrik_bawah_tanah"},
+        {"type": "battle", "enemy_group": "agen_rahasia", "min_enemies": 4},
+        {"type": "search", "location": "markas_rahasia", "required_items": ["kunci_besi"]},
+        {"type": "complete"}
+      ],
+      "converges_to": "q_kaisar_05",
+      "time_limit_days": 30,
+      "failure_conditions": ["time_expired", "detected_by_enemies"],
+      "moral_alignment": {"heaven": -3, "earth": 7, "human": -4}
+    },
+    {
+      "id": "q_kaisar_04c",
+      "title": "Diplomasi Di Ujung Pedang (Cabang Keduanya)",
+      "description": "Kau berhasil melakukan keduanya dengan susah payah. Sekarang negosiasikan perdamaian sambil bersiap perang.",
+      "type": "main",
+      "prerequisites": ["q_kaisar_03"],
+      "branch_parent": "q_kaisar_03",
+      "branch": "both_attempt",
+      "rewards": {
+        "exp": 1500,
+        "gold": 100,
+        "items": ["treaty_draft", "pedang_retak"],
+        "reputation": {"kaisar": 15, "rakyat_utara": 10, "bangsawan": -10}
+      },
+      "steps": [
+        {"type": "talk", "target": "duta_utara", "dialog_id": "d_kaisar_04c_negotiation"},
+        {"type": "battle", "enemy_group": "extremis_kedua_pihak", "min_enemies": 5},
+        {"type": "talk", "target": "jenderal_kaisar", "dialog_id": "d_kaisar_04c_war_prep"},
+        {"type": "complete"}
+      ],
+      "converges_to": "q_kaisar_05",
+      "time_limit_days": 20,
+      "failure_conditions": ["time_expired", "war_breaks_out"],
+      "moral_alignment": {"heaven": 3, "earth": 3, "human": 2}
+    },
+    {
+      "id": "q_kaisar_05",
+      "title": "Bangkitnya Kultivator Gelap",
+      "description": "Ancaman sebenarnya terungkap: sekte kultivator gelap dari benua sebelah telah menyusup selama bertahun-tahun.",
+      "type": "main",
+      "prerequisites": ["q_kaisar_04a", "q_kaisar_04b", "q_kaisar_04c"],
+      "rewards": {
+        "exp": 1300,
+        "gold": 600,
+        "items": ["segel_penyegel_sekte_gelap"],
+        "reputation": {"seluruh_faksi": 10}
+      },
+      "steps": [
+        {"type": "talk", "target": "mata_mata_tertinggi", "dialog_id": "d_kaisar_05_revelation"},
+        {"type": "move", "location": "kuil_kuno_tersegel"},
+        {"type": "battle", "enemy_group": "kultivator_gelap_elite", "min_enemies": 3},
+        {"type": "use_item", "item": "segel_penyegel_sekte_gelap", "target": "portal_dimensi"},
+        {"type": "complete"}
+      ],
+      "branch": null,
+      "converges_to": null,
+      "time_limit_days": null,
+      "failure_conditions": ["portal_opens_permanently"],
+      "moral_alignment": {"heaven": 15, "earth": 0, "human": 0}
+    },
+    {
+      "id": "q_kaisar_06",
+      "title": "Persekutuan Tiga Kekuatan",
+      "description": "Bentuk persekutuan antara Kekaisaran, Sekte pilihanmu, dan suku-suku perbatasan untuk menghadapi invasi.",
+      "type": "main",
+      "prerequisites": ["q_kaisar_05"],
+      "rewards": {
+        "exp": 1000,
+        "gold": 800,
+        "items": ["lencana_persekutuan"],
+        "reputation": {"kaisar": 25, "sekte_pemain": 20, "suku_perbatasan": 25}
+      },
+      "steps": [
+        {"type": "talk", "target": "kaisar_long", "dialog_id": "d_kaisar_06_proposal"},
+        {"type": "talk", "target": "master_sekte_pemain", "dialog_id": "d_kaisar_06_sekte_support"},
+        {"type": "talk", "target": "kepala_suku_utara", "dialog_id": "d_kaisar_06_suku_support"},
+        {"type": "complete"}
+      ],
+      "branch": null,
+      "converges_to": null,
+      "time_limit_days": 60,
+      "failure_conditions": ["alliance_fails"],
+      "moral_alignment": {"heaven": 5, "earth": 5, "human": 10}
+    },
+    {
+      "id": "q_kaisar_07",
+      "title": "Serangan Balik ke Benua Gelap",
+      "description": "Bawa pasukan persekutuan menyerbu markas sekte gelap di benua seberang melalui portal dimensi.",
+      "type": "main",
+      "prerequisites": ["q_kaisar_06"],
+      "rewards": {
+        "exp": 2000,
+        "gold": 1000,
+        "items": ["artefak_kuno_benua_gelap"],
+        "reputation": {"seluruh_faksi": 30}
+      },
+      "steps": [
+        {"type": "move", "location": "portal_dimensi_aktif"},
+        {"type": "battle", "enemy_group": "pasukan_gelap_invansi", "min_enemies": 6},
+        {"type": "battle", "enemy_group": "jendral_gelap", "min_enemies": 1, "boss": true},
+        {"type": "search", "location": "markas_sekte_gelap", "required_items": []},
+        {"type": "talk", "target": "penguasa_gelap", "dialog_id": "d_kaisar_07_final_confrontation"},
+        {"type": "complete"}
+      ],
+      "branch": null,
+      "converges_to": "q_f2_final",
+      "time_limit_days": null,
+      "failure_conditions": ["party_wiped_out", "portal_collapses"],
+      "moral_alignment": {"heaven": 20, "earth": 10, "human": 15}
+    }
+  ]
+}

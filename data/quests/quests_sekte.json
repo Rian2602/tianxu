@@ -1,0 +1,277 @@
+{
+  "quests": [
+    {
+      "id": "q_sekte_01",
+      "title": "Undangan Tiga Sekte",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Tiga utusan sekte besar tiba di Changfeng, membawa undangan resmi untuk Chen Xu.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_utusan_gabung",
+        "target": 3,
+        "hint": "Bicaralah dengan ketiga utusan sekte di Aula Ujian."
+      },
+      "next": [{"quest": "q_sekte_02", "branch": "b1", "label": "Lanjut"}],
+      "on_complete": {
+        "effects": [{"type": "flag", "key": "met_utusan", "value": true}],
+        "system_msg": "[Sistem] Jalanmu mulai menarik perhatian para kuat.",
+        "rewards": {"exp": 10, "gold": 20}
+      }
+    },
+    {
+      "id": "q_sekte_02",
+      "title": "Pilih Jalan Sekte",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Chen Xu harus memilih salah satu dari tiga sekte besar untuk bergabung.",
+      "objective": {
+        "kind": "choose",
+        "options": [
+          {"label": "Sekte Pedang Langit (天剑宗 Tiānjiàn Zōng)", "value": "sekte_tianjian"},
+          {"label": "Sekte Alkimia Surgawi (天丹阁 Tiāndān Gé)", "value": "sekte_tiandan"},
+          {"label": "Sekte Roh Kuno (古灵宗 Gǔlíng Zōng)", "value": "sekte_guling"}
+        ],
+        "hint": "Pilihan ini menentukan teknik, companion, dan alur quest berikutnya."
+      },
+      "next": [
+        {"quest": "q_sekte_03a", "branch": "b_tj", "choice_id": "dlg_pilih_sekte", "option": "opt_tj", "label": "Jalan Pedang"},
+        {"quest": "q_sekte_03b", "branch": "b_td", "choice_id": "dlg_pilih_sekte", "option": "opt_td", "label": "Jalan Alkimia"},
+        {"quest": "q_sekte_03c", "branch": "b_gl", "choice_id": "dlg_pilih_sekte", "option": "opt_gl", "label": "Jalan Roh"}
+      ],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "sekte_dipilih", "value": true},
+          {"type": "flag", "key": "arc_akademi_selesai", "value": true}
+        ],
+        "system_msg": "Kau memilih jalanmu. Tidak ada jalan kembali.",
+        "rewards": {"exp": 15}
+      }
+    },
+    {
+      "id": "q_sekte_03a",
+      "title": "Ujian Pedang Langit",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Sekte Pedang Langit menguji Chen Xu dengan duel melawan 3 senior.",
+      "objective": {
+        "kind": "battle_sequence",
+        "enemies": ["eno_senior_pedang_1", "eno_senior_pedang_2", "eno_senior_pedang_3"],
+        "hint": "Kalahkan 3 senior secara beruntun di Arena Pedang Langit."
+      },
+      "next": [{"quest": "q_sekte_04", "branch": "b_tj_conv", "label": "Konvergen"}],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "sekte_tianjian_masuk", "value": true},
+          {"type": "technique", "id": "tek_tj_langit_terbelah"},
+          {"type": "companion", "id": "comp_liuyan"}
+        ],
+        "rewards": {"exp": 25, "gold": 30}
+      }
+    },
+    {
+      "id": "q_sekte_03b",
+      "title": "Ujian Alkimia Surgawi",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Sekte Alkimia Surgawi menguji Chen Xu dengan meracik 3 pil langka.",
+      "objective": {
+        "kind": "craft",
+        "recipes": ["pil_qi_langka", "pil_pemulihan_master", "pil_detoksifikasi"],
+        "hint": "Racik 3 pil langka di Laboratorium Alkimia dalam waktu terbatas."
+      },
+      "next": [{"quest": "q_sekte_04", "branch": "b_td_conv", "label": "Konvergen"}],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "sekte_tiandan_masuk", "value": true},
+          {"type": "technique", "id": "tek_td_emberlian_suci"},
+          {"type": "companion", "id": "comp_danmo"}
+        ],
+        "rewards": {"exp": 25, "gold": 30}
+      }
+    },
+    {
+      "id": "q_sekte_03c",
+      "title": "Ujian Roh Kuno",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Sekte Roh Kuno menguji Chen Xu dengan ritual pemanggilan roh leluhur.",
+      "objective": {
+        "kind": "ritual",
+        "location": "loc_altar_roh_kuno",
+        "time_window": {"hour_start": 0, "hour_end": 4},
+        "hint": "Lakukan ritual pemanggilan di Altar Roh Kuno pada tengah malam."
+      },
+      "next": [{"quest": "q_sekte_04", "branch": "b_gl_conv", "label": "Konvergen"}],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "sekte_guling_masuk", "value": true},
+          {"type": "technique", "id": "tek_gl_panggil_leluhur"},
+          {"type": "companion", "id": "comp_linghu"}
+        ],
+        "rewards": {"exp": 25, "gold": 30}
+      }
+    },
+    {
+      "id": "q_sekte_04",
+      "title": "Pelatihan Intensif",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Chen Xu menjalani pelatihan intensif selama 30 hari di sekte pilihan.",
+      "objective": {
+        "kind": "advance_time",
+        "day_offset": 30,
+        "hour": 8,
+        "hint": "Habiskan 30 hari untuk pelatihan. Ranahmu akan naik."
+      },
+      "next": [{"quest": "q_sekte_05", "branch": "b2", "label": "Lanjut"}],
+      "on_complete": {
+        "effects": [
+          {"type": "realm_exp", "value": 500},
+          {"type": "flag", "key": "pelatihan_sekte_selesai", "value": true}
+        ],
+        "system_msg": "30 hari berlalu. Kau merasa Qi-mu mengalir lebih deras.",
+        "rewards": {"exp": 50}
+      }
+    },
+    {
+      "id": "q_sekte_05",
+      "title": "Eksperimen Terlarang",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Chen Xu menemukan dokumen rahasia tentang eksperimen 'Senjata Hidup' di sekte.",
+      "objective": {
+        "kind": "search",
+        "location": "loc_rahasia_gudang_sekte",
+        "time_window": {"hour_start": 23, "hour_end": 4},
+        "hint": "Selidiki gudang rahasia pada malam hari."
+      },
+      "next": [
+        {"quest": "q_sekte_06a", "branch": "b_infil", "choice_id": "dlg_reaksi_eksperimen", "option": "opt_infil", "label": "Infiltrasi — cari bukti lebih banyak"},
+        {"quest": "q_sekte_06b", "branch": "b_konfr", "choice_id": "dlg_reaksi_eksperimen", "option": "opt_konfr", "label": "Konfrontasi — hadapi guru sekte"},
+        {"quest": "q_sekte_06c", "branch": "b_manip", "choice_id": "dlg_reaksi_eksperimen", "option": "opt_manip", "label": "Manipulasi — pakai informasi ini untuk untung"}
+      ],
+      "on_complete": {
+        "effects": [{"type": "flag", "key": "temu_eksperimen", "value": true}],
+        "memory_unlock": "mem_05",
+        "system_msg": "[Sistem] Sejarah berulang. Kali ini kau punya pilihan.",
+        "rewards": {"exp": 30}
+      }
+    },
+    {
+      "id": "q_sekte_06a",
+      "title": "Infiltrasi Diam-Diam",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Chen Xu menyusup lebih dalam untuk mengumpulkan bukti kolusi tanpa terdeteksi.",
+      "objective": {
+        "kind": "gather",
+        "item": "bukti_kolusi",
+        "target": 3,
+        "report_to": "npc_mata_mata_netral",
+        "hint": "Kumpulkan 3 bukti kolusi dari dokumen rahasia sekte."
+      },
+      "next": [{"quest": "q_sekte_07", "branch": "b_infil_conv", "label": "Konvergen"}],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "branch_infil", "value": true},
+          {"type": "morality", "value": 5},
+          {"type": "relation", "npc": "npc_mata_mata_netral", "value": 10}
+        ],
+        "rewards": {"exp": 35, "gold": 40}
+      }
+    },
+    {
+      "id": "q_sekte_06b",
+      "title": "Konfrontasi Langsung",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Chen Xu menghadapi guru sekte dan menuntut penjelasan tentang eksperimen.",
+      "objective": {
+        "kind": "battle",
+        "enemy": "eno_guru_sekte_marah",
+        "hint": "Kalahkan guru sekte yang sudah tergila-gila kekuasaan."
+      },
+      "next": [{"quest": "q_sekte_07", "branch": "b_konfr_conv", "label": "Konvergen"}],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "branch_konfr", "value": true},
+          {"type": "morality", "value": 8},
+          {"type": "relation", "npc": "npc_guru_sekte_tj", "value": -20},
+          {"type": "relation", "npc": "npc_guru_sekte_td", "value": -20},
+          {"type": "relation", "npc": "npc_guru_sekte_gl", "value": -20}
+        ],
+        "rewards": {"exp": 50, "gold": 60}
+      }
+    },
+    {
+      "id": "q_sekte_06c",
+      "title": "Main Kedua Sisi",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Chen Xu memanipulasi situasi untuk keuntungan pribadi — menjual info ke kedua pihak.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_pedagang_info",
+        "target": 2,
+        "hint": "Jual informasi ke pedagang info hitam tertinggi."
+      },
+      "next": [{"quest": "q_sekte_07", "branch": "b_manip_conv", "label": "Konvergen"}],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "branch_manip", "value": true},
+          {"type": "morality", "value": -10},
+          {"type": "gold", "value": 100}
+        ],
+        "system_msg": "[Sistem] Mengambil. Seperti yang lain.",
+        "rewards": {"exp": 25}
+      }
+    },
+    {
+      "id": "q_sekte_07",
+      "title": "Kolusi Terungkap",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Ketiga sekte ternyata berkolusi dalam eksperimen Senjata Hidup — ini lebih besar dari yang dikira.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mata_mata_netral",
+        "target": 1,
+        "hint": "Temui mata-mata yang membawa bukti lengkap kolusi."
+      },
+      "next": [{"quest": "q_sekte_08", "branch": "b3", "label": "Lanjut"}],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "kolusi_terbukti", "value": true},
+          {"type": "flag", "key": "sekte_musuh", "value": ["sekte_tianjian", "sekte_tiandan", "sekte_guling"]}
+        ],
+        "rewards": {"exp": 35}
+      }
+    },
+    {
+      "id": "q_sekte_08",
+      "title": "Jalan yang Kau Pilih",
+      "arc": "sekte",
+      "kind": "main",
+      "summary": "Chen Xu memutuskan bagaimana menghadapi kolusi sekte.",
+      "objective": {
+        "kind": "choose",
+        "options": [
+          {"label": "Hancurkan ketiganya (jalan kekerasan)", "value": "hancurkan_sekte"},
+          {"label": "Bongkar ke publik (jalan reformis)", "value": "bongkar_publik"},
+          {"label": "Biarkan, fokus ke kekaisaran (jalan pragmatis)", "value": "abaikan_sekte"}
+        ],
+        "hint": "Pilihan ini memengaruhi world-state Fase 3."
+      },
+      "next": [{"quest": "q_kek_01", "branch": "b4", "label": "Lanjut ke Kekaisaran"}],
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "arc_sekte_selesai", "value": true},
+          {"type": "morality", "value": 10}
+        ],
+        "system_msg": "[Sistem] Langkah pertama menuju perubahan — atau kehancuran.",
+        "rewards": {"exp": 40, "gold": 50}
+      }
+    }
+  ]
+}

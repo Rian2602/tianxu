@@ -1,0 +1,356 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_liufeng",
+      "npc": "npc_jenderal_liu",
+      "start": "node_greet_liu",
+      "nodes": {
+        "node_ulang_liu": {
+          "condition": { "flag": { "key": "met_liufeng", "value": true } },
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Chen Xu, kau kembali. Pasukan masih berlatih di lapangan. Ada yang ingin kau bicarakan?",
+          "choices": [
+            { "label": "Ceritakan tentang ayahanda Long Tianxu.", "next": "node_cerita_ayah", "condition": { "memory": { "key": "mem_01", "unlocked": true } } },
+            { "label": "Apa kabar di perbatasan?", "next": "node_kabar_perbatasan" },
+            { "label": "(Aku hanya lewat — sampai jumpa)", "next": "node_pergi_liu" }
+          ]
+        },
+        "node_cerita_ayah": {
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Long Tianxu... anak itu adalah harapan kekaisaran. Aku melatihnya sendiri sejak usia sepuluh tahun. Dia punya bakat yang tidak pernah kulihat sebelumnya — tapi juga beban yang terlalu berat untuk dipikul seorang anak.",
+          "next": "node_cerita_ayah_lanjut"
+        },
+        "node_cerita_ayah_lanjut": {
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Dia selalu bertanya: 'Apakah kekuatan untuk melindungi, atau untuk menguasai?' Aku tidak pernah bisa menjawabnya dengan pasti. Sekarang... aku bahkan tidak tahu apakah dia masih hidup.",
+          "end": true
+        },
+        "node_kabar_perbatasan": {
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Kabar? Pasukan kultivator gelap semakin sering menyeberang dari benua seberang. Mereka mencari sesuatu — artefak kuno, mungkin. Kaisar mengirim mata-mata, tapi belum ada kabar jelas.",
+          "next": "node_ulang_liu"
+        },
+        "node_pergi_liu": {
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Pergilah. Dan hati-hati di jalan — ibukota tidak seaman dulu lagi.",
+          "end": true
+        },
+        "node_greet_liu": {
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Berhenti. Kau Chen Xu yang mendapat undangan istana? Aku Liu Feng — jenderal pensiunan yang dulu melatih ayahanda Long Tianxu.",
+          "choices": [
+            { "label": "Hormat padamu, Jenderal. Aku datang untuk membantu kekaisaran.", "next": "node_welcome_liu" },
+            { "label": "(Mengangguk hormat)", "next": "node_welcome_liu_singkat" }
+          ]
+        },
+        "node_welcome_liu": {
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Membantu kekaisaran? Kata-kata yang mulia. Tapi ketahuilah — di ibukota ini, bantuan seringkali berarti kematian. Banyak yang datang dengan niat baik, berakhir sebagai mayat di selokan.",
+          "next": "node_direct_liu"
+        },
+        "node_welcome_liu_singkat": {
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Diam tapi hormat. Lebih baik daripada banyak janji kosong. Masuklah.",
+          "next": "node_direct_liu"
+        },
+        "node_direct_liu": {
+          "speaker": "npc:npc_jenderal_liu",
+          "text": "Jika kau benar-benar ingin membantu, mulailah dengan mendengarkan. Jangan terburu-buru bertindak — di sini, informasi lebih berharga daripada pedang. Itu semua yang perlu kau tahu.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_selirmei",
+      "npc": "npc_selir_mei",
+      "start": "node_greet_mei",
+      "nodes": {
+        "node_ulang_mei": {
+          "condition": { "flag": { "key": "met_selirmei", "value": true } },
+          "speaker": "npc:npc_selir_mei",
+          "text": "Chen Xu, kau kembali ke sayap timur ini. Ada yang ingin kau tanyakan padaku?",
+          "choices": [
+            { "label": "Apa yang terjadi pada ayahanda Long Tianxu?", "next": "node_tanya_ayah", "condition": { "memory": { "key": "mem_01", "unlocked": true } } },
+            { "label": "Apakah kau meracuni ayahanda?", "next": "node_tanya_racun" },
+            { "label": "(Aku hanya lewat)", "next": "node_pergi_mei" }
+          ]
+        },
+        "node_tanya_ayah": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Long Tianxu... anak itu adalah cahaya di tengah kegelapan istana ini. Aku bukan ibu kandungnya, tapi aku mencintainya seperti anak sendiri. Ketika dia diusir, hatiku hancur.",
+          "next": "node_tanya_ayah_lanjut"
+        },
+        "node_tanya_ayah_lanjut": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Katakan padaku, Chen Xu — apakah dia masih hidup? Apakah dia bahagia di luar tembok istana ini?",
+          "choices": [
+            { "label": "Dia tewas. (Bohong untuk melindunginya)", "next": "node_jawab_bohong", "effects": [ { "type": "morality", "heaven": -5, "human": -5 } ] },
+            { "label": "Dia hidup, dan sedang membangun kekuatan. (Jujur)", "next": "node_jawab_jujur", "effects": [ { "type": "morality", "heaven": 5, "human": 5 } ] },
+            { "label": "(Diam saja)", "next": "node_jawab_diam" }
+          ]
+        },
+        "node_jawab_bohong": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Oh... tidak... Semoga arwahnya menemukan kedamaian. Terima kasih sudah memberitahuku, meski pahit.",
+          "end": true
+        },
+        "node_jawab_jujur": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Syukurlah! Kalau begitu, ada harapan. Dengar, Chen Xu — jika dia benar-benar hidup, katakan padanya: Selir Mei tidak pernah mengkhianatinya. Fitnah itu bukan dariku.",
+          "end": true
+        },
+        "node_jawab_diam": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Diam? Aku mengerti. Beberapa kebenaran terlalu berat untuk diucapkan. Terima kasih sudah datang.",
+          "end": true
+        },
+        "node_tanya_racun": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Meracuni? Tidak! Demi langit dan bumi, aku tidak pernah menyentuh racun! Aku difitnah — ada yang ingin menyingkirkanku karena aku satu-satunya yang tahu rahasia tertentu.",
+          "next": "node_tanya_racun_lanjut"
+        },
+        "node_tanya_racun_lanjut": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Dengar — yang meracuni Long Tianxu bukan dari dalam istana. Ada tangan dari luar, dari sekte gelap benua seberang. Tapi jangan sebarkan ini — nyawamu akan terancam.",
+          "end": true
+        },
+        "node_pergi_mei": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Pergilah. Dan ingat — di istana ini, dinding memiliki telinga.",
+          "end": true
+        },
+        "node_greet_mei": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Selamat datang di Sayap Timur, Chen Xu. Aku Selir Mei — salah satu selir ayahanda Long Tianxu. Maafkan tempat yang sederhana ini — aku bukan lagi favorit kaisar sekarang.",
+          "choices": [
+            { "label": "Aku datang untuk menanyakan kebenaran tentang masa lalu.", "next": "node_kebenaran_mei" },
+            { "label": "(Mengangguk hormat)", "next": "node_hormat_mei" }
+          ]
+        },
+        "node_kebenaran_mei": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Kebenaran? Kebenaran di istana ini adalah barang langka. Setiap orang punya versinya sendiri. Tapi jika kau mencari kejujuran... aku akan berusaha sejujur mungkin.",
+          "next": "node_ulang_mei"
+        },
+        "node_hormat_mei": {
+          "speaker": "npc:npc_selir_mei",
+          "text": "Sikap yang baik. Jarang ada yang masih menghormati wanita tua seperti aku. Silakan duduk — ada yang ingin kau bicarakan?",
+          "next": "node_ulang_mei"
+        }
+      }
+    },
+    {
+      "id": "dlg_pangeranhao",
+      "npc": "npc_pangeran_hao",
+      "start": "node_greet_hao",
+      "nodes": {
+        "node_ulang_hao": {
+          "condition": { "flag": { "key": "met_pangeranhao", "value": true } },
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Chen Xu, kau lagi? Istana bukan tempat untuk berkel tanpa tujuan. Apa yang kau inginkan kali ini?",
+          "choices": [
+            { "label": "Yang Mulia, aku ingin melaporkan ancaman dari benua seberang.", "next": "node_lapor_ancaman" },
+            { "label": "Apakah Yang Mulia tahu tentang kematian kakanda Long Tianxu?", "next": "node_tanya_kakanda", "condition": { "memory": { "key": "mem_01", "unlocked": true } } },
+            { "label": "(Aku hanya lewat)", "next": "node_pergi_hao" }
+          ]
+        },
+        "node_lapor_ancaman": {
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Ancaman dari benua seberang? Mata-mataku sudah melaporkan hal yang sama. Tapi dewan menteri masih ragu — mereka bilang itu hanya rumor.",
+          "next": "node_lapor_ancaman_lanjut"
+        },
+        "node_lapor_ancaman_lanjut": {
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Jika kau bisa membawa bukti konkret, aku akan mendukungmu dengan seluruh kekuatan kekaisaran. Tapi jangan main-main dengan laporan palsu — konsekuensinya fatal.",
+          "end": true
+        },
+        "node_tanya_kakanda": {
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Kakanda Long Tianxu... (suara rendah) Ya, aku tahu dia tewas tahun lalu. Kabar itu resmi disampaikan oleh ayahanda sebelum wafat.",
+          "next": "node_tanya_kakanda_lanjut"
+        },
+        "node_tanya_kakanda_lanjut": {
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Tapi kadang... aku bermimpi bahwa dia masih hidup. Bahwa dia akan kembali dan menantang tahtaku. Apakah aku takut? Tidak. Aku justru berharap itu terjadi — setidaknya aku bisa meminta maaf secara langsung.",
+          "end": true
+        },
+        "node_pergi_hao": {
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Pergilah. Dan jangan lupa — audiensi berikutnya butuh izin tertulis dari perdana menteri.",
+          "end": true
+        },
+        "node_greet_hao": {
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Chen Xu. Aku Pangeran Hao — sekarang Kaisar setelah kematian ayahanda dan kakandaku. Duduklah. Apa yang membawa rakyat biasa ke ruang tahtaku?",
+          "choices": [
+            { "label": "Yang Mulia, aku membawa berita penting tentang keamanan kekaisaran.", "next": "node_berita_penting" },
+            { "label": "(Bersujud hormat)", "next": "node_bersujud" }
+          ]
+        },
+        "node_berita_penting": {
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Penting? Semoga memang penting. Waktu kaisar terbatas — setiap hari ada seratus masalah yang minta diselesaikan. Bicaralah.",
+          "next": "node_ulang_hao"
+        },
+        "node_bersujud": {
+          "speaker": "npc:npc_pangeran_hao",
+          "text": "Bangunlah. Aku bukan tiran — tidak perlu bersujud seperti di era lama. Katakan apa yang perlu kau katakan.",
+          "next": "node_ulang_hao"
+        }
+      }
+    },
+    {
+      "id": "dlg_linyue",
+      "npc": "npc_lin_yue",
+      "start": "node_greet_yue",
+      "nodes": {
+        "node_ulang_yue": {
+          "condition": { "flag": { "key": "met_linyue", "value": true } },
+          "speaker": "npc:npc_lin_yue",
+          "text": "Chen Xu... kau kembali lagi ke paviliun ini. Apa yang masih kau cari dariku?",
+          "choices": [
+            { "label": "Apakah kau mengenali aku?", "next": "node_kenal", "condition": { "memory": { "key": "mem_07", "unlocked": true } } },
+            { "label": "Mengapa kau menikah dengan Pangeran Hao?", "next": "node_tanya_nikah" },
+            { "label": "(Aku hanya lewat)", "next": "node_pergi_yue" }
+          ]
+        },
+        "node_kenal": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Mengenali? (tatapan tajam) Wajahmu berbeda, tapi matamu... matanya sama. Long Tianxu, apakah itu benar-benar kau?",
+          "next": "node_kenal_lanjut"
+        },
+        "node_kenal_lanjut": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Jika iya, mengapa kau tidak mengaku? Takut? Malu? Atau... kau sudah bukan Long Tianxu lagi?",
+          "choices": [
+            { "label": "Aku adalah Chen Xu sekarang. Long Tianxu sudah mati.", "next": "node_jawab_chenxu", "effects": [ { "type": "morality", "human": -5 } ] },
+            { "label": "Aku Long Tianxu, tapi aku harus merahasiakannya.", "next": "node_jawab_tianxu", "effects": [ { "type": "morality", "human": 5 } ] },
+            { "label": "(Diam, tatap balik)", "next": "node_jawab_diam_yue" }
+          ]
+        },
+        "node_jawab_chenxu": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Chen Xu... baiklah. Jika itu yang kau pilih, aku akan menghormatinya. Tapi ketahuilah — hatiku masih mengingat Long Tianxu, siapapun kau sekarang.",
+          "end": true
+        },
+        "node_jawab_tianxu": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Syukurlah! Kau masih hidup! Tapi jangan ceritakan ini pada siapa pun — Pangeran Hao akan murka. Aku akan merahasiakannya, demi cinta kita dulu.",
+          "end": true
+        },
+        "node_jawab_diam_yue": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Diam? Mungkin itu jawaban terbaik. Beberapa hal lebih baik tidak diucapkan. Terima kasih sudah datang, Chen Xu.",
+          "end": true
+        },
+        "node_tanya_nikah": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Menikah dengan Hao? Itu bukan pilihan — itu perintah. Setelah Long Tianxu diusir, ayahandanya memaksaku untuk menikahi Hao agar aliansi keluarga tetap kuat.",
+          "next": "node_tanya_nikah_lanjut"
+        },
+        "node_tanya_nikah_lanjut": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Apakah aku mencintainya? Tidak. Tapi aku belajar hidup dengannya. Dan sekarang... aku bahkan tidak tahu apakah aku masih manusia atau hanya boneka istana.",
+          "end": true
+        },
+        "node_pergi_yue": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Pergilah. Sebelum someone melihatmu di sini dan mulai bertanya.",
+          "end": true
+        },
+        "node_greet_yue": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Siapa kau? Oh, Chen Xu — pahlawan baru istana. Aku Lin Yue, permaisuri Pangeran Hao. Selamat datang di paviliun ku.",
+          "choices": [
+            { "label": "Yang Mulia Permaisuri, aku datang untuk...(ragu)", "next": "node_ragu_yue" },
+            { "label": "(Mengamati wajahnya dengan teliti)", "next": "node_amati_yue" }
+          ]
+        },
+        "node_ragu_yue": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Ragu? Lanjutkan. Aku sudah terbiasa dengan orang yang tidak tahu bagaimana berbicara padaku.",
+          "next": "node_ulang_yue"
+        },
+        "node_amati_yue": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Ada apa dengan tatapanmu? Seolah-olah kau mengenali seseorang di wajahku. Apakah kita pernah bertemu sebelumnya?",
+          "next": "node_ulang_yue"
+        }
+      }
+    },
+    {
+      "id": "dlg_bayanganmerah",
+      "npc": "npc_pembunuh_bayangan",
+      "start": "node_greet_bayangan",
+      "nodes": {
+        "node_ulang_bayangan": {
+          "condition": { "flag": { "key": "met_bayanganmerah", "value": true } },
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Kau lagi, Chen Xu. Masih belum menyerah mengejar bayangan? Berhati-hatilah — beberapa rahasia lebih baik tetap terkubur.",
+          "choices": [
+            { "label": "Aku tahu siapa kau sebenarnya.", "next": "node_bongkar", "condition": { "memory": { "key": "mem_08", "unlocked": true } } },
+            { "label": "Mengapa kau mengikutiku?", "next": "node_tanya_ikuti" },
+            { "label": "(Siaga untuk bertarung)", "next": "node_siaga_bayarung" }
+          ]
+        },
+        "node_bongkar": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Tahu? (tertawa pahit) Jadi kau sudah menemukan ingatan itu. Bagus. Maka kau tahu bahwa aku adalah murid kesayangan Long Tianxu — yang menusuknya dari belakang.",
+          "next": "node_bongkar_lanjut"
+        },
+        "node_bongkar_lanjut": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Tapi ketahuilah — aku tidak melakukannya karena kebencian. Aku melakukannya karena diperintah. Dan perintah itu datang dari... (terdiam) Tidak, itu rahasia yang akan kubawa ke kubur.",
+          "end": true
+        },
+        "node_tanya_ikuti": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Mengikuti? Bukan mengikut — mengamati. Ada harga di kepalamu, Chen Xu. Tapi aku belum memutuskan apakah akan menagihnya atau membiarkanmu hidup.",
+          "next": "node_tanya_ikuti_lanjut"
+        },
+        "node_tanya_ikuti_lanjut": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Jika kau bijak, kau akan meninggalkan ibukota ini. Lupakan masa lalu, lupakan Long Tianxu. Hiduplah sebagai Chen Xu. Itu saran gratis dariku.",
+          "end": true
+        },
+        "node_siaga_bayarung": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Siaga? Bagus. Artinya kau punya insting bertahan. Tapi ketahuilah — jika kita bertarung di sini, salah satu dari kita tidak akan keluar hidup-hidup. Apakah itu yang kau mau?",
+          "choices": [
+            { "label": "Ya! Serang!", "next": "node_mulai_battle", "effects": [ { "type": "battle", "enemy_group": "bayangan_merah_boss" } ] },
+            { "label": "Tidak. Katakan dulu siapa dalang sebenarnya.", "next": "node_tanya_dalang" },
+            { "label": "(Turunkan senjata)", "next": "node_turun_senjata" }
+          ]
+        },
+        "node_mulai_battle": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Pilihan bodoh. Tapi aku menghargai keberanianmu. Mari kita lihat apakah kau sebaik rumor yang beredar.",
+          "end": true
+        },
+        "node_tanya_dalang": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Dalang? (tertawa) Kau pikir aku akan memberitahumu? Bahkan jika aku tahu — yang sudah mati tidak bisa bicara. Pergilah, sebelum aku berubah pikiran.",
+          "end": true
+        },
+        "node_turun_senjata": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Bijak. Sangat bijak. Mungkin kau memang berbeda dari Long Tianxu — dia tidak pernah mundur dari pertarungan. Tapi kadang, mundur adalah cara terbaik untuk menang.",
+          "end": true
+        },
+        "node_greet_bayangan": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Jadi, kau akhirnya menemukanku. Aku Bayangan Merah — mantan murid kesayangan Long Tianxu. Atau seharusnya kukatakan: pengkhianatnya?",
+          "choices": [
+            { "label": "Mengapa kau mengkhianatinya?", "next": "node_tanya_khianat" },
+            { "label": "(Pedang terhunus, siap bertarung)", "next": "node_siaga_bayarung" }
+          ]
+        },
+        "node_tanya_khianat": {
+          "speaker": "npc:npc_pembunuh_bayangan",
+          "text": "Mengapa? Pertanyaan yang bagus. Mungkin karena paksaan. Mungkin karena uang. Atau mungkin... karena aku percaya itu yang terbaik untuk kekaisaran. Mana yang benar? Kau tidak akan pernah tahu.",
+          "next": "node_ulang_bayangan"
+        }
+      }
+    }
+  ]
+}

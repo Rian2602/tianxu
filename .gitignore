@@ -1,29 +1,55 @@
-# Python
+```gitignore
+# Python cache files
 __pycache__/
-*.py[cod]
-*.egg-info/
-.venv/
-venv/
-.venv-assets/
+*.pyc
+*.pyo
+*.pyd
 
-# Runtime / save game
-saves/*.json
-
-# Tooling
+# Test cache files
 .pytest_cache/
-.mypy_cache/
-.ruff_cache/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Coverage reports
 .coverage
-graphify-out/
-
-# Proses pengembangan (artefak orchestration, tidak dipublikasikan)
-.agents/
-ORIGINAL_REQUEST.md
-.superpowers/
-
-# Coverage HTML
 htmlcov/
+coverage/
 
-# OS
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Dependencies
+.venv/
+venv/
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# Compiled files
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.a
+*.o
+```

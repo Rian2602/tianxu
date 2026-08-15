@@ -257,7 +257,7 @@ def test_grounding_blocked_in_unsafe_zone(dummy_session):
 
 def test_branch_dialog_included_in_apply_action_view(session, god_mode):
     """Memastikan view yang dikembalikan apply_action menyertakan dialog cabang saat quest bercabang selesai."""
-    from conftest import finish_dialog, move_path
+    from tests.conftest import finish_dialog, move_path
 
     session.apply_action({"type": "talk", "npc": "npc_penjaga"})
     finish_dialog(session, [0])
@@ -621,7 +621,7 @@ def test_transisi_arc_via_next(session, god_mode):
     reg.quest_by_id["q_akademi_07"]["next"] = [{"quest": "q_arc2_01"}]
 
     # selesaikan arc 1 (cabang 3aa)
-    from test_playthrough_branches import _play_3aa
+    from tests.test_playthrough_branches import _play_3aa
     _play_3aa(session)
 
     # transisi otomatis: arc 2 aktif; arc_summary masih menunjuk arc 1
@@ -631,7 +631,7 @@ def test_transisi_arc_via_next(session, god_mode):
 
     # selesaikan arc 2 (talk moyun → reach paviliun → talk suqing)
     session.apply_action({"type": "talk", "npc": "npc_moyun"})
-    from conftest import finish_dialog
+    from tests.conftest import finish_dialog
     finish_dialog(session)
     assert session.state.current_quest == "q_arc2_02"
     session.apply_action({"type": "move", "to": "loc_paviliun"})

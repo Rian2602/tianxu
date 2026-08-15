@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from conftest import finish_dialog, move_path
+from tests.conftest import finish_dialog, move_path
 from src.engine.dialog import DialogEngine
 
 
@@ -72,7 +72,7 @@ def test_penjaga_kabar_lonceng_setelah_insiden(session):
 
 def test_konfrontasi_pilihan_efek_beda(session, god_mode):
     """J3#6: opsi 'menuntut' (0) memberi morality +1; opsi 'diam' (1) tidak — hilangkan choice illusion."""
-    from conftest import play_to_incident
+    from tests.conftest import play_to_incident
     from src.engine.session import GameSession
 
     def morality_delta(idx):
@@ -95,7 +95,7 @@ def test_konfrontasi_pilihan_efek_beda(session, god_mode):
 
 def test_reaksi_3ab(session, god_mode):
     """G4c: cabang 3ab mendapat reaksi khusus (Su Qing hangat, Han Xiu respect, Zhou Yan bersyukur)."""
-    from conftest import play_to_incident
+    from tests.conftest import play_to_incident
     from src.engine.session import GameSession
 
     s = GameSession.new(session.reg)
@@ -133,7 +133,7 @@ def test_entri_kondisional_suqing(session, god_mode):
     assert "Su Qing" in session.dialog.view()["text"] or "teman sekelas" in session.dialog.view()["text"]
 
     # selesaikan sampai cabang 3b → Su Qing kecewa
-    from conftest import play_to_incident
+    from tests.conftest import play_to_incident
     from src.engine.session import GameSession
 
     s = GameSession.new(session.reg)
@@ -158,7 +158,7 @@ def test_efek_pilihan_dialog(session):
 
 
 def test_branch_option_dipilih(session, god_mode):
-    from conftest import play_to_incident
+    from tests.conftest import play_to_incident
 
     play_to_incident(session)
     finish_dialog(session, [1])  # manfaatkan situasi → opt_3b
@@ -167,7 +167,7 @@ def test_branch_option_dipilih(session, god_mode):
 
 
 def test_start_quest_hanya_jika_bisa_ditawarkan(session, god_mode):
-    from conftest import play_to_incident
+    from tests.conftest import play_to_incident
 
     play_to_incident(session)
     # side quest tersedia sejak hari 1 (available_from day 1 hour 8) → opsi muncul
@@ -189,7 +189,7 @@ def test_start_quest_hanya_jika_bisa_ditawarkan(session, god_mode):
 
 def test_side_quest_dimulai_dan_selesai(session, god_mode):
     """Efek start_quest benar-benar mengaktifkan side quest; lalu bisa selesai & diulang."""
-    from conftest import move_path, play_to_incident
+    from tests.conftest import move_path, play_to_incident
 
     play_to_incident(session)
     finish_dialog(session, [1])  # tutup dialog insiden (cabang 3b)
@@ -452,7 +452,7 @@ def test_spar_menang_menaikkan_relation(session, monkeypatch):
 
 def test_hanxiu_tip_spar_saat_relation_tinggi(session, god_mode):
     """P1-2: hubungan tinggi dengan Han Xiu (sparring berulang) membuka node tip spar."""
-    from conftest import move_path
+    from tests.conftest import move_path
 
     session.state.flags["spar_ujian_selesai"] = True
     move_path(session, ["loc_aula_ujian", "loc_arena"])
@@ -469,7 +469,7 @@ def test_hanxiu_tip_spar_saat_relation_tinggi(session, god_mode):
 
 def test_gucanghai_akui_latihan_saat_relation_tinggi(session, god_mode):
     """P1-2: hubungan tinggi dengan Gu Canghai membuka node pengakuan ketekunan."""
-    from conftest import move_path
+    from tests.conftest import move_path
 
     session.state.flags["ujian_akar_selesai"] = True
     move_path(session, ["loc_aula_ujian"])
@@ -521,7 +521,7 @@ def test_pilihan_gated_memory(session):
 
 def test_moyun_pilihan_ingatan_muncul_saat_q07(session, god_mode):
     """P1-1: di q07, pilihan terkait mem_02 muncul di node_penutup setelah ingatan pulih (3aa)."""
-    from conftest import play_to_incident
+    from tests.conftest import play_to_incident
     from src.engine.session import GameSession
 
     s = GameSession.new(session.reg)
@@ -546,7 +546,7 @@ def test_moyun_pilihan_ingatan_muncul_saat_q07(session, god_mode):
 
 def test_gucanghai_pilihan_ingatan_muncul(session, god_mode):
     """P1-1: node_umum Gu Canghai menampilkan pilihan duka tua hanya setelah mem_01 pulih."""
-    from conftest import move_path
+    from tests.conftest import move_path
 
     move_path(session, ["loc_aula_ujian"])
     # tanpa mem_01 → hanya 2 pilihan nasihat
@@ -673,7 +673,7 @@ def test_quest_talk_tanpa_node_perilaku_lama(session, monkeypatch):
 def test_3aa_konfrontasi_saat_quest_aktif(session, god_mode):
     """A2+A3: saat q_akademi_3aa aktif, bicara Penatua langsung membuka
     node_konfrontasi (bukan node_umum) — urutan naratif cabang benar."""
-    from conftest import play_to_incident
+    from tests.conftest import play_to_incident
 
     play_to_incident(session)
     finish_dialog(session, [0, 0])  # membongkar → konfrontasi langsung = opt_3aa
@@ -701,7 +701,7 @@ def test_suqing_intro_friendly_choice_relation(session):
 
 def test_suqing_dialog_memory_branch(session):
     """Cabang dialog ingatan (mem_01) pada Su Qing hanya muncul saat ingatan terbuka."""
-    from conftest import finish_dialog
+    from tests.conftest import finish_dialog
     session.state.flags["hari_pertama_selesai"] = True
     session.state.location = "loc_paviliun"
     # Tanpa ingatan mem_01

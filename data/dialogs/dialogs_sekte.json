@@ -1,0 +1,360 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_guru_tj",
+      "npc": "npc_guru_sekte_tj",
+      "start": "node_greet_tj",
+      "nodes": {
+        "node_ulang_tj": {
+          "condition": { "flag": { "key": "met_guru_tj", "value": true } },
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Kau kembali, Chen Xu. Jalan Pedang tidak menunggu siapa pun. Ada yang ingin kau pelajari?",
+          "choices": [
+            { "label": "Ajarkan aku teknik pedang tingkat lanjut.", "next": "node_pelajaran_pedang" },
+            { "label": "Apa kabar di Sekte Pedang Langit?", "next": "node_kabar_tj" },
+            { "label": "(Aku hanya lewat — sampai jumpa)", "next": "node_pergi_tj" }
+          ]
+        },
+        "node_pelajaran_pedang": {
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Pedang bukan sekadar besi — ia adalah perpanjangan jiwa. Teknik ini disebut 'Tebasan Awan Terbelah' (裂云 Liè Yún). Fokuskan Qi api ke ujung pedang, lalu tebas dengan kecepatan yang tak terlihat mata.",
+          "choices": [
+            { "label": "(Mempelajari teknik Tebesan Awan Terbelah)", "next": "node_pelajaran_pedang_selesai", "effects": [ { "type": "technique", "id": "tek_pedang_awan_terbelah" } ] }
+          ]
+        },
+        "node_pelajaran_pedang_selesai": {
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Bagus. Tapi ingat — kecepatan tanpa arah hanyalah kesia-siaan. Latihlah teknik ini di arena sparing hingga menjadi satu dengan napasmu. Pergilah.",
+          "end": true
+        },
+        "node_kabar_tj": {
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Kabar? Murid-murid baru masih berguguran di ujian awal. Beberapa senior pergi ke perbatasan utara untuk membasmi kultivator gelap. Di Sekte Pedang Langit, yang lemah tidak bertahan — itu hukum alam.",
+          "next": "node_ulang_tj"
+        },
+        "node_pergi_tj": {
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Hmph. Jangan buang waktumu. Arena sparing menunggumu, bukan gerbang ini.",
+          "end": true
+        },
+        "node_greet_tj": {
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Berhenti. Kau Chen Xu yang mendapat undangan Sekte Pedang Langit? Aku Elder Jian — guru penanggung jawab paviliun pedang.",
+          "choices": [
+            { "label": "Ya, Guru Elder. Aku datang untuk belajar jalan pedang sejati.", "next": "node_welcome_tj" },
+            { "label": "(Mengangguk hormat)", "next": "node_welcome_tj_singkat" }
+          ]
+        },
+        "node_welcome_tj": {
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Bagus. Banyak yang bermimpi menguasai pedang, tapi sedikit yang mau membayar harganya. Di sini, kau akan belajar bahwa satu tebasan bisa membelah takdir — atau mengakhiri nyawamu sendiri.",
+          "next": "node_direct_tj"
+        },
+        "node_welcome_tj_singkat": {
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Diam tapi hormat. Lebih baik daripada banyak bicara tapi kosong. Masuklah ke paviliun.",
+          "next": "node_direct_tj"
+        },
+        "node_direct_tj": {
+          "speaker": "npc:npc_guru_sekte_tj",
+          "text": "Paviliun Pedang ada di depan. Temui rekan-rekan barumu — tapi jangan harap mereka akan lembut padamu. Di sini, yang kuat bertahan, yang lemah gugur. Itu semua yang perlu kau tahu.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_guru_td",
+      "npc": "npc_guru_sekte_td",
+      "start": "node_greet_td",
+      "nodes": {
+        "node_ulang_td": {
+          "condition": { "flag": { "key": "met_guru_td", "value": true } },
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Ah, Chen Xu. Pil sudah siap di laboratorium. Ada yang ingin kau pelajari tentang alkimia?",
+          "choices": [
+            { "label": "Ajarkan aku teknik meracik pil tingkat lanjut.", "next": "node_pelajaran_pil" },
+            { "label": "Apa kabar di Sekte Alkimia Surgawi?", "next": "node_kabar_td" },
+            { "label": "(Aku hanya lewat — sampai jumpa)", "next": "node_pergi_td" }
+          ]
+        },
+        "node_pelajaran_pil": {
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Pil adalah esensi Qi yang dipadatkan. Teknik ini disebut 'Ekstraksi Sembilan Murni' (九净 Jiǔ Jìng). Dengan ini, kau bisa mengekstrak kemurnian bahan pil hingga 90% — hasil jauh lebih efektif.",
+          "choices": [
+            { "label": "(Mempelajari teknik Ekstraksi Sembilan Murni)", "next": "node_pelajaran_pil_selesai", "effects": [ { "type": "technique", "id": "tek_alchemy_ekstraksi_sembilan" } ] }
+          ]
+        },
+        "node_pelajaran_pil_selesai": {
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Ingat — kesabaran adalah kunci alkimia. Terburu-buru hanya menghasilkan pil cacat. Latihlah teknik ini di laboratorium hingga sempurna. Pergilah.",
+          "end": true
+        },
+        "node_kabar_td": {
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Kabar? Stok obat langka menipis karena permintaan dari perbatasan meningkat. Beberapa murid mencoba eksperimen terlarang — mereka sudah kuhukum. Di Sekte Alkimia, kesalahan kecil bisa berarti kematian massal.",
+          "next": "node_ulang_td"
+        },
+        "node_pergi_td": {
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Jangan lupa: laboratorium menunggumu. Jangan habiskan waktumu berkelana tanpa tujuan.",
+          "end": true
+        },
+        "node_greet_td": {
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Selamat datang, Chen Xu. Aku Master Ding — kepala Sekte Alkimia Surgawi. Kau punya bakat — itu sebabnya kami mengundangnya.",
+          "choices": [
+            { "label": "Terima kasih, Guru Master. Aku ingin mempelajari jalan alkimia sejati.", "next": "node_welcome_td" },
+            { "label": "(Mengangguk hormat)", "next": "node_welcome_td_singkat" }
+          ]
+        },
+        "node_welcome_td": {
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Bagus. Alkimia bukan sekadar mencampur bahan — ia adalah seni menyeimbangkan lima elemen untuk menciptakan keajaiban. Di sini, kau akan belajar bahwa satu pil bisa menyelamatkan nyawa — atau menghancurkan seluruh kota.",
+          "next": "node_direct_td"
+        },
+        "node_welcome_td_singkat": {
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Sikap yang baik. Kata-kata berlebihan hanya membuang napas. Masuklah ke paviliun.",
+          "next": "node_direct_td"
+        },
+        "node_direct_td": {
+          "speaker": "npc:npc_guru_sekte_td",
+          "text": "Laboratorium Alkimia ada di sayap timur. Temui rekan-rekan barumu — tapi jangan sentuh peralatan mereka tanpa izin. Di sini, presisi adalah segalanya. Itu semua yang perlu kau tahu.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_guru_gl",
+      "npc": "npc_guru_sekte_gl",
+      "start": "node_greet_gl",
+      "nodes": {
+        "node_ulang_gl": {
+          "condition": { "flag": { "key": "met_guru_gl", "value": true } },
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Kau kembali, anak muda. Roh leluhur masih berbisik tentangmu. Ada yang ingin kau pelajari?",
+          "choices": [
+            { "label": "Ajarkan aku teknik memanggil roh tingkat lanjut.", "next": "node_pelajaran_roh" },
+            { "label": "Apa kabar di Sekte Roh Kuno?", "next": "node_kabar_gl" },
+            { "label": "(Aku hanya lewat — sampai jumpa)", "next": "node_pergi_gl" }
+          ]
+        },
+        "node_pelajaran_roh": {
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Roh bukan alat — mereka adalah mitra. Teknik ini disebut 'Ikatan Jiwa Abadi' (魂结 Hún Jié). Dengan ini, kau bisa membentuk ikatan sementara dengan roh leluhur untuk memanggil mereka dalam pertempuran.",
+          "choices": [
+            { "label": "(Mempelajari teknik Ikatan Jiwa Abadi)", "next": "node_pelajaran_roh_selesai", "effects": [ { "type": "technique", "id": "tek_roh_ikatan_jiwa" } ] }
+          ]
+        },
+        "node_pelajaran_roh_selesai": {
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Bagus. Tapi ingat — roh memiliki kehendak sendiri. Paksa mereka dan mereka akan memberontak. Hormati mereka dan mereka akan membantumu. Latihlah teknik ini di ruang pemanggilan. Pergilah.",
+          "end": true
+        },
+        "node_kabar_gl": {
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Kabar? Roh leluhur gelisah belakangan ini — ada gangguan dari benua seberang. Beberapa murid mencoba memanggil roh terlarang — mereka sudah hilang, terserap oleh roh yang mereka panggil. Di Sekte Roh Kuno, kami belajar bahwa beberapa pintu sebaiknya tidak dibuka.",
+          "next": "node_ulang_gl"
+        },
+        "node_pergi_gl": {
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Anak muda, jangan buang waktumu. Ruang pemanggilan menunggumu, bukan gerbang ini.",
+          "end": true
+        },
+        "node_greet_gl": {
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Halo, Chen Xu. Aku Nenek Ling — penjaga Sekte Roh Kuno. Roh telah berbisik tentang kedatanganmu — kau membawa takdir yang berat.",
+          "choices": [
+            { "label": "Nenek, aku datang untuk mempelajari jalan roh sejati.", "next": "node_welcome_gl" },
+            { "label": "(Mengangguk hormat)", "next": "node_welcome_gl_singkat" }
+          ]
+        },
+        "node_welcome_gl": {
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Jalan roh bukan jalan yang mudah. Di sini, kau akan belajar bahwa dunia yang terlihat hanyalah sebagian kecil dari kenyataan. Roh leluhur adalah pemandu — tapi juga penguji. Mereka tidak akan melayanimu tanpa alasan.",
+          "next": "node_direct_gl"
+        },
+        "node_welcome_gl_singkat": {
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Sikap yang baik. Roh menghormati mereka yang rendah hati. Masuklah ke paviliun.",
+          "next": "node_direct_gl"
+        },
+        "node_direct_gl": {
+          "speaker": "npc:npc_guru_sekte_gl",
+          "text": "Ruang Pemanggilan ada di tengah kompleks. Temui rekan-rekan barumu — tapi jangan ganggu ritual mereka. Di sini, konsentrasi adalah segalanya. Satu kesalahan bisa memanggil roh yang salah. Itu semua yang perlu kau tahu.",
+          "end": true
+        }
+      }
+    },
+    {
+      "id": "dlg_utusan_gabung",
+      "npc": "npc_utusan_gabung",
+      "start": "node_greet_utusan",
+      "nodes": {
+        "node_ulang_utusan": {
+          "condition": { "flag": { "key": "met_utusan", "value": true } },
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Chen Xu, kau masih belum memutuskan? Tiga sekte menunggu jawabanmu.",
+          "choices": [
+            { "label": "Aku butuh waktu untuk berpikir.", "next": "node_pikir_utusan" },
+            { "label": "Aku sudah siap memilih sekte.", "next": "node_pilih_sekte" },
+            { "label": "(Diam saja)", "next": "node_diam_utusan" }
+          ]
+        },
+        "node_pikir_utusan": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Waktu adalah kemewahan yang tidak selalu tersedia. Tapi baiklah — kami akan kembali tiga hari lagi. Jangan buat kami menunggu terlalu lama.",
+          "next": "node_ulang_utusan"
+        },
+        "node_pilih_sekte": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Akhirnya. Katakan pilihanmu — Sekte Pedang Langit, Sekte Alkimia Surgawi, atau Sekte Roh Kuno?",
+          "choices": [
+            { "label": "Aku memilih Sekte Pedang Langit — jalan pedang adalah jalanku.", "next": "node_pilih_tj", "effects": [ { "type": "flag", "key": "sekte_dipilih", "value": "tianjian" } ] },
+            { "label": "Aku memilih Sekte Alkimia Surgawi — pil adalah kekuatanku.", "next": "node_pilih_td", "effects": [ { "type": "flag", "key": "sekte_dipilih", "value": "tiandan" } ] },
+            { "label": "Aku memilih Sekte Roh Kuno — roh adalah sekutuku.", "next": "node_pilih_gl", "effects": [ { "type": "flag", "key": "sekte_dipilih", "value": "guling" } ] }
+          ]
+        },
+        "node_pilih_tj": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Pilihan yang berani. Sekte Pedang Langit menunggumu. Bawa surat undangan ini ke gerbang mereka di Gunung Tianjian.",
+          "end": true
+        },
+        "node_pilih_td": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Pilihan yang bijak. Sekte Alkimia Surgawi akan menyambutmu. Bawa surat undangan ini ke paviliun mereka di Lembah Dan.",
+          "end": true
+        },
+        "node_pilih_gl": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Pilihan yang misterius. Sekte Roh Kuno akan mengujimu. Bawa surat undangan ini ke kuil mereka di Hutan Roh.",
+          "end": true
+        },
+        "node_diam_utusan": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Diam? Baiklah. Tapi ketahuilah — diam juga adalah pilihan. Dan setiap pilihan memiliki konsekuensi.",
+          "end": true
+        },
+        "node_greet_utusan": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Chen Xu! Kami adalah utusan dari Tiga Sekte Besar. Kau telah menarik perhatian kami — jarang ada murid akademi yang mendapat undangan langsung seperti ini.",
+          "choices": [
+            { "label": "Undangan apa yang kalian bawa?", "next": "node_jelas_undangan" },
+            { "label": "(Menerima gulungan surat)", "next": "node_baca_surat" }
+          ]
+        },
+        "node_jelas_undangan": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Tiga sekte kami — Pedang Langit, Alkimia Surgawi, dan Roh Kuno — adalah kekuatan terbesar di benua ini. Kami mencari bakat terbaik untuk dilatih. Dan kau, Chen Xu, adalah salah satunya.",
+          "next": "node_baca_surat"
+        },
+        "node_baca_surat": {
+          "speaker": "npc:npc_utusan_gabung",
+          "text": "Ini surat undangan resmi. Baca isinya — masing-masing sekte menawarkan jalan berbeda. Pilih satu, dan hidupmu akan berubah selamanya. Tapi berhati-hatilah — pilihan ini tidak bisa diubah.",
+          "next": "node_ulang_utusan"
+        }
+      }
+    },
+    {
+      "id": "dlg_mata_mata_netral",
+      "npc": "npc_mata_mata_netral",
+      "start": "node_greet_mata",
+      "nodes": {
+        "node_ulang_mata": {
+          "condition": { "flag": { "key": "met_mata_mata", "value": true } },
+          "speaker": "npc:npc_mata_mata_netral",
+          "text": "Kau lagi? Hati-hati — terlalu banyak bertanya bisa berbahaya. Ada informasi baru yang kau cari?",
+          "choices": [
+            { "label": "Apa kabar tentang eksperimen terlarang?", "next": "node_info_eksperimen" },
+            { "label": "Siapa dalang sebenarnya di balik ini?", "next": "node_info_dalang" },
+            { "label": "(Memberikan uang)", "next": "node_bayar_info" },
+            { "label": "(Aku hanya lewat)", "next": "node_pergi_mata" }
+          ]
+        },
+        "node_info_eksperimen": {
+          "speaker": "npc:npc_mata_mata_netral",
+          "text": "Eksperimen terlarang... Desas-desus mengatakan mereka mencoba menciptakan 'senjata hidup' dari kultivator muda. Tapi jangan tanya siapa — aku tidak mau mati.",
+          "next": "node_ulang_mata"
+        },
+        "node_info_dalang": {
+          "speaker": "npc:npc_mata_mata_netral",
+          "text": "Dalang? Bisa jadi dari dalam sekte itu sendiri. Beberapa guru senior terlalu ambisius — mereka lupa bahwa beberapa batas tidak boleh dilanggar.",
+          "next": "node_ulang_mata"
+        },
+        "node_bayar_info": {
+          "speaker": "npc:npc_mata_mata_netral",
+          "text": "Ah, emas berbicara lebih keras daripada kata-kata. Baiklah — dengar ini: ada pertemuan rahasia malam ini di gudang tua dekat perbatasan sekte. Tapi aku tidak pernah memberitahumu ini.",
+          "end": true
+        },
+        "node_pergi_mata": {
+          "speaker": "npc:npc_mata_mata_netral",
+          "text": "Pergilah. Dan jangan bilang pada siapa pun bahwa kau bertemu denganku.",
+          "end": true
+        },
+        "node_greet_mata": {
+          "speaker": "npc:npc_mata_mata_netral",
+          "text": "Siapa kau? Tidak, tunggu — jangan jawab. Lebih baik aku tidak tahu. Tapi kalau kau mencari informasi... aku bisa membantu. Dengan harga tertentu.",
+          "choices": [
+            { "label": "Informasi apa yang kau jual?", "next": "node_jual_info" },
+            { "label": "(Diam, menunggu)", "next": "node_tunggu_info" }
+          ]
+        },
+        "node_jual_info": {
+          "speaker": "npc:npc_mata_mata_netral",
+          "text": "Banyak hal — pergerakan sekte, rahasia guru, bahkan eksperimen terlarang. Tapi ingat: informasi adalah pedang bermata dua. Kadang lebih baik tidak tahu.",
+          "next": "node_ulang_mata"
+        },
+        "node_tunggu_info": {
+          "speaker": "npc:npc_mata_mata_netral",
+          "text": "Diam? Cerdas. Orang yang terlalu banyak bicara cepat mati. Baiklah — apa yang ingin kau ketahui?",
+          "next": "node_ulang_mata"
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_info",
+      "npc": "npc_pedagang_info",
+      "start": "node_greet_dagang",
+      "nodes": {
+        "node_ulang_dagang": {
+          "condition": { "flag": { "key": "met_pedagang_info", "value": true } },
+          "speaker": "npc:npc_pedagang_info",
+          "text": "Chen Xu! Kembali lagi? Daganganku hari ini lebih lengkap — pil, senjata, bahkan... informasi khusus. Mau lihat?",
+          "choices": [
+            { "label": "Tunjukkan barang daganganmu.", "next": "node_shop" },
+            { "label": "Ada informasi apa hari ini?", "next": "node_info_dagang" },
+            { "label": "(Aku hanya lewat)", "next": "node_pergi_dagang" }
+          ]
+        },
+        "node_shop": {
+          "speaker": "npc:npc_pedagang_info",
+          "text": "Silakan pilih — tapi ingat, harga tidak bisa ditawar. Emas adalah emas, di mana pun kau berada.",
+          "end": true
+        },
+        "node_info_dagang": {
+          "speaker": "npc:npc_pedagang_info",
+          "text": "Informasi panas hari ini: ada transaksi mencurigakan di pasar hitam malam ini. Katanya melibatkan artefak kuno dari benua seberang. Tapi aku tidak tahu detailnya — hanya rumor.",
+          "next": "node_ulang_dagang"
+        },
+        "node_pergi_dagang": {
+          "speaker": "npc:npc_pedagang_info",
+          "text": "Sampai jumpa lagi! Ingat — daganganku selalu buka untuk mereka yang punya emas.",
+          "end": true
+        },
+        "node_greet_dagang": {
+          "speaker": "npc:npc_pedagang_info",
+          "text": "Selamat datang, traveler! Aku berdagang di perbatasan ketiga sekte — barang legal, ilegal, semuanya ada. Apa yang kau cari?",
+          "choices": [
+            { "label": "Tunjukkan barang daganganmu.", "next": "node_shop" },
+            { "label": "Kau dengar kabar apa belakangan?", "next": "node_kabar_dagang" }
+          ]
+        },
+        "node_kabar_dagang": {
+          "speaker": "npc:npc_pedagang_info",
+          "text": "Kabar? Bisnis sedang ramai — ketiga sekte bersiap untuk sesuatu yang besar. Murid-murid membeli perlengkapan perang, guru-guru memesan bahan langka. Ada badai yang datang, teman. Dan aku akan menjual payung sebelum hujan.",
+          "next": "node_ulang_dagang"
+        }
+      }
+    }
+  ]
+}

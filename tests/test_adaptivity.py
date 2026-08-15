@@ -16,7 +16,7 @@ import pytest
 from src.engine.session import GameSession
 from src.loader import DataRegistry
 
-from conftest import finish_dialog, move_path  # noqa: F401
+from tests.conftest import finish_dialog, move_path  # noqa: F401
 
 
 def _inject_arc2(reg: DataRegistry) -> None:
@@ -99,7 +99,7 @@ def arc2_session(registry: DataRegistry) -> GameSession:
 
 def test_adaptif_main_quest_talk_reach_defeat(arc2_session, god_mode):
     """Main quest arc 2 sintetis: talk → reach+time_window → defeat+report — tanpa ubah engine."""
-    from test_playthrough_branches import _play_3aa
+    from tests.test_playthrough_branches import _play_3aa
     s = arc2_session
     _play_3aa(s)  # selesaikan arc 1 → transisi otomatis ke arc 2 (data)
     assert s.state.current_quest == "q_arc2_01"

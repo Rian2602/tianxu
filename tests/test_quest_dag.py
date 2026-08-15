@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from src.engine.session import GameSession
 
-from conftest import finish_dialog, move_path, play_to_incident  # noqa: F401
+from tests.conftest import finish_dialog, move_path, play_to_incident  # noqa: F401
 
 
 
@@ -608,7 +608,7 @@ def test_gather_report_to_dua_quest_herba_terpisah(dummy_session):
     """Dua quest gather (Su Qing 3 / Mo Yun 2) memakai item sama TIDAK saling
     memakan: kumpul 3 herba → belum ada yang selesai; serah ke Mo Yun ambil 2,
     sisa 1; serah ke Su Qing ambil 3 (perlu kumpul lagi)."""
-    from conftest import finish_dialog
+    from tests.conftest import finish_dialog
     from src.engine.session import GameSession
 
     s = GameSession.new(dummy_session.reg)
