@@ -1,0 +1,501 @@
+"""Quest engine (DAG) — ENGINE_ARCHITECTURE §6.
+
+Invariant:
+- Tepat satu quest utama aktif; quest berikutnya muncul setelah yang aktif selesai.
+- Quest dengan >1 sisi `next` = titik percabangan → dialog pilihan (choice_id);
+  opsi yang dipilih menentukan cabang. Beberapa quest menunjuk quest sama = konvergensi.
+- Quest sampingan boleh aktif bersamaan; quest utama sampingan dilarang bertabrakan
+  dengan quest utama (diverifikasi validator).
+"""
+
+from __future__ import annotations
+
+from ..loader import DataRegistry
+from .cultivation import gain_exp, gain_grind_exp
+from .effects import apply as apply_effects
+from .events import add_log
+from .memory import unlock as unlock_memory
+from .state import GameState
+
+OBJECTIVE_KINDS = {"talk", "defeat", "gather", "reach", "choose", "spar", "advance_time"}
+
+
+class QuestEngine:
+    def __init__(self, registry: DataRegistry, state: GameState) -> None:
+        self.reg = registry
+        self.state = state
+
+    # ---------- akses ----------
+
+    def current_main(self) -> dict | None:
+        if not self.state.current_quest:
+            return None
+        return self.reg.quest(self.state.current_quest)
+
+    def active_side(self) -> list[dict]:
+        # catatan progres quest utama (mis. talk/advance_time) juga ada di
+        # active_side_quests — hanya quest ber-kind side yang ditampilkan
+        return [self.reg.quest(qid) for qid in self.state.active_side_quests
+                if (self.reg.quest(qid) or {}).get("kind") == "side"]
+
+    def objective_text(self, quest: dict) -> str:
+        obj = quest.get("objective", {})
+        hint = obj.get("hint", "")
+        # G3-T1: quest ber-timeout menampilkan sisa waktu (jam)
+        sisa = self._timeout_remaining(quest)
+        if sisa is not None:
+            hint = f"{hint} · Sisa: {sisa} jam" if hint else f"Sisa: {sisa} jam"
+        kind = obj.get("kind")
+        if kind == "talk":
+            npc = self.reg.npc(obj.get("npc", ""))
+            return f"{hint} ({self._talk_count(quest)}/{obj.get('target', 1)})"
+        if kind == "defeat":
+            base = f"{hint} ({self.state.active_side_quests.get(quest['id'], {}).get('defeated', 0)}/{obj.get('target', 1)})"
+            if obj.get("report_to"):
+                npc = self.reg.npc(obj["report_to"])
+                nama = npc["name"] if npc else obj["report_to"]
+                prog = self.state.active_side_quests.get(quest["id"], {})
+                # laporan sah hanya bila kill sudah penuh (lapor sebelum kill bukan laporan)
+                lapor = "✓" if prog.get("talk", 0) and prog.get("defeated", 0) >= obj.get("target", 1) else "—"
+                return f"{base} · lapor ke {nama} ({lapor})"
+            return base
+        if kind == "gather":
+            return f"{hint} ({self.state.inventory.get(obj.get('item', ''), 0)}/{obj.get('target', 1)})"
+        if kind == "reach":
+            return hint
+        if kind == "advance_time":
+            return hint
+        if kind == "choose":
+            return hint
+        if kind == "spar":
+            return hint
+        return hint
+
+    def _timeout_remaining(self, quest: dict) -> int | None:
+        """G3-T1: sisa jam quest ber-timeout; None bila quest tak ber-timeout.
+        Start diambil dari progress (start_day/start_hour, relatif jam game);
+        bila belum tercatat (save lama) → anggap mulai sekarang (tidak langsung gagal)."""
+        hours = (quest.get("timeout") or {}).get("hours")
+        if not hours:
+            return None
+        prog = self.state.active_side_quests.get(quest["id"], {})
+        if "start_day" not in prog:
+            return int(hours)
+        start_abs = int(prog["start_day"]) * 24 + int(prog.get("start_hour", 0))
+        sisa = int(hours) - (self.state.absolute_hours - start_abs)
+        return max(0, sisa)
+
+    def _talk_count(self, quest: dict) -> int:
+        return self.state.active_side_quests.get(quest["id"], {}).get("talk", 0)
+
+    # ---------- selesaikan quest utama ----------
+
+    def notify_dialog_ended(self, npc_id: str, node_ids: str | list | set | None = None) -> None:
+        """Dipanggil sesi saat dialog berakhir — memeriksa objektif talk & lapor side quest.
+
+        A3: objective talk bisa punya `node`/`nodes` (node WAJIB dimainkan).
+        Quest selesai hanya bila SALAH SATU node yang dikunjungi ∈ daftar wajib;
+        tanpa field itu → perilaku lama (asalkan NPC benar)."""
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "talk" and q.get("objective", {}).get("npc") == npc_id:
+            obj = q["objective"]
+            required = obj.get("node") or obj.get("nodes")
+            if required:
+                if isinstance(required, str):
+                    required = [required]
+                if isinstance(node_ids, str):
+                    visited = [node_ids]
+                elif node_ids is not None:
+                    try:
+                        visited = list(node_ids)
+                    except TypeError:
+                        visited = [node_ids]
+                else:
+                    visited = []
+                if not any(n in visited for n in required):
+                    return  # node wajib belum dimainkan — quest belum selesai
+            qid = q["id"]
+            prog = self.state.active_side_quests.setdefault(qid, {})
+            prog["talk"] = prog.get("talk", 0) + 1
+            if prog["talk"] >= obj.get("target", 1):
+                self._complete_main(qid)
+        # G1-T3: main quest defeat dengan `report_to` selesai saat lapor ke pemberi
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "defeat" and q.get("objective", {}).get("report_to") == npc_id:
+            obj = q["objective"]
+            prog = self.state.active_side_quests.setdefault(q["id"], {})
+            prog["talk"] = prog.get("talk", 0) + 1
+            if prog.get("defeated", 0) >= obj.get("target", 1):
+                self._complete_main(q["id"])
+        # A2 (keputusan §17): side quest defeat dengan `report_to` selesai saat lapor ke pemberi
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if sq.get("kind") == "side" and obj.get("kind") == "defeat" and obj.get("report_to") == npc_id:
+                prog = self.state.active_side_quests[qid]
+                prog["talk"] = prog.get("talk", 0) + 1
+                if prog.get("defeated", 0) >= obj.get("target", 1):
+                    self._complete_side(qid)
+        # gather dengan `report_to`: saat lapor ke pemberi, ambil item dari inventori
+        # lalu selesaikan — satu set herba hanya untuk SATU quest (tidak sekaligus)
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if obj.get("report_to") == npc_id:
+                if obj.get("kind") == "gather":
+                    iid = obj.get("item", "")
+                    target = obj.get("target", 1)
+                    have = self.state.inventory.get(iid, 0)
+                    if have >= target:
+                        add_log(self.state, "system", f"Menyerahkan {target} × {self.reg.item(iid)['name'] if self.reg.item(iid) else iid}.")
+                        self._complete_side(qid)
+
+    def notify_spar_won(self, npc_id: str) -> None:
+        """Objektif `spar` selesai saat pemain MENANG battle melawan NPC itu."""
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "spar" and q.get("objective", {}).get("npc") == npc_id:
+            self._complete_main(q["id"])
+
+    def notify_spar_loss(self, npc_id: str) -> None:
+        """G4a: kalah sparring tetap menyelesaikan objektif `spar` (dialog berbeda,
+        sesuai STORY_FASE1 #19) — tanpa game over permanen; penalti KO tetap berlaku."""
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "spar" and q.get("objective", {}).get("npc") == npc_id:
+            self.state.flags["spar_kalah"] = True
+            self._complete_main(q["id"])
+
+    def notify_move(self) -> None:
+        q = self.current_main()
+        if not q or q.get("objective", {}).get("kind") != "reach":
+            return
+        obj = q["objective"]
+        if obj.get("location") != self.state.location:
+            return
+        tw = obj.get("time_window")
+        if tw and not self._in_window(tw):
+            return
+        self._complete_main(q["id"])
+
+    def notify_battle_won(self, defeated_enemy_ids: list[str]) -> None:
+        """Pembunuhan musuh (berburu) — progres objektif defeat.
+
+        A7: main quest `defeat` ikut pola side quest — bila `enemies`
+        didefinisikan, hanya musuh dari daftar yang memenuhi; tanpa field itu
+        perilaku lama (musuh apa pun selesai), non-breaking.
+        G1-T3 (2026-08-15): quest defeat dengan `report_to` (main ATAU side)
+        menunggu lapor ke pemberi — kill saja belum menyelesaikan quest."""
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "defeat":
+            obj = q["objective"]
+            allowed = obj.get("enemies", [])
+            killed = [e for e in defeated_enemy_ids if not allowed or e in allowed]
+            if killed:
+                prog = self.state.active_side_quests.setdefault(q["id"], {})
+                prog["defeated"] = prog.get("defeated", 0) + len(killed)
+                if not obj.get("report_to") and prog["defeated"] >= obj.get("target", 1):
+                    self._complete_main(q["id"])
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if obj.get("kind") != "defeat":
+                continue
+            allowed = obj.get("enemies", [])
+            killed = [e for e in defeated_enemy_ids if e in allowed]
+            if killed:
+                prog = self.state.active_side_quests[qid]
+                prog["defeated"] = prog.get("defeated", 0) + len(killed)
+                # A2: dengan `report_to`, selesaian butuh lapor ke pemberi — bukan langsung selesai
+                if not obj.get("report_to") and prog["defeated"] >= obj.get("target", 1):
+                    self._complete_side(qid)
+
+    def notify_gather(self) -> None:
+        """Kumpul item — quest gather TANPA `report_to` selesai otomatis saat cukup;
+        quest dengan `report_to` menunggu lapor ke pemberi (pola q_side_berburu),
+        sehingga dua quest herba tidak "memakan" satu set item yang sama sekaligus."""
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if obj.get("kind") == "gather" and not obj.get("report_to"):
+                have = self.state.inventory.get(obj.get("item", ""), 0)
+                if have >= obj.get("target", 1):
+                    self._complete_side(qid)
+
+    def _in_window(self, tw: dict) -> bool:
+        start = tw.get("hour_start", 0)
+        end = tw.get("hour_end", 24)
+        h = self.state.hour
+        if start <= end:
+            return start <= h < end
+        return h >= start or h < end  # lintas tengah malam (mis. 19 → 6)
+
+    # ---------- lanjutkan DAG ----------
+
+    def resolve_choose(self, option: str) -> None:
+        """Objektif `choose` (mis. pilih akademi) — set nilai lalu selesaikan."""
+        q = self.current_main()
+        if not q or q.get("objective", {}).get("kind") != "choose":
+            return
+        obj = q["objective"]
+        matched = False
+        if obj.get("options"):
+            for o in obj["options"]:
+                if o.get("value") == option:
+                    self.state.player.academy = option
+                    matched = True
+                    break
+        if matched:
+            self._grant_companion(option)
+            self._grant_starter_kit(option)
+            self._complete_main(q["id"])
+        else:
+            add_log(self.state, "system", "Pilihan tidak valid.")
+
+    def _grant_starter_kit(self, academy: str) -> None:
+        """Akademi dengan field `starter_kit` di config (data-driven) memberi perlengkapan pemula."""
+        items = []
+        for a in self.reg.config.get("academies", []):
+            if a.get("id") == academy:
+                items = a.get("starter_kit") or []
+                break
+        for it in items:
+            if isinstance(it, dict):
+                iid = it.get("id")
+                cnt = it.get("count", 1)
+            elif isinstance(it, str):
+                iid = it
+                cnt = 1
+            else:
+                continue
+            if iid:
+                self.state.inventory[iid] = self.state.inventory.get(iid, 0) + cnt
+                item_obj = self.reg.item(iid)
+                iname = item_obj["name"] if item_obj else iid
+                add_log(self.state, "system", f"Menerima perlengkapan pemula: {iname} ×{cnt}.")
+                # G2-T1: senjata starter terpasang otomatis ke slot weapon yang kosong
+                if (item_obj or {}).get("type") == "weapon" and not self.state.player.equipment.get("weapon"):
+                    self.state.player.equipment["weapon"] = iid
+                    add_log(self.state, "narration", f"{iname} terpasang sebagai senjatamu.")
+
+
+    def _grant_companion(self, academy: str) -> None:
+        """Akademi dengan field `companion` di config (data-driven) memberi binatang roh."""
+        cid = None
+        for a in self.reg.config.get("academies", []):
+            if a["id"] == academy:
+                cid = a.get("companion")
+                break
+        if not cid:
+            return
+        comp = next((c for c in self.reg.companions if c["id"] == cid), None)
+        if not comp:
+            return
+        scale = self.reg.config.get("companion", {})
+        hp_max = int(comp["base_hp"]) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
+        self.state.companion = {"id": cid, "hp": hp_max, "active": True}
+        add_log(self.state, "narration", f"{comp['name']} mendekat dan menempel padamu — binatang roh akademimu.")
+
+    def advance_time_target_met(self) -> None:
+        q = self.current_main()
+        if not q or q.get("objective", {}).get("kind") != "advance_time":
+            return
+        obj = q["objective"]
+        qid = q["id"]
+        prog = self.state.active_side_quests.get(qid)
+        if prog is None:
+            self._note_main_start(qid)
+            prog = self.state.active_side_quests[qid]
+        # A5: bandingkan waktu ABSOLUT (day*24+hour), bukan `hour >= target` terpisah —
+        # overshoot (melewati target) otomatis memenuhi; tanpa ini pemain yang menunggu
+        # terlalu lama malah molor hampir satu hari penuh.
+        now_abs = self.state.day * 24 + self.state.hour
+        target_abs = (prog["start_day"] + obj.get("day_offset", 0)) * 24 + obj.get("hour", 0)
+        if now_abs >= target_abs:
+            self._complete_main(qid)
+
+    def _complete_main(self, qid: str) -> None:
+        if self.state.current_quest != qid:
+            return
+        q = self.reg.quest(qid)
+        oc = q.get("on_complete", {})
+        apply_effects(self.state, self.reg, oc.get("effects"))
+        unlock_memory(self.state, self.reg, oc.get("memory_unlock"))
+        rewards = oc.get("rewards", {})
+        gain_exp(self.state, self.reg, rewards.get("exp", 0))
+        self.state.player.gold += rewards.get("gold", 0)
+        if oc.get("system_msg"):
+            add_log(self.state, "system", oc["system_msg"])
+        add_log(self.state, "narration", f"✓ Quest selesai: {q['title']}.")
+        self.state.completed_quests.append(qid)
+        self.state.active_side_quests.pop(qid, None)
+        if q.get("kind") == "main":
+            self.state.current_quest = None
+            self._advance_main(q)
+
+    def _advance_main(self, q: dict) -> None:
+        nexts = q.get("next", [])
+        if not nexts:
+            return
+        if len(nexts) == 1:
+            self.state.current_quest = nexts[0]["quest"]
+            self._note_main_start(self.state.current_quest)
+            return
+        # percabangan: minta dialog pilihan; opsi = cabang
+        cid = nexts[0].get("choice_id")
+        self.state.branch_pending = cid
+
+    def _note_main_start(self, qid: str) -> None:
+        """Catat hari/jam quest utama mulai aktif (untuk objektif advance_time)."""
+        self.state.active_side_quests[qid] = {
+            "start_day": self.state.day,
+            "start_hour": self.state.hour,
+        }
+
+    def select_branch(self, option: str) -> None:
+        """Setelah dialog percabangan selesai — pilih cabang berdasarkan opsi."""
+        q = None
+        for qid in reversed(self.state.completed_quests):
+            candidate = self.reg.quest(qid)
+            if candidate and candidate.get("kind") == "main" and candidate.get("next"):
+                q = candidate
+                break
+        if not q:
+            return
+        for edge in q.get("next", []):
+            if edge.get("option") == option:
+                self.state.current_quest = edge["quest"]
+                self._note_main_start(self.state.current_quest)
+                self.state.branch_pending = None
+                return
+        self.state.branch_pending = None
+
+    # ---------- quest sampingan ----------
+
+    def is_offerable(self, qid: str) -> bool:
+        sq = self.reg.quest(qid)
+        if not sq or sq.get("kind") != "side":
+            return False
+        if qid in self.state.active_side_quests:
+            return False
+        if qid in self.state.completed_quests and not sq.get("repeatable"):
+            return False
+        if qid in self.state.failed_quests and not sq.get("repeatable"):
+            return False  # G3-T1: quest non-repeatable yang gagal tidak ditawarkan lagi
+        cd = sq.get("cooldown", 0)
+        if cd > 0 and qid in self.state.side_quest_cooldowns:
+            now_abs_hours = self.state.absolute_hours
+            last_completed = self.state.side_quest_cooldowns[qid]
+            if (now_abs_hours - last_completed) < cd:
+                return False
+        af = sq.get("available_from")
+        if af:
+            if self.state.day < af.get("day", 1):
+                return False
+            if self.state.day == af.get("day", 1) and self.state.hour < af.get("hour", 0):
+                return False
+            # Task 3: gating by relation — quest hanya ditawarkan bila relation >= value
+            rel = af.get("relation_min")
+            if rel and self.state.relations.get(rel.get("npc"), 0) < rel.get("value", 0):
+                return False
+        return True
+
+    def start_side(self, qid: str) -> bool:
+        if not self.is_offerable(qid):
+            return False
+        # G3-T1: catat start (jam game absolut) — dasar hitung timeout quest
+        self.state.active_side_quests[qid] = {
+            "start_day": self.state.day,
+            "start_hour": self.state.hour,
+        }
+        sq = self.reg.quest(qid)
+        add_log(self.state, "narration", f"→ Quest sampingan aktif: {sq['title']}.")
+        return True
+
+    def check_timeouts(self) -> None:
+        """G3-T1: quest aktif ber-timeout gagal saat batas (>=) tercapai.
+
+        - main quest → `fail_effects` + `fail_next` (wajib ada, divalidasi) aktif
+        - side quest → `fail_effects` + hapus dari aktif
+        Keduanya tercatat di `failed_quests`. Dipanggil sesi dari `_pass_time`
+        setelah `advance_time_target_met` — quest yang SELESAI tepat sebelum
+        deadline sudah pop dari aktif, tidak ikut gagal.
+        """
+        now_abs = self.state.absolute_hours
+        # main quest
+        qid = self.state.current_quest
+        if qid:
+            q = self.reg.quest(qid)
+            hours = (q or {}).get("timeout", {}).get("hours")
+            if hours:
+                prog = self.state.active_side_quests.get(qid)
+                if prog is None:
+                    self._note_main_start(qid)
+                    prog = self.state.active_side_quests[qid]
+                if "start_day" not in prog:  # save lama tanpa start → anggap mulai sekarang
+                    prog["start_day"] = self.state.day
+                    prog["start_hour"] = self.state.hour
+                start_abs = int(prog["start_day"]) * 24 + int(prog.get("start_hour", 0))
+                if now_abs - start_abs >= int(hours):
+                    self._fail_main(qid)
+        # side quest
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            hours = (sq or {}).get("timeout", {}).get("hours")
+            if not hours or (sq or {}).get("kind") != "side":
+                continue
+            prog = self.state.active_side_quests[qid]
+            if "start_day" not in prog:
+                prog["start_day"] = self.state.day
+                prog["start_hour"] = self.state.hour
+            start_abs = int(prog["start_day"]) * 24 + int(prog.get("start_hour", 0))
+            if now_abs - start_abs >= int(hours):
+                self._fail_side(qid)
+
+    def _fail_main(self, qid: str) -> None:
+        """G3-T1: main quest gagal — efek, catat, lanjut ke `fail_next`."""
+        if self.state.current_quest != qid:
+            return
+        q = self.reg.quest(qid)
+        apply_effects(self.state, self.reg, q.get("fail_effects"))
+        if q.get("fail_system_msg"):
+            add_log(self.state, "system", q["fail_system_msg"])
+        add_log(self.state, "narration", f"✗ Quest gagal: {q['title']} (waktu habis).")
+        self.state.failed_quests.append(qid)
+        self.state.active_side_quests.pop(qid, None)
+        self.state.current_quest = None
+        nexts = q.get("fail_next") or []
+        if len(nexts) == 1:
+            self.state.current_quest = nexts[0]["quest"]
+            self._note_main_start(self.state.current_quest)
+        elif len(nexts) > 1:
+            # percabangan gagal: minta dialog pilihan (pola sama seperti _advance_main)
+            cid = nexts[0].get("choice_id")
+            self.state.branch_pending = cid
+
+    def _fail_side(self, qid: str) -> None:
+        """G3-T1: side quest gagal — efek, catat, hapus dari aktif."""
+        if qid not in self.state.active_side_quests:
+            return
+        q = self.reg.quest(qid)
+        apply_effects(self.state, self.reg, q.get("fail_effects"))
+        if q.get("fail_system_msg"):
+            add_log(self.state, "system", q["fail_system_msg"])
+        add_log(self.state, "narration", f"✗ Quest sampingan gagal: {q['title']} (waktu habis).")
+        self.state.failed_quests.append(qid)
+        del self.state.active_side_quests[qid]
+
+    def _complete_side(self, qid: str) -> None:
+        if qid not in self.state.active_side_quests:
+            return
+        now_abs_hours = self.state.absolute_hours
+        self.state.side_quest_cooldowns[qid] = now_abs_hours
+        q = self.reg.quest(qid)
+        oc = q.get("on_complete", {})
+        apply_effects(self.state, self.reg, oc.get("effects"))
+        rewards = oc.get("rewards", {})
+        gain_grind_exp(self.state, self.reg, rewards.get("exp", 0))  # A2: cap grind harian
+        self.state.player.gold += rewards.get("gold", 0)
+        if oc.get("system_msg"):
+            add_log(self.state, "system", oc["system_msg"])
+        add_log(self.state, "narration", f"✓ Quest sampingan selesai: {q['title']}.")
+        self.state.completed_quests.append(qid)
+        del self.state.active_side_quests[qid]

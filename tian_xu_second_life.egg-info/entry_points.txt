@@ -1,0 +1,2 @@
+[console_scripts]
+tianxu = src.cli:main

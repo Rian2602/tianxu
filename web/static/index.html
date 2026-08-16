@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>天缘灵 · Tian Xu: Second Life — Arc Akademi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Cinzel:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- ═══ Layar judul ═══ -->
+  <div id="title-screen">
+    <div class="title-box">
+      <svg class="title-ornament top" width="220" height="22" viewBox="0 0 220 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M0 11 H80 M140 11 H220" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="110" cy="11" r="4" fill="currentColor" opacity="0.9"/>
+        <path d="M96 11 h4 M112 11 h4" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <h1 class="game-title">天缘灵</h1>
+      <h2 class="game-subtitle">TIAN XU: SECOND LIFE</h2>
+      <p class="game-tagline">Arc Akademi — Bukti Konsep Fase 1</p>
+      <svg class="title-ornament bottom" width="220" height="22" viewBox="0 0 220 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M0 11 H80 M140 11 H220" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="110" cy="11" r="4" fill="currentColor" opacity="0.9"/>
+        <path d="M96 11 h4 M112 11 h4" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <button id="btn-new" class="btn btn-gold">Mulai Baru</button>
+      <div id="save-slots" class="save-slots"></div>
+      <p id="title-msg" class="title-msg"></p>
+      <div id="title-audio" class="title-audio" aria-label="Kontrol musik">
+        <button id="btn-audio-mute" class="btn-audio-btn" type="button" aria-label="Matikan musik">♫</button>
+        <input type="range" id="audio-volume" class="audio-volume" min="0" max="1" step="0.05" value="0.3" aria-label="Volume musik">
+        <span id="audio-volume-label" class="audio-volume-label">30%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Layar game ═══ -->
+  <div id="game-screen" class="hidden">
+    <header id="topbar">
+      <div id="header-title" class="header-title"></div>
+      <div class="topbar-right">
+        <button id="btn-toggle-right" class="btn btn-small" onclick="toggleRightDrawer()">Quest · Inventori</button>
+        <button id="btn-tianyuan" class="btn btn-small">天缘灵 · Panel</button>
+        <div id="topbar-audio" class="topbar-audio" aria-label="Kontrol musik">
+          <button id="btn-audio-mute-topbar" class="btn-audio-btn" type="button" aria-label="Matikan musik">♫</button>
+          <input type="range" id="audio-volume-topbar" class="audio-volume" min="0" max="1" step="0.05" value="0.3" aria-label="Volume musik">
+          <span id="audio-volume-label-topbar" class="audio-volume-label">30%</span>
+        </div>
+      </div>
+    </header>
+
+    <div id="layout">
+      <aside id="col-left" class="col"></aside>
+      <main id="col-center" class="col">
+        <div id="log" class="log"></div>
+        <div id="interact" class="interact"></div>
+      </main>
+      <aside id="col-right" class="col"></aside>
+    </div>
+  </div>
+
+  <!-- ═══ Panel Tianyuan Ling ═══ -->
+  <div id="tianyuan" class="hidden tianyuan"></div>
+
+  <!-- ═══ Modals ═══ -->
+  <div id="modal-overlay" class="hidden modal-overlay"></div>
+  <div id="modal-shop" class="hidden modal"></div>
+  <div id="modal-arc-summary" class="hidden modal"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

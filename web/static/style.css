@@ -1,0 +1,854 @@
+/* ═══ Font self-host (C1) — Noto Serif SC & Noto Sans SC, subset OFL ═══ */
+@import url("/static/assets/fonts.css");
+
+/* ═══ Tian Xu: Second Life — Tema Xianxia gelap + emas (keputusan visual terkunci) ═══
+   Fase polish (2026-08-14, plan fix-temuan-audit-chatgpt):
+   - Semantic color (B2): gold = kultivasi/utama · blue = pemain/roh/pengetahuan ·
+     red = bahaya/musuh · green = sukses/healing · cream = narasi · gray = sekunder
+   - Hierarchy visual (B1): kolom tengah (story) paling menonjol; panel samping redup
+   - Tekstur dari assets/textures/ (paper-dark, silk-dark, ink-wash, cloud-mist,
+     gold-noise) — dipakai halus via overlay gelap (tetap dalam batas GDD §12.5:
+     tanpa animasi, tanpa grafis penuh)
+   - Aksesibilitas keyboard (B8): :focus-visible outline emas konsisten
+   - Loading feedback (B9): .is-loading tanpa animasi (GDD §12.5) */
+
+:root {
+  --bg: #14141c;
+  --bg-panel: #1b1b26;
+  --bg-panel-2: #211f2c;
+  --bg-input: #23232f;
+  --gold: #d4af37;
+  --gold-dim: #9a7d2c;
+  --gold-bright: #f3d888;
+  --cream: #f2e8d5;
+  --gray: #b9b3a6;
+  --blue: #9db8d9;
+  --red: #d96b5f;
+  --green: #8fbf8f;
+  --jade: #4f9d82;
+  --border: #3a3540;
+  --border-glow: rgba(212, 175, 55, .28);
+  
+  /* Fonts */
+  --serif: "Noto Serif SC", Georgia, "Times New Roman", serif;
+  --sans: "Noto Sans SC", "Segoe UI", system-ui, sans-serif;
+  --font-cjk: 'Noto Serif SC', var(--serif);
+  --font-label: 'Cinzel', var(--serif);
+  --font-body: 'EB Garamond', var(--serif);
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-hand: 'Caveat', 'Segoe UI', cursive;  /* tulisan bersambung — menu opsi */
+  
+  /* hierarchy — warna per peran (B2) */
+  --c-cultivation: var(--gold);   /* ranah, teknik, judul, tombol utama */
+  --c-player: var(--blue);        /* pemain, roh, pengetahuan, ingatan */
+  --c-danger: var(--red);         /* musuh, bahaya, HP kritis */
+  --c-success: var(--green);      /* sukses, healing, reward */
+  --c-narrative: var(--cream);    /* narasi cerita */
+  --c-secondary: var(--gray);     /* info sekunder */
+}
+
+* { box-sizing: border-box; }
+
+/* ═══ D1 (2026-08-15) — transisi mikro state, lihat ENGINE_ARCHITECTURE §12.5 ═══
+   Batas: 150–300ms, hanya perubahan state (hover/modal/drawer/tab/progress).
+   TANPA loop/partikel/ambient. Wajib hormati prefers-reduced-motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+.hidden { display: none !important; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+* { scrollbar-color: var(--border) var(--bg); scrollbar-width: thin; }
+
+a, button { font-family: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ════ elemen penanda: SEGEL ════ */
+.seal {
+  --size: 30px;
+  width: var(--size); height: var(--size);
+  min-width: var(--size);
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(155deg, var(--gold-bright), var(--gold) 55%, var(--gold-dim));
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+  color: #1a1408;
+  font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 2px 8px rgba(212,175,55,.35);
+}
+.seal-ghost {
+  background: linear-gradient(155deg, #302c3a, #201f2b);
+  color: var(--gold); box-shadow: inset 0 0 0 1px var(--border-glow);
+}
+.seal-sm { --size: 22px; font-size: 11px; }
+
+.ink-divider {
+  height: 2px; margin: 6px 0 14px; opacity: .65;
+  background: linear-gradient(90deg,
+    var(--gold) 0%, var(--gold-dim) 34%, transparent 35%, transparent 41%,
+    var(--gold-dim) 42%, var(--gold) 64%, transparent 65%, transparent 69%,
+    var(--gold-dim) 70%, transparent 100%);
+}
+
+/* ═══ Icon Lucide (C2) — self-host, stroke currentColor ═══ */
+.lucide {
+  color: currentColor;
+  flex-shrink: 0;
+}
+
+.stat-label .lucide { color: var(--gray); }
+.stat-value .lucide { display: none; }
+
+/* ═══ Aksesibilitas keyboard (B8) — fokus terlihat konsisten ═══ */
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ═══ Feedback loading (B9) — tanpa animasi (GDD §12.5) ═══ */
+
+.is-loading {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ════ layar judul ════ */
+#title-screen {
+  min-height: calc(100vh - 34px);
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse 900px 500px at 50% 15%, #2a2440 0%, transparent 60%),
+    radial-gradient(ellipse 1200px 800px at 50% 100%, #1c1826 0%, var(--bg) 65%);
+  position: relative; overflow: hidden;
+  transition: opacity .4s var(--ease-out), transform .4s var(--ease-out);
+}
+#title-screen.screen-out { opacity: 0; transform: scale(.98); pointer-events: none; }
+
+#title-screen::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(212,175,55,.18) 1px, transparent 1px);
+  background-size: 3px 3px; opacity: .35; mix-blend-mode: screen;
+}
+
+.title-box { text-align: center; padding: 40px; position: relative; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Ornamen xianxia (B7) — SVG inline, tanpa gambar eksternal */
+@keyframes ornamentExpandTop {
+  from { opacity: 0; transform: scaleX(0.3); }
+  to { opacity: 0.85; transform: scaleX(1); }
+}
+@keyframes ornamentExpandBottom {
+  from { opacity: 0; transform: scaleX(0.3) scaleY(-1); }
+  to { opacity: 0.85; transform: scaleX(1) scaleY(-1); }
+}
+
+.title-ornament {
+  display: block;
+  margin: 0 auto;
+  color: var(--gold);
+  opacity: 0.85;
+  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.35));
+}
+.title-ornament.top { 
+  margin-bottom: 18px; 
+  animation: ornamentExpandTop 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+}
+.title-ornament.bottom { 
+  margin-top: 22px; 
+  transform: scaleY(-1); 
+  animation: ornamentExpandBottom 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+}
+
+.game-title {
+  font-family: var(--font-cjk); font-weight: 900;
+  font-size: 76px; margin: 0; color: var(--gold);
+  letter-spacing: 14px;
+  text-shadow: 0 0 50px rgba(212,175,55,.4), 0 0 4px rgba(212,175,55,.6);
+  animation: fadeUp .9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.game-subtitle {
+  font-family: var(--font-label); font-weight: 600;
+  font-size: 22px; margin: 10px 0 0; letter-spacing: 8px; color: var(--cream);
+  animation: fadeUp .9s cubic-bezier(0.16, 1, 0.3, 1) .15s both;
+}
+.game-tagline {
+  font-family: var(--font-body); font-style: italic;
+  color: var(--gray); margin: 10px 0 34px; font-size: 16px;
+  animation: fadeUp .9s cubic-bezier(0.16, 1, 0.3, 1) .3s both;
+}
+.title-cta { animation: fadeUp .9s cubic-bezier(0.16, 1, 0.3, 1) .45s both; }
+
+/* ════ tombol (kelas sama dgn kode asli) ════ */
+.btn {
+  font-family: var(--sans);
+  font-size: 16px;
+  padding: 10px 26px;
+  margin: 6px;
+  background: var(--bg-input);
+  color: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.12s ease;
+}
+
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+
+.btn-gold {
+  background: var(--gold);
+  color: #14141c;
+  font-weight: bold;
+  border: none;
+}
+
+.btn-gold:hover { background: var(--gold-dim); color: var(--bg); }
+
+.btn-small { font-size: 13px; padding: 6px 14px; }
+
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.save-slots { margin-top: 18px; }
+
+.save-slot {
+  display: block;
+  width: 260px;
+  margin: 6px auto;
+  padding: 8px 14px;
+  font-family: var(--sans);
+  font-size: 14px;
+  background: var(--bg-input);
+  color: var(--gray);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.save-slot:hover { color: var(--gold); border-color: var(--gold); }
+
+.title-msg { color: var(--red); margin-top: 14px; min-height: 20px; }
+
+/* ═══ Layar game ═══ */
+
+#topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.96), rgba(27, 27, 38, 0.96)),
+    url("/static/assets/textures/silk-dark.png");
+  background-size: cover;
+  border-bottom: 1px solid var(--gold-dim);
+}
+
+.header-title {
+  color: var(--gold);
+  letter-spacing: 3px;
+  font-size: 15px;
+}
+
+/* Layout — kolom tengah (story) paling menonjol (B1) */
+#layout {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr) 300px;
+  gap: 0;
+  min-height: calc(100vh - 58px);
+}
+
+.col { padding: 18px 20px; overflow-y: auto; background: radial-gradient(ellipse at top, var(--bg-panel-2), var(--bg-panel) 65%); }
+#col-left { border-right: 1px solid var(--border); }
+#col-right { border-left: 1px solid var(--border); }
+#col-center { background: var(--bg); }
+
+/* panel kiri — statistik */
+
+.stat-title {
+  font-family: var(--font-label); font-weight: 600;
+  color: var(--gold); letter-spacing: 2px; font-size: 13px;
+  text-transform: uppercase; margin: 0 0 4px;
+}
+
+.player-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.player-name { font-family: var(--font-cjk); font-weight: 700; font-size: 17px; color: var(--cream); }
+
+.stat-row {
+  display: flex; justify-content: space-between; padding: 4px 0;
+  border-bottom: 1px dotted #2a2530; font-size: 13px;
+}
+.stat-label { color: var(--gray); font-family: var(--font-label); font-size: 11px; letter-spacing: .04em; }
+.stat-value { color: var(--cream); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.stat-value.gold { color: var(--gold); }
+.stat-value.red { color: var(--red); }
+.stat-value.blue { color: var(--blue); }
+
+/* ── batang HP/Qi/Exp (komponen baru) ── */
+.stat-bar-wrap { margin: 10px 0; }
+.stat-bar-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.stat-bar-label { font-family: var(--font-label); font-size: 10.5px; letter-spacing: .06em; color: var(--gray); text-transform: uppercase; }
+.stat-bar-num { font-family: var(--font-mono); font-size: 12px; color: var(--cream); font-variant-numeric: tabular-nums; }
+.stat-bar-track { 
+  height: 7px; border-radius: 4px; 
+  background: #0d0d13; 
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.7); 
+  overflow: hidden; margin-top: 4px;
+}
+.stat-bar-fill { height: 100%; width: 0; border-radius: 4px; transition: width .7s cubic-bezier(0.16, 1, 0.3, 1); }
+.stat-bar-fill.hp { background: linear-gradient(90deg, #a83e35, var(--red)); }
+.stat-bar-fill.qi { background: linear-gradient(90deg, #4d719b, var(--blue)); }
+.stat-bar-fill.exp { background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright)); }
+.stat-value.green { color: var(--green); }
+
+/* B3 — Ranah sebagai hero stat: nama besar + progress exp statis */
+.realm-hero {
+  text-align: center;
+  padding: 10px 6px 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.realm-hero .realm-name {
+  color: var(--gold);
+  font-size: 22px;
+  letter-spacing: 2px;
+  display: block;
+}
+
+.realm-hero .realm-level {
+  color: var(--gray);
+  font-size: 13px;
+  letter-spacing: 3px;
+  display: block;
+  margin-top: 2px;
+}
+
+.progress-track {
+  height: 8px;
+  margin-top: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 3px;
+}
+
+.progress-caption {
+  color: var(--gray);
+  font-size: 11px;
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+
+/* kolom tengah — log & interaksi */
+
+/* C4: ambience lokasi — atmosfer statis (gradient + tekstur) dari data, tanpa gambar */
+#col-center {
+  background:
+    linear-gradient(rgba(20, 20, 28, 0.90), rgba(20, 20, 28, 0.90)),
+    url("/static/assets/textures/cloud-mist.png");
+  background-size: cover;
+  border-right: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+body.ambience-academy #col-center {
+  background:
+    linear-gradient(rgba(26, 24, 34, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/silk-dark.png");
+  background-size: cover;
+}
+
+body.ambience-forest #col-center {
+  background:
+    linear-gradient(rgba(20, 28, 26, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/ink-wash.png");
+  background-size: cover;
+}
+
+body.ambience-night #col-center {
+  background:
+    linear-gradient(rgba(14, 14, 24, 0.94), rgba(20, 20, 28, 0.94)),
+    url("/static/assets/textures/cloud-mist.png");
+  background-size: cover;
+}
+
+body.ambience-market #col-center {
+  background:
+    linear-gradient(rgba(28, 24, 20, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/paper-dark.png");
+  background-size: cover;
+}
+
+body.ambience-hall #col-center {
+  background:
+    linear-gradient(rgba(24, 22, 30, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/gold-noise.png");
+  background-size: cover;
+}
+
+body.ambience-library #col-center {
+  background:
+    linear-gradient(rgba(22, 24, 30, 0.92), rgba(20, 20, 28, 0.92)),
+    url("/static/assets/textures/paper-dark.png");
+  background-size: cover;
+}
+
+#log {
+  max-height: 46vh;
+  overflow-y: auto;
+  padding-right: 8px;
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+@keyframes logIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.log-entry { margin-bottom: 7px; white-space: pre-wrap; animation: logIn .35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.log-narration { color: var(--cream); }
+.log-npc { color: var(--gray); }
+.log-player { color: var(--blue); }
+.log-battle { color: var(--red); }
+.log-system { color: var(--gold-dim); font-family: var(--font-label); font-size: 12px; letter-spacing: .03em; }
+
+/* B4 — perlakuan speaker & separator antar-scene (berbasis waktu game) */
+.log-scene {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dotted rgba(212, 175, 55, 0.35);
+}
+
+.log-entry.speaker-line .log-speaker-label {
+  color: var(--gold);
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.log-entry.log-npc.speaker-line { color: var(--cream); }
+.log-entry.log-player.speaker-line { color: var(--c-player); }
+
+#interact { margin-top: 18px; }
+
+/* B5 — dialog sebagai "story card": accent emas kiri, beda dari panel statistik */
+.interact-box {
+  border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px;
+  background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 14px 34px rgba(0,0,0,.4);
+  position: relative;
+}
+.interact-box::before {
+  content: ""; position: absolute; inset: 0; border-radius: 6px; padding: 1px;
+  background: linear-gradient(160deg, var(--border-glow), transparent 40%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+}
+
+.dialog-speaker-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.dialog-speaker { font-family: var(--font-label); color: var(--gold); font-weight: 600; letter-spacing: .03em; font-size: 15px; }
+.dialog-text { font-family: var(--font-body); font-size: 18px; line-height: 1.7; margin-bottom: 16px; font-style: italic; color: var(--cream); min-height: 1.7em; }
+
+@keyframes blink { 50% { opacity: 0; } }
+.tw-cursor { display: inline-block; width: 2px; height: 1em; background: var(--gold); margin-left: 2px; vertical-align: -3px; animation: blink .9s steps(1) infinite; }
+
+.action-row { margin: 8px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.action-label { color: var(--gray); font-size: 13px; margin-right: 4px; font-family: var(--font-hand); }
+
+/* menu opsi (aksi lokasi + pilihan dialog) — tulisan bersambung (Caveat) */
+.action-row .btn, .choice-btn { font-family: var(--font-hand); font-weight: 600; }
+
+select, input[type="text"], input[type="number"] {
+  font-family: var(--sans);
+  font-size: 14px;
+  padding: 6px 8px;
+  background: var(--bg-input);
+  color: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.battle-foe { margin: 4px 0; }
+.battle-foe .foe-name { color: var(--c-danger); font-weight: bold; }
+.battle-hp { color: var(--cream); }
+
+.hint { color: var(--gray); font-style: italic; font-size: 13px; }
+
+/* panel kanan — quest & inventori (B1: hierarchy lebih redup dari story) */
+
+.section { margin-bottom: 18px; }
+
+.quest-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 8px; }
+.quest-title { font-family: var(--font-label); font-size: 13px; color: var(--gold); font-weight: 600; letter-spacing: .02em; }
+.quest-objective { color: var(--gray); font-size: 13px; margin-top: 3px; line-height: 1.5; }
+.quest-done { color: var(--gold-dim); font-size: 13px; font-style: italic; }
+
+.item-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 2px; font-size: 13.5px; border-bottom: 1px dotted #2a2530; }
+.item-name { color: var(--cream); }
+.item-name.rarity-common { color: var(--cream); }
+.item-name.rarity-uncommon { color: var(--jade); }
+.item-name.rarity-rare { color: var(--blue); }
+.item-count { color: var(--gray); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.combatant-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 9px 12px; margin: 5px 0; border-radius: 4px; border-left: 3px solid var(--border);
+  background: var(--bg-input); transition: border-color .2s;
+}
+.combatant-card.ally { border-left-color: var(--jade); }
+.combatant-card.foe { border-left-color: var(--red); }
+.combatant-card .c-name { font-family: var(--font-label); font-size: 13px; letter-spacing: .03em; }
+.combatant-card.ally .c-name { color: var(--jade); }
+.combatant-card.foe .c-name { color: var(--red); }
+.combatant-card .c-bar { flex: 1; max-width: 160px; }
+
+.curriculum-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 13px;
+  border-bottom: 1px dotted #2a2530;
+}
+.curriculum-row.locked { opacity: 0.55; }
+.badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+.badge-learned {
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+}
+.badge-available {
+  background: rgba(143, 191, 143, 0.2);
+  color: var(--green);
+  border: 1px solid rgba(143, 191, 143, 0.4);
+}
+.badge-locked {
+  background: rgba(185, 179, 166, 0.1);
+  color: var(--gray);
+  border: 1px solid rgba(185, 179, 166, 0.2);
+}
+.badge-friendly {
+  background: rgba(143, 191, 143, 0.2);
+  color: var(--green);
+  border: 1px solid rgba(143, 191, 143, 0.4);
+}
+.badge-neutral {
+  background: rgba(185, 179, 166, 0.1);
+  color: var(--gray);
+  border: 1px solid rgba(185, 179, 166, 0.2);
+}
+.badge-hostile {
+  background: rgba(197, 85, 85, 0.2);
+  color: var(--red);
+  border: 1px solid rgba(197, 85, 85, 0.4);
+}
+.badge-distrustful {
+  background: rgba(217, 107, 95, 0.12);
+  color: var(--red);
+  border: 1px solid rgba(217, 107, 95, 0.3);
+}
+.badge-close {
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+}
+
+.relation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  border-bottom: 1px dotted #2a2530;
+  font-size: 13px;
+}
+
+.mem-row { padding: 2px 0; font-size: 13px; color: var(--c-player); cursor: pointer; }
+.mem-row:hover { color: var(--gold); }
+
+/* ═══ Panel Tianyuan Ling ═══ */
+
+#tianyuan {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  max-width: 90vw;
+  height: 100vh;
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.98), rgba(27, 27, 38, 0.98)),
+    url("/static/assets/textures/silk-dark.png");
+  background-size: cover;
+  border-left: 1px solid var(--gold-dim);
+  padding: 18px;
+  overflow-y: auto;
+  z-index: 50;
+  
+  /* D1 (2026-08-15): panel tianyuan slide-in */
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.22s ease, visibility 0s linear 0.22s;
+}
+#tianyuan.tianyuan-open {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform 0.22s ease, visibility 0s linear 0s;
+}
+
+.tianyuan h3 {
+  color: var(--gold);
+  letter-spacing: 3px;
+  margin-top: 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.mem-full { margin-bottom: 16px; }
+.mem-full .mem-title { color: var(--gold); font-weight: bold; margin-bottom: 4px; }
+.mem-full .mem-text { color: var(--cream); font-style: italic; line-height: 1.6; white-space: pre-wrap; }
+
+.sys-log-entry { color: var(--gold); font-size: 13px; padding: 2px 0; border-bottom: 1px dotted #2a2530; }
+
+/* ═══ Modals ═══
+   D1 (2026-08-15): fade+scale saat buka/tutup (opacity, bukan display) —
+   mekanisme toggle di app.js (showModal/closeModal menambah class .modal-visible
+   sebentar setelah .hidden dilepas, agar transition CSS ter-trigger). */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.75); z-index: 99;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.modal-overlay.modal-visible { opacity: 1; }
+
+.modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.97);
+  background:
+    linear-gradient(rgba(27, 27, 38, 0.98), rgba(27, 27, 38, 0.98)),
+    url("/static/assets/textures/paper-dark.png");
+  background-size: cover;
+  border: 1px solid var(--gold);
+  border-radius: 6px; padding: 20px; z-index: 100;
+  max-width: 90vw; width: 500px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.modal.modal-visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+.modal h3 {
+  color: var(--gold); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px;
+}
+
+.shop-tabs { display: flex; gap: 10px; margin-bottom: 16px; }
+.shop-tab {
+  flex: 1; text-align: center; padding: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg-input); color: var(--gray);
+  border-radius: 4px;
+  transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+}
+.shop-tab:hover { color: var(--cream); }
+.shop-tab.active { border-color: var(--gold); color: var(--gold); background: transparent; }
+
+.shop-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dotted #2a2530; }
+.shop-item-info { display: flex; flex-direction: column; }
+.shop-item-price { color: var(--gold); font-size: 13px; }
+.shop-item-empty { opacity: 0.55; }
+.shop-item-empty .shop-item-price { color: var(--gray); }
+.shop-item-soldout { color: var(--gray); font-size: 13px; font-style: italic; white-space: nowrap; }
+
+.mem-locked {
+  border: 1px dashed var(--gold-dim);
+  padding: 10px; margin-bottom: 16px;
+  color: var(--gray); text-align: center;
+  border-radius: 4px;
+}
+
+/* ═══ B6 — mobile naratif: story → choices → quest; panel kanan jadi drawer ═══ */
+
+#btn-toggle-right { display: none; }
+
+@media (max-width: 1023px) {
+  #layout { grid-template-columns: 1fr; }
+  .col { overflow-y: visible; }
+  #log { max-height: none; }
+
+  #btn-toggle-right {
+    display: inline-block;
+  }
+
+  /* panel kanan disembunyikan di mobile, dibuka via tombol — D1 (2026-08-15):
+     geser dari kanan (transform), bukan display:none/block instan.
+     visibility ditunda lewat transition-delay (bukan JS timer) agar elemen
+     tertutup keluar dari tab-order (B8: aksesibilitas keyboard) tanpa
+     mematikan transisi geser itu sendiri. */
+  #col-right {
+    position: fixed;
+    top: 0; right: 0;
+    width: min(340px, 90vw);
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 60;
+    border-left: 1px solid var(--gold-dim);
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.5);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.22s ease, visibility 0s linear 0.22s;
+  }
+  #col-right.drawer-open {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.22s ease, visibility 0s linear 0s;
+  }
+
+  /* overlay gelap untuk drawer */
+  #drawer-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.55); z-index: 55;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+  #drawer-overlay.drawer-visible { opacity: 1; }
+}
+
+/* ═══ Audio Controls ═══ */
+
+.title-audio,
+.topbar-audio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.topbar-audio {
+  margin-top: 0;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid var(--border);
+}
+
+.choice-btn:active { transform: translateX(3px) scale(.99); }
+
+.btn-audio-btn {
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 10px;
+  background: var(--bg-input);
+  color: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-audio-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.btn-audio-btn.muted {
+  color: var(--gray);
+  border-color: var(--border);
+}
+
+.btn-audio-btn.muted:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.audio-volume {
+  width: 100px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.audio-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--gold);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.audio-volume::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.audio-volume::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--gold);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.audio-volume:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.audio-volume:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.audio-volume-label {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--gray);
+  min-width: 36px;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .topbar-audio {
+    display: none;
+  }
+  .title-audio {
+    margin-top: 12px;
+  }
+  .audio-volume {
+    width: 80px;
+  }
+}
