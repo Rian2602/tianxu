@@ -21,8 +21,6 @@ from src.loader import DataRegistry
 from src.validate import DataContractError
 from src.engine.session import GameSession
 
-FIX = Path(__file__).parent / "fixtures" / "minimal_data"
-
 # ---------- pembuat data sintetis ----------
 
 DEFAULT_REALMS = [{
