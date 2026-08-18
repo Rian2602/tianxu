@@ -79,3 +79,21 @@ def test_max_hp_realm_level_zero_no_negative(tmp_path):
     # level 0 → guard clamps to 1 → base + 0*per = base
     assert s.state.max_hp(reg) == 50, f"max_hp realm_level=0 harus 50, dapat {s.state.max_hp(reg)}"
     assert s.state.max_qi(reg) == 30, f"max_qi realm_level=0 harus 30, dapat {s.state.max_qi(reg)}"
+
+
+# --- Task 3: state.py pending_dialog serialization ---
+
+def test_pending_dialog_roundtrip(tmp_path):
+    """pending_dialog harus survive save/load — dialog tidak boleh hilang."""
+    realms = [{"id": "r1", "name": "R1", "name_pinyin": "R1", "order": "1",
+               "levels": "2", "base_hp": "50", "hp_per_level": "5",
+               "base_qi": "30", "qi_per_level": "3"}]
+    reg, s = _sess(tmp_path, quests=[_quest_choose()], realms=realms)
+    s.state.pending_dialog = "dlg_test_123"
+    d = s.state.to_dict()
+    assert d.get("pending_dialog") == "dlg_test_123", \
+        f"to_dict harus include pending_dialog, dapat {d.get('pending_dialog')}"
+    from src.engine.state import GameState
+    loaded = GameState.from_dict(d)
+    assert loaded.pending_dialog == "dlg_test_123", \
+        f"from_dict harus restore pending_dialog, dapat {loaded.pending_dialog}"

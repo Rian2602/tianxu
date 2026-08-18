@@ -205,6 +205,7 @@ class GameState:
             "daily_spar_counts": {k: v for k, v in self.daily_spar_counts.items() if isinstance(k, str) and isinstance(v, int) and v >= 0} if isinstance(self.daily_spar_counts, dict) else {},
             "branch_pending": self.branch_pending,
             "branch_quest": self.branch_quest,
+            "pending_dialog": self.pending_dialog,
             "pending_battle": copy.deepcopy(self.pending_battle) if self.pending_battle else None,
             "companion": copy.deepcopy(self.companion) if self.companion else None,
             "npc_states": copy.deepcopy(self.npc_states),
@@ -285,6 +286,7 @@ class GameState:
             daily_spar_counts=cleaned_spar,
             branch_pending=d.get("branch_pending"),
             branch_quest=d.get("branch_quest"),  # None utk save lama → fallback pencarian
+            pending_dialog=d.get("pending_dialog"),
             pending_battle=copy.deepcopy(d.get("pending_battle")),
             companion=copy.deepcopy(d.get("companion")),
             npc_states=copy.deepcopy(d.get("npc_states", {})),
