@@ -1,0 +1,82 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_orthodox_faction_001",
+      "npc": "npc_grandmaster",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau datang tepat waktu. Aku butuh seseorang yang bisa kupercaya — dan setelah semua yang terjadi, sepertinya kau orangnya. Ada gangguan di formasi penjaga. Bukan gangguan biasa.",
+          "choices": [
+            {"label": "Aku akan menyelidikinya.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Formasi penjaga adalah nyawa Tian Xu. Tanpa ia, segel lemah, monster spiritual bebas, dan dunia di luar kehilangan satu-satunya penjaga. Gangguan ini... datang dari dalam. Seseorang merusaknya.",
+          "choices": [
+            {"label": "Siapa yang mungkin melakukan ini?", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Itulah yang harus kau temukan. Tapi hati-hati — pelakunya mungkin seseorang yang kau kenal. Dan jika kau menemukannya, jangan buru-buru menghakimi. Mereka mungkin punya alasan.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_orthodox_faction_002",
+      "npc": "npc_grandmaster",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau sudah menyelidiki. Sekarang pertanyaannya: apa yang akan kau lakukan dengan apa yang kau temukan?",
+          "choices": [
+            {
+              "label": "Aku setia pada Tian Xu. Aku akan melaporkan semuanya.",
+              "effects": [
+                {"type": "flag", "key": "state_orthodox_stance", "value": "loyal"},
+                {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": 3}
+              ],
+              "next": "n_end_loyal"
+            },
+            {
+              "label": "Aku punya pertanyaan. Kenapaformasi ini harus dilindungi dengan cara ini?",
+              "effects": [
+                {"type": "flag", "key": "state_orthodox_stance", "value": "questioning"},
+                {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -1}
+              ],
+              "next": "n_end_questioning"
+            },
+            {
+              "label": "Sistem ini harus berubah. Aku tidak bisa melindungi kebohongan.",
+              "effects": [
+                {"type": "flag", "key": "state_orthodox_stance", "value": "rebel"},
+                {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -3}
+              ],
+              "next": "n_end_rebel"
+            }
+          ]
+        },
+        "n_end_loyal": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau memilih jalan yang benar. Tian Xu butuh orang-orang sepertimu — yang rela berkorban demi yang lebih besar. Aku tidak akan melupakan ini.",
+          "choices": []
+        },
+        "n_end_questioning": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Pertanyaan itu... berbahaya. Tapi aku menghargai kejujuranmu. Mungkin suatu hari kita akan menjawabnya bersama. Untuk sekarang, jangan menyebarkannya.",
+          "choices": []
+        },
+        "n_end_rebel": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau memilih jalan yang berbeda. Aku tidak bisa menghentikanmu — tapi aku bisa memastikan bahwa pilihanmu memiliki konsekuensi. Pergilah. Dan jangan menyesal.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

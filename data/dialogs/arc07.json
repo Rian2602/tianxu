@@ -41,6 +41,18 @@
       }
      ]
     },
+    "n_orthodox_loyal": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Aku tahu kau setia pada Grandmaster — dan aku menghargai itu. Tapi malam ini, keputusanmu bukan untuk faksi. Keputusanmu untuk semua orang.",
+     "condition": {"flag": {"key": "state_orthodox_stance", "value": "loyal"}},
+     "choices": [
+      {
+       "label": "Aku tahu. Aku akan memilih yang terbaik untuk semua.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
     "n_mei_ruo_gone": {
      "speaker": "npc:npc_lin_yue",
      "text": "Kau datang. Aku sudah menunggumu. Mei Ruo... dia bilang dia tidak bisa lagi berada di sini. Dia pergi mencari kebenarannya sendiri — dan aku tidak tahu apakah itu hal yang baik atau buruk.",

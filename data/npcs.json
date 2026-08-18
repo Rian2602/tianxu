@@ -180,16 +180,27 @@
     }
    }
   },
-  {
-   "id": "npc_grandmaster",
-   "name": "Grandmaster",
-   "location": "loc_grandmaster_chamber",
-   "dialog_routes": {
-    "general": "dlg_a04_d03",
-    "main": {
-     "quest_a04_c03_003": "dlg_a04_d03"
-    }
-   }
+  {      "id": "npc_grandmaster",
+      "name": "Grandmaster",
+      "location": "loc_grandmaster_chamber",
+      "dialog_routes": {
+        "general": "dlg_a04_d03",
+        "main": {
+          "quest_a04_c03_003": "dlg_a04_d03"
+        }
+      },
+      "side_offers": [
+        {
+          "quest": "quest_faction_orthodox_001",
+          "dialog": "dlg_orthodox_faction_001",
+          "min_relation": 2
+        },
+        {
+          "quest": "quest_faction_orthodox_002",
+          "dialog": "dlg_orthodox_faction_002",
+          "requires": "flag_orthodox_task_accepted"
+        }
+      ]
   },
   {
    "id": "npc_villager_elder",
