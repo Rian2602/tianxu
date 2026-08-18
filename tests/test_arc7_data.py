@@ -13,8 +13,6 @@ Skip bila data Arc I-VI tidak ada.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from src.loader import DataRegistry, DATA_DIR
@@ -28,15 +26,10 @@ pytestmark = pytest.mark.skipif(
     reason="data story Arc VII belum ada di data/",
 )
 
-REGISTRY: DataRegistry | None = None
-
 
 @pytest.fixture(scope="module")
 def registry() -> DataRegistry:
-    global REGISTRY
-    if REGISTRY is None:
-        REGISTRY = DataRegistry()
-    return REGISTRY
+    return DataRegistry()
 
 
 def _through_arc1_2_3_4(registry, branch_idx: int = 1) -> GameSession:

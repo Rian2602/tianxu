@@ -45,4 +45,5 @@ def update_reliability(state: GameState, memory_id: str, new_reliability: str) -
         if mid == memory_id:
             if isinstance(m, dict):
                 m["reliability"] = new_reliability
-            break
+            return
+    add_log(state, "system", f"[Sistem] Ingatan '{memory_id}' tidak ditemukan — reliability tidak diubah.")

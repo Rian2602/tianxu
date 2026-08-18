@@ -324,7 +324,7 @@ a, button { font-family: inherit; }
   box-shadow: inset 0 1px 3px rgba(0,0,0,.7); 
   overflow: hidden; margin-top: 4px;
 }
-.stat-bar-fill { height: 100%; width: 0; border-radius: 4px; transition: width .7s cubic-bezier(0.16, 1, 0.3, 1); }
+.stat-bar-fill { height: 100%; width: 0; border-radius: 4px; transition: width .3s cubic-bezier(0.16, 1, 0.3, 1); }
 .stat-bar-fill.hp { background: linear-gradient(90deg, #a83e35, var(--red)); }
 .stat-bar-fill.qi { background: linear-gradient(90deg, #4d719b, var(--blue)); }
 .stat-bar-fill.exp { background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright)); }
