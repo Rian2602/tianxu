@@ -113,10 +113,6 @@
   ],
   "monster_respawn_hours": 2
  },
- "morality": {
-  "min": -100,
-  "max": 100
- },
  "arcs": [
   {
    "id": "arc_01",
