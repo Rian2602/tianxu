@@ -8,8 +8,6 @@ memory unlock, pilihan pavilion, arc_summary + ending. Skip bila `data/` kosong
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from src.loader import DataRegistry, DATA_DIR
@@ -20,15 +18,10 @@ pytestmark = pytest.mark.skipif(
     reason="data story Arc I belum ada di data/",
 )
 
-REGISTRY: DataRegistry | None = None
-
 
 @pytest.fixture(scope="module")
 def registry() -> DataRegistry:
-    global REGISTRY
-    if REGISTRY is None:
-        REGISTRY = DataRegistry()  # data dir default = data/
-    return REGISTRY
+    return DataRegistry()  # data dir default = data/
 
 
 def _new_session(registry: DataRegistry) -> GameSession:
@@ -89,7 +82,7 @@ def test_arc1_full_playthrough_yellow(registry):
     assert s.state.current_quest == "quest_a01_c04_005"
     assert s.state.player.academy == "pavilion_yanzhi"
     # starter kit pavilion diterima; curriculum khas pavilion tersedia
-    assert s.state.inventory.get("pil_qi", 0) >= 3  # 2 awal + 2 starter - 0
+    assert s.state.inventory.get("pil_qi", 0) == 4  # 2 awal + 2 starter pavilion
     curr = [t["id"] for t in registry.academy_curriculum("pavilion_yanzhi")]
     assert "teknik_yanzhi" in curr
 
@@ -174,4 +167,7 @@ def test_arc1_hunt_and_battle(registry):
         s.apply_action({"type": "battle_action", "action": "attack"})
         guard += 1
     assert s.state.pending_battle is None, "battle hunt harus berakhir"
-    assert s.state.player.exp >= exp0
+    won = any("🏆" in e["text"] or "Kemenangan" in e["text"]
+              for e in s.state.log if e["type"] == "battle")
+    assert won, "hunt harus berujung kemenangan agar assertion exp bermakna"
+    assert s.state.player.exp > exp0, "menang battle harus memberi exp (> bukan >=)"
