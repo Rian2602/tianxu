@@ -11,8 +11,6 @@ Arc I-IV tidak ada.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from src.loader import DataRegistry, DATA_DIR
@@ -23,15 +21,10 @@ pytestmark = pytest.mark.skipif(
     reason="data story Arc V belum ada di data/",
 )
 
-REGISTRY: DataRegistry | None = None
-
 
 @pytest.fixture(scope="module")
 def registry() -> DataRegistry:
-    global REGISTRY
-    if REGISTRY is None:
-        REGISTRY = DataRegistry()
-    return REGISTRY
+    return DataRegistry()
 
 
 def _new_session(registry: DataRegistry) -> GameSession:
@@ -140,21 +133,26 @@ def test_arc5_data_contract_ok(registry):
     assert registry.dialog("dlg_a05_branch_family") is not None
 
 
-def test_arc5_spiritual_collapse_and_mountain_gate(registry):
-    """Q1 Spiritual Collapse → Q2 Mountain Gate MAJOR → dialog pilihan 2-cabang."""
+def _to_mountain_gate_branch(registry: DataRegistry) -> GameSession:
+    """Arc I-IV → desa terdampak → gerbang gunung → dialog branch.
+    DRY: dipakai spiritual_collapse, mountain_gate, family_crisis, entity."""
     s = _through_arc1_2_3_4(registry)
-    # keluar dari ruang terdalam menuju desa terdampak
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
     _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region")
     _reach(s, "loc_affected_village")
     _talk(s, "npc_villager_elder")
     assert s.state.current_quest == "quest_a05_c02_002"
-    assert s.state.flags.get("world_event_a05_spiritual_collapse") == "active"
-    # Q2: gerbang gunung → branch dialog
     _reach(s, "loc_outer_region"); _reach(s, "loc_mountain_gate")
     _talk(s, "npc_mountain_guard", close=False)
     s.apply_action({"type": "dialog_choice", "choice_index": -1})
     assert s.state.branch_pending == "dlg_a05_branch_mg"
+    return s
+
+
+def test_arc5_spiritual_collapse_and_mountain_gate(registry):
+    """Q1 Spiritual Collapse → Q2 Mountain Gate MAJOR → dialog pilihan 2-cabang."""
+    s = _to_mountain_gate_branch(registry)
+    assert s.state.flags.get("world_event_a05_spiritual_collapse") == "active"
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # changed
     assert s.state.current_quest == "quest_a05_c03_003"
     assert s.state.flags.get("flag_mountain_gate_changed") is True
@@ -167,14 +165,7 @@ def test_arc5_spiritual_collapse_and_mountain_gate(registry):
 ])
 def test_arc5_mountain_gate_two_branches(registry, idx, flag, rel_npc, rel_min):
     """MAJOR outcome Mountain Gate: 2 cabang → flag + relation berbeda → konvergen."""
-    s = _through_arc1_2_3_4(registry)
-    _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
-    _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region")
-    _reach(s, "loc_affected_village")
-    _talk(s, "npc_villager_elder")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_mountain_gate")
-    _talk(s, "npc_mountain_guard", close=False)
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    s = _to_mountain_gate_branch(registry)
     s.apply_action({"type": "dialog_choice", "choice_index": idx})
     assert s.state.current_quest == "quest_a05_c03_003", f"{flag} harus konvergen"
     assert s.state.flags.get(flag) is True
@@ -195,19 +186,34 @@ def test_arc5_mountain_gate_two_branches(registry, idx, flag, rel_npc, rel_min):
          "state_mei_ruo_status": "disillusioned", "state_gu_han_status": "disillusioned"},
      "npc_gu_han", 0),
 ])
+
+
+def _to_family_crisis_branch(registry: DataRegistry, mg_idx: int = 0) -> GameSession:
+    """Mountain Gate resolved → loop dialog krisis sampai branch Family Crisis.
+    DRY: dipakai family_crisis + entity_and_memory."""
+    s = _to_mountain_gate_branch(registry)
+    s.apply_action({"type": "dialog_choice", "choice_index": mg_idx})
+    _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
+    return s
+
+
+@pytest.mark.parametrize("idx,status_map,rel_npc,rel_min", [
+    (0, {"state_lin_yue_status": "loyal", "state_mei_ruo_status": "loyal",
+         "state_shen_luo_status": "separated", "state_gu_han_status": "disillusioned"},
+     "npc_lin_yue", 3),
+    (1, {"state_shen_luo_status": "loyal", "state_gu_han_status": "loyal",
+         "state_lin_yue_status": "separated", "state_mei_ruo_status": "disillusioned"},
+     "npc_shen_luo", 3),
+    (2, {"state_mei_ruo_status": "loyal", "state_lin_yue_status": "loyal",
+         "state_gu_han_status": "separated", "state_shen_luo_status": "disillusioned"},
+     "npc_mei_ruo", 3),
+    (3, {"state_lin_yue_status": "separated", "state_shen_luo_status": "separated",
+         "state_mei_ruo_status": "disillusioned", "state_gu_han_status": "disillusioned"},
+     "npc_gu_han", 0),
+])
 def test_arc5_family_crisis_four_branches(registry, idx, status_map, rel_npc, rel_min):
     """Found Family Crisis: 4 keputusan → status tiap anggota berbeda (docs 04) → konvergen."""
-    s = _through_arc1_2_3_4(registry)
-    _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
-    _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region")
-    _reach(s, "loc_affected_village")
-    _talk(s, "npc_villager_elder")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_mountain_gate")
-    _talk(s, "npc_mountain_guard", close=False)
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})
-    s.apply_action({"type": "dialog_choice", "choice_index": 0})  # changed
-    # Q3: family crisis → dialog krisis → branch dialog (talk anggota found family)
-    _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
+    s = _to_family_crisis_branch(registry)
     for npc in ("npc_lin_yue", "npc_shen_luo", "npc_mei_ruo", "npc_gu_han"):
         s.apply_action({"type": "talk", "npc": npc})
         if s.state.pending_dialog:
@@ -232,16 +238,7 @@ def test_arc5_family_crisis_four_branches(registry, idx, status_map, rel_npc, re
 
 def test_arc5_entity_and_memory_to_ending(registry):
     """Q4 Entity first contact → Q5 memory besar → ending + arc_summary."""
-    s = _through_arc1_2_3_4(registry)
-    _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
-    _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region")
-    _reach(s, "loc_affected_village")
-    _talk(s, "npc_villager_elder")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_mountain_gate")
-    _talk(s, "npc_mountain_guard", close=False)
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})
-    s.apply_action({"type": "dialog_choice", "choice_index": 0})  # changed
-    _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
+    s = _to_family_crisis_branch(registry)
     for npc in ("npc_lin_yue", "npc_shen_luo", "npc_mei_ruo", "npc_gu_han"):
         s.apply_action({"type": "talk", "npc": npc})
         if s.state.pending_dialog:
