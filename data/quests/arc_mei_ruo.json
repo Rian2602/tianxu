@@ -1,0 +1,63 @@
+{
+  "quests": [
+    {
+      "id": "quest_char_mei_ruo_001",
+      "kind": "side",
+      "title": "Pertanyaan yang Tersisa",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1,
+        "hint": "Bicara dengan Mei Ruo tentang inkonsistensi dalam ingatanmu."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a03_m01_questioned", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+        ],
+        "rewards": {"exp": 8},
+        "system_msg": "Mei Ruo menunjukkan inkonsistensi dalam ingatanmu — Gerbang yang Kubuka mungkin tidak seperti yang kau ingat."
+      },
+      "next": []
+    },
+    {
+      "id": "quest_char_mei_ruo_002",
+      "kind": "side",
+      "title": "Bukti yang Tersembunyi",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1,
+        "hint": "Temukan bukti yang bertentangan dengan ingatanmu tentang Gerbang."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a03_m01_evidence_found", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Kau menemukan catatan yang menunjukkan Jiang Yan tidak membuka Gerbang untuk menghancurkan — ia mencoba memisahkan Entity dari sumber cultivation."
+      },
+      "next": []
+    },
+    {
+      "id": "quest_char_mei_ruo_003",
+      "kind": "side",
+      "title": "Kebenaran yang Berbeda",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1,
+        "hint": "Putuskan bagaimana kau memahami kebenaran tentang Gerbang."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_mei_ruo_arc_complete", "value": true}
+        ],
+        "rewards": {"exp": 12},
+        "system_msg": "Kau mencapai pemahaman baru tentang apa yang sebenarnya terjadi di Gerbang."
+      },
+      "next": []
+    }
+  ]
+}

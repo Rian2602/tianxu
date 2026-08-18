@@ -60,17 +60,33 @@
         }
       ]
   },
-  {
-   "id": "npc_mei_ruo",
-   "name": "Mei Ruo",
-   "location": "loc_pavilion_yanzhi",
-   "dialog_routes": {
-    "general": "dlg_a01_d005",
-    "main": {
-     "quest_a04_c01_001": "dlg_a04_d01",
-     "quest_a04_c02_002": "dlg_a04_d02"
-    }
-   }
+  {      "id": "npc_mei_ruo",
+      "name": "Mei Ruo",
+      "location": "loc_pavilion_yanzhi",
+      "dialog_routes": {
+        "general": "dlg_a01_d005",
+        "main": {
+          "quest_a04_c01_001": "dlg_a04_d01",
+          "quest_a04_c02_002": "dlg_a04_d02"
+        }
+      },
+      "side_offers": [
+        {
+          "quest": "quest_char_mei_ruo_001",
+          "dialog": "dlg_mei_ruo_char_001",
+          "requires": "memory_a03_m01"
+        },
+        {
+          "quest": "quest_char_mei_ruo_002",
+          "dialog": "dlg_mei_ruo_char_002",
+          "requires": "flag_memory_a03_m01_questioned"
+        },
+        {
+          "quest": "quest_char_mei_ruo_003",
+          "dialog": "dlg_mei_ruo_char_002",
+          "requires": "flag_memory_a03_m01_evidence_found"
+        }
+      ]
   },
   {
    "id": "npc_gu_han",

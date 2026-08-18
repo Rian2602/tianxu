@@ -1,0 +1,94 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_mei_ruo_char_001",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Aku sudah menunggumu — dan aku punya pertanyaan tentang ingatanmu. Yang kau sebut 'Gerbang yang Kubuka.'",
+          "choices": [
+            {"label": "Apa masalahnya?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ingatan itu bilang kau membuka Gerbang dengan tenang — 'Kalau dunia harus membenciku, biarkan.' Tapi catatan resmi Tian Xu bilang Gerbang dibuka dengan paksa, dan orang yang membukanya melawan semua orang yang mencoba menghentikannya.",
+          "choices": [
+            {"label": "Jadi ingatanku salah?", "next": "n3"},
+            {"label": "Mungkin ada dua versi kejadian.", "next": "n3b"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Tidak harus salah — tapi mungkin tidak lengkap. Ingatan sering hanya menangkap emosi, bukan konteks. Yang kau ingat adalah PERASAAN membuka Gerbang. Yang tidak kau ingat adalah MENGAPA.",
+          "choices": [
+            {"label": "Aku ingin tahu mengapa.", "next": "n4"}
+          ]
+        },
+        "n3b": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Persis. Dan dua versi itu tidak harus kontradiktif — mungkin keduanya benar dari sudut pandang berbeda. Tapi kita perlu mencari bukti untuk memutuskan mana yang lebih dekat ke kebenaran.",
+          "choices": [
+            {"label": "Aku akan mencarinya.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Bagus. Aku sudah menemukan petunjuk pertama — ada catatan pribadi yang tersembunyi di arsip bawah tanah. Catatan itu ditulis oleh seseorang yang ADA di sana saat Gerbang dibuka. Kau mau melihatnya?",
+          "choices": [
+            {"label": "Ya. Tunjukkan padaku.", "next": "n5"}
+          ]
+        },
+        "n5": {
+          "speaker": "narration",
+          "text": "Mei Ruo membawamu ke ruangan kecil di bawah arsip. Di atas meja tua, sebuah gulungan catatan — tulisan tangan, buram oleh waktu. Ini bukan catatan resmi. Ini catatan pribadi saksi mata.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_mei_ruo_char_002",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah membaca catatan itu. Sekarang pertanyaannya: apa yang kau percaya?",
+          "choices": [
+            {
+              "label": "Jiang Yan membuka Gerbang untuk menghancurkan segalanya.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a03_m01_reinterpretation", "value": "destroy"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Jiang Yan membuka Gerbang untuk memisahkan Entity dari sumber cultivation.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a03_m01_reinterpretation", "value": "separate"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 3}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Aku tidak tahu. Mungkin keduanya benar sebagian.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a03_m01_reinterpretation", "value": "uncertain"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+              ],
+              "next": "n_end"
+            }
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kebenaran tidak selalu tunggal. Yang penting adalah kau TIDAK lagi hanya menerima ingatan pertamamu sebagai satu-satunya versi. Itu langkah pertama untuk memahami siapa kau sebenarnya.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

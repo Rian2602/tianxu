@@ -162,6 +162,19 @@
       "npc": "npc_entity",
       "start": "n1",
       "nodes": {
+        "n_separate": {
+          "speaker": "npc:npc_entity",
+          "text": "Kau sudah tahu. Bukan dari ingatan — tapi dari bukti. Jiang Yan tidak membunuhku untuk menghancurkan. Dia mencoba memisahkanku dari sumbernya. Dia mencoba MENYELAMATKANKU.",
+          "condition": {"flag": {"key": "state_memory_a03_m01_reinterpretation", "value": "separate"}},
+          "choices": [
+            {"label": "Aku mengerti sekarang.", "next": "n_end_separate"}
+          ]
+        },
+        "n_end_separate": {
+          "speaker": "npc:npc_entity",
+          "text": "Maka kau melangkah lebih jauh dari Jiang Yan. Dia gagal karena takut. Kau... kita akan lihat apa yang akan kau lakukan.",
+          "choices": []
+        },
         "n1": {
           "speaker": "npc:npc_entity",
           "text": "Kau membunuhku sekali. Kau sudah lupa. Aku tidak.",
