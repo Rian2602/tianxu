@@ -7,6 +7,7 @@ __pycache__/
 .agents/
 .opencode/
 .claude/
+claude/
 
 # Save files (player data, not code)
 saves/
