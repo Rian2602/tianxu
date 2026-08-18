@@ -12,7 +12,13 @@ from dataclasses import dataclass, field
 # Versi skema save (ENGINE_ARCHITECTURE §13). Naikkan saat format save berubah
 # MAKNA (bukan sekadar field baru) — `from_dict` wajib migrasi/penolakan.
 # Save tanpa key = versi legacy (v0): toleran via `.get(..., default)`.
-SCHEMA_VERSION = 1
+#
+# v1 → v2 (F2.3): `last_hunt_time` int (satu zona global) → dict[str, int]
+# (timer per zona berburu). Migrator: int → {"legacy": int} agar timer v1
+# tetap dihormati oleh zona legacy.
+#
+# v2 → v3: factions dari flags (rep_*) + memories string → dict{reliability}
+SCHEMA_VERSION = 3
 
 
 @dataclass
@@ -85,19 +91,22 @@ class GameState:
     inventory: dict = field(default_factory=dict)  # item_id -> count
     flags: dict = field(default_factory=dict)
     relations: dict = field(default_factory=dict)  # npc_id -> skor
-    memories: list = field(default_factory=list)  # id ingatan terbuka
+    memories: list = field(default_factory=list)  # list of dicts: {id, reliability}
     talked_npcs: set = field(default_factory=set)  # npc_id yang pernah diajak bicara (routing dialog)
     log: list = field(default_factory=list)
     last_safe_location: str | None = None
-    last_hunt_time: int | None = None
+    last_hunt_time: dict[str, int] | None = None  # hunt_id -> jam absolut (F2.3)
     grounding_hours_today: int = 0
     exp_grind_today: int = 0  # cap exp grinding harian (berburu/spar/side quest)
     daily_spar_counts: dict = field(default_factory=dict)
     branch_pending: str | None = None  # dialog id untuk pilih cabang quest
+    branch_quest: str | None = None  # quest id yang memicu branch (bukti eksplisit,
+    #                                   hindari pencarian mundur di completed_quests)
     pending_dialog: str | None = None
     pending_battle: dict | None = None  # data battle aktif (dict, lihat battle.py)
     companion: dict | None = None  # {"id", "hp", "active"} — jalur Summoning (ENGINE §9.4)
     npc_states: dict = field(default_factory=dict)  # npc_id -> {"location"?, "available"?} — efek npc_state
+    factions: dict = field(default_factory=dict)  # faksi_id -> skor (orthodox, reformation, dll.)
     _ui_proxy: UIState | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -117,19 +126,10 @@ class GameState:
     # ---------- waktu: bulan (derived — C2, GDD §7) ----------
 
     def month(self, registry) -> int:
-        """Bulan (1-based) dihitung dari `day` — derived, tidak diserialisasi,
-        jadi save lama otomatis kompatibel tanpa migrasi. `month_length_days`
-        dari `config.time` (default 30)."""
         mld = int((registry.config.get("time", {}) or {}).get("month_length_days", 30))
-        # `(day−1) // mld + 1`: day 1..30 = Bulan 1, day 31..60 = Bulan 2, dst.
-        # (deviasi 1 baris dari formula plan `day // mld + 1` — yang terakhir
-        # off-by-one di kelipatan persis: day 30 → Bulan 2 padahal masih Bulan 1;
-        # kasus plan day 1/31/61 tetap terpenuhi)
         return max(1, (self.day - 1) // mld + 1)
 
     def month_name(self, registry) -> str:
-        """Nama tampilan bulan — dari `config.time.month_names` (bila ada 12
-        nama); fallback `f"Bulan {month}"` (data arc berikutnya bisa isi nama)."""
         names = (registry.config.get("time", {}) or {}).get("month_names")
         if isinstance(names, list) and len(names) >= self.month(registry):
             return names[self.month(registry) - 1]
@@ -139,22 +139,23 @@ class GameState:
 
     def max_hp(self, registry) -> int:
         r = registry.realm_by_id(self.player.realm)
-        if not r:
-            return self.player.hp
+        if not r or not r.get("base_hp"):
+            return 50  # sane default — returning current HP makes rest/heal no-op
         base = int(r["base_hp"])
-        per = int(r["hp_per_level"])
-        return base + (self.player.realm_level - 1) * per
+        per = int(r.get("hp_per_level", 0) or 0)
+        lvl = max(1, self.player.realm_level)  # guard: realm_level=0 from corrupt save
+        return base + (lvl - 1) * per
 
     def max_qi(self, registry) -> int:
         r = registry.realm_by_id(self.player.realm)
-        if not r:
-            return self.player.qi
+        if not r or not r.get("base_qi"):
+            return 30  # sane default
         base = int(r["base_qi"])
-        per = int(r["qi_per_level"])
-        return base + (self.player.realm_level - 1) * per
+        per = int(r.get("qi_per_level", 0) or 0)
+        lvl = max(1, self.player.realm_level)
+        return base + (lvl - 1) * per
 
     def exp_next(self, registry) -> int:
-        """Exp yang dibutuhkan untuk naik dari tingkat saat ini ke berikutnya."""
         c = registry.config.get("cultivation", {})
         base = c.get("exp_per_level_base", 10)
         growth = c.get("exp_growth_per_level", 1.2)
@@ -203,9 +204,11 @@ class GameState:
             "exp_grind_today": self.exp_grind_today,
             "daily_spar_counts": {k: v for k, v in self.daily_spar_counts.items() if isinstance(k, str) and isinstance(v, int) and v >= 0} if isinstance(self.daily_spar_counts, dict) else {},
             "branch_pending": self.branch_pending,
+            "branch_quest": self.branch_quest,
             "pending_battle": copy.deepcopy(self.pending_battle) if self.pending_battle else None,
             "companion": copy.deepcopy(self.companion) if self.companion else None,
             "npc_states": copy.deepcopy(self.npc_states),
+            "factions": copy.deepcopy(self.factions),
         }
 
     @classmethod
@@ -213,6 +216,36 @@ class GameState:
         ver = d.get("schema_version")
         if ver is not None and ver > SCHEMA_VERSION:
             raise ValueError(f"save versi {ver} lebih baru dari engine (v{SCHEMA_VERSION}) — perbarui game dulu")
+
+        # Migrasi v0/v1 → v2: last_hunt_time int → dict per zona
+        raw_lht = d.get("last_hunt_time")
+        if isinstance(raw_lht, dict):
+            lht = {k: v for k, v in raw_lht.items()
+                   if isinstance(k, str) and isinstance(v, int) and v >= 0}
+        elif isinstance(raw_lht, int) and raw_lht >= 0:
+            lht = {"legacy": raw_lht}
+        else:
+            lht = {}
+
+        # v0/v1/v2 → v3: factions dari flags + memories string → dict
+        v = ver or 0
+        raw_flags = copy.deepcopy(d.get("flags", {}))
+        factions = copy.deepcopy(d.get("factions", {}))
+        if v < 3:
+            for key in list(raw_flags):
+                if key.startswith("rep_"):
+                    faksi = key[4:]
+                    factions[faksi] = factions.get(faksi, 0) + raw_flags.pop(key)
+
+        raw_mems = d.get("memories", [])
+        if v < 3:
+            memories = [
+                {"id": m, "reliability": "unknown"} if isinstance(m, str) else m
+                for m in raw_mems
+            ]
+        else:
+            memories = copy.deepcopy(raw_mems)
+
         p = d["player"]
         raw_spar = d.get("daily_spar_counts")
         cleaned_spar = {k: v for k, v in raw_spar.items() if isinstance(k, str) and isinstance(v, int) and v >= 0} if isinstance(raw_spar, dict) else {}
@@ -241,17 +274,19 @@ class GameState:
             active_side_quests=copy.deepcopy(d.get("active_side_quests", {})),
             side_quest_cooldowns=copy.deepcopy(d.get("side_quest_cooldowns", {})),
             inventory=copy.deepcopy(d.get("inventory", {})),
-            flags=copy.deepcopy(d.get("flags", {})),
+            flags=raw_flags,
             relations=copy.deepcopy(d.get("relations", {})),
-            memories=copy.deepcopy(d.get("memories", [])),
+            memories=memories,
             talked_npcs=set(d.get("talked_npcs", [])),
             last_safe_location=d.get("last_safe_location"),
-            last_hunt_time=d.get("last_hunt_time"),
+            last_hunt_time=lht,
             grounding_hours_today=d.get("grounding_hours_today", 0),
             exp_grind_today=d.get("exp_grind_today", 0),
             daily_spar_counts=cleaned_spar,
             branch_pending=d.get("branch_pending"),
+            branch_quest=d.get("branch_quest"),  # None utk save lama → fallback pencarian
             pending_battle=copy.deepcopy(d.get("pending_battle")),
             companion=copy.deepcopy(d.get("companion")),
             npc_states=copy.deepcopy(d.get("npc_states", {})),
+            factions=factions,
         )
