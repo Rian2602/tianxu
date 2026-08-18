@@ -33,9 +33,6 @@ EFFECT_TYPES = {
     "technique", "start_quest", "npc_state",
 }
 
-# Dispatch table — validate & tests derive kind sets from these.
-EFFECT_HANDLERS: dict[str, object] = {k: None for k in EFFECT_TYPES - EFFECT_TYPES_DIALOG_ONLY}
-
 
 def apply(state: GameState, registry: DataRegistry, effects: list | None) -> None:
     for fx in effects or []:

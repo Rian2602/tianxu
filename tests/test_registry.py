@@ -25,7 +25,7 @@ from src.engine.battle import (
     player_combat,
 )
 from src.engine.dialog import CONDITION_CHECKERS, CONDITION_KEYS
-from src.engine.effects import EFFECT_HANDLERS, apply as apply_effects
+from src.engine.effects import EFFECT_TYPES, apply as apply_effects
 from src.engine.quest import OBJECTIVE_HANDLERS
 from src.loader import DataRegistry
 from src.validate import DataContractError
@@ -39,8 +39,8 @@ def test_validator_kind_sets_match_registry_keys():
     """Set yang divalidasi = kunci dispatch — mustahil validator basi terhadap executor.
     (subsumes cek "tabel terisi": perbandingan himpunan eksplisit di bawah ini
     sudah memastikan set tidak kosong dan tidak berubah dari kontrak)."""
-    assert set(EFFECT_HANDLERS) == {"morality", "relation", "reputation", "flag",
-                                    "item", "gold", "technique", "npc_state"}
+    assert EFFECT_TYPES == {"morality", "relation", "reputation", "flag",
+                            "item", "gold", "technique", "start_quest", "npc_state"}
     assert set(OBJECTIVE_HANDLERS) == {"talk", "defeat", "gather", "reach", "choose",
                                        "spar", "advance_time"}
     assert TECHNIQUE_KINDS == {"attack", "defend", "heal"}
@@ -56,7 +56,7 @@ def test_validator_kind_sets_match_registry_keys():
     )
     assert V_OBJ == set(OBJECTIVE_HANDLERS)
     # validator sengaja menambah start_quest (dialog-only) ke set eksekusi
-    assert V_EFFECT == set(EFFECT_HANDLERS) | {"start_quest"}
+    assert V_EFFECT == EFFECT_TYPES
     assert V_COND == CONDITION_KEYS
     assert V_TECH == TECHNIQUE_KINDS
     assert V_STATUS == STATUS_KINDS
