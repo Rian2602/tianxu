@@ -9,8 +9,6 @@ Arc I tidak ada (data tidak di-commit — AGENTS.md).
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from src.loader import DataRegistry, DATA_DIR
@@ -21,15 +19,10 @@ pytestmark = pytest.mark.skipif(
     reason="data story Arc II belum ada di data/",
 )
 
-REGISTRY: DataRegistry | None = None
-
 
 @pytest.fixture(scope="module")
 def registry() -> DataRegistry:
-    global REGISTRY
-    if REGISTRY is None:
-        REGISTRY = DataRegistry()
-    return REGISTRY
+    return DataRegistry()
 
 
 def _new_session(registry: DataRegistry) -> GameSession:
@@ -133,6 +126,22 @@ def test_arc2_trials_and_investigation(registry):
     assert s.state.inventory.get("catatan_siklus") == 1
 
 
+def _to_accusation_branch(registry: DataRegistry) -> GameSession:
+    """Mainkan Arc I → midterm → team trial → investigasi → sampai dialog
+    percabangan dlg_a02_branch (DRY: dipakai accusation + convergence)."""
+    s = _through_arc1(registry)
+    _reach(s, "loc_training_hall")
+    _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
+    _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
+    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
+    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
+    _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
+    _talk(s, "npc_lin_yue", close=False)
+    s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    assert s.state.branch_pending == "dlg_a02_branch"
+    return s
+
+
 @pytest.mark.parametrize("idx,flag,needle", [
     (0, "state_rel_proctor", "obey"),
     (1, "flag_archive_suspicious", "investigate"),
@@ -141,17 +150,7 @@ def test_arc2_trials_and_investigation(registry):
 def test_arc2_accusation_three_branches(registry, idx, flag, needle):
     """First Major Choice: 3 cabang → efek state berbeda → semua konvergen ke
     quest_a02_c04_007 (prinsip convergence docs 03)."""
-    s = _through_arc1(registry)
-    _reach(s, "loc_training_hall")
-    _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
-    _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
-    # quest 006: dialog d013 lalu pilih branch
-    _talk(s, "npc_lin_yue", close=False)
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})  # tutup d013
-    assert s.state.branch_pending == "dlg_a02_branch"
+    s = _to_accusation_branch(registry)
     assert s.view()["mode"] == "dialog"
     s.apply_action({"type": "dialog_choice", "choice_index": idx})
     assert s.state.current_quest == "quest_a02_c04_007", f"branch {needle} harus konvergen"
@@ -171,15 +170,7 @@ def test_arc2_accusation_three_branches(registry, idx, flag, needle):
 
 def test_arc2_convergence_to_ending(registry):
     """Konvergensi: hidden cave → artefak (memory_a02_m01) → return → arc_summary."""
-    s = _through_arc1(registry)
-    _reach(s, "loc_training_hall")
-    _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
-    _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
-    _talk(s, "npc_lin_yue", close=False)
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    s = _to_accusation_branch(registry)
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # obey
     # 7. hidden cave
     _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
