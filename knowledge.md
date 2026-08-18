@@ -42,7 +42,7 @@ No package/build tooling: no `pyproject.toml`, `requirements.txt`, or build conf
 
 ## Conventions & constraints
 
-- **Dispatch tables everywhere** — `EFFECT_HANDLERS`, `CONDITION_CHECKERS`, `OBJECTIVE_HANDLERS`. New type = new dict key, no if/elif chains. `TECHNIQUE_KINDS` and `STATUS_KINDS` are frozensets (single source of truth for validator).
+- **Dispatch tables everywhere** — `CONDITION_CHECKERS`, `OBJECTIVE_HANDLERS`. New type = new dict key, no if/elif chains. `EFFECT_TYPES`, `TECHNIQUE_KINDS`, and `STATUS_KINDS` are frozensets (single source of truth for validator).
 - **Data-driven** — quests/dialogs/NPCs/locations/items/enemies/hunts/recipes/techniques/memories/companions/factions are JSON/CSV in `data/`. Adding content = adding files, zero code changes.
 - **Engine is UI-agnostic** — `session.view()` returns a plain dict that both CLI and web render.
 - **config.web** — data-driven title/subtitle/tagline/panel/audio/avatar (all with xianxia defaults)

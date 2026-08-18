@@ -12,10 +12,6 @@ from .events import add_log
 from .morality import adjust as adjust_morality
 from .state import GameState
 
-# Jenis efek yang hanya diproses DialogEngine.choose() — sengaja TIDAK bisa
-# dipakai via apply() biasa. Validator tetap mengenalinya.
-EFFECT_TYPES_DIALOG_ONLY = frozenset({"start_quest"})
-
 # Field wajib per jenis efek — dicek validator saat load.
 EFFECT_REQUIRED_FIELDS: dict[str, set[str]] = {
     "flag": {"key"},
@@ -59,7 +55,7 @@ def apply(state: GameState, registry: DataRegistry, effects: list | None) -> Non
                 if state.inventory[iid] <= 0:
                     del state.inventory[iid]
         elif t == "gold":
-            state.player.gold += fx.get("value", 0)
+            state.player.gold += int(fx.get("value", 0))
             if state.player.gold < 0:
                 state.player.gold = 0
         elif t == "technique":

@@ -30,7 +30,7 @@ No `pyproject.toml`, `requirements.txt`, or build tooling. No pip install needed
 
 ## Key patterns
 
-- **Dispatch tables everywhere** — `EFFECT_HANDLERS`, `CONDITION_CHECKERS`, `OBJECTIVE_HANDLERS`. Adding a new type = add a dict key. No if/elif chains. `TECHNIQUE_KINDS` and `STATUS_KINDS` are frozensets (single source of truth for validator).
+- **Dispatch tables everywhere** — `CONDITION_CHECKERS`, `OBJECTIVE_HANDLERS`. Adding a new type = add a dict key. No if/elif chains. `EFFECT_TYPES`, `TECHNIQUE_KINDS`, and `STATUS_KINDS` are frozensets (single source of truth for validator).
 - **Engine is UI-agnostic** — `session.view()` returns a plain dict. Both CLI and web render from the same dict.
 - **Data-driven** — Game content is JSON/CSV in `data/`. Adding quests/dialogs/NPCs = adding files. Zero code changes.
 - **Validator runs at startup** — `validate.py` checks schema, duplicates, cross-references, unknown types, illegal `start_quest`, branching quests, timeouts. All violations collected before throwing.
