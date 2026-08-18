@@ -68,3 +68,7 @@ No package/build tooling: no `pyproject.toml`, `requirements.txt`, or build conf
 - Stdlib only: verify a library is already used before adding any dependency.
 - Companion system is dormant (no companions.json in data) — optional feature, don't remove.
 - `_victory()` syncs HP/Qi BEFORE granting exp (bug fix for level-up heal being clobbered)
+
+## Claude version note (2026-08-18)
+
+A `claude/` directory with older versions of key files existed for comparison. Repo was found to be **more advanced** — 11 additional hardening fixes, dead code cleanup, and a fuller test suite (287 tests). No adaptations needed from Claude files; directory deleted (Task 1). See `.superpowers/sdd/2026-08-18-adapt-claude-best-parts/` for full diff details.
