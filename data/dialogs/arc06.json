@@ -5,6 +5,14 @@
       "npc": "npc_mentor",
       "start": "n1",
       "nodes": {
+        "n_gu_han_beliefs": {
+          "speaker": "npc:npc_mentor",
+          "text": "Kau datang. Dan aku tahu kau sudah bicara dengan Gu Han — dia bilang kau mendengarkan. Itu... langka. Kebanyakan murid hanya ingin menghancurkan atau mempertahankan. Kau memilih untuk memahami.",
+          "condition": {"flag": {"key": "flag_gu_han_beliefs_shared", "value": true}},
+          "choices": [
+            {"label": "Aku ingin tahu kebenarannya.", "next": "n2"}
+          ]
+        },
         "n_changed": {
           "speaker": "npc:npc_mentor",
           "text": "Kau datang. Aku mendengar apa yang kau lakukan di gerbang — kau terjun langsung, menyelamatkan konvoi itu. Itu... mengingatkanku pada seseorang. Jiang Yan juga akan melakukan hal yang sama.",

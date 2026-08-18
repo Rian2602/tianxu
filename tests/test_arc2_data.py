@@ -87,6 +87,8 @@ def test_arc2_data_contract_ok(registry):
         "quest_a06_c01_001", "quest_a06_c02_002", "quest_a06_c03_003",
         "quest_a06_c04_004",
         "quest_a07_c01_001", "quest_a07_c02_002", "quest_a07_c03_003",
+        # Gu Han Character Arc (Phase 5)
+        "quest_char_gu_han_001", "quest_char_gu_han_002",
         # Lin Yue Character Arc (Phase 1)
         "quest_char_lin_yue_001", "quest_char_lin_yue_002",
         # Mei Ruo Character Arc (Phase 4)

@@ -1,0 +1,43 @@
+{
+  "quests": [
+    {
+      "id": "quest_char_gu_han_001",
+      "kind": "side",
+      "title": "Yang Tidak Bisa Dihancurkan",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_gu_han",
+        "target": 1,
+        "hint": "Bicara dengan Gu Han tentang mengapa ia percaya Tian Xu harus tetap berdiri."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_gu_han_beliefs_shared", "value": true},
+          {"type": "relation", "npc": "npc_gu_han", "value": 2}
+        ],
+        "rewards": {"exp": 8},
+        "system_msg": "Gu Han membuka diri tentang keyakinannya — Tian Xu bukan sekadar akademi, tapi penjaga keseimbangan dunia."
+      },
+      "next": []
+    },
+    {
+      "id": "quest_char_gu_han_002",
+      "kind": "side",
+      "title": "Harga yang Harus Dibayar",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_gu_han",
+        "target": 1,
+        "hint": "Hadapi pilihan Gu Han: tetap setia atau mengorbankan diri."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_gu_han_arc_complete", "value": true}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Gu Han membuat keputusannya — dan keputusan itu akan menentukan apakah ia tetap menjadi teman atau menjadi legenda."
+      },
+      "next": []
+    }
+  ]
+}

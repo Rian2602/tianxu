@@ -88,13 +88,24 @@
         }
       ]
   },
-  {
-   "id": "npc_gu_han",
-   "name": "Gu Han",
-   "location": "loc_training_hall",
-   "dialog_routes": {
-    "general": "dlg_a01_d006"
-   }
+  {      "id": "npc_gu_han",
+      "name": "Gu Han",
+      "location": "loc_training_hall",
+      "dialog_routes": {
+        "general": "dlg_a01_d006"
+      },
+      "side_offers": [
+        {
+          "quest": "quest_char_gu_han_001",
+          "dialog": "dlg_gu_han_char_001",
+          "min_relation": 0
+        },
+        {
+          "quest": "quest_char_gu_han_002",
+          "dialog": "dlg_gu_han_char_002",
+          "requires": "flag_gu_han_beliefs_shared"
+        }
+      ]
   },
   {
    "id": "npc_teacher_wuxin",
