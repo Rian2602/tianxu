@@ -12,12 +12,14 @@ from src.engine.session import GameSession
 
 
 def _sess(tmp_path, *, quests, enemies=None, companions=None, realms=None,
-          npcs=None, config_extra=None):
+          npcs=None, items=None, config_extra=None):
     kw = dict(quests=quests, npcs=npcs or [], enemies=enemies or [])
     if companions is not None:
         kw["companions"] = companions
     if realms is not None:
         kw["realms"] = realms
+    if items is not None:
+        kw["items"] = items
     if config_extra is not None:
         kw["config_extra"] = config_extra
     d = build_data(tmp_path, **kw)
@@ -136,3 +138,43 @@ def test_item_effect_float_count_becomes_int(tmp_path):
     apply_effects(s.state, reg, [{"type": "item", "id": "i1", "count": 2.0}])
     assert s.state.inventory.get("i1") == 2
     assert isinstance(s.state.inventory.get("i1"), int)
+
+
+# --- Task 5: session.py spar/scope/deref ---
+
+def test_spar_quest_no_combat_npc_logs_error(tmp_path):
+    """spar quest dengan NPC tanpa data combat harus log error, bukan diam-diam pecah."""
+    realms = [{"id": "r1", "name": "R1", "name_pinyin": "R1", "order": "1",
+               "levels": "2", "base_hp": "50", "hp_per_level": "5",
+               "base_qi": "30", "qi_per_level": "3"}]
+    npc_spar = {"id": "npc_spar", "name": "Spar NPC", "location": "l_start",
+                "can_spar": False, "dialog_routes": {}}
+    q_spar = {"id": "q_spar", "kind": "main", "title": "Spar Quest",
+              "objective": {"kind": "spar", "npc": "npc_spar"}}
+    reg, s = _sess(tmp_path, quests=[q_spar], npcs=[npc_spar], realms=realms)
+    s.state.current_quest = "q_spar"
+    s.state.flags["q_spar_started"] = True
+    s.dialog.last_npc = "npc_spar"
+    s.quest.notify_dialog_ended("npc_spar", None)
+    assert s.state.pending_battle is None
+
+
+def test_shop_buy_item_not_in_registry_no_crash(tmp_path):
+    """shop_buy dengan item ID yang tidak ada di registry tidak boleh crash."""
+    from unittest.mock import patch
+    realms = [{"id": "r1", "name": "R1", "name_pinyin": "R1", "order": "1",
+               "levels": "2", "base_hp": "50", "hp_per_level": "5",
+               "base_qi": "30", "qi_per_level": "3"}]
+    npc_shop = {"id": "npc_merchant", "name": "Merchant", "location": "l_start",
+                "shop": {"buy": [{"item": "i_missing", "price": 10}]},
+                "dialog_routes": {}}
+    dummy_item = [{"id": "i_missing", "name": "Missing", "type": "consumable"}]
+    reg, s = _sess(tmp_path, quests=[_quest_choose()], npcs=[npc_shop], realms=realms,
+                   items=dummy_item)
+    s.state.player.gold = 100
+    orig_item = reg.item
+    def _no_item(iid):
+        return None
+    with patch.object(reg, "item", _no_item):
+        result = s.apply_action({"type": "shop_buy", "item": "i_missing"})
+    assert result is not None

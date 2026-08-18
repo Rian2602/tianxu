@@ -15,7 +15,9 @@ from pathlib import Path
 
 from ..loader import DataRegistry
 from .battle import BattleEngine, companion_stats, player_combat
+from .cultivation import gain_exp
 from .dialog import DialogEngine
+from .effects import apply as apply_effects
 from .events import add_log
 from .quest import QuestEngine
 from .state import GameState, PlayerState
@@ -47,6 +49,12 @@ class GameSession:
         self.quest = QuestEngine(registry, state)
         self.dialog = DialogEngine(registry, state, self.quest)
         self.battle = BattleEngine(registry, state, self.quest)
+        # G3-T1: quest utama yang aktif SEJAK AWAL (config starting, atau save
+        # lama tanpa start) dicatat start-nya di sini — tanpa ini timeout & objektif
+        # advance_time terhitung dari cek PERTAMA (setelah waktu lewat → deadline
+        # mundur diam-diam). Quest yang sudah punya start (DAG/save) tidak disentuh.
+        if self.state.current_quest and self.state.current_quest not in self.state.active_side_quests:
+            self.quest._note_main_start(self.state.current_quest)
         self._maybe_start_branch_dialog()
 
 
@@ -55,22 +63,27 @@ class GameSession:
 
     @classmethod
     def new(cls, registry: DataRegistry) -> "GameSession":
-        start = registry.config["starting"]
-        p = start["player"]
+        # F1.2: `starting`/`time` wajib di kontrak validator — tapi tetap defensif
+        # (save lama / data parsial): default aman, bukan KeyError diam-diam.
+        start = registry.config.get("starting") or {}
+        p = start.get("player") or {}
+        time_cfg = registry.config.get("time") or {}
+        realm = p.get("realm") or next(iter(registry.realms), "realm_awal")
+        location = start.get("location") or (registry.locations[0]["id"] if registry.locations else "")
         state = GameState(
             player=PlayerState(
-                name=p["name"],
-                hp=p["hp"],
-                qi=p["qi"],
-                realm=p["realm"],
-                realm_level=p["realm_level"],
+                name=p.get("name", "Kultivator"),
+                hp=p.get("hp", 50),
+                qi=p.get("qi", 30),
+                realm=realm,
+                realm_level=p.get("realm_level", 1),
                 gold=p.get("gold", 0),
                 roots=p.get("roots", "akar_mid"),
                 equipment=dict(p.get("equipment", {"weapon": None})),
             ),
-            location=start["location"],
-            day=registry.config["time"]["start_day"],
-            hour=registry.config["time"]["start_hour"],
+            location=location,
+            day=time_cfg.get("start_day", 1),
+            hour=time_cfg.get("start_hour", 6),
             current_quest=start.get("current_quest"),
             inventory={i["id"]: i["count"] for i in start.get("inventory", [])},
             flags=dict(start.get("flags", {})),
@@ -122,6 +135,7 @@ class GameSession:
             "choose": self._choose,
             "battle_action": self._battle_action,
             "use_item": self._use_item,
+            "use_key_item": self._use_key_item,
             "equip": self._equip,
             "grounding": self._grounding,
             "spar": self._spar,
@@ -154,12 +168,15 @@ class GameSession:
             res = self.dialog.start(self.state.branch_pending)
             if not res:
                 self.state.branch_pending = None
+                self.state.branch_quest = None
 
     def can_hunt(self) -> bool:
-        """G2-T1: lokasi berburu dibaca dari data (config.world.hunt.location) —
-        tanpa hardcode id lokasi arc-1; konsisten dengan `_hunt` (A8)."""
-        loc = (self.reg.config.get("world", {}).get("hunt") or {}).get("location")
-        return bool(loc) and self.state.location == loc
+        """Can player hunt at current location? Multi-zone: check registry.hunts."""
+        return bool(self.reg.hunts_for_location(self.state.location))
+
+    def hunts_here(self) -> list[dict]:
+        """Zones available at current location."""
+        return self.reg.hunts_for_location(self.state.location)
 
     def npc_location(self, npc: dict) -> str:
         """Lokasi NPC — override efek npc_state menang atas data statis npcs.json."""
@@ -215,6 +232,16 @@ class GameSession:
             forced = q["objective"].get("start_node")
         dlg_id, forced_node = self._resolve_dialog(npc, forced)
         dlg = self.dialog.start(dlg_id, forced_node=forced_node)
+        # F3 (adaptifitas): NPC TANPA routing eksplisit (dialog_routes/default_dialog)
+        # → fallback deterministik ke dialog yang field `npc`-nya cocok. Tanpa ini,
+        # data story minimal (dialog ber-npc tanpa routes) = talk quest softlock
+        # diam-diam. Bila author sudah memberi routes, routes dihormati penuh.
+        if not dlg and not npc.get("dialog_routes") and not npc.get("default_dialog"):
+            for cand in sorted(self.reg.dialogs, key=lambda d: d.get("id", "")):
+                if cand.get("npc") == nid:
+                    dlg = self.dialog.start(cand["id"], forced_node=forced_node)
+                    if dlg:
+                        break
         if not dlg:
             add_log(self.state, "system", f"{npc['name']} tidak ingin bicara.")
         return self.view()
@@ -327,6 +354,8 @@ class GameSession:
                 self.battle.start([foe], "spar")
                 self.state.pending_battle["spar_npc"] = npc_id
                 return
+            add_log(self.state, "system",
+                    f"Quest spar terkendala: {npc['name'] if npc else npc_id} tidak punya data pertarungan.")
         # pilihan cabang quest (dialog percabangan)
         if self.state.branch_pending:
             if getattr(self.dialog, "last_dialog_id", None) == self.state.branch_pending:
@@ -417,6 +446,30 @@ class GameSession:
         self.quest.notify_gather()
         return self.view()
 
+    def _use_key_item(self, action: dict) -> dict:
+        """Gunakan key_item — terapkan use_effects dari data."""
+        iid = action.get("item")
+        if self.state.inventory.get(iid, 0) < 1:
+            add_log(self.state, "system", "Item tidak tersedia.")
+            return self.view()
+        it = self.reg.item(iid)
+        if not it or it.get("type") != "key_item":
+            add_log(self.state, "system", "Item itu bukan kunci.")
+            return self.view()
+        ki_data = self.reg.key_items.get(iid)
+        if not ki_data or not ki_data.get("use_effects"):
+            add_log(self.state, "system", "Item itu tidak bisa dipakai saat ini.")
+            return self.view()
+        apply_effects(self.state, self.reg, ki_data["use_effects"])
+        if ki_data.get("consumed", False):
+            self.state.inventory[iid] -= 1
+            if self.state.inventory[iid] <= 0:
+                del self.state.inventory[iid]
+        desc = ki_data.get("description", it["name"])
+        add_log(self.state, "narration", f"Memakai {it['name']}: {desc}")
+        self.quest.notify_gather()
+        return self.view()
+
     def _grounding(self, action: dict) -> dict:
         loc = self.reg.location(self.state.location)
         if not loc or not loc.get("is_safe"):
@@ -426,7 +479,7 @@ class GameSession:
             res["error"] = msg
             return res
         hours = max(1, int(action.get("hours", 1)))
-        cfg = self.reg.config["cultivation"]
+        cfg = self.reg.config.get("cultivation", {})
         allowed = cfg.get("grounding_max_hours_per_day", 8) - self.state.grounding_hours_today
         if allowed <= 0:
             add_log(self.state, "system", "Kau sudah berkultivasi maksimal hari ini.")
@@ -436,7 +489,6 @@ class GameSession:
         self.state.grounding_hours_today += hours
         self._pass_time(hours)
         add_log(self.state, "narration", f"Kau bermeditasi selama {hours} jam... (+{exp} exp, Qi pulih pelan.)")
-        from .cultivation import gain_exp
         gain_exp(self.state, self.reg, exp)
         self.state.player.qi = min(self.state.max_qi(self.reg), self.state.player.qi + hours * 2)
         return self.view()
@@ -451,7 +503,6 @@ class GameSession:
         req = npc.get("spar_require")
         if not req:
             return True
-        from src.engine.dialog import DialogEngine
         return DialogEngine._eval_condition(self.state, req, self.reg)
 
     def _spar(self, action: dict) -> dict:
@@ -475,22 +526,21 @@ class GameSession:
         return self.view()
 
     def _hunt(self, action: dict) -> dict:
-        # A8: semua konten hunt dari config.world.hunt — TANPA fallback id konten
-        # arc-1 (data-driven murni; arc baru = data saja)
-        hunt = self.reg.config.get("world", {}).get("hunt")
-        if not hunt:
-            add_log(self.state, "system", "Berburu belum tersedia di dunia ini.")
+        zones = self.reg.hunts_for_location(self.state.location)
+        if not zones:
+            add_log(self.state, "system", "Berburu belum tersedia di sini.")
             return self.view()
-        hunt_loc = hunt.get("location")
-        if not hunt_loc:
-            add_log(self.state, "system", "Berburu belum tersedia di dunia ini.")
-            return self.view()
-        if self.state.location != hunt_loc:
-            loc = self.reg.location(hunt_loc)
-            nama = loc.get("name", "Wilayah Berburu") if loc else "Wilayah Berburu"
-            add_log(self.state, "system", f"Berburu hanya bisa dilakukan di {nama}.")
-            return self.view()
-        # P1-3: pool malam (GDD §8) — jam dalam night_window memakai night_pool
+        # pilih zona (explicit id atau default pertama)
+        hunt_id = action.get("hunt")
+        hunt = None
+        if hunt_id:
+            hunt = next((z for z in zones if z.get("id") == hunt_id), None)
+            if not hunt:
+                add_log(self.state, "system", f"Zona berburu '{hunt_id}' tidak ditemukan di sini. Menggunakan zona default.")
+                hunt = zones[0]
+        else:
+            hunt = zones[0]
+        # pool
         nw = hunt.get("night_window")
         if nw and self.quest._in_window(nw):
             pool = list(hunt.get("night_pool") or [])
@@ -501,37 +551,33 @@ class GameSession:
         if not pool:
             add_log(self.state, "system", "Tidak ada mangsa di sini.")
             return self.view()
-        if random.random() < float(hunt.get("mini_boss_chance", 0.1)):  # mini-boss jarang
+        if random.random() < float(hunt.get("mini_boss_chance", 0.1)):
             pool = [hunt["mini_boss"]] if hunt.get("mini_boss") else pool
         eid = random.choice(pool)
         foe = self.reg.enemy(eid)
         if not foe:
             add_log(self.state, "system", "Tidak ada mangsa di sini.")
             return self.view()
-
+        # cooldown per zona
         respawn_hours = self.reg.config.get("world", {}).get("monster_respawn_hours", 5)
         now_abs_hours = self.state.absolute_hours
-        if self.state.last_hunt_time is not None and (now_abs_hours - self.state.last_hunt_time) < respawn_hours:
-            remaining = respawn_hours - (now_abs_hours - self.state.last_hunt_time)
-            add_log(self.state, "system", f"Wilayah Berburu masih sepi. Monster liar baru muncul kembali dalam {remaining} jam.")
+        if self.state.last_hunt_time is None:
+            self.state.last_hunt_time = {}
+        last = self.state.last_hunt_time.get(hunt["id"])
+        if last is not None and (now_abs_hours - last) < respawn_hours:
+            remaining = respawn_hours - (now_abs_hours - last)
+            add_log(self.state, "system", f"Wilayah masih sepi. Monster baru muncul kembali dalam {remaining} jam.")
             return self.view()
-
-        self.state.last_hunt_time = now_abs_hours
+        self.state.last_hunt_time[hunt["id"]] = now_abs_hours
         self.battle.start([foe], "hunt")
         return self.view()
 
     def _search(self, action: dict) -> dict:
-        # A8: item & lokasi dari config.world.hunt — tanpa fallback id konten
-        hunt = self.reg.config.get("world", {}).get("hunt")
-        if not hunt or not hunt.get("location"):
-            add_log(self.state, "system", "Mencari belum tersedia di dunia ini.")
+        zones = self.reg.hunts_for_location(self.state.location)
+        if not zones:
+            add_log(self.state, "system", "Mencari belum tersedia di sini.")
             return self.view()
-        hunt_loc = hunt.get("location")
-        if self.state.location != hunt_loc:
-            loc = self.reg.location(hunt_loc)
-            nama = loc.get("name", "Wilayah Berburu") if loc else "Wilayah Berburu"
-            add_log(self.state, "system", f"Mencari herba hanya bisa dilakukan di {nama}.")
-            return self.view()
+        hunt = zones[0]  # default search uses first zone
         item_id = hunt.get("search_item")
         if not item_id:
             add_log(self.state, "system", "Tidak ada yang bisa dicari di sini.")
@@ -560,18 +606,20 @@ class GameSession:
         self.state.player.qi = self.state.max_qi(self.reg)
         # kompanion KO bangkit kembali di titik aman (§9.4)
         revived = False
+        comp_name = None
         if self.state.companion and not self.state.companion.get("active"):
             cid = self.state.companion["id"]
-            comp = next((c for c in self.reg.companions if c["id"] == cid), None)
+            comp = next((c for c in self.reg.companions if c.get("id") == cid), None)
             if comp:
                 scale = self.reg.config.get("companion", {})
-                hp_max = int(comp["base_hp"]) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
+                hp_max = int(comp.get("base_hp", 10)) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
                 self.state.companion["active"] = True
                 self.state.companion["hp"] = hp_max
                 revived = True
+                comp_name = comp["name"]
         msg = f"Kau beristirahat selama {hours} jam. HP & Qi pulih penuh."
-        if revived:
-            msg += f" {comp['name']} bangkit kembali."
+        if revived and comp_name:
+            msg += f" {comp_name} bangkit kembali."
         add_log(self.state, "narration", msg)
         return self.view()
 
@@ -593,7 +641,8 @@ class GameSession:
         self.state.player.gold -= cost
         self.state.inventory[iid] = self.state.inventory.get(iid, 0) + count
         it = self.reg.item(iid)
-        add_log(self.state, "narration", f"Membeli {count}× {it['name']} ({cost} Koin Emas).")
+        name = it["name"] if it else iid
+        add_log(self.state, "narration", f"Membeli {count}× {name} ({cost} Koin Emas).")
         self.quest.notify_gather()
         return self.view()
 
@@ -617,7 +666,8 @@ class GameSession:
         gold = int(entry["price"]) * count
         self.state.player.gold += gold
         it = self.reg.item(iid)
-        add_log(self.state, "narration", f"Menjual {count}× {it['name']} (+{gold} Koin Emas).")
+        name = it["name"] if it else iid
+        add_log(self.state, "narration", f"Menjual {count}× {name} (+{gold} Koin Emas).")
         return self.view()
 
     def _craft(self, action: dict) -> dict:
@@ -726,17 +776,34 @@ class GameSession:
         loc = self.reg.location(s.location)
         q = self.quest.current_main()
         pc = player_combat(s, self.reg)
-        realm = self.reg.realms[s.player.realm]
+        realm = self.reg.realms.get(s.player.realm) or {"name_pinyin": s.player.realm, "name": s.player.realm, "order": "1"}
         
         # arc_summary data-driven (B1): arc TERAKHIR di config yang final quest-nya selesai
         arc_summary = None
         for arc in reversed(self.reg.config.get("arcs", [])):
             if arc.get("final_quest") not in s.completed_quests:
                 continue
+            # B1: pilihan akhir arc — data-driven `arcs[].branches` {flag: label}.
+            # - flag boolean True → label
+            # - flag bernilai string (enum, mis. state_identity_stance) → nilai humanized
+            # - `state_pavilion` (docs 13) = akademi pemain (player.academy, bukan flags)
             chosen_branch = "Tidak Diketahui"
             for flag, label in (arc.get("branches") or {}).items():
-                if s.flags.get(flag):
+                if flag == "state_pavilion":
+                    if s.player.academy:
+                        chosen_branch = next(
+                            (a.get("name", a.get("id", s.player.academy))
+                             for a in self.reg.config.get("academies", [])
+                             if a.get("id") == s.player.academy),
+                            s.player.academy)
+                        break
+                    continue
+                val = s.flags.get(flag)
+                if val is True:
                     chosen_branch = label
+                    break
+                if isinstance(val, str) and val:
+                    chosen_branch = val.replace("_", " ").title()
                     break
             arc_summary = {
                 "completed": True,
@@ -758,7 +825,9 @@ class GameSession:
 
         return {
             "location": {
-                "id": loc["id"], "name": loc["name"], "description": loc["description"],
+                "id": loc["id"], "name": loc["name"],
+                # F1.2: description opsional (pola .get sama seperti is_safe/connections/ambience)
+                "description": loc.get("description", ""),
                 "is_safe": loc.get("is_safe", False), "connections": loc.get("connections", []),
                 # C4: ambience lokasi (data-driven, opsional) → atmosfer visual web
                 "ambience": loc.get("ambience", "academy"),
@@ -786,15 +855,23 @@ class GameSession:
                 {"id": sq["id"], "title": sq["title"], "objective": self.quest.objective_text(sq)}
                 for sq in self.quest.active_side()
             ],
+            # audit Claude: lookup item SEKALI per baris (view() dipanggil tiap
+            # tick UI — double lookup adalah pemborosan murni). Bentuk generator
+            # bersarang (bukan walrus) — konsisten gaya codebase (tanpa `:=`).
             "inventory": [
-                {"id": iid, "name": self.reg.item(iid)["name"], "count": c,
-                 "type": self.reg.item(iid).get("type", "")}
-                for iid, c in sorted(s.inventory.items())
-                if self.reg.item(iid)
+                {"id": iid, "name": it["name"], "count": c,
+                 "type": it.get("type", "")}
+                for iid, c, it in (
+                    (iid, c, self.reg.item(iid)) for iid, c in sorted(s.inventory.items())
+                )
+                if it
             ],
             "memories": [
-                {"id": mid, "title": self.reg.memory(mid)["title"]}
-                for mid in s.memories if self.reg.memory(mid)
+                {"id": m["id"] if isinstance(m, dict) else m,
+                 "title": (self.reg.memory(m["id"] if isinstance(m, dict) else m) or {}).get("title", ""),
+                 "reliability": m.get("reliability", "unknown") if isinstance(m, dict) else "unknown"}
+                for m in s.memories
+                if self.reg.memory(m["id"] if isinstance(m, dict) else m)
             ],
             "companion": companion_stats(s, self.reg),
             "mode": self._mode(),
@@ -803,17 +880,24 @@ class GameSession:
             "choose": self._choose_view(),
             "log": s.log,
             "arc_summary": arc_summary,
+            # faksi: id + skor + nama dari data (bila factions.json ada;
+            # fallback id apa adanya — tema tanpa registri faksi tetap jalan)
+            "factions": [
+                {"id": fid, "score": v,
+                 "name": (self.reg.faction_by_id.get(fid) or {}).get("name", fid)}
+                for fid, v in s.factions.items()
+            ],
         }
 
     def _pick_ending(self, s, arc: dict) -> dict | None:
-        """C3 (GDD §3.4/§9): pilih ending dari `config.arcs[].endings` — ending
-        pertama yang kondisinya cocok (first-match, AND — pola `_eval_condition`
-        dipakai ulang apa adanya). Tanpa `endings` → None (kontrak view lama).
-        Arc berikutnya (mis. final) cukup isi data endings tematik."""
+        """C3: pilih ending dari `config.arcs[].endings` — ending pertama yang
+        kondisinya cocok (first-match, AND — pola `_eval_condition` dipakai ulang
+        apa adanya). Murni data-driven (flag/relation/faksi/memory), TIDAK
+        berbasis skala moralitas. Tanpa `endings` → None (kontrak view lama)."""
         for end in arc.get("endings") or []:
             cond = end.get("condition") or {}
             if DialogEngine._eval_condition(s, cond, self.reg):
-                return {"id": end["id"], "title": end.get("title", ""), "desc": end.get("desc", "")}
+                return {"id": end.get("id", "?"), "title": end.get("title", ""), "desc": end.get("desc", "")}
         return None
 
     def _mode(self) -> str:
