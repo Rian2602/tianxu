@@ -5,6 +5,54 @@
    "npc": "npc_lin_yue",
    "start": "n1",
    "nodes": {
+    "n_split": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Tapi aku harus jujur — tidak semua dari kami bisa bertahan sampai malam ini. Shen Luo sudah pergi. Gu Han... aku tidak tahu di mana dia. Mei Ruo masih di sini, tapi dia tidak bicara kepadaku sejak krisis itu.",
+     "condition": {"flag": {"key": "state_shen_luo_status", "value": "separated"}},
+     "choices": [
+      {
+       "label": "Aku tahu. Aku akan menyelesaikan ini sendiri.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_disillusioned": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu — dan aku senang kau masih datang. Tapi keadaan di luar sana... banyak yang berubah sejak krisis itu. Beberapa dari kami memilih jalan yang berbeda. Yang tersisa di sini hanyalah mereka yang masih percaya.",
+     "condition": {"flag_not": [{"key": "state_shen_luo_status", "value": "loyal"}, {"key": "state_shen_luo_status", "value": "separated"}]},
+     "choices": [
+      {
+       "label": "Siapa yang masih di sini?",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_gu_han_gone": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Gu Han... dia tidak ada di sini. Sejak krisis itu, dia memilih jalan sendiri. Aku tidak bisa menyalahkannya.",
+     "condition": {"flag": {"key": "state_gu_han_status", "value": "disillusioned"}},
+     "choices": [
+      {
+       "label": "Aku mengerti. Aku akan kembali.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_mei_ruo_gone": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Mei Ruo... dia bilang dia tidak bisa lagi berada di sini. Dia pergi mencari kebenarannya sendiri — dan aku tidak tahu apakah itu hal yang baik atau buruk.",
+     "condition": {"flag": {"key": "state_mei_ruo_status", "value": "disillusioned"}},
+     "choices": [
+      {
+       "label": "Semoga dia baik-baik saja.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
     "n1": {
      "speaker": "npc:npc_lin_yue",
      "text": "Kau datang. Aku sudah menunggumu — dan takut pada momen ini sejak pertama kali kita bertemu di gerbang itu.",

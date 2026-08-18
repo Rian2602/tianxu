@@ -76,6 +76,14 @@
       "npc": "npc_lin_yue",
       "start": "n1",
       "nodes": {
+        "n_obey": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau tampak berbeda sejak kemarin. Mei Ruo bilang kau menemukan sesuatu di arsip. Aku juga mendengar kau melaporkan kejanggalan itu kepada guru — kau memang selalu mempercayai sistem, ya?",
+          "condition": {"flag": {"key": "flag_branch_obey", "value": true}},
+          "choices": [
+            {"label": "Aku percaya pada mereka yang lebih tahu. Apa salahnya?", "next": "n2"}
+          ]
+        },
         "n1": {
           "speaker": "npc:npc_lin_yue",
           "text": "Kau tampak berbeda sejak kemarin. Mei Ruo bilang kau menemukan sesuatu di arsip. Apa yang terjadi?",

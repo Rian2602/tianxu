@@ -89,6 +89,14 @@
       "npc": "npc_grandmaster",
       "start": "n1",
       "nodes": {
+        "n_confront": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau. Aku tahu kau akan datang — sejak konfrontasimu di forum terbuka. Kau membuat beberapa orang di akademi sangat tidak nyaman. Tapi justru karena itu, aku berbicara terus terang kepadamu.",
+          "condition": {"flag": {"key": "flag_branch_confront", "value": true}},
+          "choices": [
+            {"label": "Apa yang kau sembunyikan?", "next": "n2"}
+          ]
+        },
         "n1": {
           "speaker": "npc:npc_grandmaster",
           "text": "Kau sudah membaca yang tidak seharusnya kau baca. Maka kau tahu: sistem ini tidak sempurna. Aku tidak akan menyangkalnya.",

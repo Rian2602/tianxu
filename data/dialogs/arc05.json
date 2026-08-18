@@ -73,6 +73,14 @@
       "npc": "npc_lin_yue",
       "start": "n1",
       "nodes": {
+        "n_spread": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau kembali. Tapi situasinya berubah — beberapa murid sudah tahu tentang kebenaran yang kau bagikan. Ada yang marah, ada yang ketakutan. Grandmaster tidak senang. Apa yang kau lakukan, kau lakukan tanpa meminta izin siapa pun.",
+          "condition": {"flag": {"key": "state_truth_spread_level", "value": 1}},
+          "choices": [
+            {"label": "Mereka berhak tahu. Aku tidak menyesal.", "next": "n2"}
+          ]
+        },
         "n1": {
           "speaker": "npc:npc_lin_yue",
           "text": "Kau kembali. Aku mendengar apa yang terjadi di gerbang. Dan aku mendengar suara-suara lain di kelompok kita — suara yang mulai saling menuduh.",
