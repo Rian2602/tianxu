@@ -194,6 +194,20 @@ def _to_family_crisis_branch(registry: DataRegistry, mg_idx: int = 0) -> GameSes
     s = _to_mountain_gate_branch(registry)
     s.apply_action({"type": "dialog_choice", "choice_index": mg_idx})
     _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
+    for npc in ("npc_lin_yue", "npc_shen_luo", "npc_mei_ruo", "npc_gu_han"):
+        s.apply_action({"type": "talk", "npc": npc})
+        if s.state.pending_dialog:
+            break
+    guard = 0
+    while s.state.pending_dialog and guard < 20:
+        v = s.view()
+        did = v["dialog"]["dialog_id"] if v.get("dialog") else None
+        if did == "dlg_a05_branch_family":
+            break
+        s.apply_action({"type": "dialog_choice", "choice_index": -1})
+        guard += 1
+    v = s.view()
+    assert v.get("dialog") and v["dialog"]["dialog_id"] == "dlg_a05_branch_family", v.get("dialog")
     return s
 
 
@@ -214,21 +228,6 @@ def _to_family_crisis_branch(registry: DataRegistry, mg_idx: int = 0) -> GameSes
 def test_arc5_family_crisis_four_branches(registry, idx, status_map, rel_npc, rel_min):
     """Found Family Crisis: 4 keputusan → status tiap anggota berbeda (docs 04) → konvergen."""
     s = _to_family_crisis_branch(registry)
-    for npc in ("npc_lin_yue", "npc_shen_luo", "npc_mei_ruo", "npc_gu_han"):
-        s.apply_action({"type": "talk", "npc": npc})
-        if s.state.pending_dialog:
-            break
-    # dialog krisis → auto-lanjut sampai dialog branch muncul (bukan melewatinya)
-    guard = 0
-    while s.state.pending_dialog and guard < 20:
-        v = s.view()
-        did = v["dialog"]["dialog_id"] if v.get("dialog") else None
-        if did == "dlg_a05_branch_family":
-            break
-        s.apply_action({"type": "dialog_choice", "choice_index": -1})
-        guard += 1
-    v = s.view()
-    assert v.get("dialog") and v["dialog"]["dialog_id"] == "dlg_a05_branch_family", v.get("dialog")
     s.apply_action({"type": "dialog_choice", "choice_index": idx})
     assert s.state.current_quest == "quest_a05_c04_004", f"branch {idx} harus konvergen"
     for flag, val in status_map.items():
@@ -239,21 +238,6 @@ def test_arc5_family_crisis_four_branches(registry, idx, status_map, rel_npc, re
 def test_arc5_entity_and_memory_to_ending(registry):
     """Q4 Entity first contact → Q5 memory besar → ending + arc_summary."""
     s = _to_family_crisis_branch(registry)
-    for npc in ("npc_lin_yue", "npc_shen_luo", "npc_mei_ruo", "npc_gu_han"):
-        s.apply_action({"type": "talk", "npc": npc})
-        if s.state.pending_dialog:
-            break
-    # dialog krisis → auto-lanjut sampai dialog branch muncul
-    guard = 0
-    while s.state.pending_dialog and guard < 20:
-        v = s.view()
-        did = v["dialog"]["dialog_id"] if v.get("dialog") else None
-        if did == "dlg_a05_branch_family":
-            break
-        s.apply_action({"type": "dialog_choice", "choice_index": -1})
-        guard += 1
-    v = s.view()
-    assert v.get("dialog") and v["dialog"]["dialog_id"] == "dlg_a05_branch_family", v.get("dialog")
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # protect
     # Q4: entity di ruang terdalam
     _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")

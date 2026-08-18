@@ -541,6 +541,8 @@ def _validate_npcs(registry, errors) -> None:
                      f"dialog tak dikenal: '{did}'.")
         # default_dialog berada di level NPC root (bukan di dialog_routes) —
         # session.py: npc.get("default_dialog", "").
+        # default_dialog berada di level NPC root (bukan di dialog_routes) —
+        # session.py: npc.get("default_dialog", "").
         if n.get("default_dialog") and n["default_dialog"] not in registry.dialog_by_id:
             _add(errors, src, f"{ctx}.default_dialog",
                  f"dialog tak dikenal: '{n['default_dialog']}'.")

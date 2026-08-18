@@ -139,6 +139,7 @@ def _to_stance_branch(registry: DataRegistry) -> GameSession:
     _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
     _talk(s, "npc_archive_clerk")
     assert s.state.current_quest == "quest_a03_c04_004"
+    assert s.state.flags.get("flag_jiang_yan_deceased_confirmed") is True
     _reach(s, "loc_training_hall")
     _talk(s, "npc_lin_yue", close=False)
     s.apply_action({"type": "dialog_choice", "choice_index": -1})
@@ -149,7 +150,6 @@ def _to_stance_branch(registry: DataRegistry) -> GameSession:
 def test_arc3_deceased_and_stance_branch(registry):
     """Q3 Deceased (flag) → Q4 diskusi Lin Yue → branch 3-cabang state_identity_stance."""
     s = _to_stance_branch(registry)
-    assert s.state.flags.get("flag_jiang_yan_deceased_confirmed") is True
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # deny
     assert s.state.current_quest == "quest_a03_c05_005"
     assert s.state.flags.get("state_identity_stance") == "deny"
