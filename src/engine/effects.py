@@ -12,24 +12,51 @@ from .events import add_log
 from .morality import adjust as adjust_morality
 from .state import GameState
 
+# Jenis efek yang hanya diproses DialogEngine.choose() — sengaja TIDAK bisa
+# dipakai via apply() biasa. Validator tetap mengenalinya.
+EFFECT_TYPES_DIALOG_ONLY = frozenset({"start_quest"})
+
+# Field wajib per jenis efek — dicek validator saat load.
+EFFECT_REQUIRED_FIELDS: dict[str, set[str]] = {
+    "flag": {"key"},
+    "item": {"id"},
+    "relation": {"npc", "value"},
+    "reputation": {"faksi", "value"},
+    "technique": {"id"},
+    "start_quest": {"quest"},
+    "npc_state": {"npc"},
+}
+
+# Semua jenis efek yang dikenal engine.
+EFFECT_TYPES = {
+    "morality", "relation", "reputation", "flag", "item", "gold",
+    "technique", "start_quest", "npc_state",
+}
+
+# Dispatch table — validate & tests derive kind sets from these.
+EFFECT_HANDLERS: dict[str, object] = {k: None for k in EFFECT_TYPES - EFFECT_TYPES_DIALOG_ONLY}
+
 
 def apply(state: GameState, registry: DataRegistry, effects: list | None) -> None:
     for fx in effects or []:
         t = fx.get("type")
         if t == "morality":
-            adjust_morality(state, registry, fx.get("value", 0))
+            adjust_morality(state, registry, int(fx.get("value", 0)))
         elif t == "relation":
             nid = fx.get("npc")
             if nid:
-                state.relations[nid] = state.relations.get(nid, 0) + fx.get("value", 0)
+                state.relations[nid] = state.relations.get(nid, 0) + int(fx.get("value", 0))
         elif t == "reputation":
-            key = "rep_" + fx.get("faksi", "?")
-            state.flags[key] = state.flags.get(key, 0) + fx.get("value", 0)
+            faksi = fx.get("faksi", "")
+            if faksi:
+                state.factions[faksi] = state.factions.get(faksi, 0) + int(fx.get("value", 0))
         elif t == "flag":
-            state.flags[fx["key"]] = fx.get("value", True)
+            key = fx.get("key")
+            if key:
+                state.flags[key] = fx.get("value", True)
         elif t == "item":
             iid = fx.get("id")
-            count = fx.get("count", 1)
+            count = int(fx.get("count", 1))
             if iid:
                 state.inventory[iid] = state.inventory.get(iid, 0) + count
                 if state.inventory[iid] <= 0:

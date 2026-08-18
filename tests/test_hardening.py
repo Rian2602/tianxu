@@ -97,3 +97,42 @@ def test_pending_dialog_roundtrip(tmp_path):
     loaded = GameState.from_dict(d)
     assert loaded.pending_dialog == "dlg_test_123", \
         f"from_dict harus restore pending_dialog, dapat {loaded.pending_dialog}"
+
+
+# --- Task 4: effects.py KeyError + type coercion ---
+
+def test_flag_effect_missing_key_no_crash(tmp_path):
+    """flag effect tanpa field 'key' tidak boleh KeyError — defense-in-depth."""
+    from src.engine.effects import apply as apply_effects
+    realms = [{"id": "r1", "name": "R1", "name_pinyin": "R1", "order": "1",
+               "levels": "2", "base_hp": "50", "hp_per_level": "5",
+               "base_qi": "30", "qi_per_level": "3"}]
+    reg, s = _sess(tmp_path, quests=[_quest_choose()], realms=realms)
+    # flag effect tanpa 'key' — tidak boleh crash
+    apply_effects(s.state, reg, [{"type": "flag", "value": True}])
+    # state tetap utuh
+    assert isinstance(s.state.flags, dict)
+
+
+def test_morality_effect_string_value_no_crash(tmp_path):
+    """morality effect dengan value string tidak boleh TypeError."""
+    from src.engine.effects import apply as apply_effects
+    realms = [{"id": "r1", "name": "R1", "name_pinyin": "R1", "order": "1",
+               "levels": "2", "base_hp": "50", "hp_per_level": "5",
+               "base_qi": "30", "qi_per_level": "3"}]
+    reg, s = _sess(tmp_path, quests=[_quest_choose()], realms=realms)
+    before = s.state.player.morality
+    apply_effects(s.state, reg, [{"type": "morality", "value": "5"}])
+    assert s.state.player.morality == before + 5
+
+
+def test_item_effect_float_count_becomes_int(tmp_path):
+    """item effect dengan count float harus di-cast ke int."""
+    from src.engine.effects import apply as apply_effects
+    realms = [{"id": "r1", "name": "R1", "name_pinyin": "R1", "order": "1",
+               "levels": "2", "base_hp": "50", "hp_per_level": "5",
+               "base_qi": "30", "qi_per_level": "3"}]
+    reg, s = _sess(tmp_path, quests=[_quest_choose()], realms=realms)
+    apply_effects(s.state, reg, [{"type": "item", "id": "i1", "count": 2.0}])
+    assert s.state.inventory.get("i1") == 2
+    assert isinstance(s.state.inventory.get("i1"), int)
