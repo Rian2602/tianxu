@@ -89,6 +89,14 @@
       "npc": "npc_grandmaster",
       "start": "n1",
       "nodes": {
+        "n_shen_luo_doubts": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau sudah membaca yang tidak seharusnya kau baca. Dan aku tahu Shen Luo juga mulai bertanya — dia tidak pandai menyembunyikan keraguannya. Kalian berdua di sini sekarang. Apa yang akan kau lakukan dengan pengetahuan itu?",
+          "condition": {"flag": {"key": "flag_shen_luo_doubts_shared", "value": true}},
+          "choices": [
+            {"label": "Aku akan mencari kebenaran sendiri.", "next": "n2"}
+          ]
+        },
         "n_confront": {
           "speaker": "npc:npc_grandmaster",
           "text": "Kau. Aku tahu kau akan datang — sejak konfrontasimu di forum terbuka. Kau membuat beberapa orang di akademi sangat tidak nyaman. Tapi justru karena itu, aku berbicara terus terang kepadamu.",

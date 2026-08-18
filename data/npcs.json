@@ -23,16 +23,42 @@
      "quest_a02_c03_006": "dlg_a02_d013",
      "quest_a03_c04_004": "dlg_a03_d04",
      "quest_a05_c03_003": "dlg_a05_d03"
+    },
+    "side": {
+     "quest_char_lin_yue_001": {
+      "offer": "dlg_lin_yue_char_001_low",
+      "report": "dlg_lin_yue_char_002"
+     },
+     "quest_char_lin_yue_002": {
+      "report": "dlg_lin_yue_char_002"
+     }
     }
    }
   },
-  {
-   "id": "npc_shen_luo",
-   "name": "Shen Luo",
-   "location": "loc_training_hall",
-   "dialog_routes": {
-    "general": "dlg_a01_d004"
-   }
+  {      "id": "npc_shen_luo",
+      "name": "Shen Luo",
+      "location": "loc_training_hall",
+      "dialog_routes": {
+        "general": "dlg_a01_d004"
+      },
+      "side_offers": [
+        {
+          "quest": "quest_char_shen_luo_001",
+          "dialog": "dlg_shen_luo_char_001_low",
+          "min_relation": 0,
+          "max_relation": 3
+        },
+        {
+          "quest": "quest_char_shen_luo_001",
+          "dialog": "dlg_shen_luo_char_001_high",
+          "min_relation": 4
+        },
+        {
+          "quest": "quest_char_shen_luo_002",
+          "dialog": "dlg_shen_luo_char_002",
+          "requires": "flag_shen_luo_doubts_shared"
+        }
+      ]
   },
   {
    "id": "npc_mei_ruo",

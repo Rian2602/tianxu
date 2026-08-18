@@ -1,0 +1,43 @@
+{
+  "quests": [
+    {
+      "id": "quest_char_shen_luo_001",
+      "kind": "side",
+      "title": "Beratnya Mengetahui",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_shen_luo",
+        "target": 1,
+        "hint": "Bicara dengan Shen Luo tentang keraguannya terhadap Tian Xu."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_shen_luo_doubts_shared", "value": true},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+        ],
+        "rewards": {"exp": 8},
+        "system_msg": "Shen Luo membuka diri tentang keraguannya — sesuatu yang tidak ia lakukan kepada sembarang orang."
+      },
+      "next": []
+    },
+    {
+      "id": "quest_char_shen_luo_002",
+      "kind": "side",
+      "title": "Garis Di Antara Kita",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_shen_luo",
+        "target": 1,
+        "hint": "Hadapi pilihan Shen Luo: tetap atau pergi."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_shen_luo_arc_complete", "value": true}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Shen Luo membuat keputusannya — dan keputusan itu akan menentukan siapa yang tetap berdiri di sisimu."
+      },
+      "next": []
+    }
+  ]
+}
