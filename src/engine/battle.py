@@ -24,9 +24,7 @@ TECHNIQUE_KINDS = frozenset({"attack", "defend", "heal"})
 # Jenis status effect yang didukung engine.
 STATUS_KINDS = frozenset({"dot", "stun"})
 
-# Dispatch tables — validate & tests derive kind sets from these.
-TECHNIQUE_HANDLERS: dict[str, object] = {k: None for k in TECHNIQUE_KINDS}
-STATUS_KIND_HANDLERS: dict[str, object] = {k: None for k in STATUS_KINDS}
+
 
 
 def companion_stats(state: GameState, registry: DataRegistry) -> dict | None:
