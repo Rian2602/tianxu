@@ -11,8 +11,6 @@ arc_summary + ending. Skip bila data Arc I-III tidak ada.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from src.loader import DataRegistry, DATA_DIR
@@ -23,15 +21,10 @@ pytestmark = pytest.mark.skipif(
     reason="data story Arc IV belum ada di data/",
 )
 
-REGISTRY: DataRegistry | None = None
-
 
 @pytest.fixture(scope="module")
 def registry() -> DataRegistry:
-    global REGISTRY
-    if REGISTRY is None:
-        REGISTRY = DataRegistry()
-    return REGISTRY
+    return DataRegistry()
 
 
 def _talk(s: GameSession, npc: str, *, close: bool = True) -> None:
@@ -57,6 +50,10 @@ def _spar_win(s: GameSession, npc: str) -> None:
 
 def _reach(s: GameSession, loc: str) -> None:
     s.apply_action({"type": "move", "to": loc})
+
+
+def _new_session(registry: DataRegistry) -> GameSession:
+    return GameSession.new(registry)
 
 
 def _through_arc1_2_3(registry, branch_idx: int = 1) -> GameSession:
@@ -97,10 +94,6 @@ def _through_arc1_2_3(registry, branch_idx: int = 1) -> GameSession:
     _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_hidden_room_mural")
     assert s.state.current_quest == "quest_a04_c01_001", s.state.current_quest
     return s
-
-
-def _new_session(registry: DataRegistry) -> GameSession:
-    return GameSession.new(registry)
 
 
 def test_arc4_data_contract_ok(registry):
