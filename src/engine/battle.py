@@ -18,6 +18,16 @@ from .cultivation import gain_exp, gain_grind_exp
 from .events import add_log
 from .state import GameState
 
+# Jenis teknik yang didukung engine — satu sumber kebenaran untuk validator.
+TECHNIQUE_KINDS = frozenset({"attack", "defend", "heal"})
+
+# Jenis status effect yang didukung engine.
+STATUS_KINDS = frozenset({"dot", "stun"})
+
+# Dispatch tables — validate & tests derive kind sets from these.
+TECHNIQUE_HANDLERS: dict[str, object] = {k: None for k in TECHNIQUE_KINDS}
+STATUS_KIND_HANDLERS: dict[str, object] = {k: None for k in STATUS_KINDS}
+
 
 def companion_stats(state: GameState, registry: DataRegistry) -> dict | None:
     """Stat kompanion aktif — base + level × scale (ENGINE_ARCHITECTURE §9.4).
@@ -27,21 +37,24 @@ def companion_stats(state: GameState, registry: DataRegistry) -> dict | None:
     c = state.companion
     if not c or not c.get("active"):
         return None
-    comp = next((x for x in registry.companions if x["id"] == c["id"]), None)
+    comp = next((x for x in registry.companions if x.get("id") == c["id"]), None)
     if not comp:
         return None
     scale = registry.config.get("companion", {})
     lvl = state.player.realm_level
-    hp_max = int(comp["base_hp"]) + lvl * int(scale.get("hp_per_level", 12))
+    # F3 (adaptifitas): kolom opsional → default, jangan KeyError di tengah battle
+    hp_max = int(comp.get("base_hp", 10)) + lvl * int(scale.get("hp_per_level", 12))
     return {
         "id": c["id"],
         "name": comp["name"],
         "element": comp.get("element"),
-        "hp": min(c.get("hp") or hp_max, hp_max),
+        # Bug #2 (audit Claude): 0 adalah nilai HP sah (KO) — jangan jatuh ke
+        # hp_max karena 0 falsy di Python. Cek eksplisit None.
+        "hp": min(hp_max if c.get("hp") is None else int(c.get("hp")), hp_max),
         "hp_max": hp_max,
-        "attack": int(comp["base_attack"]) + lvl * int(scale.get("attack_per_level", 2)),
-        "defense": int(comp["base_defense"]) + lvl * int(scale.get("defense_per_level", 1)),
-        "speed": int(comp["base_speed"]) + round(lvl * float(scale.get("speed_per_level", 0.5))),
+        "attack": int(comp.get("base_attack", 3)) + lvl * int(scale.get("attack_per_level", 2)),
+        "defense": int(comp.get("base_defense", 1)) + lvl * int(scale.get("defense_per_level", 1)),
+        "speed": int(comp.get("base_speed", 5)) + round(lvl * float(scale.get("speed_per_level", 0.5))),
     }
 
 
@@ -115,9 +128,10 @@ class BattleEngine:
         }
         self.state.pending_battle = b
         for f in b["foes"]:
-            # normalisasi angka (CSV dibaca sebagai string)
-            f["hp"] = int(f["hp"])
-            f["qi"] = int(f.get("qi", 0) or 0)
+            # normalisasi angka (CSV dibaca sebagai string) — F3: kolom opsional
+            # diberi default, bukan KeyError di tengah battle
+            f["hp"] = int(f["hp"]) if f.get("hp") is not None else 10
+            f["qi"] = int(f["qi"]) if f.get("qi") is not None else 0
             f["attack"] = int(f.get("attack", 1))
             f["defense"] = int(f.get("defense", 0))
             f["speed"] = int(f.get("speed", 5))
@@ -214,12 +228,18 @@ class BattleEngine:
         if tid not in allowed:
             add_log(self.state, "battle", "Kau belum menguasai teknik itu.")
             return
+        kind = tek.get("kind")
+        # Fix audit v3 §1.4: kind tak dikenal TIDAK boleh menghanguskan Qi —
+        # dilaporkan lalu diabaikan (defense-in-depth setelah validator).
+        if kind not in TECHNIQUE_KINDS:
+            add_log(self.state, "battle",
+                    f"Teknik '{tek['name']}' (kind '{kind}') tak dikenal — tidak terjadi apa-apa.")
+            return
         cost = int(tek["qi_cost"])
         if pc["qi"] < cost:
             add_log(self.state, "battle", "Qi tidak cukup untuk teknik itu!")
             return
         pc["qi"] -= cost
-        kind = tek["kind"]
         # C1: power naik sesuai level teknik (power × (1 + (level−1) × growth))
         lvl = int(self.state.player.technique_levels.get(tid, 1))
         growth = float(self.reg.config.get("cultivation", {}).get("technique_power_growth_per_level", 0.0))
@@ -275,11 +295,18 @@ class BattleEngine:
             sc = cfg.get(sid)
             if not sc:
                 continue
-            if sc.get("kind") == "dot":
+            kind = sc.get("kind")
+            # Fix audit v3 §1.5: status kind tak dikenal dilaporkan + diabaikan,
+            # tidak menempel-inert (tanpa efek diam-diam).
+            if kind not in STATUS_KINDS:
+                add_log(self.state, "battle",
+                        f"Efek '{sc.get('name', sid)}' (kind '{kind}') tak dikenal — diabaikan.")
+                continue
+            if kind == "dot":
                 dmg = int(sc.get("power", 0))
                 pc["hp"] -= dmg
                 add_log(self.state, "battle", f"{sc.get('name', sid)}! Kehilangan {dmg} HP.")
-            elif sc.get("kind") == "stun":
+            elif kind == "stun":
                 stunned = True
         return stunned
 
@@ -372,10 +399,15 @@ class BattleEngine:
         b["over"] = True
         b["won"] = True
         self.state.pending_battle = None
+        # Bug #1 (audit Claude): sinkronkan HP/Qi yang benar-benar bertarung
+        # SEBELUM grant exp — gain_grind_exp bisa memicu level-up yang full-heal
+        # di cultivation._level_up; tanpa urutan ini snapshot pra-reward menimpa
+        # heal level-up diam-diam.
+        self._sync_player(pc)
         killed = [f["id"] for f in b["foes"] if f.get("id")]
         # exp — sumber grinding (spar/berburu) dibatasi cap harian (A2, keputusan §17)
         if b["context"] == "spar":
-            gain_grind_exp(self.state, self.reg, self.reg.config["cultivation"]["spar_win_exp"])
+            gain_grind_exp(self.state, self.reg, self.reg.config.get("cultivation", {}).get("spar_win_exp", 5))
             arr = self.reg.config.get("cultivation", {}).get("spar_relation_diminishing") or [5, 3, 1]
             if b.get("spar_npc"):
                 npc_id = b["spar_npc"]
@@ -405,13 +437,11 @@ class BattleEngine:
                 add_log(self.state, "battle", f"Menemukan: {it['name'] if it else di}.")
         add_log(self.state, "battle", f"🏆 Kemenangan! (+{self._last_exp(b)} exp)")
         self.quest_engine.notify_battle_won(killed)
-        # sinkronkan HP/Qi yang benar-benar bertarung (bukan stat segar)
-        self._sync_player(pc)
         return self.view()
 
     def _last_exp(self, b: dict) -> int:
         if b["context"] == "spar":
-            return self.reg.config["cultivation"]["spar_win_exp"]
+            return self.reg.config.get("cultivation", {}).get("spar_win_exp", 5)
         return sum(int(f.get("exp_reward", 0)) for f in b["foes"])
 
     def _ko(self, b: dict) -> dict:
@@ -423,7 +453,7 @@ class BattleEngine:
         loss = round(self.state.exp_next(self.reg) * ratio)
         self.state.player.exp = max(0, self.state.player.exp - loss)
         if b["context"] == "spar":
-            gain_exp(self.state, self.reg, self.reg.config["cultivation"]["spar_loss_exp"])
+            gain_exp(self.state, self.reg, self.reg.config.get("cultivation", {}).get("spar_loss_exp", 2))
             # G4a: kalah sparring tetap menyelesaikan objektif `spar` (dialog berbeda)
             if b.get("spar_npc"):
                 self.quest_engine.notify_spar_loss(b["spar_npc"])
