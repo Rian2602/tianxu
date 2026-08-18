@@ -1,0 +1,85 @@
+{
+  "quests": [
+    {
+      "id": "quest_a04_c01_001",
+      "kind": "main",
+      "title": "Arsip di Bawah",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1,
+        "hint": "Bicaralah dengan Mei Ruo — ia menemukan jalan menuju Arsip Terlarang."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_history_v1_v2_compared", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 3}
+        ],
+        "rewards": {"exp": 12},
+        "system_msg": "Version I dan Version II saling bertentangan secara fundamental — bukan sekadar detail kecil. Sesuatu di sini sengaja ditulis ulang."
+      },
+      "next": [{"quest": "quest_a04_c02_002"}]
+    },
+    {
+      "id": "quest_a04_c02_002",
+      "kind": "main",
+      "title": "Apa yang Kami Segel",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1,
+        "hint": "Bicaralah dengan Mei Ruo — ia menemukan catatan pribadi pendiri di bagian terdalam arsip."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_version_iii_read", "value": true},
+          {"type": "flag", "key": "flag_origin_cultivation_known_partial", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+        ],
+        "rewards": {"exp": 15},
+        "system_msg": "Di bagian terdalam arsip, kau menemukan catatan pribadi pendiri — Version III: 'Yang kami segel bukan musuh. Kami menyegel akibat dari kesalahan kami sendiri.'"
+      },
+      "next": [{"quest": "quest_a04_c03_003"}]
+    },
+    {
+      "id": "quest_a04_c03_003",
+      "kind": "main",
+      "title": "Orang yang Memilih Ketakutan",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_grandmaster",
+        "target": 1,
+        "hint": "Temui Grandmaster di ruangnya — sudah waktunya berhadapan langsung."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_grandmaster_met", "value": true},
+          {"type": "flag", "key": "flag_stakes_of_stopping_source_known", "value": true},
+          {"type": "relation", "npc": "npc_grandmaster", "value": 3}
+        ],
+        "rewards": {"exp": 15, "gold": 10},
+        "system_msg": "Grandmaster tidak membantah. Ia hanya bertanya: 'Jika sumbernya dihentikan, siapa yang menanggung runtuhnya dunia yang bergantung padanya?'"
+      },
+      "next": [{"quest": "quest_a04_c04_004"}]
+    },
+    {
+      "id": "quest_a04_c04_004",
+      "kind": "main",
+      "title": "Apa yang Tian Xu Makan",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_tianxu_deepest_chamber",
+        "hint": "Turunlah ke ruang terdalam Tian Xu — lihat sendiri apa yang ada di bawah."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_tianxu_feeds_segel_known", "value": true},
+          {"type": "flag", "key": "flag_arc4_complete", "value": true}
+        ],
+        "rewards": {"exp": 20, "gold": 15},
+        "system_msg": "Formation raksasa menyala di lantai, menyerap energi yang mengalir dari seluruh akademi di atasnya. Murid, guru, kurikulum — semuanya bahan bakar. Tian Xu bukan penjaga segel. Tian Xu memberi makan segel."
+      },
+      "next": [{"quest": "quest_a05_c01_001"}]
+    }
+  ]
+}

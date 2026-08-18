@@ -1,0 +1,23 @@
+{
+  "npcs": [
+    {
+      "id": "npc_guru",
+      "name": "Guru",
+      "location": "loc_gerbang",
+      "can_spar": true,
+      "spar_require": {"realm_min": "realm_awal"},
+      "combat": {
+        "hp": 40,
+        "attack": 8,
+        "defense": 3,
+        "exp_reward": 6
+      },
+      "dialog_routes": {
+        "general": "dlg_intro",
+        "main": {
+          "q_min_intro": "dlg_intro"
+        }
+      }
+    }
+  ]
+}

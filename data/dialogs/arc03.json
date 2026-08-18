@@ -1,0 +1,138 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a03_d02",
+      "npc": "npc_mo_chen",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Kau... wajah itu. Aku tahu namamu meski kau tidak ingat. Jiang Yan.",
+          "choices": [
+            {"label": "Jiang Yan? Siapa itu?", "next": "n2"},
+            {
+              "label": "(Tunjukkan simbol kuno yang kau temukan)",
+              "condition": {"has_item": "simbol_kuno"},
+              "next": "n3"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Namamu — kehidupan yang lalu. Aku tidak punya waktu untuk menjelaskan. Carilah namamu di arsip akademi. Kau akan menemukan lebih dari yang kau kira.",
+          "choices": [
+            {"label": "Tunggu—", "next": "n4"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Simbol itu... aku pernah melihatnya, di tangan orang yang sama — di kehidupan yang lalu. Kau benar-benar dia. Jiang Yan.",
+          "choices": [
+            {"label": "Kau tahu artinya?", "next": "n5"}
+          ]
+        },
+        "n4": {
+          "speaker": "narration",
+          "text": "Sebelum kau sempat bertanya, sosok itu telah menghilang ke dalam bayangan koridor.",
+          "choices": []
+        },
+        "n5": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Itu bukan untuk kuceritakan. Carilah namamu di arsip akademi. Lalu putuskan sendiri apa yang kau percaya.",
+          "choices": [
+            {"label": "Tunggu—", "next": "n4"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "dlg_a03_d03",
+      "npc": "npc_archive_clerk",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_archive_clerk",
+          "text": "Kau mencari dokumen? Arsip publik terbuka untuk murid. Nama apa yang kau cari?",
+          "choices": [
+            {"label": "Jiang Yan.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_archive_clerk",
+          "text": "Jiang Yan... ini dia. Catatan lama, lebih dari dua puluh tahun. Statusnya: Deceased. Kau mengenalnya?",
+          "choices": [
+            {"label": "(Baca dokumen itu dalam diam)", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "narration",
+          "text": "Tanggalnya jauh sebelum kau lahir. Namun namamu tertulis di sana — dan statusnya DECEASED. Kepalamu berputar.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a03_d04",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau tampak berbeda sejak kemarin. Mei Ruo bilang kau menemukan sesuatu di arsip. Apa yang terjadi?",
+          "choices": [
+            {"label": "Namaku di kehidupan lain adalah Jiang Yan. Dan statusnya... deceased.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Aku... kau serius? Kalau begitu, siapa kau sekarang? — Maaf. Itu bukan pertanyaan yang adil. Yang penting: apa yang KAU percaya?",
+          "choices": [
+            {"label": "Aku harus memikirkan ini sendiri.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Apa pun yang kau putuskan, kami di sini. Jangan lupakan itu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a03_branch",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "narration",
+          "text": "Tiga sikap terbuka di hadapanmu. Tidak ada yang salah — tapi masing-masing akan menemani langkahmu dari sini.",
+          "choices": [
+            {
+              "label": "Deny — aku bukan dia. Aku hanya Chen Xu.",
+              "option": "deny",
+              "effects": [
+                {"type": "flag", "key": "state_identity_stance", "value": "deny"},
+                {"type": "relation", "npc": "npc_gu_han", "value": 2},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": -1}
+              ]
+            },
+            {
+              "label": "Accept Cautious — aku menerima, tapi belum siap menjadi dia.",
+              "option": "accept_cautious",
+              "effects": [
+                {"type": "flag", "key": "state_identity_stance", "value": "accept_cautious"},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 1}
+              ]
+            },
+            {
+              "label": "Seek Truth — aku harus tahu siapa aku sebenarnya.",
+              "option": "seek_truth",
+              "effects": [
+                {"type": "flag", "key": "state_identity_stance", "value": "seek_truth"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 4}
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

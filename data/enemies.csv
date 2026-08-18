@@ -1,0 +1,3 @@
+id,name,hp,attack,defense,exp_reward,speed,drop_item,drop_chance
+penjaga_formation,Penjaga Formasi Tua,30,6,3,12,4,,
+binatang_hutan,Binatang Hutan,12,3,1,4,6,,

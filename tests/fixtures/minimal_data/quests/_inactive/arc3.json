@@ -1,0 +1,138 @@
+{
+  "quests": [
+    {
+      "id": "q_a03_c01_001",
+      "kind": "main",
+      "title": "Ruangan yang Tak Ada di Peta",
+      "quest_type": "main",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_hidden_room_mural",
+        "hint": "Artefak itu berdenyut lebih kuat saat kau mendekati Paviliun Lima Elemen. Sepertinya ada sesuatu di balik dinding belakangnya."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "mural_analyzed", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Di balik dinding paviliun, kau menemukan ruangan yang tidak tercatat di peta mana pun. Mural raksasa memenuhi dindingnya — sejarah Tian Xu dalam cat dan batu. Mei Ruo menelusuri garis-garisnya dengan jari: \"Ini bukan rusak karena usia. Seseorang sengaja menghapusnya.\""
+      },
+      "next": [
+        {"quest": "q_a03_c02_002"}
+      ]
+    },
+    {
+      "id": "q_a03_c02_002",
+      "kind": "main",
+      "title": "Orang Asing yang Tahu Namaku",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mo_chen",
+        "target": 1,
+        "hint": "Sesosok cultivator misterius muncul di hutan — ia tampak mengenalimu."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "name_jiang_yan_known", "value": true},
+          {"type": "flag", "key": "mo_chen_met", "value": true}
+        ],
+        "rewards": {"exp": 8},
+        "system_msg": "Orang asing itu menatapmu lama — lalu memanggilmu dengan nama yang tidak pernah kau dengar: \"Jiang Yan.\" Ia menyebut simbol di lehermu, tersenyum tipis, dan menghilang ke dalam bayang-bayang hutan sebelum kau sempat bertanya."
+      },
+      "next": [
+        {"quest": "q_a03_c03_003"}
+      ]
+    },
+    {
+      "id": "q_a03_c03_003",
+      "kind": "main",
+      "title": "Deceased",
+      "quest_type": "main",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_arsip_publik",
+        "hint": "Cari dokumen tentang nama itu di arsip publik akademi — verifikasi apakah 'Jiang Yan' benar-benar ada."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "jiang_yan_deceased_confirmed", "value": true},
+          {"type": "item", "id": "dokumen_jiang_yan", "count": 1}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Di rak paling jauh arsip, kau menemukannya: dokumen tua dengan nama Jiang Yan, tanggal lebih dari dua puluh tahun sebelum kau lahir — dan satu kata yang membuat dunia berhenti: 'Deceased'. Kau pernah mati. Kau sedang membaca catatan kematianmu sendiri."
+      },
+      "next": [
+        {"quest": "q_a03_c04_004"}
+      ]
+    },
+    {
+      "id": "q_a03_c04_004",
+      "kind": "main",
+      "title": "Apa yang Kupilih untuk Dipercaya",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Kembalilah ke kelompokmu. Dokumen itu mengubah segalanya — dan kau harus memutuskan bagaimana menyikapinya."
+      },
+      "on_complete": {
+        "rewards": {"exp": 5},
+        "system_msg": "Keputusan telah dibuat. Apapun sikapmu, kelompokmu berdiri di sisimu."
+      },
+      "next": [
+        {"quest": "q_a03_c05_005", "option": "deny", "choice_id": "dlg_arc3_branch"},
+        {"quest": "q_a03_c05_005", "option": "accept_cautious", "choice_id": "dlg_arc3_branch"},
+        {"quest": "q_a03_c05_005", "option": "seek_truth", "choice_id": "dlg_arc3_branch"}
+      ]
+    },
+    {
+      "id": "q_a03_c05_005",
+      "kind": "main",
+      "title": "Gerbang yang Kubuka",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1,
+        "hint": "Mei Ruo mengajakmu mencoba lagi — menggenggam artefak itu bersama, untuk mencari jawaban di balik gerbang."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "memory_gate_a03_seen", "value": true},
+          {"type": "flag", "key": "belief_may_be_cause", "value": true},
+          {"type": "flag", "key": "arc3_complete", "value": true}
+        ],
+        "rewards": {"exp": 12},
+        "memory_unlock": "memory_a03_m01",
+        "system_msg": "Saat tangan kalian menggenggam artefak itu bersama, dunia terbalik. Kau berdiri di depan gerbang cahaya hitam — dan suaramu sendiri berkata: 'Kalau dunia harus membenciku, biarkan.' Kau membuka gerbang itu. Cut. Arc III selesai."
+      },
+      "next": [
+        {"quest": "q_a04_c01_001"}
+      ]
+    },
+    {
+      "id": "q_a03_side_dokumen",
+      "kind": "side",
+      "title": "Jejak Jiang Yan",
+      "quest_type": "side",
+      "objective": {
+        "kind": "defeat",
+        "enemies": ["monster_penjaga_formation"],
+        "target": 1,
+        "report_to": "npc_mei_ruo",
+        "hint": "Jalur investigasi mandiri: Mei Ruo menemukan catatan tentang sebuah lokasi yang berhubungan dengan Jiang Yan di luar hutan — amankan tempat itu dari monster penjaga, lalu laporkan kembali."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "side_dokumen_done", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+        ],
+        "rewards": {"exp": 8, "gold": 15},
+        "system_msg": "Mei Ruo mencatat temuannya. \"Satu jejak lagi tertutup. Semakin kita gali, semakin besar pertanyaannya — tapi setidaknya kita tidak lagi berjalan buta.\""
+      }
+    }
+  ]
+}

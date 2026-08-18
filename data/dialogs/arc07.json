@@ -1,0 +1,322 @@
+{
+ "dialogs": [
+  {
+   "id": "dlg_a07_d01",
+   "npc": "npc_lin_yue",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu — dan takut pada momen ini sejak pertama kali kita bertemu di gerbang itu.",
+     "choices": [
+      {
+       "label": "Formasi di bawah mulai runtuh.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Aku tahu. Semua orang tahu. Malam ini bukan malam perayaan — ini malam terakhir Tian Xu seperti yang kita kenal. Apa pun yang terjadi di bawah sana, kami semua di sini menunggu.",
+     "choices": [
+      {
+       "label": "Apa yang kalian tunggu?",
+       "next": "n3",
+       "effects": []
+      }
+     ]
+    },
+    "n3": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kamu. Bukan Jiang Yan — kamu. Orang yang memilih jalannya sendiri, yang membangun keluarganya sendiri di sini. Kami menunggu untuk melihat apa yang akan kau pilih, karena apa pun itu, kami akan ada di sisimu.",
+     "choices": [
+      {
+       "label": "Terima kasih. Aku akan kembali.",
+       "next": "n4",
+       "effects": []
+      }
+     ]
+    },
+    "n4": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kembalilah. Dan apa pun yang kau temukan di bawah sana — ingat: kau bukan warisan siapa pun. Kau hidupmu sendiri.",
+     "choices": []
+    }
+   }
+  },
+  {
+   "id": "dlg_a07_d02",
+   "npc": "npc_jiang_yan_imprint",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_jiang_yan_imprint",
+     "text": "Akhirnya. Kau datang — seperti yang selalu kurencanakan. Aku membuatmu untuk menyelesaikan apa yang gagal kuselesaikan.",
+     "choices": [
+      {
+       "label": "Kau membuatku?",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_jiang_yan_imprint",
+     "text": "Second Life bukan hadiah. Ia adalah eksperimen yang tersisa — kesempatan kedua yang kutanam untuk melanjutkan apa yang kutolak untuk gagal. Tubuhmu, akarmu, bakatmu — semuanya kurencanakan. Kau adalah kelanjutanku.",
+     "choices": [
+      {
+       "label": "Tidak. Aku bukan kau.",
+       "next": "n3",
+       "effects": []
+      }
+     ]
+    },
+    "n3": {
+     "speaker": "narration",
+     "text": "Kata-kata itu menggema di ruang kosong di bawah segalanya. Dan untuk pertama kalinya sejak Second Life dimulai, sesuatu di dalam dirimu — yang selama ini kau kira suara Jiang Yan — terdiam.",
+     "choices": [
+      {
+       "label": "Kau mendengar itu?",
+       "next": "n4",
+       "effects": []
+      }
+     ]
+    },
+    "n4": {
+     "speaker": "npc:npc_jiang_yan_imprint",
+     "text": "Aku... mendengarnya. 'Kau bukan kau.' Aku telah merencanakan segalanya kecuali kemungkinan ini: bahwa kau bisa menolak apa yang kutanamkan. Bahwa kau bisa menjadi sesuatu yang tidak pernah kuperhitungkan.",
+     "choices": [
+      {
+       "label": "Siapa yang berbicara di dalam diriku selama ini?",
+       "next": "n5",
+       "effects": []
+      }
+     ]
+    },
+    "n5": {
+     "speaker": "npc:npc_jiang_yan_imprint",
+     "text": "Itu bukan aku. Itu Entity — yang terperangkap di The Gate, yang sumbernya kami curi untuk cultivation, yang hidupnya kami makan untuk bertahan. Ia tidak membencimu. Ia hanya ingin kau tahu kebenaran sebelum kau memutuskan nasib segalanya.",
+     "choices": [
+      {
+       "label": "Apa kebenarannya?",
+       "next": "n6",
+       "effects": []
+      }
+     ]
+    },
+    "n6": {
+     "speaker": "entity",
+     "text": "Kau membunuhku sekali — di kehidupan pertamamu, ketika kau mencoba memisahkanku dari sumbernya. Kau gagal. Dan karena kegagalan itu, kalian menciptakan siklus ini: formasi yang memakanku, cultivation yang kau sebut anugerah, dunia yang kau bangun di atas penderitaan yang tidak kau lihat.",
+     "choices": [
+      {
+       "label": "Lalu apa yang kau minta?",
+       "next": "n7",
+       "effects": []
+      }
+     ]
+    },
+    "n7": {
+     "speaker": "entity",
+     "text": "Aku tidak meminta apa pun. Aku hanya memberi tahu. Apa yang terjadi selanjutnya — pertahankan dunia yang memakanku, hancurkan, ubah, atau korbankan dirimu untuknya — itu keputusanmu. Bukan keputusan Jiang Yan. Bukan keputusanku. Keputusanmu.",
+     "choices": []
+    }
+   }
+  },
+  {
+   "id": "dlg_a07_d03",
+   "npc": "npc_jiang_yan_imprint",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "narration",
+     "text": "Semuanya bermuara pada satu momen. Di bawah Tian Xu, di hadapan segala yang telah kau pelajari, kau harus memilih. Dunia akan mengingat malam ini — dengan satu nama, atau tanpa nama sama sekali.",
+     "choices": [
+      {
+       "label": "Preserve — pertahankan dunia yang ada, perbaiki dari dalam.",
+       "option": "preserve",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "state_ending_achieved",
+         "value": "preserve"
+        },
+        {
+         "type": "relation",
+         "npc": "npc_grandmaster",
+         "value": 3
+        },
+        {
+         "type": "reputation",
+         "faksi": "faction_tianxu_orthodox",
+         "value": 3
+        }
+       ],
+       "next": "n_ep_preserve"
+      },
+      {
+       "label": "Destroy — sistem ini telah gagal; hancurkan agar dunia baru lahir.",
+       "option": "destroy",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "state_ending_achieved",
+         "value": "destroy"
+        },
+        {
+         "type": "relation",
+         "npc": "npc_gu_han",
+         "value": 3
+        },
+        {
+         "type": "reputation",
+         "faksi": "faction_tianxu_orthodox",
+         "value": -4
+        }
+       ],
+       "next": "n_ep_destroy"
+      },
+      {
+       "label": "Transform — ubah hubungan dunia dengan sumbernya, bukan hancurkan.",
+       "option": "transform",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "state_ending_achieved",
+         "value": "transform"
+        },
+        {
+         "type": "relation",
+         "npc": "npc_mei_ruo",
+         "value": 3
+        },
+        {
+         "type": "relation",
+         "npc": "npc_shen_luo",
+         "value": 2
+        }
+       ],
+       "next": "n_ep_transform"
+      },
+      {
+       "label": "Sacrifice — akhiri siklus ini dengan harga terakhir.",
+       "option": "sacrifice",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "state_ending_achieved",
+         "value": "sacrifice"
+        },
+        {
+         "type": "relation",
+         "npc": "npc_mentor",
+         "value": 3
+        }
+       ],
+       "next": "n_ep_sacrifice"
+      },
+      {
+       "label": "Second Life — tolak ketiga jalur itu; bebaskan Entity tanpa menghancurkan, tanpa mengorbankan dirimu.",
+       "option": "second_life",
+       "condition": {
+        "flags": [
+         {
+          "key": "flag_the_gate_full_truth_known",
+          "value": true
+         },
+         {
+          "key": "flag_tianxu_feeds_segel_known",
+          "value": true
+         },
+         {
+          "key": "flag_version_iii_read",
+          "value": true
+         },
+         {
+          "key": "flag_jiang_yan_origin_known",
+          "value": true
+         },
+         {
+          "key": "flag_betrayal_identity_known",
+          "value": true
+         },
+         {
+          "key": "flag_cycle_formation_known_partial",
+          "value": true
+         },
+         {
+          "key": "belief_protagonist_may_be_cause",
+          "value": false
+         }
+        ],
+        "flag_not": [
+         {
+          "key": "state_lin_yue_status",
+          "value": "disillusioned"
+         },
+         {
+          "key": "state_identity_stance",
+          "value": "deny"
+         },
+         {
+          "key": "state_final_principle",
+          "value": "sacrifice"
+         }
+        ]
+       },
+       "effects": [
+        {
+         "type": "flag",
+         "key": "state_ending_achieved",
+         "value": "second_life"
+        },
+        {
+         "type": "relation",
+         "npc": "npc_lin_yue",
+         "value": 4
+        }
+       ],
+       "next": "n_ep_second_life"
+      }
+     ]
+    },
+    "n_ep_preserve": {
+     "speaker": "narration",
+     "text": "Tian Xu selamat. Cultivation tetap ada — dan pertanyaan tetap hidup: berapa lama sebelum tragedi kembali? Dunia tampak normal di permukaan. Tapi kau tahu harganya, dan kau memilih untuk tetap menjaganya.",
+     "choices": []
+    },
+    "n_ep_destroy": {
+     "speaker": "narration",
+     "text": "Cultivation perlahan menghilang. Sebagian membencimu. Sebagian berterima kasih. Manusia tidak lagi bergantung pada sesuatu yang tidak mereka pahami. Dunia kehilangan keajaibannya — dan menemukan kebebasannya.",
+     "choices": []
+    },
+    "n_ep_transform": {
+     "speaker": "narration",
+     "text": "Institusi baru mulai terbentuk. Ini bukan kemenangan sempurna — generasi baru harus belajar ulang cultivation dari awal. Tapi untuk pertama kalinya, hubungan dunia dengan sumbernya tidak lagi eksploitatif.",
+     "choices": []
+    },
+    "n_ep_sacrifice": {
+     "speaker": "narration",
+     "text": "Dunia terus berjalan tanpa kau. Sebagian mengingat namamu. Sebagian melupakannya. Dan di antara mereka yang tersisa, ada yang tidak pernah berhenti berterima kasih pada orang yang tidak pernah mereka lihat lagi.",
+     "choices": []
+    },
+    "n_ep_second_life": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Pagi pertama dunia yang baru. Lin Yue duduk di sampingmu, menatap kejauhan, lalu bertanya dengan tenang: 'Kalau kau bisa mengulang hidupmu, apakah kau akan memilih hal yang sama?'",
+     "choices": [
+      {
+       "label": "Tidak.",
+       "next": "n2_second_life_b",
+       "effects": []
+      }
+     ]
+    },
+    "n2_second_life_b": {
+     "speaker": "narration",
+     "text": "'Tidak.' Jawaban itu keluar tanpa ragu. Lin Yue tersenyum — bukan senyum lega, tapi senyum pengertian. 'Kalau begitu, kali ini jalani dengan caramu sendiri.' Entitas dibebaskan. Cultivation berubah. Tian Xu berubah. Kau tidak menjadi dewa, tidak menjadi penguasa, tidak menjadi legenda. Kau tetap manusia — dan untuk pertama kalinya, itu cukup.",
+     "choices": []
+    }
+   }
+  }
+ ]
+}

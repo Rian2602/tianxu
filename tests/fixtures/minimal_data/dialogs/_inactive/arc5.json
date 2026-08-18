@@ -1,0 +1,367 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a05_collapse",
+      "npc": "npc_guru_utama",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Kau sudah dengar laporannya? Bukan lagi satu gua atau satu arsip — sekarang dunianya. Wilayah-wilayah di luar akademi mulai runtuh. Cultivation menyimpang di beberapa tempat, monster-monster bermutasi, zona mati tumbuh, dan badai spiritual menyapu desa-desa. Formasi-formasi tua — yang seharusnya kokoh selama ribuan tahun — retak seperti kaca tua.",
+          "choices": [
+            {
+              "label": "Ini bukan kebetulan.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Tidak. Aku sudah pernah melihat pola ini — di catatan-catatan lama, yang bahkan tidak berani kubicarakan dengan siapa pun. Seolah dunia sedang mengulang sesuatu. Seolah... ini pernah terjadi sebelumnya.",
+          "choices": [
+            {
+              "label": "(...Kau pernah melihat semua ini. Di kehidupan yang lain.)",
+              "next": "n3"
+            }
+          ]
+        },
+        "n3": {
+          "speaker": "player",
+          "text": "(...Di kehidupan yang lain. Aku pernah melihat semua ini — dari sisi yang berbeda. Dan kali ini, aku berdiri di sini untuk menghentikannya.)"
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_gate_prelude",
+      "npc": "npc_penjaga_gerbang",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_penjaga_gerbang",
+          "text": "Kau! Murid akademi? Jangan dekat-dekat! Makhluk-makhluk ini bukan gangguan biasa — mereka bermutasi, liar, dan mereka tahu gerbang ini adalah satu-satunya jalan. Aku sudah menjaga jalur ini bertahun-tahun. Malam ini... aku tidak yakin cukup.",
+          "choices": [
+            {
+              "label": "Aku membantumu menjaga gerbang.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_penjaga_gerbang",
+          "text": "Hah. Murid yang berani. Kalau kau mau bertaruh nyawamu di sini — lakukanlah. Tapi ingat: kalau gerbang ini runtuh, bukan hanya akademi yang kalah. Dunia di baliknya ikut terbuka. Kau siap?",
+          "choices": [
+            {
+              "label": "Siap. (Hadapi gelombang penyerbu.)",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "spar_kalah",
+                  "value": false
+                }
+              ],
+              "next": "n3"
+            }
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_penjaga_gerbang",
+          "text": "Kalau begitu — pegang senjatamu erat-erat. Ini bukan sparing. Ini perang."
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_gate_outcome",
+      "npc": "npc_lin_yue",
+      "start": "n_gate_changed",
+      "nodes": {
+        "n_gate_repeated": {
+          "once": true,
+          "condition": {
+            "flag": {
+              "key": "spar_kalah",
+              "value": true
+            }
+          },
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau kembali... dan gerbang itu runtuh. Kami mendengar gema runtuhannya sampai ke lapangan. Tragedi yang sama seperti yang kau ceritakan — terulang lagi, tepat di depan mata kami. Ini bukan salahmu seorang — tapi dunia mencatatnya. Sejarah berulang, dan kita semua menyaksikannya.",
+          "choices": [
+            {
+              "label": "...Kali ini, kita tidak akan membiarkannya berulang lagi.",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "mountain_gate_repeated",
+                  "value": true
+                }
+              ],
+              "next": "n_end"
+            }
+          ]
+        },
+        "n_gate_changed": {
+          "once": true,
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau kembali — dan gerbang itu bertahan. Penjaga tua itu menceritakan semuanya: kau berdiri di sampingnya, melawan apa pun yang datang. Ini bukan gerbang yang sama dengan catatan lama itu. Kali ini, sejarah berubah. Karena kau hadir di sana.",
+          "choices": [
+            {
+              "label": "Kita ubah ceritanya — satu babak pada satu waktu.",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "mountain_gate_changed",
+                  "value": true
+                }
+              ],
+              "next": "n_end"
+            }
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Tapi ada yang harus kita bicarakan — semua ini, tentang apa yang harus kita lakukan selanjutnya. Dan kali ini, aku tidak bisa bicara sendirian. Dengarkan mereka."
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_crisis",
+      "npc": "npc_lin_yue",
+      "start": "n_intro",
+      "nodes": {
+        "n_intro": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kita tidak bisa berpura-pura tidak terjadi apa-apa. Dunia runtuh, dan akademi ini — sumber dari semuanya — berdiri di tengahnya. Aku tahu kita semua melihat hal yang berbeda. Dengarkan satu per satu — lalu putuskan.",
+          "choices": [
+            {
+              "label": "Dengarkan pendapat mereka semua.",
+              "next": "n_lin"
+            }
+          ]
+        },
+        "n_lin": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Aku bicara dulu. Apa pun yang salah dengan sistem ini — murid-murid tidak bersalah. Mereka datang ke sini untuk mencari jalan, bukan untuk menjadi korban dari rahasia yang dikubur pendiri. Lindungi mereka. Bangun perisai di sekeliling akademi, dan selamatkan siapa yang bisa diselamatkan.",
+          "next": "n_shen"
+        },
+        "n_shen": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Perisai? Itu hanya menunda. Sistem ini lahir dari kebohongan — kita semua minum dari sumber yang busuk. Selama Tian Xu berdiri, dunia akan terus muntah. Hancurkan sistemnya. Ganti fondasinya — atau biarkan semuanya mati bersama kebohongan itu.",
+          "next": "n_mei"
+        },
+        "n_mei": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kita belum tahu apa-apa. Entitas itu berbicara. Formasi itu menyimpan jawaban. Jangan menghancurkan, jangan bersembunyi — telusuri. Kebenaran penuh dulu, keputusan sesudahnya. Itu satu-satunya cara kita tidak mengulangi kesalahan pendiri.",
+          "next": "n_gu"
+        },
+        "n_gu": {
+          "speaker": "npc:npc_gu_han",
+          "text": "Aku tidak percaya pada salah satu dari kalian. Murid yang dilindungi menjadi lemah. Sistem yang dihancurkan menyisakan kekosongan. Kebenaran yang dikejar tanpa henti menghancurkan orang yang mengejarnya. Dunia ini tidak bisa diperbaiki — hanya bisa dikelola, selagi kita masih bisa bernapas.",
+          "next": "n_ask"
+        },
+        "n_ask": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Empat suara. Satu keputusan. Kita tidak bisa berdiri di persimpangan selamanya — pilih jalan kita, sekarang.",
+          "choices": [
+            {
+              "label": "Lindungi para murid. Akademi adalah rumah mereka — selamatkan mereka dulu. (Posisi Lin Yue)",
+              "option": "shield",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "crisis_shield",
+                  "value": true
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_lin_yue",
+                  "value": 2
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_shen_luo",
+                  "value": -2
+                }
+              ],
+              "next": "n_shield"
+            },
+            {
+              "label": "Kejar kebenaran sampai tuntas. Jawaban dulu — baru tindakan. (Posisi Mei Ruo)",
+              "option": "truth",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "crisis_truth",
+                  "value": true
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_mei_ruo",
+                  "value": 2
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_gu_han",
+                  "value": -1
+                }
+              ],
+              "next": "n_truth"
+            },
+            {
+              "label": "Hancurkan sistemnya. Selama Tian Xu berdiri, dunia terus muntah. (Posisi Shen Luo)",
+              "option": "dismantle",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "crisis_dismantle",
+                  "value": true
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_shen_luo",
+                  "value": 2
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_gu_han",
+                  "value": 1
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_lin_yue",
+                  "value": -2
+                }
+              ],
+              "next": "n_dismantle"
+            }
+          ]
+        },
+        "n_shield": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Terima kasih. Malam ini, setidaknya — para murid tidur lebih aman karena keputusanmu. Kita urus sisanya besok."
+        },
+        "n_truth": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Itu keputusan yang berani. Kita mulai besok pagi — dari formasi itu, dari entitas itu, sampai tidak ada satu rahasia pun yang tersisa."
+        },
+        "n_dismantle": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Akhirnya, seseorang yang melihat dengan jelas. Kita mulai menyusun rencananya — pelan, tapi pasti. Sistem ini akan tumbang."
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_entity",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Artefak itu berdenyut tanpa henti sejak Gerbang Gunung. Setiap detak — seperti jantung. Aku sudah mencoba membacanya sendiri, tapi ia tidak meresponsku. Ia menunggu seseorang. Aku pikir... ia menunggumu.",
+          "choices": [
+            {
+              "label": "Bawa aku ke sana.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Di ruang terdalam... formasi itu terbuka seperti mata. Sst. Dengar.",
+          "choices": [
+            {
+              "label": "(Rasakan denyut formasi.)",
+              "next": "n3"
+            }
+          ]
+        },
+        "n3": {
+          "speaker": "player",
+          "text": "Suara itu datang bukan dari luar — tapi dari dalam kepalaku sendiri. Tua. Lapar. Familiar.\n\n'Kau membunuhku sekali.'",
+          "next": "n4"
+        },
+        "n4": {
+          "speaker": "player",
+          "text": "'Siapa kau?'",
+          "next": "n5"
+        },
+        "n5": {
+          "speaker": "player",
+          "text": "'Aku adalah alasan kalian menyebut dunia ini sebagai anugerah.'\n\nLalu — keheningan.",
+          "next": "n6"
+        },
+        "n6": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau dengar itu juga, kan? Jangan bilang tidak. Wajahmu pucat seperti orang yang baru bicara dengan hantu. Karena... itu memang hantu, bukan?"
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_side_aid_offer",
+      "npc": "npc_penjaga_gerbang",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "condition": {
+            "flag": {
+              "key": "world_event_collapse",
+              "value": true
+            }
+          },
+          "speaker": "npc:npc_penjaga_gerbang",
+          "text": "Kau lihat sendiri keadaan gerbang ini — dan semua yang ada di sekitarnya. Makhluk-makhluk bermutasi itu terus berdatangan, dan penduduk tidak berani keluar rumah. Satu orang yang bersedia turun tangan bisa membuat perbedaan. Maukah kau membantuku?",
+          "choices": [
+            {
+              "label": "Aku akan bersihkan wilayah itu. (Mulai misi bantuan.)",
+              "effects": [
+                {
+                  "type": "start_quest",
+                  "quest": "q_a05_side_aid"
+                }
+              ],
+              "next": "n2"
+            },
+            {
+              "label": "Belum sekarang.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_penjaga_gerbang",
+          "text": "Dunia ini mulai runtuh, murid. Tapi selama masih ada orang yang bersedia turun tangan — ia belum runtuh sepenuhnya. Berhati-hatilah di luar sana."
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_side_aid_report",
+      "npc": "npc_penjaga_gerbang",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_penjaga_gerbang",
+          "text": "Bagaimana wilayah itu?",
+          "choices": [
+            {
+              "label": "Makhluk-makhluknya sudah kuhadapi. Wilayah itu lebih aman — untuk sekarang.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_penjaga_gerbang",
+          "text": "Satu wilayah lebih aman malam ini — karena ada orang yang bersedia turun tangan. Terima kasih, murid. Dunia ini belum kehilangan harapan. Guru Utama akan mendengar laporan tentang ini."
+        }
+      }
+    },
+    {
+      "id": "dlg_penjaga_gate_general",
+      "npc": "npc_penjaga_gerbang",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_penjaga_gerbang",
+          "text": "Gerbang ini dijaga sejak sebelum kau lahir, murid. Selama batu-batu ini masih berdiri, tidak ada yang lewat — baik dari dalam, maupun dari luar."
+        }
+      }
+    }
+  ]
+}

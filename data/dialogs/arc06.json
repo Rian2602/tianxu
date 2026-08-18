@@ -1,0 +1,158 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a06_d01",
+      "npc": "npc_mentor",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mentor",
+          "text": "Kau datang mencari jawaban. Baik. Sudah terlalu lama aku menyimpannya — dan kau sudah terlalu jauh untuk kubiarkan terus menebak.",
+          "choices": [
+            {
+              "label": "Kau kenal Jiang Yan.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mentor",
+          "text": "Ya. Aku mengenalnya. Aku murid yang sama seperti kau sekarang — dulu. Dan aku mengenalnya lebih dekat daripada siapa pun yang masih hidup.",
+          "choices": [
+            {
+              "label": "Apa yang terjadi di antara kalian?",
+              "next": "n3"
+            }
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mentor",
+          "text": "Dia datang padaku dengan rencana. Bukan rencana biasa — dia ingin membuka The Gate, memisahkan Entity dari sumber cultivation. Aku takut. Bukan pada dirinya — pada apa yang bisa terjadi jika dia salah. Maka aku mengkhianatinya. Diam-diam, kukirim kabar ke mereka yang bisa menghentikannya.",
+          "choices": [
+            {
+              "label": "Dia tahu?",
+              "next": "n4"
+            }
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_mentor",
+          "text": "Dia tahu di akhir. Dan dia memilih untuk tetap melanjutkan — bukan karena membenciku, tapi karena itulah satu-satunya jalan yang tersisa. Aku menyebutnya pengkhianatan selama bertahun-tahun. Sekarang aku tahu: itu bukan pengkhianatan. Itu kepengecutan yang lahir dari kepedulian. Dan aku menanggungnya setiap hari sejak itu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a06_d03",
+      "npc": "npc_mentor",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mentor",
+          "text": "Aku sudah lama menunggu momen ini — dan takut padanya. Cara kau memegang pedang... aku pernah melihatnya. Bertahun-tahun lalu, pada seseorang yang kau serupai tanpa kau sadari.",
+          "choices": [
+            {
+              "label": "Jiang Yan.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mentor",
+          "text": "Ya. Dan aku tidak tahu — sampai sekarang — bahwa kau adalah dia. Atau lebih tepatnya: kau adalah kesempatan yang dia tinggalkan. Apa yang dia mulai, kau yang harus menyelesaikannya. Tapi kali ini, kau yang memilih caranya.",
+          "choices": [
+            {
+              "label": "Aku harus memutuskan sesuatu, kan?",
+              "next": "n3"
+            }
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mentor",
+          "text": "Kau harus. Sebelum kau turun ke bawah, sebelum kau berhadapan dengan semua yang telah kau pelajari: apa yang akan kau lakukan dengan pengetahuan ini? Pertahankan dunia yang ada? Hancurkan yang telah gagal? Ubah menjadi sesuatu yang baru? Atau korbankan segalanya?",
+          "choices": [
+            {
+              "label": "Preserve — pertahankan dunia yang ada, perbaiki dari dalam.",
+              "option": "preserve",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "state_final_principle",
+                  "value": "preserve"
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_lin_yue",
+                  "value": 2
+                },
+                {
+                  "type": "reputation",
+                  "faksi": "faction_tianxu_orthodox",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "label": "Destroy — sistem ini telah gagal; hancurkan agar dunia baru lahir.",
+              "option": "destroy",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "state_final_principle",
+                  "value": "destroy"
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_gu_han",
+                  "value": 2
+                },
+                {
+                  "type": "reputation",
+                  "faksi": "faction_tianxu_orthodox",
+                  "value": -3
+                }
+              ]
+            },
+            {
+              "label": "Transform — ubah sistem dari akarnya, tanpa menghancurkannya sepenuhnya.",
+              "option": "transform",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "state_final_principle",
+                  "value": "transform"
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_mei_ruo",
+                  "value": 2
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_shen_luo",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "label": "Sacrifice — korbankan apa pun, termasuk dirimu, demi menghentikan ini.",
+              "option": "sacrifice",
+              "effects": [
+                {
+                  "type": "flag",
+                  "key": "state_final_principle",
+                  "value": "sacrifice"
+                },
+                {
+                  "type": "relation",
+                  "npc": "npc_mentor",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

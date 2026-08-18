@@ -1,0 +1,24 @@
+{
+ "factions": [
+  {
+   "id": "faction_tianxu_orthodox",
+   "name": "Tian Xu Ortodoks",
+   "description": "Institusi resmi akademi Tian Xu — otoritas atas sejarah dan kurikulum."
+  },
+  {
+   "id": "faction_reformists",
+   "name": "Kaum Reformis",
+   "description": "Sistem harus diubah dari dalam — perubahan bertahap dan terkelola, bukan revolusi tak terkendali atau status quo korup."
+  },
+  {
+   "id": "faction_liberation",
+   "name": "Faksi Pembebasan",
+   "description": "Cultivation harus dihentikan — sumber masalah bukan penyalahgunaan sistem, tapi keberadaan sistem itu sendiri."
+  },
+  {
+   "id": "faction_hidden_guardians",
+   "name": "Penjaga Tersembunyi",
+   "description": "Tidak ada solusi sempurna. Menjaga keseimbangan informasi dan mencegah keputusan gegabah dari pihak mana pun."
+  }
+ ]
+}

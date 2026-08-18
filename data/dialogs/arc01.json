@@ -1,0 +1,207 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a01_d001",
+      "npc": "npc_aptitude_examiner",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_aptitude_examiner",
+          "text": "Nama? Tujuan datang ke Tian Xu?",
+          "choices": [
+            {"label": "Aku datang untuk belajar cultivation.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_aptitude_examiner",
+          "text": "Tempatkan tanganmu di atas batu pemeriksa. Tenang — hasilnya hanya penentu kelas, bukan nilaimu.",
+          "choices": [
+            {"label": "(Mematuhi)", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_aptitude_examiner",
+          "text": "Hmm. Akar biasa-biasa saja, tidak lemah juga tidak menonjol. Masuk. Di dalam, selesaikan registrasi.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d002",
+      "npc": "npc_aptitude_examiner",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_aptitude_examiner",
+          "text": "Tanda tangan di sini. Kamu terhitung murid tahun ini — pavilion akan dipilih setelah pelajaran pertama.",
+          "choices": [
+            {"label": "(Menandatangani)", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_aptitude_examiner",
+          "text": "Selesai. Pergilah ke ruang latihan umum — pelajaran pertama sudah menunggu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d003",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau murid baru juga? Aku Lin Yue. Gerakan dasarmu tadi... anehnya terlihat seperti orang yang sudah pernah berlatih.",
+          "choices": [
+            {"label": "Aku baru pertama kali mencoba.", "next": "n2"},
+            {"label": "Mungkin aku memang berbakat?", "next": "n3"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kalau begitu mungkin itu firasat. Di Tian Xu, banyak hal tidak seperti yang terlihat. Sampai jumpa di pelajaran.",
+          "choices": []
+        },
+        "n3": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Hmm, mungkin. Tapi hati-hati — 'berbakat' di sini bisa berarti banyak hal, dan tidak semuanya baik.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d004",
+      "npc": "npc_shen_luo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Shen Luo. Aku tidak suka basa-basi. Yang lemah tertinggal, yang kuat maju — itulah Tian Xu.",
+          "choices": [
+            {"label": "Lalu di mana posisiku menurutmu?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Belum jelas. Tapi aku akan mengawasimu. Jangan kau buat aku kecewa.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d005",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Oh, kau! Mei Ruo. Aku sedang mencatat sejarah pavilion. Kalau kau penasaran soal akademi ini, tanyakan padaku.",
+          "choices": [
+            {"label": "Sejarah apa yang kau catat?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Semuanya — pendirian Tian Xu, formasi di bawahnya, hal-hal yang 'tidak penting' untuk murid biasa. Bagiku, semua itu penting.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d006",
+      "npc": "npc_gu_han",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_gu_han",
+          "text": "Gu Han. Aku tidak percaya apa pun yang tidak bisa kubuktikan sendiri. Termasuk reputasi akademi ini.",
+          "choices": [
+            {"label": "Kau terdengar seperti tidak percaya pada Tian Xu.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_gu_han",
+          "text": "Katakan saja aku waspada. Dan waspada itu menyelamatkan nyawa lebih sering daripada keberanian.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d007",
+      "npc": "npc_teacher_wuxin",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_teacher_wuxin",
+          "text": "Pavilion Wuxin mengajarkan bahwa kekuatan tumbuh saat kau melepaskan — bukan saat kau menggenggam erat.",
+          "choices": [
+            {"label": "(Mendengarkan filosofi Wuxin)", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_teacher_wuxin",
+          "text": "Apakah kau siap mengosongkan hatimu untuk mengisinya dengan sesuatu yang lebih besar?",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d008",
+      "npc": "npc_teacher_jianxin",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_teacher_jianxin",
+          "text": "Jianxin: satu pedang, satu disiplin, satu tujuan. Tidak ada jalan pintas menuju ketepatan.",
+          "choices": [
+            {"label": "(Mendengarkan filosofi Jianxin)", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_teacher_jianxin",
+          "text": "Berlatihlah seribu kali. Setelah itu, baru kita bicara soal bakat.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d009",
+      "npc": "npc_teacher_yanzhi",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_teacher_yanzhi",
+          "text": "Yanzhi percaya: pahami prinsip di balik gerakan, dan gerakan itu menjadi milikmu selamanya.",
+          "choices": [
+            {"label": "(Mendengarkan filosofi Yanzhi)", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_teacher_yanzhi",
+          "text": "Kekuatan tanpa pemahaman adalah bahaya. Pemahaman tanpa kekuatan adalah kemandulan. Di sini, keduanya dilatih.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d010",
+      "npc": "npc_teacher_liuguang",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_teacher_liuguang",
+          "text": "Liuguang: air mengalir tidak memaksa jalannya — ia menyesuaikan. Begitu pula cultivation.",
+          "choices": [
+            {"label": "(Mendengarkan filosofi Liuguang)", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_teacher_liuguang",
+          "text": "Tidak ada satu jalan yang benar. Yang ada hanyalah jalan yang tepat untukmu — dan kau bebas mengubahnya.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

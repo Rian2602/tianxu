@@ -1,0 +1,173 @@
+{
+  "quests": [
+    {
+      "id": "quest_a05_c01_001",
+      "kind": "main",
+      "title": "Dunia Juga Mengingat",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_villager_elder",
+        "target": 1,
+        "hint": "Pergilah ke desa terdampak — Spiritual Collapse mulai menyebar."
+      },
+      "on_complete": {
+        "effects": [
+          {
+            "type": "flag",
+            "key": "world_event_a05_spiritual_collapse",
+            "value": "active"
+          },
+          {
+            "type": "relation",
+            "npc": "npc_lin_yue",
+            "value": 1
+          },
+          {
+            "type": "relation",
+            "npc": "npc_gu_han",
+            "value": 1
+          }
+        ],
+        "rewards": {
+          "exp": 12
+        },
+        "system_msg": "Desa itu hancur dalam semalam — tanaman busuk, formasi retak, ternak bermutasi. Spiritual Collapse bukan lagi rumor: ia di sini. Dan sesuatu di dalamnya terasa familier."
+      },
+      "next": [
+        {
+          "quest": "quest_a05_c02_002"
+        }
+      ]
+    },
+    {
+      "id": "quest_a05_c02_002",
+      "kind": "main",
+      "title": "Gerbang Gunung, Lagi",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mountain_guard",
+        "target": 1,
+        "hint": "Berangkatlah ke Gerbang Gunung — insiden itu terjadi lagi, dan kali ini kau hadir."
+      },
+      "on_complete": {
+        "system_msg": "Kabut spiritual membiru di celah gunung. Konvoi warga terjebak di tengah. Insiden ini persis seperti yang tercatat di kehidupan pertamamu — hanya satu perbedaan: kali ini kau di sini."
+      },
+      "next": [
+        {
+          "quest": "quest_a05_c03_003",
+          "option": "changed",
+          "choice_id": "dlg_a05_branch_mg"
+        },
+        {
+          "quest": "quest_a05_c03_003",
+          "option": "repeated",
+          "choice_id": "dlg_a05_branch_mg"
+        }
+      ]
+    },
+    {
+      "id": "quest_a05_c03_003",
+      "kind": "main",
+      "title": "Retak di Keluarga",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Kembalilah ke akademi — keluarga berkumpul, dan empat suara mulai berselisih."
+      },
+      "on_complete": {
+        "system_msg": "Krisis pegunungan menjadi katalis. Lin Yue ingin melindungi murid-murid. Shen Luo ingin menghancurkan sistem. Mei Ruo ingin kebenaran penuh. Gu Han yakin Tian Xu tak bisa diperbaiki. Keputusanmu di sini menentukan siapa yang tetap berdiri di sisimu."
+      },
+      "next": [
+        {
+          "quest": "quest_a05_c04_004",
+          "option": "protect",
+          "choice_id": "dlg_a05_branch_family"
+        },
+        {
+          "quest": "quest_a05_c04_004",
+          "option": "destroy",
+          "choice_id": "dlg_a05_branch_family"
+        },
+        {
+          "quest": "quest_a05_c04_004",
+          "option": "truth",
+          "choice_id": "dlg_a05_branch_family"
+        },
+        {
+          "quest": "quest_a05_c04_004",
+          "option": "despair",
+          "choice_id": "dlg_a05_branch_family"
+        }
+      ]
+    },
+    {
+      "id": "quest_a05_c04_004",
+      "kind": "main",
+      "title": "Suara di Bawah Segalanya",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_entity",
+        "target": 1,
+        "hint": "Turunlah ke ruang terdalam — sesuatu di sana akhirnya berbicara."
+      },
+      "on_complete": {
+        "effects": [
+          {
+            "type": "flag",
+            "key": "flag_entity_first_contact",
+            "value": true
+          }
+        ],
+        "rewards": {
+          "exp": 15
+        },
+        "system_msg": "'Kau membunuhku sekali.' Suara itu datang dari mana-mana dan tidak dari mana-mana. 'Aku adalah alasan kalian menyebut dunia ini sebagai anugerah.'"
+      },
+      "next": [
+        {
+          "quest": "quest_a05_c05_005"
+        }
+      ]
+    },
+    {
+      "id": "quest_a05_c05_005",
+      "kind": "main",
+      "title": "Apa yang Kucoba Kubunuh",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_tianxu_deepest_chamber",
+        "hint": "Kembalilah ke ruang terdalam — ingatan itu menunggumu."
+      },
+      "on_complete": {
+        "memory_unlock": "memory_a05_m01",
+        "effects": [
+          {
+            "type": "flag",
+            "key": "flag_memory_kill_attempt_seen",
+            "value": true
+          },
+          {
+            "type": "flag",
+            "key": "flag_cycle_formation_known_partial",
+            "value": true
+          },   {
+    "type": "flag",
+    "key": "belief_protagonist_may_be_cause",
+    "value": false
+   }
+  ],
+        "rewards": {
+          "exp": 25,
+          "gold": 20
+        },
+        "system_msg": "Kau melihat — kehidupan pertamamu mencoba membunuh Entity, gagal, karena ia tidak bisa dibunuh tanpa menghancurkan sumber cultivation itu sendiri. Lalu ia menciptakan Cycle Formation sebagai solusi darurat. Bukan rencana besar. Kegagalan yang menjadi segalanya."
+      },
+      "next": [
+        {
+          "quest": "quest_a06_c01_001"
+        }
+      ]
+    }
+  ]
+}

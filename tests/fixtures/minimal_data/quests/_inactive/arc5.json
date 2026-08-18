@@ -1,0 +1,201 @@
+{
+ "quests": [
+  {
+   "id": "q_a05_c01_001",
+   "kind": "main",
+   "title": "Dunia Juga Mengingat",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_guru_utama",
+    "target": 1,
+    "hint": "Guru Utama memanggil semua murid — ada laporan buruk dari luar akademi. Temui dia di lapangan latihan."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "world_event_collapse",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 10
+    },
+    "system_msg": "Laporan dari luar: wilayah-wilayah mulai runtuh. Cultivation menyimpang, monster bermutasi, zona mati tumbuh, badai spiritual melanda, formasi-formasi tua rusak. Guru Utama menatapmu: 'Ini bukan kebetulan. Polanya... aku sudah pernah melihat pola ini di catatan lama. Seolah dunia sedang mengulang sesuatu.' Kau merasakan hawa dingin di punggungmu — karena kau juga pernah melihat semua ini. Di kehidupan yang lain."
+   },
+   "next": [
+    {
+     "quest": "q_a05_c02_002"
+    }
+   ]
+  },
+  {
+   "id": "q_a05_c02_002",
+   "kind": "main",
+   "title": "Gerbang Gunung, Lagi",
+   "quest_type": "main",
+   "objective": {
+    "kind": "spar",
+    "npc": "npc_penjaga_gerbang",
+    "hint": "Gerbang Gunung diserang — makhluk spiritual yang bermutasi mencoba menerobos. Penjaga gerbang berdiri di jalurnya. Ini insiden yang sama dengan catatan kehidupan pertamamu — tapi kali ini kau hadir. Menang: gerbang bertahan. Kalah: tragedi terulang."
+   },
+   "on_complete": {
+    "rewards": {
+     "exp": 10
+    },
+    "system_msg": "Pertarungan di Gerbang Gunung usai. Udara masih bergetar — tapi insiden itu, entah berhasil dicegah atau tidak, telah tercatat. Sekarang kau harus kembali ke kelompokmu."
+   },
+   "next": [
+    {
+     "quest": "q_a05_c03_003"
+    }
+   ]
+  },
+  {
+   "id": "q_a05_c03_003",
+   "kind": "main",
+   "title": "Retak di Keluarga",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_lin_yue",
+    "target": 1,
+    "hint": "Kembalilah ke kelompokmu di lapangan. Hasil insiden Gerbang Gunung — dan pertanyaan tentang apa yang harus dilakukan — menunggu keputusan."
+   },
+   "on_complete": {
+    "rewards": {
+     "exp": 5
+    },
+    "system_msg": "Keputusan telah diambil. Kelompokmu tidak lagi berpikir dengan satu suara — tapi setidaknya, untuk malam ini, kalian masih berdiri bersama."
+   },
+   "next": [
+    {
+     "quest": "q_a05_c04_004",
+     "option": "shield",
+     "choice_id": "dlg_a05_crisis"
+    },
+    {
+     "quest": "q_a05_c04_004",
+     "option": "truth",
+     "choice_id": "dlg_a05_crisis"
+    },
+    {
+     "quest": "q_a05_c04_004",
+     "option": "dismantle",
+     "choice_id": "dlg_a05_crisis"
+    }
+   ]
+  },
+  {
+   "id": "q_a05_c04_004",
+   "kind": "main",
+   "title": "Suara di Bawah Segalanya",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_mei_ruo",
+    "target": 1,
+    "hint": "Artefak itu berdenyut tanpa henti sejak Gerbang Gunung. Mei Ruo menunggumu di lapangan — sesuatu di bawah ingin berbicara, dan kali ini ia memanggilmu."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "entity_first_contact",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 12
+    },
+    "system_msg": "Di ruang terdalam, formasi itu berdenyut — dan kemudian, suara itu datang. Bukan dari luar, tapi dari dalam kepalamu sendiri. 'Kau membunuhku sekali.' 'Siapa kau?' 'Aku adalah alasan kalian menyebut dunia ini sebagai anugerah.' Lalu keheningan. Mei Ruo menggenggam lenganmu: 'Kau dengar itu juga, kan?'"
+   },
+   "next": [
+    {
+     "quest": "q_a05_c05_005"
+    }
+   ]
+  },
+  {
+   "id": "q_a05_c05_005",
+   "kind": "main",
+   "title": "Yang Kucoba untuk Kubunuh",
+   "quest_type": "main",
+   "objective": {
+    "kind": "reach",
+    "location": "loc_tianxu_deepest_chamber",
+    "hint": "Kembalilah ke ruang terdalam sendirian. Formasi itu menyimpan sesuatu yang harus kau lihat — memory kehidupan pertamamu."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "memory_kill_attempt_seen",
+      "value": true
+     },
+     {
+      "type": "flag",
+      "key": "cycle_formation_known_partial",
+      "value": true
+     },
+     {
+      "type": "flag",
+      "key": "belief_may_be_cause",
+      "value": false
+     },
+     {
+      "type": "flag",
+      "key": "arc5_complete",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 15
+    },
+    "memory_unlock": "memory_a05_m01",
+    "system_msg": "Memory itu datang seperti gelombang. Bukan untuk membebaskan entitas — kau pernah mencoba membunuhnya. Dan kau gagal, karena entitas tidak bisa dibunuh tanpa menghancurkan sumber cultivation. Jadi kau melakukan sesuatu yang ekstrem: kau menciptakan siklus. Kehidupan kedua yang mampu menemukan solusi yang tidak bisa kau temukan. Rencana itu tidak bekerja sempurna — tetapi kau tidak punya pilihan lain. Kesimpulanmu di Arc III — bahwa kau mungkin penyebab tragedi — kini jelas tidak akurat. Kau mencoba mencegah. Kau gagal. Dan dari kegagalan itu, tragedi baru lahir. Arc V selesai."
+   },
+   "next": [
+    {
+     "quest": "q_a06_c01_001"
+    }
+   ]
+  },
+  {
+   "id": "q_a05_side_aid",
+   "kind": "side",
+   "title": "Bantuan Wilayah Terdampak",
+   "quest_type": "side",
+   "objective": {
+    "kind": "defeat",
+    "enemies": [
+     "monster_gerbang_ambruk"
+    ],
+    "target": 1,
+    "report_to": "npc_penjaga_gerbang",
+    "hint": "Wilayah-wilayah terdampak Spiritual Collapse butuh bantuan. Bersihkan makhluk-makhluk yang bermutasi di dekat Gerbang Gunung, lalu laporkan kembali ke Penjaga Gerbang."
+   },
+   "repeatable": true,
+   "cooldown": 24,
+   "available_from": {
+    "day": 1,
+    "hour": 0
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "relation",
+      "npc": "npc_guru_utama",
+      "value": 1
+     }
+    ],
+    "rewards": {
+     "exp": 8,
+     "gold": 20
+    },
+    "system_msg": "Guru Utama mengangguk. 'Satu wilayah lebih aman malam ini — karena ada orang yang bersedia turun tangan. Dunia ini mulai runtuh, Chen Xu. Tapi selama masih ada yang bertindak, ia belum runtuh sepenuhnya.'"
+   }
+  }
+ ]
+}

@@ -1,0 +1,122 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a04_d01",
+      "npc": "npc_mei_ruo",
+      "start": "n_default",
+      "nodes": {
+        "n_investigate": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah curiga sejak Arc II — akses mandiri lebih cepat. Aku tahu jalan ke Arsip Terlarang, dan kau tidak perlu meminta izin.",
+          "choices": [
+            {"label": "Tunjukkan jalannya.", "next": "n_compare"}
+          ],
+          "condition": {"flag": {"key": "flag_archive_suspicious", "value": true}}
+        },
+        "n_obey": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kepercayaanmu pada guru membuka pintu — guru pengawas memberimu izin khusus. Ikut aku, Arsip Terlarang ada di bawah arsip publik.",
+          "choices": [
+            {"label": "Ikut.", "next": "n_compare"}
+          ],
+          "condition": {"faction_min": {"faksi": "faction_tianxu_orthodox", "value": 3}}
+        },
+        "n_confront": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Konfrontasimu dengan akademi membuat beberapa simpatisan diam-diam membukakan jalan. Mereka tidak berani bicara, tapi mereka ingin kau melihat ini.",
+          "choices": [
+            {"label": "Bawa aku ke sana.", "next": "n_compare"}
+          ],
+          "condition": {"faction_max": {"faksi": "faction_tianxu_orthodox", "value": -3}}
+        },
+        "n_default": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Aku menemukan sesuatu di arsip — ruangan yang tidak tercatat. Di bawah arsip publik. Aku tidak berani menyelidikinya sendirian.",
+          "choices": [
+            {"label": "Aku ikut.", "next": "n_compare"}
+          ]
+        },
+        "n_compare": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ini dia. Dua versi sejarah Tian Xu. Version I — yang diajarkan ke semua murid. Version II — yang disimpan rapat. Bandingkan sendiri: keduanya tidak mungkin benar bersamaan.",
+          "choices": [
+            {"label": "(Bandingkan kedua dokumen)", "next": "n_v1v2"}
+          ]
+        },
+        "n_v1v2": {
+          "speaker": "narration",
+          "text": "Version I menyebut Tian Xu penjaga segel sejak awal. Version II menyebut segel itu baru dibuat — jauh setelah akademi berdiri. Seseorang menulis ulang sejarahnya sendiri.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a04_d02",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ada satu lagi — lebih dalam dari yang lain. Catatan pribadi pendiri, tersembunyi di balik dinding palsu. Aku tidak berani menyentuhnya. Ini milikmu untuk dibaca.",
+          "choices": [
+            {"label": "(Baca catatan pendiri)", "next": "n_v3"}
+          ]
+        },
+        "n_v3": {
+          "speaker": "narration",
+          "text": "'Yang kami segel bukan musuh. Kami menyegel akibat dari kesalahan kami sendiri.' — Pendiri Tian Xu",
+          "choices": [
+            {"label": "Ini mengubah segalanya.", "next": "n_spread"},
+            {
+              "label": "Aku akan membagikan sebagian kebenaran ini ke murid lain.",
+              "effects": [
+                {"type": "flag", "key": "state_truth_spread_level", "value": 1},
+                {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -2}
+              ],
+              "next": "n_spread"
+            }
+          ]
+        },
+        "n_spread": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Apa pun yang kau putuskan untuk lakukan dengan ini — hati-hati. Kebenaran yang jatuh ke tangan yang salah bisa menjadi senjata.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a04_d03",
+      "npc": "npc_grandmaster",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau sudah membaca yang tidak seharusnya kau baca. Maka kau tahu: sistem ini tidak sempurna. Aku tidak akan menyangkalnya.",
+          "choices": [
+            {"label": "Kenapa menyembunyikan kebenaran?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Karena dunia membutuhkan cultivation. Jika sumbernya dihentikan mendadak — teknik runtuh, kerajaan runtuh, monster spiritual tak terkendali. Jutaan orang kehilangan mata pencaharian. Aku memilih menjaga mereka.",
+          "choices": [
+            {"label": "Dengan berbohong kepada mereka?", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Dengan melindungi mereka dari kepanikan yang tidak akan menyelesaikan apa pun. Aku juga pernah menginginkannya — kebenaran, perubahan. Lalu aku melihat apa yang terjadi setelahnya.",
+          "choices": [
+            {"label": "Aku tidak bisa menerima itu.", "next": "n4"},
+            {"label": "Aku mengerti... tapi aku tetap tidak setuju.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Maka sekarang kau tahu taruhannya. Pergilah. Dan pikirkan baik-baik apa yang akan kau lakukan dengan pengetahuan itu.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

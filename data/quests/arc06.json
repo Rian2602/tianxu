@@ -1,0 +1,130 @@
+{
+ "quests": [
+  {
+   "id": "quest_a06_c01_001",
+   "kind": "main",
+   "title": "Seseorang Sepertiku",
+   "objective": {
+    "kind": "reach",
+    "location": "loc_jiang_yan_records",
+    "hint": "Buka catatan pribadi Jiang Yan di arsip — cari tahu seperti apa kehidupan pertamanya."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "flag_jiang_yan_origin_known",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 15
+    },
+    "system_msg": "Catatan Jiang Yan terbuka. Ia memulai dari nol — akar biasa, tanpa bakat istimewa — persis seperti dirimu. Ia punya empat orang di sekitarnya, seperti kau punya keluargamu sekarang. Dan ia meminta bantuan seseorang untuk rencananya."
+   },
+   "next": [
+    {
+     "quest": "quest_a06_c02_002"
+    }
+   ]
+  },
+  {
+   "id": "quest_a06_c02_002",
+   "kind": "main",
+   "title": "Pengkhianatan yang Bukan",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_mentor",
+    "target": 1,
+    "hint": "Temui Mentor di lapangan latihannya — ada sesuatu tentang masa lalu Jiang Yan yang harus kau tanyakan."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "flag_betrayal_identity_known",
+      "value": true
+     },
+     {
+      "type": "relation",
+      "npc": "npc_mentor",
+      "value": 3
+     }
+    ],
+    "rewards": {
+     "exp": 15
+    },
+    "system_msg": "Mentor mengaku: ia mengenal Jiang Yan. Dan ketika Jiang Yan datang meminta bantuan untuk membuka The Gate, ia menolak — lalu berusaha menghentikannya diam-diam. Bukan karena benci. Karena takut pada apa yang bisa terjadi. Pengkhianatan itu lahir dari kepedulian — dan ia menanggungnya sejak hari itu."
+   },
+   "next": [
+    {
+     "quest": "quest_a06_c03_003"
+    }
+   ]
+  },
+  {
+   "id": "quest_a06_c03_003",
+   "kind": "main",
+   "title": "Gerbang, Formasi, dan Harganya",
+   "objective": {
+    "kind": "reach",
+    "location": "loc_tianxu_deepest_chamber",
+    "hint": "Kembalilah ke ruang terdalam Tian Xu — tempat yang selama ini kau kira hanya ruang penyimpanan. Itu adalah The Gate."
+   },
+   "on_complete": {
+    "memory_unlock": "memory_a06_m01",
+    "effects": [
+     {
+      "type": "flag",
+      "key": "flag_the_gate_full_truth_known",
+      "value": true
+     },
+     {
+      "type": "flag",
+      "key": "flag_second_life_meaning_known",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 20
+    },
+    "system_msg": "Memory penuh: Jiang Yan membuka The Gate menuju sumber asli cultivation — bukan untuk membebaskan Entity, tapi untuk memisahkannya dari sumber. Eksperimen itu gagal. Sumber menjadi tidak stabil. Tian Xu hampir runtuh. Maka Cycle Formation lahir — bukan rencana besar, tapi solusi darurat terakhir. Second Life bukan hadiah. Ia adalah eksperimen yang tersisa."
+   },
+   "next": [
+    {
+     "quest": "quest_a06_c04_004"
+    }
+   ]
+  },
+  {
+   "id": "quest_a06_c04_004",
+   "kind": "main",
+   "title": "Apa yang Diingat Pedang",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_mentor",
+    "target": 1,
+    "hint": "Temui Mentor sekali lagi — momen terakhir sebelum kau memutuskan prinsip yang akan kau bawa ke babak final."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "relation",
+      "npc": "npc_mentor",
+      "value": 4
+     }
+    ],
+    "rewards": {
+     "exp": 25,
+     "gold": 20
+    },
+    "system_msg": "Mentor menatap caramu memegang pedang — dan untuk pertama kalinya, ia tersenyum dengan kesedihan. 'Cara kau memegang pedang... aku pernah melihatnya. Bertahun-tahun lalu, pada seseorang yang kau serupai tanpa kau sadari.' Kau tidak lagi menolak namamu. Kau memilih apa yang akan kau lakukan dengannya."
+   },
+   "next": [
+    {
+     "quest": "quest_a07_c01_001"
+    }
+   ]
+  }
+ ]
+}

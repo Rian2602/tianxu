@@ -1,0 +1,336 @@
+{
+ "starting": {
+  "player": {
+   "name": "Chen Xu",
+   "hp": 50,
+   "qi": 30,
+   "realm": "realm_awal",
+   "realm_level": 1,
+   "gold": 20,
+   "roots": "akar_biasa",
+   "equipment": {
+    "weapon": null
+   }
+  },
+  "location": "loc_tianxu_gate",
+  "current_quest": "quest_a01_c01_001",
+  "inventory": [
+   {
+    "id": "pil_qi",
+    "count": 2
+   },
+   {
+    "id": "pedang_kayu",
+    "count": 1
+   }
+  ],
+  "flags": {}
+ },
+ "time": {
+  "start_day": 1,
+  "start_hour": 8,
+  "month_length_days": 30
+ },
+ "academies": [
+  {
+   "id": "pavilion_wuxin",
+   "name": "Pavilion Wuxin (Hati Kosong)",
+   "curriculum": [
+    "teknik_dasar",
+    "teknik_wuxin"
+   ],
+   "starter_kit": [
+    {
+     "id": "pil_qi",
+     "count": 2
+    }
+   ]
+  },
+  {
+   "id": "pavilion_jianxin",
+   "name": "Pavilion Jianxin (Hati Pedang)",
+   "curriculum": [
+    "teknik_dasar",
+    "teknik_jianxin"
+   ],
+   "starter_kit": [
+    {
+     "id": "pil_qi",
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "pavilion_yanzhi",
+   "name": "Pavilion Yanzhi (Hati Tinta)",
+   "curriculum": [
+    "teknik_dasar",
+    "teknik_yanzhi"
+   ],
+   "starter_kit": [
+    {
+     "id": "pil_qi",
+     "count": 2
+    }
+   ]
+  },
+  {
+   "id": "pavilion_liuguang",
+   "name": "Pavilion Liuguang (Cahaya Mengalir)",
+   "curriculum": [
+    "teknik_dasar",
+    "teknik_liuguang"
+   ],
+   "starter_kit": [
+    {
+     "id": "pil_qi",
+     "count": 1
+    }
+   ]
+  }
+ ],
+ "cultivation": {
+  "spar_win_exp": 5,
+  "spar_loss_exp": 2,
+  "grounding_max_hours_per_day": 8,
+  "grounding_exp_per_hour": 4
+ },
+ "battle": {
+  "statuses": {}
+ },
+ "world": {
+  "hunts": [
+   {
+    "id": "hunt_hutan_akademi",
+    "location": "loc_hutan_akademi",
+    "pool": [
+     "binatang_hutan"
+    ],
+    "search_item": "herba_qi",
+    "mini_boss_chance": 0.1,
+    "mini_boss": "penjaga_formation"
+   }
+  ],
+  "monster_respawn_hours": 2
+ },
+ "morality": {
+  "min": -100,
+  "max": 100
+ },
+ "arcs": [
+  {
+   "id": "arc_01",
+   "title": "A New Life",
+   "teaser": "Kehidupan baru di Tian Xu — tapi ada sesuatu yang tersisa dari masa lalu.",
+   "final_quest": "quest_a01_c04_006",
+   "memories_total": 4,
+   "branches": {
+    "state_pavilion": "Paviliun"
+   },
+   "endings": [
+    {
+     "id": "end_a01_awakening",
+     "title": "Awal Kesadaran",
+     "desc": "Simbol kuno di tanganmu. Kamu bukan lagi murid biasa — tapi apa artinya?",
+     "condition": {
+      "flag": {
+       "key": "flag_memory_awareness",
+       "value": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "arc_02",
+   "title": "The First Trial",
+   "teaser": "Ujian pertama — dan keputusan yang menguji kepercayaan.",
+   "final_quest": "quest_a02_c04_009",
+   "memories_total": 5,
+   "branches": {
+    "flag_archive_suspicious": "Investigate",
+    "flag_branch_obey": "Obey",
+    "flag_branch_confront": "Confront"
+   },
+   "endings": [
+    {
+     "id": "end_a02_first_artifact",
+     "title": "Artefak Pertama",
+     "desc": "Artefak bereaksi padamu. Suara Lin Yue versi tua bergema: 'Kalau kau melakukan ini, kau tidak akan kembali.'",
+     "condition": {
+      "flag": {
+       "key": "flag_arc2_complete",
+       "value": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "arc_03",
+   "title": "Echoes of Another Self",
+   "teaser": "Nama dari kehidupan pertamamu: Jiang Yan. Dan gerbang yang pernah kau buka.",
+   "final_quest": "quest_a03_c05_005",
+   "memories_total": 6,
+   "branches": {
+    "state_identity_stance": "Sikap Identitas"
+   },
+   "endings": [
+    {
+     "id": "end_a03_gate_opened",
+     "title": "Gerbang yang Kubuka",
+     "desc": "Kau tahu namamu: Jiang Yan. Status: Deceased. Dan kau mungkin penyebab tragedi ini — untuk saat ini.",
+     "condition": {
+      "flag": {
+       "key": "flag_memory_gate_a03_seen",
+       "value": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "arc_04",
+   "title": "The False History",
+   "teaser": "Tiga versi sejarah. Satu kesalahan yang disegel. Dan Tian Xu yang memberi makan segel itu.",
+   "final_quest": "quest_a04_c04_004",
+   "memories_total": 6,
+   "endings": [
+    {
+     "id": "end_a04_false_history",
+     "title": "Sejarah yang Salah",
+     "desc": "Kau tahu kebenarannya: Tian Xu bukan penjaga segel — ia memberinya makan. Dan kau baru saja menjadi bagian dari sistem itu.",
+     "condition": {
+      "flag": {
+       "key": "flag_arc4_complete",
+       "value": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "arc_05",
+   "title": "The World That Remembers",
+   "teaser": "Dunia mulai mengingat. Dan apa yang kau kira sebagai kebenaran mulai runtuh.",
+   "final_quest": "quest_a05_c05_005",
+   "memories_total": 7,
+   "branches": {
+    "flag_mountain_gate_changed": "Selamatkan Konvoi",
+    "flag_mountain_gate_repeated": "Evakuasi Dulu"
+   },
+   "endings": [
+    {
+     "id": "end_a05_world_remembers",
+     "title": "Dunia yang Mengingat",
+     "desc": "Entity telah berbicara. Kau mencoba membunuhnya di kehidupan pertama — dan gagal. Cycle Formation lahir dari kegagalan itu. Dan kau bukan penyebab tragedi: kau yang mencoba mencegahnya.",
+     "condition": {
+      "flag": {
+       "key": "flag_memory_kill_attempt_seen",
+       "value": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "arc_06",
+   "title": "The Last Cycle",
+   "teaser": "Semua misteri mulai menemukan jawabannya — dan setiap jawaban menuntut satu keputusan.",
+   "final_quest": "quest_a06_c04_004",
+   "memories_total": 8,
+   "branches": {
+    "state_final_principle": "Prinsip Final"
+   },
+   "endings": [
+    {
+     "id": "end_a06_last_cycle",
+     "title": "Siklus Terakhir",
+     "desc": "Kau tahu segalanya sekarang: siapa Jiang Yan, pengkhianatan yang bukan pengkhianatan, The Gate, dan makna sebenarnya dari kehidupan keduamu. Mentor mengakui caramu memegang pedang. Dan kau memilih prinsip yang akan kau bawa ke babak final.",
+     "condition": {
+      "flag": {
+       "key": "flag_second_life_meaning_known",
+       "value": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "arc_07",
+   "title": "Second Life",
+   "teaser": "Semua jalan bermuara di sini. Pertahankan, hancurkan, ubah, korbankan — atau temukan jalan yang tak pernah ditulis siapa pun.",
+   "final_quest": "quest_a07_c03_003",
+   "memories_total": 8,
+   "branches": {
+    "state_ending_achieved": "Ending"
+   },
+   "endings": [
+    {
+     "id": "ending_unbroken_heaven",
+     "title": "The Unbroken Heaven",
+     "desc": "Tian Xu selamat. Cultivation tetap ada — dan pertanyaan tetap hidup: berapa lama sebelum tragedi kembali? Dunia tampak normal di permukaan, tapi kau tahu harganya.",
+     "condition": {
+      "flag": {
+       "key": "state_ending_achieved",
+       "value": "preserve"
+      }
+     }
+    },
+    {
+     "id": "ending_mortal_dawn",
+     "title": "The Mortal Dawn",
+     "desc": "Cultivation perlahan menghilang. Sebagian membencimu. Sebagian berterima kasih. Manusia tidak lagi bergantung pada sesuatu yang tidak mereka pahami.",
+     "condition": {
+      "flag": {
+       "key": "state_ending_achieved",
+       "value": "destroy"
+      }
+     }
+    },
+    {
+     "id": "ending_new_heaven",
+     "title": "The New Heaven",
+     "desc": "Cultivation tidak dihancurkan, tapi hubungan eksploitatifnya diubah. Ini bukan kemenangan sempurna — generasi baru harus belajar ulang segalanya.",
+     "condition": {
+      "flag": {
+       "key": "state_ending_achieved",
+       "value": "transform"
+      }
+     }
+    },
+    {
+     "id": "ending_nameless_guardian",
+     "title": "The Nameless Guardian",
+     "desc": "Dunia selamat. Siklus berhenti. Dan kau kehilangan kehidupan keduamu sepenuhnya. Sebagian mengingat namamu. Sebagian melupakannya.",
+     "condition": {
+      "flag": {
+       "key": "state_ending_achieved",
+       "value": "sacrifice"
+      }
+     }
+    },
+    {
+     "id": "ending_second_life",
+     "title": "Second Life (Hidden Resolution)",
+     "desc": "Entity dibebaskan. Cultivation berubah. Tian Xu berubah. Kau tidak menjadi dewa, tidak menjadi penguasa, tidak menjadi legenda — kau tetap manusia.",
+     "condition": {
+      "flag": {
+       "key": "state_ending_achieved",
+       "value": "second_life"
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "roots": {
+  "tiers": [
+   {
+    "id": "akar_biasa",
+    "name": "Akar Biasa",
+    "exp_multiplier": 1.0
+   }
+  ]
+ }
+}

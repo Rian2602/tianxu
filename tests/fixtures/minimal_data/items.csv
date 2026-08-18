@@ -1,0 +1,4 @@
+id,name,type,hp_restore,qi_restore,power
+pil_qi,Pil Qi,consumable,20,10,
+herba_qi,Herba Qi,consumable,10,,
+pedang_kayu,Pedang Kayu,weapon,,,3

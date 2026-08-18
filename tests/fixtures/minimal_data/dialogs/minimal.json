@@ -1,0 +1,50 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_intro",
+      "npc": "npc_guru",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru",
+          "text": "Selamat datang di Tian Xu. Kau tampak belum familiar dengan akademi.",
+          "choices": [
+            {"label": "Lanjut", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_guru",
+          "text": "Pergilah ke lapangan latihan dan pilih akademi yang cocok untukmu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_side_offer",
+      "npc": "npc_guru",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru",
+          "text": "Ada tugas untukmu.",
+          "choices": [
+            {
+              "label": "Terima tugas",
+              "effects": [{"type": "start_quest", "quest": "q_min_side"}]
+            },
+            {
+              "label": "Tolak",
+              "condition": {"flag": {"key": "sudah_kenal", "value": true}},
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_guru",
+          "text": "Baiklah, mungkin lain kali.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

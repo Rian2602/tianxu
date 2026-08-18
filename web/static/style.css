@@ -290,6 +290,16 @@ a, button { font-family: inherit; }
   text-transform: uppercase; margin: 0 0 4px;
 }
 
+/* avatar fallback (inisial) — dipakai bila config.web.avatar gagal dimuat */
+.avatar-fallback {
+  width: 120px; height: 120px; margin: 0 auto;
+  border-radius: 50%; border: 2px solid var(--gold);
+  background: rgba(212, 175, 55, 0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-cjk); font-weight: 700; font-size: 44px;
+  color: var(--gold);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
 .player-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
 .player-name { font-family: var(--font-cjk); font-weight: 700; font-size: 17px; color: var(--cream); }
 
@@ -470,7 +480,7 @@ body.ambience-library #col-center {
 
 .dialog-speaker-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .dialog-speaker { font-family: var(--font-label); color: var(--gold); font-weight: 600; letter-spacing: .03em; font-size: 15px; }
-.dialog-text { font-family: var(--font-body); font-size: 18px; line-height: 1.7; margin-bottom: 16px; font-style: italic; color: var(--cream); min-height: 1.7em; }
+.dialog-text { font-family: var(--font-body); font-size: 18px; line-height: 1.7; margin-bottom: 16px; font-style: italic; color: var(--cream); min-height: 1.7em; white-space: pre-wrap; }
 
 @keyframes blink { 50% { opacity: 0; } }
 .tw-cursor { display: inline-block; width: 2px; height: 1em; background: var(--gold); margin-left: 2px; vertical-align: -3px; animation: blink .9s steps(1) infinite; }
@@ -580,6 +590,15 @@ select, input[type="text"], input[type="number"] {
   background: rgba(212, 175, 55, 0.2);
   color: var(--gold);
   border: 1px solid var(--gold-dim);
+}
+/* keandalan ingatan (docs 06) — kurva RENDAH → TINGGI, netral */
+.badge-reliability {
+  background: rgba(103, 130, 183, 0.18);
+  color: var(--blue);
+  border: 1px solid rgba(103, 130, 183, 0.35);
+  font-size: 10px;
+  margin-left: 6px;
+  vertical-align: middle;
 }
 
 .relation-row {

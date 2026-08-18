@@ -1,0 +1,123 @@
+{
+  "quests": [
+    {
+      "id": "q_a04_c01_001",
+      "kind": "main",
+      "title": "Arsip di Bawah",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1,
+        "hint": "Mural di ruangan tersembunyi itu mengarah ke bawah. Mei Ruo tahu cara membuka pintu yang tidak tercatat di peta — temui dia untuk mengakses arsip bawah tanah."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "history_v1_v2_compared", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Di bawah ruangan mural, koridor tua terbuka. Arsip Terlarang — dua versi sejarah berdampingan di rak yang sama. Version I, catatan resmi: pendiri menyegel iblis untuk menyelamatkan dunia. Version II, yang disembunyikan: pendiri menyegel sesuatu yang tidak pernah disebut — dan tanggal-tanggalnya tidak sejalan. Kontradiksi itu bukan perbedaan kecil. Ini dua cerita yang berbeda tentang peristiwa yang sama."
+      },
+      "next": [
+        {"quest": "q_a04_c02_002"}
+      ]
+    },
+    {
+      "id": "q_a04_c02_002",
+      "kind": "main",
+      "title": "Yang Kami Segel",
+      "quest_type": "main",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_forbidden_archive_deep",
+        "hint": "Di balik Arsip Terlarang ada bagian yang lebih dalam — tempat catatan pribadi pendiri disimpan. Cari Version III."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "version_iii_read", "value": true},
+          {"type": "flag", "key": "origin_cultivation_known_partial", "value": true}
+        ],
+        "rewards": {"exp": 12},
+        "system_msg": "Di bagian terdalam arsip, tanganmu menemukan buku yang tidak bersampul — catatan pribadi pendiri Tian Xu. Sebagian halamannya hancur oleh waktu, tetapi satu kalimat masih utuh, ditulis dengan tangan yang gemetar: 'Yang kami segel bukan musuh. Kami menyegel akibat dari kesalahan kami sendiri.' Cultivation bukan hadiah dari langit — manusia menemukan sumber spiritual purba, dan entitas lahir dari penggunaannya. Tian Xu didirikan untuk mengendalikan akibatnya. Kesimpulanmu di Arc III — bahwa kau mungkin penyebab tragedi — mulai terasa tidak lengkap. Ada lebih banyak yang disembunyikan dari sekadar namamu."
+      },
+      "next": [
+        {"quest": "q_a04_c03_003"}
+      ]
+    },
+    {
+      "id": "q_a04_c03_003",
+      "kind": "main",
+      "title": "Orang yang Memilih Ketakutan",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_grandmaster",
+        "target": 1,
+        "hint": "Grandmaster Tian Xu mengetahui sebagian kebenaran. Konfrontasi ideologis menantimu di ruangnya — bukan pertarungan, tapi percakapan yang menentukan."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "grandmaster_met", "value": true},
+          {"type": "flag", "key": "stakes_of_stopping_source_known", "value": true}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Grandmaster mendengarkanmu sampai selesai. Ia tidak menyangkal arsip itu — tidak menyangkal Version III. 'Dunia membutuhkan cultivation,' katanya pelan. 'Jika sumber itu dihentikan: teknik runtuh, cultivator kehilangan kekuatan, kerajaan jatuh, monster berubah, keseimbangan dunia hancur. Kau boleh menyebutku pengecut. Tapi aku sudah melihat apa yang terjadi setelahnya — dan aku memilih ketakutan.' Ia tidak meminta maaf. Ia tidak berjanji berubah. Ia hanya mempertahankan dunia yang ia takut kehilangan."
+      },
+      "next": [
+        {"quest": "q_a04_c04_004"}
+      ]
+    },
+    {
+      "id": "q_a04_c04_004",
+      "next": [
+        {
+          "quest": "q_a05_c01_001"
+        }
+      ],
+      "kind": "main",
+      "title": "Yang Dimakan Tian Xu",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Kembalilah ke kelompokmu di lapangan. Formasi di bawah Tian Xu harus kau ceritakan — mereka berhak tahu apa yang kau lihat di ruang terdalam."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "tianxu_feeds_segel_known", "value": true},
+          {"type": "flag", "key": "arc4_complete", "value": true},
+          {"type": "item", "id": "catatan_formation", "count": 1}
+        ],
+        "rewards": {"exp": 15},
+        "memory_unlock": "memory_a04_m01",
+        "system_msg": "Ruang terdalam Tian Xu. Sebuah formasi raksasa membentang di bawah fondasi akademi — berdenyut, hidup, dan lapar. Dari dinding-dindingnya mengalir aliran qi yang halus namun tak henti: dari murid yang berlatih di lapangan, dari guru yang mengajar, dari setiap teknik yang diajarkan di sini. Tian Xu bukan menjaga segel. Tian Xu memberi makan segel. Dan kau — kau telah menjadi bagian dari sistem ini sejak hari pertama. Arc IV selesai."
+      }
+    },
+    {
+      "id": "q_a04_side_truth_spread",
+      "kind": "side",
+      "title": "Kebenaran yang Beredar",
+      "quest_type": "side",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_gu_han",
+        "target": 1,
+        "report_to": "npc_gu_han",
+        "hint": "Kebenaran yang kau temukan di arsip terlalu besar untuk disimpan sendiri. Ceritakan sebagian darinya kepada murid lain — biarkan kebenaran itu beredar, sedikit demi sedikit."
+      },
+      "repeatable": true,
+      "cooldown": 24,
+      "available_from": {"day": 1, "hour": 0},
+      "on_complete": {
+        "effects": [
+          {"type": "reputation", "faksi": "truth_spread", "value": 1},
+          {"type": "relation", "npc": "npc_gu_han", "value": 1}
+        ],
+        "rewards": {"exp": 6},
+        "system_msg": "Murid itu mendengarkan — sebagian percaya, sebagian ragu, tetapi semua diam dan berpikir. Kebenaran, sekali disebarkan, tidak bisa ditarik kembali. Ini baru permulaan."
+      }
+    }
+  ]
+}

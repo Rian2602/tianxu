@@ -14,6 +14,7 @@ from typing import Any
 
 from ..loader import DataRegistry
 from .effects import apply as apply_effects
+from .events import add_log
 from .state import GameState
 
 
@@ -134,19 +135,32 @@ class DialogEngine:
         return self._end()
 
     def advance(self) -> dict | None:
-        """Lanjut node TANPA pilihan (tekan enter)."""
+        """Lanjut node TANPA pilihan (tekan enter) — auto-lewati node perantara.
+
+        Alur teks murni (node ber-`choices` dipilih opsi pertama, node ber-`next`
+        diikuti) diteruskan sampai dialog berakhir atau berhenti di node yang
+        butuh pilihan eksplisit. Guard iterasi mencegah loop tak hingga bila data
+        dialog punya siklus (defense-in-depth; data valid tidak akan begini)."""
         if not self.current or not self.node_id:
             return None
-        node = self.current["nodes"][self.node_id]
-        if node.get("choices"):
-            return self.view()
-        nxt = node.get("next")
-        if nxt:
-            self.node_id = nxt
-            self._mark_once()
-            self.visited.add(nxt)
-            return self.view()
-        return self._end()
+        guard = 0
+        while self.current and self.node_id and guard < 100:
+            guard += 1
+            node = self.current["nodes"][self.node_id]
+            choices = self._visible_choices(node)
+            if choices:
+                res = self.choose(0)
+                if not res or res.get("ended"):
+                    return res
+                continue
+            nxt = node.get("next")
+            if nxt:
+                self.node_id = nxt
+                self._mark_once()
+                self.visited.add(nxt)
+                continue
+            return self._end()
+        return self.view()
 
     # ---------- internal ----------
 
@@ -241,6 +255,14 @@ class DialogEngine:
     @staticmethod
     def _eval_condition(state: GameState, cond: dict[str, Any], registry: DataRegistry | None = None) -> bool:
         s = state
+        if not cond:
+            return True
+        # Kunci tak dikenal → False (fail-safe) + log peringatan.
+        unknown = set(cond) - CONDITION_KEYS
+        if unknown:
+            for k in sorted(unknown):
+                add_log(s, "system", f"[Sistem] Kondisi dialog tak dikenal: '{k}'.")
+            return False
         # C3: `flag` adalah cek AND biasa — TIDAK boleh early-return (bug laten:
         # kombinasi `flag` + kondisi lain mengabaikan kondisi lain). Data dialog
         # existing memakai flag tunggal; kombinasi multi-kunci kini benar-benar AND.
@@ -249,6 +271,22 @@ class DialogEngine:
             # flag yang tidak pernah diset dianggap False (bukan None)
             if s.flags.get(f["key"], False) != f.get("value", True):
                 return False
+        if "flags" in cond:
+            # A07: multi-flag AND — Hidden Resolution (docs 11) butuh kombinasi
+            # SEMUA kondisi independen terpenuhi, bukan satu flag.
+            for f in cond["flags"]:
+                if s.flags.get(f["key"], False) != f.get("value", True):
+                    return False
+        if "flag_not" in cond:
+            # A07: negasi flag — forbidden condition (docs 11): flag TIDAK boleh
+            # bernilai value. Menerima dict tunggal ATAU list (multi-negasi AND).
+            # Flag belum diset = False → lolos selama value != False.
+            items = cond["flag_not"]
+            if isinstance(items, dict):
+                items = [items]
+            for f in items:
+                if s.flags.get(f["key"], False) == f.get("value", True):
+                    return False
         if "morality_min" in cond:
             if s.player.morality < cond["morality_min"]:
                 return False
@@ -272,9 +310,11 @@ class DialogEngine:
         if "realm_min" in cond:
             if registry is None:
                 return False
-            order_cur = int(registry.realms[s.player.realm]["order"])
-            order_min = int(registry.realms[cond["realm_min"]]["order"])
-            if order_cur < order_min:
+            cur_r = registry.realms.get(s.player.realm)
+            min_r = registry.realms.get(cond["realm_min"])
+            if not cur_r or not min_r:
+                return False
+            if int(cur_r["order"]) < int(min_r["order"]):
                 return False
         if "academy" in cond:
             if s.player.academy != cond["academy"]:
@@ -306,9 +346,56 @@ class DialogEngine:
             if s.relations.get(r["npc"], 0) > r["value"]:
                 return False
         if "memory" in cond:
-            if cond["memory"] not in s.memories:
+            mid = cond["memory"]
+            found = False
+            for m in s.memories:
+                if (m["id"] if isinstance(m, dict) else m) == mid:
+                    found = True
+                    break
+            if not found:
+                return False
+        if "faction_min" in cond:
+            fm = cond["faction_min"]
+            if s.factions.get(fm["faksi"], 0) < fm["value"]:
+                return False
+        if "faction_max" in cond:
+            fm = cond["faction_max"]
+            if s.factions.get(fm["faksi"], 0) > fm["value"]:
                 return False
         return True
 
     def _eval(self, cond: dict[str, Any]) -> bool:
         return DialogEngine._eval_condition(self.state, cond, self.reg)
+
+
+# Kunci kondisi yang dikenal engine — satu sumber kebenaran untuk validator.
+CONDITION_KEYS = frozenset({
+    "flag", "flags", "flag_not", "morality_min", "morality_max", "has_item",
+    "has_items", "defeated_min", "realm_min", "academy", "quest_active",
+    "quest_not_active", "month_min", "month_max", "relation_min",
+    "relation_max", "memory", "faction_min", "faction_max",
+})
+
+CONDITION_NUMERIC_KEYS = frozenset(
+    {"morality_min", "morality_max", "month_min", "month_max"})
+
+CONDITION_VALUE_NUMERIC_KEYS = frozenset(
+    {"has_items", "defeated_min", "relation_min", "relation_max",
+     "faction_min", "faction_max"})
+
+CONDITION_STRING_KEYS = frozenset(
+    {"has_item", "realm_min", "academy", "quest_active", "quest_not_active", "memory"})
+
+CONDITION_REQUIRED_FIELDS: dict[str, set[str]] = {
+    "flag": {"key"},
+    "flag_not": {"key"},
+    "has_items": {"item"},
+    "defeated_min": {"quest"},
+    "relation_min": {"npc", "value"},
+    "relation_max": {"npc", "value"},
+    "faction_min": {"faksi", "value"},
+    "faction_max": {"faksi", "value"},
+}
+
+# Dispatch table — validate & tests derive kind sets from these.
+CONDITION_CHECKERS: dict[str, object] = {k: None for k in CONDITION_KEYS}

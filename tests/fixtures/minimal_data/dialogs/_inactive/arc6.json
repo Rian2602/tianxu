@@ -1,0 +1,460 @@
+{
+ "dialogs": [
+  {
+   "id": "dlg_a06_records",
+   "npc": "npc_mei_ruo",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Kau tahu apa yang kutemukan di antara tumpukan itu? Bukan dokumen resmi — sesuatu yang tidak pernah dimaksudkan untuk dibaca siapa pun. Catatan pribadi. Ditulis tangan yang sama dengan catatan di arsip terlarang. Milik Jiang Yan.",
+     "choices": [
+      {
+       "label": "Apa isinya?",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Bukan tentang pahlawan. Bukan tentang chosen one. Ini tentang murid biasa yang datang ke Tian Xu tanpa apa-apa — gagal dalam ujian masuk pertamanya, dianggap tidak berbakat oleh gurunya. Ia menulis tentang rasa malu, tentang malam-malam sendirian berlatih di halaman belakang. Tapi perlahan, ia mengumpulkan orang-orang di sekelilingnya. Seorang sahabat yang selalu percaya padanya. Seorang rival yang tidak pernah mau mengalah. Seseorang yang mengejar kebenaran tanpa henti. Dan satu lagi yang tidak percaya pada apa pun.",
+     "choices": [
+      {
+       "label": "Seperti... kita.",
+       "next": "n3"
+      }
+     ]
+    },
+    "n3": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Ya. Persis seperti kita. Lin Yue, Shen Luo, Gu Han, aku. Aku membacanya dan kulihat wajah-wajah kita di sana. Ia memulai dari nol, sama seperti kau. Ia punya mentor yang mengajarinya cara memegang pedang. Ia punya semua yang kita punya sekarang. Perbedaannya — ia memilih jalan yang berbeda.",
+     "choices": [
+      {
+       "label": "Kalau begitu, aku harus tahu jalan mana yang ia pilih.",
+       "next": "n4"
+      }
+     ]
+    },
+    "n4": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Aku juga ingin tahu. Tapi catatan ini hanya sampai di sini — lalu berhenti. Ada satu nama yang muncul berulang kali, nama yang tidak pernah masuk narasi resmi. Seseorang yang ia minta bantuannya. Dan kemudian... halaman-halamannya hilang. Seolah sejarah sengaja memotong bagian itu.",
+     "choices": [
+      {
+       "label": "Siapa namanya?",
+       "next": "n5"
+      }
+     ]
+    },
+    "n5": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Bukan nama yang kukenal dari catatan akademi. Tapi ada satu hal yang membuatku merinding: orang yang menulis catatan itu menggambarkan seseorang yang selalu berada di tepi cerita — hadir di setiap momen penting, tapi tidak pernah disebut. Guru tua yang mengawasi dari kejauhan. Yang tahu cara memegang pedang.",
+     "choices": [
+      {
+       "label": "Mentor.",
+       "next": "n6"
+      }
+     ]
+    },
+    "n6": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Kau juga merasakannya, kan. Ada satu guru di akademi ini yang tidak seperti yang lain. Yang tidak pernah ikut dalam hiruk-pikuk, yang selalu menatapmu dengan mata yang seolah-olah... mengenalimu. Aku tidak yakin. Tapi kalau ada orang yang bisa menjelaskan halaman yang hilang itu — itu dia. Temui ia.",
+     "choices": [
+      {
+       "label": "Aku akan menemuinya.",
+       "next": "n7"
+      }
+     ]
+    },
+    "n7": {
+     "speaker": "player",
+     "text": "Sebelum aku pergi — terima kasih, Mei Ruo. Kau terus mengejar kebenaran bahkan ketika yang lain sudah menyerah. Itu... sangat berarti."
+    }
+   }
+  },
+  {
+   "id": "dlg_a06_betrayal",
+   "npc": "npc_mentor",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_mentor",
+     "text": "Kau tahu caraku menatapmu sejak hari pertama. Aku tahu kau pasti datang ke sini pada akhirnya. Pertanyaanmu tertulis di wajahmu, murid — kau ingin tahu tentang Jiang Yan, dan tentang orang yang mengkhianatinya.",
+     "choices": [
+      {
+       "label": "Kau mengenalnya, bukan?",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_mentor",
+     "text": "Mengenal? Aku adalah orang itu. Aku yang 'mengkhianati' Jiang Yan.",
+     "choices": [
+      {
+       "label": "(Diam.)",
+       "next": "n3"
+      }
+     ]
+    },
+    "n3": {
+     "speaker": "npc:npc_mentor",
+     "text": "Tapi dengarkan baik-baik apa arti kata itu, karena sejarah mencatatnya dengan satu cara — dan kenyataannya dengan cara yang lain. Jiang Yan menemukan rahasia Tian Xu. Ia tahu cultivation berasal dari sumber purba, bahwa sumber itu melahirkan entitas, bahwa sistem ini perlahan merusak dunia — dan bahwa menghancurkan sistem secara langsung akan membunuh jutaan orang. Ia mencari solusi. Tidak ada solusi sempurna. Lalu ia datang padaku — memintaku membantunya membuka gerbang.",
+     "choices": [
+      {
+       "label": "Dan kau menolaknya?",
+       "next": "n4"
+      }
+     ]
+    },
+    "n4": {
+     "speaker": "npc:npc_mentor",
+     "text": "Aku tidak menolaknya. Aku takut. Aku melihat rencananya — dan aku tahu apa yang bisa terjadi jika ia salah. Aku mencoba menghentikannya. Aku melaporkannya. Aku melakukan apa yang kuanggap perlindungan — terhadap dunia, terhadap jutaan orang yang tidak tahu apa-apa tentang sumber di bawah kaki mereka. Itulah 'pengkhianatan' yang dicatat sejarah.",
+     "choices": [
+      {
+       "label": "Kau takut. Dan karena takut, kau menghentikan satu-satunya orang yang mencoba menyelamatkan dunia.",
+       "option": "menuntut",
+       "effects": [
+        {
+         "type": "relation",
+         "npc": "npc_mentor",
+         "value": -2
+        }
+       ],
+       "next": "n5"
+      },
+      {
+       "label": "Kau melakukan apa yang kau yakini benar. Tak seorang pun bisa memintamu lebih dari itu.",
+       "option": "mengampuni",
+       "effects": [
+        {
+         "type": "relation",
+         "npc": "npc_mentor",
+         "value": 2
+        }
+       ],
+       "next": "n6"
+      }
+     ]
+    },
+    "n5": {
+     "speaker": "npc:npc_mentor",
+     "text": "Kau benar. Mungkin kau benar. Aku sudah menghabiskan bertahun-tahun bertanya pada diriku sendiri: apakah aku menghentikan kehancuran — atau apakah aku menghentikan satu-satunya kesempatan dunia? Jawabannya tidak pernah datang. Dan sekarang kau di sini, membawa pertanyaan yang sama yang pernah ia bawa. Dunia ini kejam, murid. Ia memberi kita pilihan yang sama dan berharap kita memilih yang berbeda.",
+     "choices": [
+      {
+       "label": "Jiang Yan tetap melanjutkan. Apa yang terjadi kemudian?",
+       "next": "n7"
+      }
+     ]
+    },
+    "n6": {
+     "speaker": "npc:npc_mentor",
+     "text": "Kau terlalu baik padaku. Terlalu pengertian untuk orang yang tahu apa yang kulakukan. Aku menghabiskan bertahun-tahun bertanya pada diriku sendiri — dan tidak pernah menemukan jawaban. Yang kuingat hanyalah: ia tetap melanjutkan. Terlepas dari aku, terlepas dari pengkhianatan itu, Jiang Yan melanjutkan rencananya.",
+     "choices": [
+      {
+       "label": "Apa yang terjadi kemudian?",
+       "next": "n7"
+      }
+     ]
+    },
+    "n7": {
+     "speaker": "npc:npc_mentor",
+     "text": "Ia membuka gerbang. Bukan untuk membebaskan entitas — ia membuka gerbang menuju sumber asli cultivation, untuk memisahkan entitas dari sumbernya. Eksperimen itu gagal. Sumber menjadi tidak stabil. Tian Xu hampir runtuh. Untuk mencegah kehancuran total, ia menggunakan formasi terakhir — Cycle Formation. Dan kemudian... ia tidak pernah kembali. Itulah yang kuketahui. Yang tidak kuketahui — kau. Karena cara kau berjalan, cara kau berbicara, cara kau memegang pedang di hari pertama kau masuk dojo ini... aku sudah mengenalinya sejak lama.",
+     "choices": [
+      {
+       "label": "Kau tahu siapa aku sebenarnya.",
+       "next": "n8"
+      }
+     ]
+    },
+    "n8": {
+     "speaker": "npc:npc_mentor",
+     "text": "Aku tidak tahu apa yang terjadi padamu — tidak sepenuhnya. Formasi itu menciptakan sesuatu yang tidak pernah kumengerti. Tapi aku tahu satu hal: tangan yang memegang pedang itu tidak berbohong. Kau adalah kelanjutan dari pilihan yang kucoba hentikan dulu. Dan kali ini... aku tidak akan menghentikanmu.",
+     "choices": [
+      {
+       "label": "Aku harus melihat gerbang itu sendiri.",
+       "next": "n9"
+      }
+     ]
+    },
+    "n9": {
+     "speaker": "npc:npc_mentor",
+     "text": "Pergilah ke ruang terdalam. Formasi itu akan menunjukkan sisanya — apa yang terjadi di gerbang, apa yang ia korbankan, dan mengapa kau ada di sini. Aku akan menunggumu di dojo ini. Kita belum selesai bicara."
+    }
+   }
+  },
+  {
+   "id": "dlg_a06_sword",
+   "npc": "npc_mentor",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_mentor",
+     "text": "Kau sudah melihat semuanya sekarang. Gerbang. Kegagalan. Formasi. Dan kau masih berdiri di sini — memegang pedang yang sama dengan cara yang sama. Seperti ia.",
+     "choices": [
+      {
+       "label": "Kau ingin bicara tentang itu.",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_mentor",
+     "text": "Selama bertahun-tahun aku mengajarmu cara menangkis, cara menyerang, cara bertahan. Tapi aku tidak pernah mengajarimu cara menggenggam gagang itu — karena itu bukan sesuatu yang bisa diajarkan. Itu dibawa sejak lahir. Dan aku pernah melihatnya hanya pada satu orang.",
+     "choices": [
+      {
+       "label": "Cara kau memegang pedang...",
+       "next": "n3"
+      }
+     ]
+    },
+    "n3": {
+     "speaker": "npc:npc_mentor",
+     "text": "...aku pernah melihatnya. Pada Jiang Yan. Aku menghabiskan seluruh hidupku takut pada apa yang ia rencanakan — dan sekarang kau berdiri di sini, tahu persis apa yang ia ketahui, dengan pilihan yang belum pernah ia miliki. Kau tahu apa yang terjadi jika ia gagal. Kau sudah melihatnya. Itu membuatmu berbeda darinya.",
+     "choices": [
+      {
+       "label": "Tapi aku masih belum tahu apa yang harus kulakukan.",
+       "next": "n4"
+      }
+     ]
+    },
+    "n4": {
+     "speaker": "npc:npc_mentor",
+     "text": "Maka inilah saatnya kau memilih. Bukan untukku, bukan untuk Jiang Yan, bukan untuk sejarah. Untuk dirimu sendiri — prinsip yang akan kau bawa ke akhir segalanya. Dengarkan empat jalan, lalu pilih satu. Tidak ada jawaban yang salah. Hanya jalan.",
+     "choices": [
+      {
+       "label": "Pertahankan. (Preserve)",
+       "next": "n_preserve"
+      },
+      {
+       "label": "Hancurkan. (Destroy)",
+       "next": "n_destroy"
+      },
+      {
+       "label": "Ubah. (Transform)",
+       "next": "n_transform"
+      },
+      {
+       "label": "Korbankan. (Sacrifice)",
+       "next": "n_sacrifice"
+      }
+     ]
+    },
+    "n_preserve": {
+     "speaker": "npc:npc_mentor",
+     "text": "Preserve. Kau memilih untuk mempertahankan cultivation dan sistem Tian Xu — memperbaikinya dari dalam, melindungi jutaan orang yang hidupnya bergantung padanya. Jalan yang paling berisiko dihakimi, karena ia terlihat seperti membiarkan segala sesuatu tetap berjalan. Tapi kadang, keberanian terbesar adalah menolak menghancurkan apa yang belum bisa kau gantikan.",
+     "choices": [
+      {
+       "label": "Aku memilih untuk mempertahankan.",
+       "option": "preserve",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "final_principle_preserve",
+         "value": true
+        },
+        {
+         "type": "relation",
+         "npc": "npc_mentor",
+         "value": 1
+        }
+       ],
+       "next": "n_end"
+      }
+     ]
+    },
+    "n_destroy": {
+     "speaker": "npc:npc_mentor",
+     "text": "Destroy. Kau memilih untuk menghancurkan sistem dan membebaskan dunia dari cultivation — apa pun biayanya. Jalan yang paling jujur dan paling berbahaya. Jiang Yan tidak pernah berani mengambil jalan ini sampai ke ujungnya. Pertanyaannya bukan apakah kau berani — tapi apakah kau bisa hidup dengan apa yang tersisa setelahnya.",
+     "choices": [
+      {
+       "label": "Aku memilih untuk menghancurkan.",
+       "option": "destroy",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "final_principle_destroy",
+         "value": true
+        },
+        {
+         "type": "relation",
+         "npc": "npc_mentor",
+         "value": 1
+        }
+       ],
+       "next": "n_end"
+      }
+     ]
+    },
+    "n_transform": {
+     "speaker": "npc:npc_mentor",
+     "text": "Transform. Kau memilih untuk mengubah hubungan manusia dengan sumber cultivation — bukan mempertahankan, bukan menghancurkan, melainkan menulis ulang aturannya. Jalan yang paling tidak pasti, karena ia menuntut hal yang belum pernah dicoba siapa pun. Tapi kau bukan siapa pun, bukan? Kau sudah membuktikan bahwa kau bisa melakukan apa yang tidak bisa Jiang Yan.",
+     "choices": [
+      {
+       "label": "Aku memilih untuk mengubah.",
+       "option": "transform",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "final_principle_transform",
+         "value": true
+        },
+        {
+         "type": "relation",
+         "npc": "npc_mentor",
+         "value": 1
+        }
+       ],
+       "next": "n_end"
+      }
+     ]
+    },
+    "n_sacrifice": {
+     "speaker": "npc:npc_mentor",
+     "text": "Sacrifice. Kau memilih untuk menggunakan kehidupanmu sendiri sebagai pengganti sistem. Jalan yang paling pelan dan paling sunyi — tidak ada yang akan bertepuk tangan, tidak ada yang akan mencatat namamu. Jiang Yan mengorbankan segalanya tanpa pernah menyelesaikan apa yang ia mulai. Mungkin kau bisa menyelesaikannya.",
+     "choices": [
+      {
+       "label": "Aku memilih untuk mengorbankan diri.",
+       "option": "sacrifice",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "final_principle_sacrifice",
+         "value": true
+        },
+        {
+         "type": "relation",
+         "npc": "npc_mentor",
+         "value": 1
+        }
+       ],
+       "next": "n_end"
+      }
+     ]
+    },
+    "n_end": {
+     "speaker": "npc:npc_mentor",
+     "text": "Maka itulah jalanmu. Aku tidak akan mengatakan bahwa kau memilih dengan benar atau salah — karena bahkan aku tidak tahu jawabannya. Tapi aku tahu satu hal: kali ini, kau tidak akan berjalan sendirian. Apa pun yang kau pilih, aku akan berada di sampingmu sampai akhir. Sekarang pergilah. Dunia menunggumu."
+    }
+   }
+  },
+  {
+   "id": "dlg_mentor_general",
+   "npc": "npc_mentor",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_mentor",
+     "text": "Selama ini aku selalu menyuruhmu untuk menangkis sebelum menyerang — jangan pernah menyerang dengan tangan yang belum siap menahan. Ada alasan mengapa aku mengajarkannya, murid. Ada alasan mengapa aku tidak pernah mengajarkanmu cara yang lain. Kau pikir kau baru mengenalku hari ini. Tapi aku telah mengawasi caramu berlatih sejak hari pertama kau masuk gerbang ini. Dan aku sudah tahu sejak lama bahwa kau bukan murid biasa.",
+     "choices": [
+      {
+       "label": "Kau selalu tahu?",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_mentor",
+     "text": "Tahu? Tidak. Mencurigai? Mungkin. Ada satu hal yang kupelajari selama bertahun-tahun mengajar di tempat ini: setiap murid datang membawa sesuatu yang tidak pernah mereka ceritakan. Dan setiap kali aku melihat murid baru, aku bertanya pada diriku sendiri — apakah ia akan mengulang kesalahan yang sama seperti yang lain?\n\nTapi dengarkan nasihat ini baik-baik, murid: jangan pernah mencoba menyelesaikan semuanya sendirian. Apa pun yang kau hadapi — betapapun besarnya — dunia ini tidak pernah diselamatkan oleh satu orang yang berdiri di puncak. Ia diselamatkan oleh orang-orang yang memilih untuk berdiri bersama."
+    }
+   }
+  },
+  {
+   "id": "dlg_a06_parallel_offer",
+   "npc": "npc_mentor",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "condition": {
+      "flag": {
+       "key": "flag_jiang_yan_origin_known",
+       "value": true
+      }
+     },
+     "speaker": "npc:npc_mentor",
+     "text": "Kau sudah membaca catatan Jiang Yan — kau tahu ia membangun kelompoknya sendiri, orang demi orang, sama seperti kau. Tapi ada satu hal yang belum pernah kau lakukan: membandingkannya. Ceritakan padaku tentang orang-orang di sisimu sekarang. Aku ingin mendengar bagaimana kelompokmu terbentuk.",
+     "choices": [
+      {
+       "label": "Aku akan menceritakannya. (Mulai perbandingan.)",
+       "effects": [
+        {
+         "type": "start_quest",
+         "quest": "q_a06_side_parallel"
+        }
+       ],
+       "next": "n2"
+      },
+      {
+       "label": "Belum sekarang.",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_mentor",
+     "text": "Aku akan ada di dojo ini kapan pun kau siap."
+    }
+   }
+  },
+  {
+   "id": "dlg_a06_parallel_report",
+   "npc": "npc_mentor",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_mentor",
+     "text": "Ceritakan padaku. Siapa mereka — orang-orang yang berdiri di sisimu?",
+     "choices": [
+      {
+       "label": "Lin Yue — dia yang selalu percaya, bahkan ketika aku sendiri tidak percaya pada diriku.",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_mentor",
+     "text": "Seperti sahabat Jiang Yan. Yang selalu percaya padanya, bahkan ketika ia meragukan dirinya sendiri. Siapa lagi?",
+     "choices": [
+      {
+       "label": "Shen Luo — rival yang tidak pernah mau mengalah, dan karena itu membuatku terus tumbuh.",
+       "next": "n3"
+      }
+     ]
+    },
+    "n3": {
+     "speaker": "npc:npc_mentor",
+     "text": "Seperti rival Jiang Yan. Yang tidak pernah mau mengalah — dan karena itu, tidak pernah membiarkannya berhenti. Lanjutkan.",
+     "choices": [
+      {
+       "label": "Mei Ruo — pengejar kebenaran yang tidak pernah puas, yang membuat kami semua tetap jujur.",
+       "next": "n4"
+      }
+     ]
+    },
+    "n4": {
+     "speaker": "npc:npc_mentor",
+     "text": "Seperti orang yang mengejar kebenaran di kelompok Jiang Yan. Yang membuat mereka semua tidak bisa bersembunyi dari kenyataan. Dan yang terakhir?",
+     "choices": [
+      {
+       "label": "Gu Han — yang tidak percaya pada apa pun, dan karena itu tidak pernah membiarkan kami terlalu percaya diri.",
+       "next": "n5"
+      }
+     ]
+    },
+    "n5": {
+     "speaker": "npc:npc_mentor",
+     "text": "Seperti orang yang tidak percaya pada apa pun di kelompok Jiang Yan. Empat orang. Pola yang sama. Ketika aku mendengarmu, aku mendengar gema kehidupan yang lain — dan itu membuatku takut, dan juga memberiku harapan.",
+     "choices": [
+      {
+       "label": "Kenapa harapan?",
+       "next": "n6"
+      }
+     ]
+    },
+    "n6": {
+     "speaker": "npc:npc_mentor",
+     "text": "Karena kau tahu apa yang ia tidak tahu saat itu. Kau sudah melihat jalan itu gagal. Kau sudah melihat apa yang terjadi ketika seorang pria mencoba menyelesaikan semuanya sendirian. Dan sekarang kau berdiri di sini dengan empat orang di sisimu. Itu satu-satunya perbedaan yang berarti."
+    }
+   }
+  }
+ ]
+}

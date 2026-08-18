@@ -1,0 +1,18 @@
+{
+  "locations": [
+    {
+      "id": "loc_gerbang",
+      "name": "Gerbang Tian Xu",
+      "description": "Gerbang masuk akademi.",
+      "is_safe": true,
+      "connections": ["loc_hutan"]
+    },
+    {
+      "id": "loc_hutan",
+      "name": "Hutan Berburu",
+      "description": "Hutan di pinggir akademi.",
+      "is_safe": false,
+      "connections": ["loc_gerbang"]
+    }
+  ]
+}

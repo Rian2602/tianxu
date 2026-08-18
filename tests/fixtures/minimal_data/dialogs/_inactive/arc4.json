@@ -1,0 +1,244 @@
+{
+ "dialogs": [
+  {
+   "id": "dlg_a04_archive_access",
+   "npc": "npc_mei_ruo",
+   "start": "n_via_investigate",
+   "nodes": {
+    "n_via_investigate": {
+     "once": true,
+     "condition": {
+      "flag": {
+       "key": "flag_archive_suspicious",
+       "value": true
+      }
+     },
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Kau sudah menaruh curiga sejak catatan yang hilang itu — aku juga. Mural itu mengarah ke bawah, dan aku sudah lama mencari pintu ini. Kita masuk lewat jalur yang tidak dicatat siapa pun: lebih cepat, dan tidak ada yang perlu tahu.",
+     "choices": [
+      {
+       "label": "Buka pintunya.",
+       "next": "n_enter"
+      }
+     ]
+    },
+    "n_via_obey": {
+     "once": true,
+     "condition": {
+      "flag": {
+       "key": "branch_arc2_obey",
+       "value": true
+      }
+     },
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Kepercayaan Guru padamu membuka banyak pintu — termasuk yang ini. Mural itu mengarah ke bawah, dan Guru telah mengizinkan kita menyelidiki arsip tua atas namanya. Jalur resmi. Kita tidak perlu bersembunyi.",
+     "choices": [
+      {
+       "label": "Buka pintunya.",
+       "next": "n_enter"
+      }
+     ]
+    },
+    "n_via_confront": {
+     "once": true,
+     "condition": {
+      "flag": {
+       "key": "branch_arc2_confront",
+       "value": true
+      }
+     },
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Setelah forum itu, sebagian staf diam-diam bersimpati padamu. Salah satunya meninggalkan kunci untuk pintu di bawah mural ini — tanpa nama, tanpa syarat. Jalur alternatif. Tidak resmi, tapi terbuka.",
+     "choices": [
+      {
+       "label": "Buka pintunya.",
+       "next": "n_enter"
+      }
+     ]
+    },
+    "n_enter": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Arsip Terlarang. Dua versi sejarah berdampingan di rak yang sama. Version I — yang resmi. Version II — yang disembunyikan. Mari kita bandingkan, baris demi baris. Sesuatu di sini tidak akan pernah cocok."
+    }
+   }
+  },
+  {
+   "id": "dlg_a04_grandmaster",
+   "npc": "npc_grandmaster",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_grandmaster",
+     "text": "Kau menemukan arsip itu. Tentu saja kau menemukannya — semua orang yang mencari cukup lama akan menemukannya. Duduklah, Chen Xu. Atau apa pun nama yang ingin kau pakai sekarang.",
+     "choices": [
+      {
+       "label": "Kau tahu tentang Jiang Yan juga?",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_grandmaster",
+     "text": "Aku tahu lebih banyak daripada yang kau kira — dan lebih sedikit daripada yang kau harapkan. Yang kusegel bukan rahasia namamu. Yang kusegel adalah apa yang dilakukan orang-orang di akademi ini dengan pengetahuan yang kau bawa.",
+     "choices": [
+      {
+       "label": "Version III menyebutnya 'akibat dari kesalahan kami sendiri'. Kesalahan apa?",
+       "next": "n3"
+      }
+     ]
+    },
+    "n3": {
+     "speaker": "npc:npc_grandmaster",
+     "text": "Kultivasi bukan hadiah. Manusia menemukan sumber spiritual purba, dan menggunakannya — dan dari penggunaan itu, sesuatu lahir. Sesuatu yang tidak seharusnya ada. Tian Xu dibangun bukan untuk menyegel musuh. Tian Xu dibangun untuk menyegel akibat.",
+     "choices": [
+      {
+       "label": "Jadi kebenaran itu memang sengaja dikubur.",
+       "next": "n4"
+      },
+      {
+       "label": "Dan kau membiarkan sistem ini terus berjalan.",
+       "next": "n4"
+      }
+     ]
+    },
+    "n4": {
+     "speaker": "npc:npc_grandmaster",
+     "text": "Kebenaran tidak pernah dikubur tanpa alasan. Dunia ini dibangun di atas cultivation — teknik, kerajaan, keseimbangan alam, semuanya. Jika sumber itu dihentikan, semuanya runtuh. Kau boleh menyebutku pengecut. Tapi aku sudah melihat apa yang terjadi setelahnya. Dan aku memilih ketakutan.",
+     "choices": [
+      {
+       "label": "Aku mengerti ketakutanmu — tapi sistem ini melahap orang-orang di sekitarnya. (Empati.)",
+       "effects": [
+        {
+         "type": "relation",
+         "npc": "npc_grandmaster",
+         "value": 2
+        }
+       ],
+       "next": "n5"
+      },
+      {
+       "label": "Ketakutan tidak membenarkan apa yang kalian lakukan pada murid-murid ini. (Tegas.)",
+       "effects": [
+        {
+         "type": "relation",
+         "npc": "npc_grandmaster",
+         "value": 0
+        }
+       ],
+       "next": "n5"
+      }
+     ]
+    },
+    "n5": {
+     "speaker": "npc:npc_grandmaster",
+     "text": "Mungkin kau benar. Mungkin tidak. Yang pasti: aku tidak akan berubah hari ini, dan aku tidak akan minta maaf. Tapi kau sudah sampai sejauh ini — jadi ada satu hal yang harus kau lihat sendiri. Di bawah ruang ini, ada ruang terdalam Tian Xu. Kalau kau harus tahu, kau harus tahu."
+    }
+   }
+  },
+  {
+   "id": "dlg_grandmaster_general",
+   "npc": "npc_grandmaster",
+   "start": "n1",
+   "nodes": {
+    "n_a06_full_payoff": {
+     "once": true,
+     "condition": {
+      "flag": {
+       "key": "flag_the_gate_full_truth_known",
+       "value": true
+      },
+      "relation_min": {
+       "npc": "npc_grandmaster",
+       "value": 2
+      }
+     },
+     "speaker": "npc:npc_grandmaster",
+     "text": "Kau sudah melihat semuanya sekarang — gerbang, kegagalan, Cycle Formation. Maka kau tahu mengapa aku mempertahankan sistem ini. Bukan karena haus kekuasaan. Aku pernah kehilangan seseorang akibat kegagalan sistem — dan aku tidak akan membiarkan itu terjadi lagi. Kau ingin menghancurkan sistem ini. Aku juga pernah menginginkannya. Lalu aku melihat apa yang terjadi setelahnya. Jadi kau harus memilih dengan mata terbuka: apakah kau menghancurkan apa yang kugenggam untuk melindungi — atau apakah kau menemukan cara yang tidak pernah kutemukan?",
+     "choices": [
+      {
+       "label": "Aku tidak akan mengulangi kesalahanmu — atau kesalahan Jiang Yan.",
+       "next": "n_a06_payoff_end"
+      }
+     ]
+    },
+    "n_a06_payoff_end": {
+     "speaker": "npc:npc_grandmaster",
+     "text": "Maka kau benar-benar berbeda. Itu membuatku takut — dan juga memberiku satu-satunya harapan yang kumiliki. Pergilah, Chen Xu. Dan buktikan bahwa aku salah untuk takut."
+    },
+    "n_high_rel": {
+     "once": true,
+     "condition": {
+      "relation_min": {
+       "npc": "npc_grandmaster",
+       "value": 2
+      }
+     },
+     "speaker": "npc:npc_grandmaster",
+     "text": "Aku juga pernah menginginkannya — kebenaran, tanpa kompromi, tanpa rasa takut. Lalu aku melihat apa yang terjadi setelahnya. Kau berbeda dari yang lain, Chen Xu. Aku tidak tahu apakah itu harapan atau kutukan."
+    },
+    "n1": {
+     "speaker": "npc:npc_grandmaster",
+     "text": "Kau masih di sini. Bagus. Dunia membutuhkan orang yang bertanya — selama mereka tidak berhenti di tengah jalan."
+    }
+   }
+  },
+  {
+   "id": "dlg_a04_truth_offer",
+   "npc": "npc_gu_han",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "condition": {
+      "flag": {
+       "key": "version_iii_read",
+       "value": true
+      }
+     },
+     "speaker": "npc:npc_gu_han",
+     "text": "Kau kembali dari bawah dengan wajah seperti orang yang baru tahu dunia ini lebih busuk dari yang dia kira. Aku tahu perasaan itu. Ada murid-murid yang mulai bertanya-tanya sendiri — dan aku bukan orang yang suka menyimpan rahasia untuk akademi ini. Ceritakan sebagian darinya, sedikit demi sedikit. Kebenaran, sekali beredar, tidak bisa dikubur kembali.",
+     "choices": [
+      {
+       "label": "Aku akan berbagi sebagian dari yang kutemukan. (Mulai menyebarkan kebenaran.)",
+       "effects": [
+        {
+         "type": "start_quest",
+         "quest": "q_a04_side_truth_spread"
+        }
+       ],
+       "next": "n2"
+      },
+      {
+       "label": "Belum sekarang.",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_gu_han",
+     "text": "Hati-hati dengan kata-katamu. Kebenaran itu seperti api — menerangi, atau membakar. Kau yang memutuskan bagaimana menggunakannya."
+    }
+   }
+  },
+  {
+   "id": "dlg_a04_truth_report",
+   "npc": "npc_gu_han",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_gu_han",
+     "text": "Sudah kau bagikan?",
+     "choices": [
+      {
+       "label": "Beberapa murid mendengarkan. Sebagian percaya, sebagian ragu.",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_gu_han",
+     "text": "Bagus. Satu percakapan di sini, satu gosip di sana — sampai suatu hari, kebenaran itu tidak lagi bisa dianggap sebagai desas-desus. Lanjutkan, sedikit demi sedikit."
+    }
+   }
+  }
+ ]
+}

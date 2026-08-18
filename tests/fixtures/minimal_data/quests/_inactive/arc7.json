@@ -1,0 +1,90 @@
+{
+ "quests": [
+  {
+   "id": "q_a07_c01_001",
+   "kind": "main",
+   "title": "Malam Terakhir",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_lin_yue",
+    "target": 1,
+    "hint": "Kau kembali ke lapangan. Seluruh kelompok berkumpul untuk terakhir kalinya sebelum turun ke bawah Tian Xu."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "flag_last_night_complete",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 15
+    },
+    "system_msg": "Malam berakhir. Fajar akan segera tiba — dan dengan itu, keputusan terakhir."
+   },
+   "next": [
+    {
+     "quest": "q_a07_c02_002"
+    }
+   ]
+  },
+  {
+   "id": "q_a07_c02_002",
+   "kind": "main",
+   "title": "Aku Bukan Kau",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_jiang_yan",
+    "target": 1,
+    "hint": "Turun ke ruang terdalam. Di sana, entitas menunggu — dan bersamanya, imprint dari kehidupan pertamamu."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "flag_entity_truth_known",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 20
+    },
+    "system_msg": "Kau mengucapkan kalimat yang tidak pernah Jiang Yan ucapkan pada kehidupan pertama: 'Aku bukan kau.' Entitas itu diam. Lalu, untuk pertama kalinya, ia mengangguk."
+   },
+   "next": [
+    {
+     "quest": "q_a07_c03_003"
+    }
+   ]
+  },
+  {
+   "id": "q_a07_c03_003",
+   "kind": "main",
+   "title": "Kehidupan Kedua",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_mentor",
+    "target": 1,
+    "hint": "Kau kembali ke permukaan. Mentor menunggu dengan pedang yang telah ia genggam sejak kehidupan pertamamu."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "arc7_complete",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 30
+    },
+    "system_msg": "Keputusan dibuat. Kehidupan kedua berakhir — atau justru dimulai."
+   },
+   "next": []
+  }
+ ]
+}

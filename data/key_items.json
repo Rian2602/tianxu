@@ -1,0 +1,28 @@
+{
+  "key_items": [
+    {
+      "id": "simbol_kuno",
+      "description": "Simbol kuno yang bersinar saat disentuh. Tanganmu tahu cara menggambarnya, meski kau tidak ingat pernah mempelajarinya.",
+      "consumed": false,
+      "use_effects": [
+        {"type": "flag", "key": "simbol_kuno_aktif", "value": true}
+      ]
+    },
+    {
+      "id": "catatan_siklus",
+      "description": "Catatan usang di tempat persembunyian murid yang hilang. Aksaranya bergaris-garis: 'Siklus dimulai lagi.'",
+      "consumed": false,
+      "use_effects": [
+        {"type": "flag", "key": "catatan_siklus_dibaca", "value": true}
+      ]
+    },
+    {
+      "id": "artefak_pertama",
+      "description": "Artefak kuno yang bereaksi saat kau sentuh — memancarkan cahaya samar dan kilasan ingatan.",
+      "consumed": false,
+      "use_effects": [
+        {"type": "flag", "key": "artefak_pertama_aktif", "value": true}
+      ]
+    }
+  ]
+}

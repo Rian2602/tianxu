@@ -1,0 +1,44 @@
+{
+  "quests": [
+    {
+      "id": "q_min_intro",
+      "kind": "main",
+      "title": "Langkah Pertama",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_guru",
+        "target": 1,
+        "hint": "Bicara dengan guru di gerbang."
+      },
+      "on_complete": {"system_msg": "Guru menyambutmu."},
+      "next": [{"quest": "q_min_pilih"}]
+    },
+    {
+      "id": "q_min_pilih",
+      "kind": "main",
+      "title": "Pilih Akademi",
+      "objective": {
+        "kind": "choose",
+        "hint": "Pilih akademi yang ingin kamu masuki.",
+        "options": [
+          {"value": "akademi_bambu", "label": "Akademi Bambu", "set": {"academy": "akademi_bambu"}},
+          {"value": "akademi_batu", "label": "Akademi Batu", "set": {"academy": "akademi_batu"}},
+          {"value": "akademi_serigala", "label": "Akademi Serigala", "set": {"academy": "akademi_serigala"}}
+        ]
+      },
+      "on_complete": {"system_msg": "Akademi dipilih."}
+    },
+    {
+      "id": "q_min_side",
+      "kind": "side",
+      "title": "Kumpulkan Herba",
+      "objective": {
+        "kind": "gather",
+        "item": "pil_qi",
+        "target": 1,
+        "hint": "Kumpulkan 1 Pil Qi."
+      },
+      "on_complete": {"system_msg": "Herba terkumpul."}
+    }
+  ]
+}

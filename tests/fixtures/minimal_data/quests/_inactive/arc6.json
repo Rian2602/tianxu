@@ -1,0 +1,165 @@
+{
+ "quests": [
+  {
+   "id": "q_a06_c01_001",
+   "kind": "main",
+   "title": "Someone Like Me",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_mei_ruo",
+    "target": 1,
+    "hint": "Mei Ruo menemukan sesuatu di tumpukan rekaman lama — catatan pribadi tentang kehidupan pertama, ditulis oleh tangan yang sama dengan yang kau lihat di arsip terlarang. Temui dia di lapangan latihan."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "flag_jiang_yan_origin_known",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 10
+    },
+    "system_msg": "Rekaman itu bukan tentang pahlawan. Jiang Yan bukan chosen one. Ia memulai dari nol — murid biasa yang gagal berkali-kali, belajar dari kesalahan, dan perlahan membangun kelompoknya sendiri. Ia punya sahabat. Ia punya rival. Ia punya mentor. Semua yang kau alami sekarang — ia pernah mengalaminya. Perbedaannya: ia memilih jalan yang berbeda. Untuk pertama kalinya, kau tidak melihat Jiang Yan sebagai figur misterius yang menakutkan. Kau melihat seseorang yang seperti dirimu."
+   },
+   "next": [
+    {
+     "quest": "q_a06_c02_002"
+    }
+   ]
+  },
+  {
+   "id": "q_a06_c02_002",
+   "kind": "main",
+   "title": "Pengkhianatan yang Tak Pernah Ada",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_mentor",
+    "target": 1,
+    "hint": "Mei Ruo menemukan satu nama yang tidak cocok dengan narasi resmi — nama yang selalu kau lihat menatapmu dari sudut dojo. Mentor mengetahui sesuatu tentang kehidupan pertama. Temui dia di dojo pribadinya."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "flag_betrayal_identity_known",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 10
+    },
+    "system_msg": "Jadi pengkhianat itu bukan pengkhianat. Mentor — orang yang mencoba menghentikan Jiang Yan — melakukannya bukan karena benci atau iri. Ia takut. Takut pada apa yang akan terjadi jika rencana Jiang Yan gagal, takut pada jutaan nyawa yang bisa meledak bersama sistem. Ia mencoba mencegah. Itulah 'pengkhianatan' yang dicatat sejarah. Dan Jiang Yan tetap melanjutkan. Pola yang sama berulang di sekelilingmu — 'antagonist' dalam cerita ini selalu punya alasan yang bisa dipahami."
+   },
+   "next": [
+    {
+     "quest": "q_a06_c03_003"
+    }
+   ]
+  },
+  {
+   "id": "q_a06_c03_003",
+   "kind": "main",
+   "title": "Gerbang, Formasi, dan Biaya",
+   "quest_type": "main",
+   "objective": {
+    "kind": "reach",
+    "location": "loc_tianxu_deepest_chamber",
+    "hint": "Formasi raksasa di ruang terdalam menyimpan memory yang belum pernah kau lihat utuh — The Gate. Kembalilah ke ruang itu sendirian."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "flag_the_gate_full_truth_known",
+      "value": true
+     },
+     {
+      "type": "flag",
+      "key": "flag_second_life_meaning_known",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 15
+    },
+    "memory_unlock": "memory_a06_m01",
+    "system_msg": "Memory itu datang utuh — lebih utuh dari yang pernah kau lihat. Jiang Yan membuka gerbang bukan untuk membebaskan entitas. Ia membuka gerbang menuju sumber asli cultivation, untuk memisahkan entitas darinya. Eksperimen gagal. Sumber menjadi tidak stabil. Tian Xu hampir runtuh. Untuk mencegah kehancuran total, ia menggunakan formasi terakhir — Cycle Formation. Formasi mengulang kondisi tertentu dunia, tapi ia tidak bisa mengendalikan semuanya. Maka lahirlah kehidupan kedua. Bukan hadiah. Bukan takdir. Kesempatan eksperimental. Kalimat dari Arc III — 'Kalau dunia harus membenciku, biarkan' — akhirnya masuk akal. Bukan ancaman. Kesediaan menanggung kesalahpahaman demi mencoba menyelamatkan dunia."
+   },
+   "next": [
+    {
+     "quest": "q_a06_c04_004"
+    }
+   ]
+  },
+  {
+   "id": "q_a06_c04_004",
+   "kind": "main",
+   "title": "Yang Diingat Pedang",
+   "quest_type": "main",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_mentor",
+    "target": 1,
+    "hint": "Mentor memanggilmu ke dojo — ada sesuatu yang harus ia katakan, tentang cara kau memegang pedang, tentang tangan yang sama dari kehidupan pertama."
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "arc6_complete",
+      "value": true
+     }
+    ],
+    "rewards": {
+     "exp": 20
+    },
+    "system_msg": "Mentor menurunkan pedangnya dan menatapmu lama. 'Selama bertahun-tahun aku mengajarmu cara menangkis, cara menyerang, cara bertahan. Tapi aku tidak pernah mengajarimu cara kau menggenggam gagang itu. Karena itu bukan sesuatu yang bisa diajarkan.' Lalu, dengan suara yang lebih pelan: 'Cara kau memegang pedang... aku pernah melihatnya. Pada satu orang, di kehidupan yang lain.' Arc VI selesai. Kau tahu siapa dirimu. Kau tahu apa yang terjadi. Sekarang — pertanyaannya adalah apa yang akan kau lakukan tentangnya."
+   },
+    "next": [
+     {
+      "quest": "q_a07_c01_001"
+     }
+    ]
+  },
+  {
+   "id": "q_a06_side_parallel",
+   "kind": "side",
+   "title": "Dua Kelompok, Satu Pola",
+   "quest_type": "side",
+   "objective": {
+    "kind": "talk",
+    "npc": "npc_mentor",
+    "target": 1,
+    "node": "n6",
+    "hint": "Mentor ingin membandingkan catatan found family Jiang Yan dengan kelompok yang kau bangun sekarang. Ceritakan padanya tentang orang-orang di sisimu \u2014 sampai cerita itu selesai."
+   },
+   "available_from": {
+    "day": 1,
+    "hour": 0
+   },
+   "on_complete": {
+    "effects": [
+     {
+      "type": "flag",
+      "key": "side_parallel_done",
+      "value": true
+     },
+     {
+      "type": "relation",
+      "npc": "npc_mentor",
+      "value": 1
+     }
+    ],
+    "rewards": {
+     "exp": 8,
+     "gold": 15
+    },
+    "system_msg": "Mentor mengangguk perlahan. 'Kelompokmu mirip dengan kelompoknya dalam cara yang membuatku takut. Tapi ada satu perbedaan.' Ia menatapmu. 'Kau tahu apa yang ia tidak tahu saat itu. Kau sudah melihat jalan itu gagal. Sekarang kau bebas memilih jalan yang lain.'"
+   }
+  }
+ ]
+}

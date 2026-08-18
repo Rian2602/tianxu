@@ -1,7 +1,9 @@
 """Skala moralitas (baik → jahat), disimpan sebagai integer.
 
-Digunakan untuk membuka/menutup opsi dialog & menentukan arah ending
-(GDD §3.4).
+Digunakan untuk membuka/menutup opsi dialog (kondisi morality_min/max) —
+sistem OPSIONAL yang data-driven: tema/cerita boleh memakainya atau tidak.
+PENTING: moralitas TIDAK menentukan ending — ending dipilih dari kondisi
+`config.arcs[].endings` (lihat session._pick_ending), bukan skala moralitas.
 """
 
 from __future__ import annotations

@@ -25,37 +25,96 @@ class DataRegistry:
         # Per-arc files — glob (bukan hardcode nama file): arc baru = taruh file
         # baru di folder, nol sentuhan kode. Subfolder (mis. `_inactive/`) tidak
         # ikut terbaca — file arc berikutnya yang belum aktif ditaruh di sana.
-        main_quests: list[dict] = []
-        side_quests: list[dict] = []
+        self.quests: list[dict] = []
+        self.quest_src_list: list[str] = []
         for f in sorted((self.data_dir / "quests").glob("*.json")):
-            for q in self._json(f"quests/{f.name}")["quests"]:
-                (side_quests if q.get("kind") == "side" else main_quests).append(q)
-        self.quests = main_quests + side_quests
+            fname = f"quests/{f.name}"
+            for q in self._json(fname)["quests"]:
+                self.quests.append(q)
+                self.quest_src_list.append(fname)
 
         self.dialogs: list[dict] = []
+        self.dialog_src_list: list[str] = []
         for f in sorted((self.data_dir / "dialogs").glob("*.json")):
-            self.dialogs += self._json(f"dialogs/{f.name}")["dialogs"]
+            fname = f"dialogs/{f.name}"
+            for d in self._json(fname)["dialogs"]:
+                self.dialogs.append(d)
+                self.dialog_src_list.append(fname)
         self.npcs = self._json("npcs.json")["npcs"]
         self.locations = self._json("locations.json")["locations"]
-        self.memories = self._json("memories.json")["memories"]
-        self.recipes = self._json("recipes.json")["recipes"]
-        self.companions = self._json("companions.json")["companions"]
+        # Fitur opsional — tema baru boleh tidak punya ingatan/roh/resep/kunci.
+        # Tanpa guard ini, mengganti data story = FileNotFoundError saat boot.
+        self.memories = []
+        try:
+            self.memories = self._json("memories.json")["memories"]
+        except (FileNotFoundError, KeyError):
+            pass
+        try:
+            self.recipes = self._json("recipes.json")["recipes"]
+        except (FileNotFoundError, KeyError):
+            self.recipes = []
+        self.companions = []
+        try:
+            self.companions = self._json("companions.json")["companions"]
+        except (FileNotFoundError, KeyError):
+            pass
 
-        self.items = {r["id"]: r for r in self._csv("items.csv")}
-        self.enemies = {r["id"]: r for r in self._csv("enemies.csv")}
-        self.realms = {r["id"]: r for r in self._csv("realms.csv")}
-        self.techniques = {r["id"]: r for r in self._csv("techniques.csv")}
+        # Key items — separate file for use effects (CSV can't handle nested JSON).
+        # PER-INSTANCE (bukan global modul): dua DataRegistry dengan data dir
+        # berbeda dalam satu proses tidak boleh saling mencemari key item.
+        self.key_items: dict[str, dict] = {}
+        try:
+            ki_data = self._json("key_items.json")["key_items"]
+            for ki in ki_data:
+                if ki.get("id"):
+                    self.key_items[ki["id"]] = ki
+        except (FileNotFoundError, KeyError, TypeError):
+            pass  # key_items.json is optional
 
-        # lookup index
-        self.quest_by_id = {q["id"]: q for q in self.quests}
-        self.dialog_by_id = {d["id"]: d for d in self.dialogs}
-        self.npc_by_id = {n["id"]: n for n in self.npcs}
-        self.location_by_id = {l["id"]: l for l in self.locations}
-        self.memory_by_id = {m["id"]: m for m in self.memories}
+        # Faksi — OPSIONAL (tema tanpa faksi boleh tidak punya file ini). Bila
+        # ada, validator memakai `registry.factions` untuk cross-reference
+        # effect `reputation` & condition `faction_min`/`faction_max` (docs 05).
+        self.factions: list[dict] = []
+        try:
+            self.factions = self._json("factions.json")["factions"]
+        except (FileNotFoundError, KeyError, TypeError):
+            pass  # factions.json is optional
+
+        self.items_raw = self._csv("items.csv")
+        self.items = {r["id"]: r for r in self.items_raw}
+        self.enemies_raw = self._csv("enemies.csv")
+        self.enemies = {r["id"]: r for r in self.enemies_raw}
+        self.realms_raw = self._csv("realms.csv")
+        self.realms = {r["id"]: r for r in self.realms_raw}
+        self.techniques_raw = self._csv("techniques.csv")
+        self.techniques = {r["id"]: r for r in self.techniques_raw}
+
+        # lookup index — entri tanpa id dilewati (validator #1 melaporkannya
+        # dengan pesan jelas; tanpa guard ini loader KeyError duluan)
+        self.quest_by_id = {q["id"]: q for q in self.quests if q.get("id")}
+        self.dialog_by_id = {d["id"]: d for d in self.dialogs if d.get("id")}
+        self.npc_by_id = {n["id"]: n for n in self.npcs if n.get("id")}
+        self.location_by_id = {l["id"]: l for l in self.locations if l.get("id")}
+        self.memory_by_id = {m["id"]: m for m in self.memories if m.get("id")}
+        self.faction_by_id = {f["id"]: f for f in self.factions if f.get("id")}
 
         # konfigurasi turunan
         self.roots_tier = {t["id"]: t for t in self.config.get("roots", {}).get("tiers", [])}
         self.element_advantage = self.config.get("element_advantage", {})
+
+        # hunting zones — multi-zone (F2.3): world.hunts[] kanonik, world.hunt legacy
+        self.hunts: list[dict] = []
+        world_cfg = self.config.get("world") or {}
+        hunts_list = world_cfg.get("hunts")
+        if isinstance(hunts_list, list):
+            self.hunts = list(hunts_list)
+        elif isinstance(world_cfg.get("hunt"), dict):
+            legacy = dict(world_cfg["hunt"])
+            legacy["id"] = "legacy"
+            self.hunts = [legacy]
+
+        from .validate import validate
+        validate(self)
 
     # ---------- pembaca file ----------
 
@@ -95,6 +154,9 @@ class DataRegistry:
 
     def technique(self, tid: str) -> dict | None:
         return self.techniques.get(tid)
+
+    def hunts_for_location(self, location_id: str) -> list[dict]:
+        return [h for h in self.hunts if h.get("location") == location_id]
 
     def academy_curriculum(self, academy: str) -> list[dict]:
         """Daftar teknik kurikulum untuk suatu akademi/paviliun (berurutan)."""

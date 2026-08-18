@@ -48,13 +48,19 @@ def print_header(session: GameSession) -> None:
     print(f"{BOLD}═══ {bulan} — Hari {v['day']}, jam {v['hour']:02d}:00 — {loc['name']} ═══{RESET}")
     print(DIM + loc["description"] + RESET)
     print()
-    print(f"{BOLD}Chen Xu{RESET} — {p['realm']} Lv.{p['realm_level']} | "
+    print(f"{BOLD}{p['name']}{RESET} — {p['realm']} Lv.{p['realm_level']} | "
           f"HP {p['hp']}/{p['hp_max']} | Qi {p['qi']}/{p['qi_max']} | "
           f"{GOLD}{p['gold']} Koin{RESET} | Moral {p['morality']} | Exp {p['exp']}/{p['exp_next']}")
     if p["academy"]:
         for a in session.reg.config["academies"]:
             if a["id"] == p["academy"]:
-                print(DIM + f"Akademi: {a['name']} ({a['hanzi']} {a['pinyin']})" + RESET)
+                # B3: hanzi/pinyin opsional di kontrak — tanpa keduanya tetap tampil nama
+                hanzi = a.get("hanzi", "")
+                pinyin = a.get("pinyin", "")
+                if hanzi or pinyin:
+                    print(DIM + f"Akademi: {a['name']} ({hanzi} {pinyin})" + RESET)
+                else:
+                    print(DIM + f"Akademi: {a['name']}" + RESET)
     w = p.get("equipment", {}).get("weapon")
     if w:
         wi = session.reg.item(w)
@@ -75,9 +81,7 @@ def print_header(session: GameSession) -> None:
 
 def print_log(session: GameSession, start: int) -> None:
     for e in session.state.log[start:]:
-        txt = e["text"]
-        prefix = f"[H{e['day']}:{e['hour']:02d}] " if False else ""
-        print(color(e["type"]) + txt + RESET)
+        print(color(e["type"]) + e["text"] + RESET)
 
 
 def explore_menu(session: GameSession) -> None:
@@ -100,8 +104,14 @@ def explore_menu(session: GameSession) -> None:
     for n in npcs:
         if session.can_spar(n):
             print(f"  {GREEN}[spar]{RESET} latihan vs {n['name']}")
-    if v["location"]["is_safe"] and any(i["id"] == "material_herba" and i["count"] >= 2 for i in v["inventory"]):
-        print(f"  {GREEN}[racik]{RESET} pil dari bahan (rc_pil_qi / rc_pil_pemulihan)")
+    if v["location"]["is_safe"] and session.reg.recipes:
+        inv_map = {i["id"]: i["count"] for i in v["inventory"]}
+        available = [r for r in session.reg.recipes
+                     if all(inv_map.get(ing["item"], 0) >= ing["count"]
+                            for ing in r.get("ingredients", []))]
+        if available:
+            names = ", ".join(r["id"] for r in available)
+            print(f"  {GREEN}[racik]{RESET} resep tersedia: {names}")
     if any((session.reg.item(i["id"]) or {}).get("type") == "weapon" for i in v["inventory"]):
         print(f"  {GREEN}[pasang]{RESET} <senjata> — pasang ke slot senjata")
     print(f"  {GREEN}[tunggu]{RESET} beberapa jam · {GREEN}[pakai]{RESET} <item> · {GREEN}[ingatan]{RESET} baca ingatan")
@@ -172,10 +182,14 @@ def main() -> None:
         session = GameSession.new(registry)
 
     log_start = 0
-    print(f"{GOLD}{BOLD}═══ 天缘灵 · TIAN XU: SECOND LIFE — Arc Akademi ═══{RESET}")
+    # judul data-driven (config.web) — tema baru boleh punya judul sendiri
+    web_cfg = registry.config.get("web") or {}
+    game_title = web_cfg.get("title", "天缘灵")
+    game_subtitle = web_cfg.get("subtitle", "TIAN XU: SECOND LIFE")
+    print(f"{GOLD}{BOLD}═══ {game_title} · {game_subtitle} ═══{RESET}")
     print("Ketik 'bantuan' untuk daftar perintah, 'keluar' untuk berhenti.\n")
 
-    arc_ended = False
+    arc_ended = None  # judul arc terakhir yang summary-nya sudah ditampilkan
     while True:
         v = session.view()
         print_header(session)
@@ -222,9 +236,9 @@ def main() -> None:
                         lv = session.state.player.technique_levels
                         print("Teknik: " + ", ".join(
                             f"{t['id']} (Lv.{lv.get(t['id'], 1)})" for t in teks))
-                        action = {"type": "battle_action", "action": "guard"}  # fallback aman
+                        print(DIM + "(ketik 'teknik <id>' untuk memakainya — melihat daftar tidak memakan giliran)" + RESET)
                     else:
-                        action = {"type": "battle_action", "action": "attack"}
+                        print("Kau belum menguasai teknik apa pun.")
             elif parts[0] == "3" or parts[0] == "item":
                 action = {"type": "battle_action", "action": "item", "item": parts[1] if len(parts) > 1 else None}
             elif parts[0] == "4" or parts[0] == "bertahan":
@@ -286,10 +300,18 @@ def main() -> None:
                 if len(parts) > 1:
                     action = {"type": "spar", "npc": parts[1]}
                 else:
-                    print("NPC sparing: hanxiu, gucanghai")
+                    spar_npcs = [n["id"] for n in registry.npcs if session.can_spar(n)]
+                    print("NPC sparing: " + (", ".join(spar_npcs) if spar_npcs else "tidak ada"))
             elif cmd == "pakai" or cmd == "use":
                 if len(parts) > 1:
                     action = {"type": "use_item", "item": parts[1]}
+            elif cmd in {"gunakan_kunci", "use_key"}:
+                if len(parts) > 1:
+                    action = {"type": "use_key_item", "item": parts[1]}
+                else:
+                    key_items = [i["id"] for i in v["inventory"]
+                                 if (session.reg.item(i["id"]) or {}).get("type") == "key_item"]
+                    print("Kunci: " + (", ".join(key_items) if key_items else "tidak ada"))
             elif cmd == "beli":
                 if len(parts) > 1:
                     action = {"type": "shop_buy", "item": parts[1], "count": int(parts[2]) if len(parts) > 2 else 1}
@@ -297,47 +319,55 @@ def main() -> None:
                 if len(parts) > 1:
                     action = {"type": "shop_sell", "item": parts[1], "count": int(parts[2]) if len(parts) > 2 else 1}
             elif cmd == "racik" or cmd == "craft":
-                action = {"type": "craft", "recipe": parts[1] if len(parts) > 1 else "rc_pil_qi"}
+                action = {"type": "craft", "recipe": parts[1] if len(parts) > 1 else None}
             elif cmd == "ingatan":
-                mids = session.state.memories
+                mids = [m["id"] if isinstance(m, dict) else m for m in session.state.memories]
                 if not mids:
                     print("Belum ada ingatan yang terbuka.")
                 else:
                     mid = parts[1] if len(parts) > 1 else mids[-1]
                     mem = registry.memory(mid)
                     if mem:
-                        print(GOLD + f"─── {mem['title']} ───" + RESET)
-                        print(mem["text"])
+                        rel = "unknown"
+                        for m in session.state.memories:
+                            if (m["id"] if isinstance(m, dict) else m) == mid:
+                                rel = m.get("reliability", "unknown") if isinstance(m, dict) else "unknown"
+                                break
+                        print(GOLD + f"─── {mem.get('title', mid)} ───" + RESET)
+                        if rel not in ("high", "unknown"):
+                            print(f"  [Keandalan: {rel}]")
+                        print(mem.get("text", ""))
             elif cmd == "bantuan":
                 print("Perintah: bicara <npc> · pindah <lokasi> · tunggu <jam> · meditasi <jam> · istirahat"
-                      " · berburu · cari · spar <npc> · pakai <item> · beli <item> · jual <item> · racik <resep>"
-                      " · tingkatkan <teknik> · simpan <nama> · ingatan <id> · bantuan · keluar")
+                      " · berburu · cari · spar <npc> · pakai <item> · gunakan_kunci <item> · beli <item>"
+                      " · jual <item> · racik <resep> · tingkatkan <teknik> · simpan <nama>"
+                      " · ingatan <id> · bantuan · keluar")
             elif cmd in {"keluar", "quit", "exit"}:
                 break
 
         if action:
             session.apply_action(action)
-        # cek selesai arc (tampilkan sekali; lanjutkan loop agar pemain bisa simpan)
-        # B3: trigger via arc_summary (data-driven) — bukan flag literal arc-1
-        if not arc_ended:
-            v_after = session.view()
-            if v_after.get("arc_summary"):
-                arc_ended = True
-                s = v_after["arc_summary"]
-                print(f"\n{GOLD}═══ {s['title']} ═══{RESET}")
-                print(f"Kultivator: {s['player_name']}")
-                print(f"Ranah: {s['realm']} Lv.{s['realm_level']}")
-                print(f"Akademi: {s['academy'] or '—'}")
-                print(f"Moralitas: {s['morality']}")
-                print(f"Pilihan Akhir: {s['branch']}")
-                print(f"Ingatan Terbuka: {s['memories_unlocked']}")
-                # C3: ending data-driven (None untuk arc tanpa endings)
-                end = s.get("ending")
-                if end:
-                    print(f"Ending: {end['title']}")
-                    print(DIM + end.get("desc", "") + RESET)
-                print(DIM + f"\"{s['teaser']}\"" + RESET)
-                print(f"{GOLD}════════════════════════════════{RESET}\n")
+        # cek selesai arc (tampilkan per-arc; lanjutkan loop agar pemain bisa simpan)
+        # B3: trigger via arc_summary (data-driven) — semua arc menampilkan summary-nya
+        v_after = session.view()
+        s_after = v_after.get("arc_summary")
+        if s_after and arc_ended != s_after["title"]:
+            arc_ended = s_after["title"]
+            s = s_after
+            print(f"\n{GOLD}═══ {s['title']} ═══{RESET}")
+            print(f"Kultivator: {s['player_name']}")
+            print(f"Ranah: {s['realm']} Lv.{s['realm_level']}")
+            print(f"Akademi: {s['academy'] or '—'}")
+            print(f"Moralitas: {s['morality']}")
+            print(f"Pilihan Akhir: {s['branch']}")
+            print(f"Ingatan Terbuka: {s['memories_unlocked']}")
+            # C3: ending data-driven (None untuk arc tanpa endings)
+            end = s.get("ending")
+            if end:
+                print(f"Ending: {end['title']}")
+                print(DIM + end.get("desc", "") + RESET)
+            print(DIM + f"\"{s['teaser']}\"" + RESET)
+            print(f"{GOLD}════════════════════════════════{RESET}\n")
 
 
 if __name__ == "__main__":

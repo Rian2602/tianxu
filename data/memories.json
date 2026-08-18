@@ -1,0 +1,52 @@
+{
+  "memories": [
+    {
+      "id": "memory_a01_m01",
+      "title": "Koridor Terbakar",
+      "text": "Koridor terbakar. Tidak ada wajah yang terlihat. Suara berteriak, terdistorsi seperti dalam mimpi: 'Jangan buka gerbang itu!' Kau terbangun sebelum tahu siapa yang berbicara.",
+      "reliability": "RENDAH"
+    },
+    {
+      "id": "memory_a01_m02",
+      "title": "Tangan yang Mengingat",
+      "text": "Bukan penglihatan — ini ingatan tubuh. Saat kau mencoba gerakan dasar pertama, tangan dan tubuhmu sudah 'tahu' caranya, seolah gerakan ini pernah kau lakukan ribuan kali. Kejutan ringan, cepat berlalu.",
+      "reliability": "RENDAH-SEDANG"
+    },
+    {
+      "id": "memory_a01_m03",
+      "title": "Apa yang Formasi Ingat",
+      "text": "Formasi tua yang sama — tapi dalam kondisi hancur. Retakan di atas batu, cahaya yang meredup dan pecah. Tidak ada suara, tidak ada narasi. Hanya jantungmu yang berdebar tanpa kau pahami sebabnya.",
+      "reliability": "SEDANG"
+    },
+    {
+      "id": "memory_a01_m04",
+      "title": "Jangan Percaya Sejarah",
+      "text": "Kau melihat dirimu sendiri, wajah tak terlihat. Seseorang berdiri di hadapanmu dan berkata: 'Kalau kau kembali, jangan percaya sejarah.' Kau terbangun — dan di meja kamarmu ada simbol kuno, yang tanganmu tahu cara menggambarnya.",
+      "reliability": "SEDANG-TINGGI"
+    },
+    {
+      "id": "memory_a02_m01",
+      "title": "Apa yang Tidak Akan Kau Kembali",
+      "text": "Artefak memancarkan cahaya. Tiba-tiba kau berada di tempat lain: Lin Yue — versi tua, wajahnya berkerut oleh waktu — menatapmu dengan urgensi. 'Kalau kau melakukan ini, kau tidak akan kembali.' Kilasan itu hilang, menyisakan pertanyaan tanpa jawaban.",
+      "reliability": "SEDANG"
+    },
+    {
+      "id": "memory_a03_m01",
+      "title": "Gerbang yang Kubuka",
+      "text": "Kau berdiri di depan gerbang. Tian Xu di belakangmu, cahaya hitam di depannya. Kau berkata — dengan tenang, bukan panik: 'Kalau dunia harus membenciku, biarkan.' Kau membuka gerbang. — Lalu gelap. Kau tidak melihat apa yang terjadi setelahnya.",
+      "reliability": "SANGAT RENDAH"
+    },
+    {
+      "id": "memory_a05_m01",
+      "title": "Apa yang Kucoba Kubunuh",
+      "text": "Kau (kehidupan pertama) berdiri di hadapan Entity. Kau menyerang — sekali, dua kali, sampai kau paham: ia tidak bisa dibunuh tanpa menghancurkan sumber cultivation itu sendiri. Kau berhenti. Bukan kalah. Realisasi. Lalu kau mulai menggambar formation — Cycle Formation — sebagai solusi darurat terakhir.",
+      "reliability": "TINGGI"
+    },
+    {
+      "id": "memory_a06_m01",
+      "title": "Gerbang, Formasi, dan Harganya",
+      "text": "Sequence paling lengkap dari kehidupan pertamamu. Kau (Jiang Yan) berdiri di hadapan The Gate — pintu menuju sumber asli cultivation. Bukan untuk membebaskan Entity: kau ingin memisahkannya dari sumber itu sendiri. Gerbang terbuka. Eksperimen berjalan. Lalu gagal — sumber menjadi tidak stabil, Tian Xu hampir runtuh, dan kau menggambar Cycle Formation dengan tangan gemetar sebagai tindakan darurat terakhir. Bukan rencana besar. Solusi dari kegagalan. Dan Second Life — kehidupan ini — adalah apa yang tersisa dari eksperimen itu.",
+      "reliability": "TINGGI"
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+ "dialogs": [
+  {
+   "id": "dlg_a02_d011",
+   "npc": "npc_proctor",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_proctor",
+     "text": "Ujian tengah semester dimulai. Perlihatkan apa yang telah kau pelajari — satu ronde, aturan standar.",
+     "choices": [
+      {
+       "label": "Aku siap.",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_proctor",
+     "text": "Bagus. Mulai!",
+     "choices": []
+    }
+   }
+  },
+  {
+   "id": "dlg_a02_d012",
+   "npc": "npc_proctor",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_proctor",
+     "text": "Ujian kelompok — bukan soal siapa terkuat, tapi bagaimana kalian bertarung bersama. Aku akan menguji kalian.",
+     "choices": [
+      {
+       "label": "Kami siap bersama.",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_proctor",
+     "text": "Tunjukkan kerja samamu. Mulai!",
+     "choices": []
+    }
+   }
+  },
+  {
+   "id": "dlg_a02_d013",
+   "npc": "npc_lin_yue",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau sudah membaca catatannya. 'Siklus dimulai lagi' — apa maksudnya? Akademi bilang murid itu kabur, tapi catatan ini...",
+     "choices": [
+      {
+       "label": "Kita harus memutuskan apa yang dilakukan dengan ini.",
+       "next": "n2"
+      }
+     ]
+    },
+    "n2": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Ya. Apa pun yang kita pilih, ini akan mengubah segalanya. Aku percaya padamu.",
+     "choices": []
+    }
+   }
+  },
+  {
+   "id": "dlg_a02_branch",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "narration",
+     "text": "Kau memegang catatan itu. Tiga jalan terbuka — dan masing-masing membawa konsekuensi yang bertahan lama.",
+     "choices": [
+      {
+       "label": "Obey — serahkan bukti kepada guru",
+       "option": "obey",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "flag_branch_obey",
+         "value": true
+        },
+        {
+         "type": "relation",
+         "npc": "npc_proctor",
+         "value": 5
+        },
+        {
+         "type": "relation",
+         "npc": "npc_lin_yue",
+         "value": 1
+        },
+        {
+         "type": "reputation",
+         "faksi": "faction_tianxu_orthodox",
+         "value": 3
+        }
+       ]
+      },
+      {
+       "label": "Investigate — selidiki sendiri secara diam-diam",
+       "option": "investigate",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "flag_archive_suspicious",
+         "value": true
+        },
+        {
+         "type": "relation",
+         "npc": "npc_mei_ruo",
+         "value": 3
+        }
+       ]
+      },
+      {
+       "label": "Confront — tuduh akademi terbuka",
+       "option": "confront",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "flag_branch_confront",
+         "value": true
+        },
+        {
+         "type": "reputation",
+         "faksi": "faction_tianxu_orthodox",
+         "value": -3
+        },
+        {
+         "type": "relation",
+         "npc": "npc_gu_han",
+         "value": 3
+        },
+        {
+         "type": "reputation",
+         "faksi": "faction_liberation",
+         "value": 2
+        },
+        {
+         "type": "reputation",
+         "faksi": "faction_reformists",
+         "value": 1
+        }
+       ]
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

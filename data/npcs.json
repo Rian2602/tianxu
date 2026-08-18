@@ -1,0 +1,199 @@
+{
+ "npcs": [
+  {
+   "id": "npc_aptitude_examiner",
+   "name": "Pemeriksa Aptitude",
+   "location": "loc_tianxu_gate",
+   "dialog_routes": {
+    "general": "dlg_a01_d001",
+    "main": {
+     "quest_a01_c01_001": "dlg_a01_d001",
+     "quest_a01_c01_002": "dlg_a01_d002"
+    }
+   }
+  },
+  {
+   "id": "npc_lin_yue",
+   "name": "Lin Yue",
+   "location": "loc_training_hall",
+   "dialog_routes": {
+    "general": "dlg_a01_d003",
+    "main": {
+     "quest_a01_c02_003": "dlg_a01_d003",
+     "quest_a02_c03_006": "dlg_a02_d013",
+     "quest_a03_c04_004": "dlg_a03_d04",
+     "quest_a05_c03_003": "dlg_a05_d03"
+    }
+   }
+  },
+  {
+   "id": "npc_shen_luo",
+   "name": "Shen Luo",
+   "location": "loc_training_hall",
+   "dialog_routes": {
+    "general": "dlg_a01_d004"
+   }
+  },
+  {
+   "id": "npc_mei_ruo",
+   "name": "Mei Ruo",
+   "location": "loc_pavilion_yanzhi",
+   "dialog_routes": {
+    "general": "dlg_a01_d005",
+    "main": {
+     "quest_a04_c01_001": "dlg_a04_d01",
+     "quest_a04_c02_002": "dlg_a04_d02"
+    }
+   }
+  },
+  {
+   "id": "npc_gu_han",
+   "name": "Gu Han",
+   "location": "loc_training_hall",
+   "dialog_routes": {
+    "general": "dlg_a01_d006"
+   }
+  },
+  {
+   "id": "npc_teacher_wuxin",
+   "name": "Guru Wuxin",
+   "location": "loc_pavilion_wuxin",
+   "dialog_routes": {
+    "general": "dlg_a01_d007"
+   }
+  },
+  {
+   "id": "npc_teacher_jianxin",
+   "name": "Guru Jianxin",
+   "location": "loc_pavilion_jianxin",
+   "dialog_routes": {
+    "general": "dlg_a01_d008"
+   }
+  },
+  {
+   "id": "npc_teacher_yanzhi",
+   "name": "Guru Yanzhi",
+   "location": "loc_pavilion_yanzhi",
+   "dialog_routes": {
+    "general": "dlg_a01_d009"
+   }
+  },
+  {
+   "id": "npc_teacher_liuguang",
+   "name": "Guru Liuguang",
+   "location": "loc_pavilion_liuguang",
+   "dialog_routes": {
+    "general": "dlg_a01_d010"
+   }
+  },
+  {
+   "id": "npc_proctor",
+   "name": "Guru Pengawas Ujian",
+   "location": "loc_training_hall",
+   "can_spar": true,
+   "combat": {
+    "hp": 40,
+    "attack": 6,
+    "defense": 3,
+    "exp_reward": 10
+   },
+   "dialog_routes": {
+    "general": "dlg_a02_d011",
+    "main": {
+     "quest_a02_c01_001": "dlg_a02_d011",
+     "quest_a02_c01_002": "dlg_a02_d012"
+    }
+   }
+  },
+  {
+   "id": "npc_mo_chen",
+   "name": "Mo Chen",
+   "location": "loc_mo_chen_meeting",
+   "dialog_routes": {
+    "general": "dlg_a03_d02",
+    "main": {
+     "quest_a03_c02_002": "dlg_a03_d02"
+    }
+   }
+  },
+  {
+   "id": "npc_archive_clerk",
+   "name": "Arsiparis",
+   "location": "loc_archive_public",
+   "dialog_routes": {
+    "general": "dlg_a03_d03",
+    "main": {
+     "quest_a03_c03_003": "dlg_a03_d03"
+    }
+   }
+  },
+  {
+   "id": "npc_grandmaster",
+   "name": "Grandmaster",
+   "location": "loc_grandmaster_chamber",
+   "dialog_routes": {
+    "general": "dlg_a04_d03",
+    "main": {
+     "quest_a04_c03_003": "dlg_a04_d03"
+    }
+   }
+  },
+  {
+   "id": "npc_villager_elder",
+   "name": "Tetua Desa",
+   "location": "loc_affected_village",
+   "dialog_routes": {
+    "general": "dlg_a05_d01",
+    "main": {
+     "quest_a05_c01_001": "dlg_a05_d01"
+    }
+   }
+  },
+  {
+   "id": "npc_mountain_guard",
+   "name": "Penjaga Gerbang Gunung",
+   "location": "loc_mountain_gate",
+   "dialog_routes": {
+    "general": "dlg_a05_d02",
+    "main": {
+     "quest_a05_c02_002": "dlg_a05_d02"
+    }
+   }
+  },
+  {
+   "id": "npc_entity",
+   "name": "Entity",
+   "location": "loc_tianxu_deepest_chamber",
+   "dialog_routes": {
+    "general": "dlg_a05_d04",
+    "main": {
+     "quest_a05_c04_004": "dlg_a05_d04"
+    }
+   }
+  },
+  {
+   "id": "npc_mentor",
+   "name": "Mentor",
+   "location": "loc_mentor_ground",
+   "dialog_routes": {
+    "general": "dlg_a06_d03",
+    "main": {
+     "quest_a06_c02_002": "dlg_a06_d01",
+     "quest_a06_c04_004": "dlg_a06_d03"
+    }
+   }
+  },
+  {
+   "id": "npc_jiang_yan_imprint",
+   "name": "Jiang Yan",
+   "location": "loc_below_deepest",
+   "dialog_routes": {
+    "general": "dlg_a07_d02",
+    "main": {
+     "quest_a07_c02_002": "dlg_a07_d02",
+     "quest_a07_c03_003": "dlg_a07_d03"
+    }
+   }
+  }
+ ]
+}

@@ -52,7 +52,11 @@ def gain_grind_exp(state: GameState, registry: DataRegistry, amount: int) -> Non
 
 def _level_up(state: GameState, registry: DataRegistry) -> bool:
     """Naikkan level. Return False bila sudah di puncak ranah (level tidak bisa naik)."""
-    levels = int(registry.realms[state.player.realm]["levels"])
+    realm_data = registry.realms.get(state.player.realm)
+    if not realm_data:
+        add_log(state, "system", f"[Sistem] Ranah tak dikenal: {state.player.realm}.")
+        return False
+    levels = int(realm_data.get("levels", 1) or 1)
     state.player.realm_level += 1
     if state.player.realm_level > levels:
         ok = _breakthrough(state, registry)
@@ -67,7 +71,10 @@ def _level_up(state: GameState, registry: DataRegistry) -> bool:
 def _breakthrough(state: GameState, registry: DataRegistry) -> bool:
     """Terobosan ke ranah berikutnya. Return False bila sudah ranah tertinggi."""
     realm_id = state.player.realm
-    order = int(registry.realms[realm_id]["order"])
+    cur = registry.realms.get(realm_id)
+    if not cur:
+        return False
+    order = int(cur["order"])
     nxt = None
     for rid, r in registry.realms.items():
         if int(r["order"]) == order + 1:
@@ -75,7 +82,7 @@ def _breakthrough(state: GameState, registry: DataRegistry) -> bool:
             break
     if not nxt:
         # ranah tertinggi — tetap di level maks
-        state.player.realm_level = int(registry.realms[realm_id]["levels"])
+        state.player.realm_level = int(cur.get("levels", 1) or 1)
         add_log(state, "system", "[Sistem] Kau mencapai puncak ranah ini.")
         return False
     old = registry.realms[realm_id]["name_pinyin"]

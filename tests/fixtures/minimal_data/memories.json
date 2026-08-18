@@ -1,0 +1,10 @@
+{
+  "memories": [
+    {
+      "id": "mem_1",
+      "title": "Ingatan Pertama",
+      "text": "Sebuah ingatan samar tentang kehidupan masa lalu.",
+      "reliability": "unknown"
+    }
+  ]
+}

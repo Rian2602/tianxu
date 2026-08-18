@@ -1,0 +1,206 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a03_mo_chen",
+      "npc": "npc_mo_chen",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Ah. Kau datang. Aku sudah mencari wajah itu cukup lama — meskipun kau tidak mengingatnya.",
+          "choices": [
+            {"label": "Siapa kau? Dan bagaimana kau mengenalku?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Namaku Mo Chen. Dan kau... kau adalah Jiang Yan. Setidaknya, dulu. Simbol di lehermu — aku yang memberikannya, di kehidupan yang berbeda.",
+          "choices": [
+            {"label": "Jiang Yan? Aku tidak mengenal nama itu.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Tentu saja tidak. Nama itu mati sebelum kau lahir — di kehidupan kedua ini, kau hanyalah Chen Xu. Tapi darah yang sama, jiwa yang sama, dan utang yang sama masih melekat padamu.",
+          "choices": [
+            {"label": "Tunggu — apa maksudmu, utang?", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Bukan sekarang. Cari jawabannya sendiri — mulai dari nama itu. Kalau kau memang Jiang Yan, kau akan tahu ke mana harus mencari.",
+          "choices": [
+            {"label": "Apa yang kau maksud?", "next": "n5"}
+          ]
+        },
+        "n5": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "(Senyum tipis.) Kita akan bertemu lagi — ketika kau siap mendengar kebenaran yang tidak menyenangkan. Sampai saat itu, Jiang Yan."
+        }
+      }
+    },
+    {
+      "id": "dlg_mo_chen_general",
+      "npc": "npc_mo_chen",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mo_chen",
+          "text": "Kau masih mencari. Bagus. Kebenaran tidak datang kepada mereka yang menunggu."
+        }
+      }
+    },
+    {
+      "id": "dlg_a03_decision",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Dokumen itu... kau membawanya sendiri, jadi kau tahu apa isinya. 'Jiang Yan. Deceased.' Namamu di kehidupan lain — dan bukti bahwa kau pernah mati.",
+          "choices": [
+            {"label": "Aku tidak tahu harus berpikir apa.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Aku sudah menelusuri sebagian nama itu di catatan lama. Jiang Yan bukan sekadar nama — ada jejak yang sengaja dikubur. Seseorang di akademi ini tidak ingin nama itu diingat.",
+          "choices": [
+            {"label": "Jadi aku ini... siapa sebenarnya?", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_gu_han",
+          "text": "Kau tetap kau, apa pun nama lamamu. Tapi aku tidak akan berbohong: ini mengubah banyak hal. Kau harus memutuskan bagaimana menyikapinya — dan apa pun pilihanmu, kami di sini.",
+          "choices": [
+            {"label": "Aku perlu waktu untuk memikirkan ini.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Ambil waktumu. Tapi ingat satu hal: apa pun yang kau putuskan tentang Jiang Yan, kau tetap bagian dari kelompok ini."
+        }
+      }
+    },
+    {
+      "id": "dlg_arc3_branch",
+      "npc": "npc_lin_yue",
+      "start": "n_ask",
+      "nodes": {
+        "n_ask": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Jadi, bagaimana kau menyikapi ini? Bahwa kau pernah hidup sebagai Jiang Yan — dan mati sebagai dia?",
+          "choices": [
+            {
+              "label": "Aku bukan dia. Aku Chen Xu — dan hanya itu.",
+              "option": "deny",
+              "effects": [
+                {"type": "flag", "key": "stance_deny", "value": true}
+              ],
+              "next": "n_deny"
+            },
+            {
+              "label": "Mungkin aku dulu dia. Tapi aku tetap aku.",
+              "option": "accept_cautious",
+              "effects": [
+                {"type": "flag", "key": "stance_accept_cautious", "value": true}
+              ],
+              "next": "n_accept"
+            },
+            {
+              "label": "Aku harus tahu kebenaran — apa pun harganya.",
+              "option": "seek_truth",
+              "effects": [
+                {"type": "flag", "key": "stance_seek_truth", "value": true},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+              ],
+              "next": "n_seek"
+            }
+          ]
+        },
+        "n_deny": {
+          "speaker": "npc:npc_gu_han",
+          "text": "Masuk akal. Identitas lama bukan kewajibanmu. Kau memilih siapa dirimu hari ini."
+        },
+        "n_accept": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Itu sikap yang bijak. Menerima tanpa tenggelam. Apa pun yang kau putuskan, kami berdiri di sisimu."
+        },
+        "n_seek": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kalau begitu kita telusuri sampai tuntas. Aku ikut — aku juga ingin tahu siapa sebenarnya Jiang Yan itu."
+        }
+      }
+    },
+    {
+      "id": "dlg_a03_gate",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Artefak itu bereaksi padamu — dan tadi, saat kau menyentuhnya sendirian, kau pingsan. Kali ini kita lakukan bersama. Pegang tanganku. Dan pegang artefak itu.",
+          "choices": [
+            {"label": "Aku siap. Mari kita buka.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "player",
+          "text": "(Dunia terbalik. Kau berdiri di depan gerbang cahaya hitam yang berdenyut. Di belakangmu, Tian Xu dalam senja. Suaramu sendiri berkata: 'Kalau dunia harus membenciku, biarkan.' Kau mendorong gerbang itu terbuka — dan cahaya hitam menelan segalanya.)",
+          "choices": [
+            {"label": "(Terbangun.)", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Chen Xu! Kau kembali. Kau pingsan hampir seharian. Aku melihat... aku melihat sesuatu dari matamu, sebelum kau sadar. Sebuah gerbang. Dan kau — kau membukanya."
+        }
+      }
+    },
+    {
+      "id": "dlg_a03_dokumen_offer",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "condition": {"flag": {"key": "stance_seek_truth", "value": true}},
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau memilih mengejar kebenaran — bagus, karena aku menemukan sesuatu. Sebuah catatan tentang lokasi yang berhubungan dengan Jiang Yan, di luar hutan. Tempat itu dijaga monster tua. Amankan, lalu kembali padaku.",
+          "choices": [
+            {
+              "label": "Aku cari tahu.",
+              "effects": [{"type": "start_quest", "quest": "q_a03_side_dokumen"}],
+              "next": "n2"
+            },
+            {
+              "label": "Nanti saja.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Hati-hati di luar sana. Semakin banyak yang kita tahu, semakin dekat kita pada kebenaran."
+        }
+      }
+    },
+    {
+      "id": "dlg_a03_dokumen_report",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Tempat itu sudah aman?",
+          "choices": [
+            {"label": "Sudah. Tidak ada yang tersisa di sana.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Bagus. Aku mencatatnya sebagai bagian dari investigasi kita. Satu jejak lagi tertutup — dan satu pertanyaan lagi terbuka. Kita semakin dekat, Chen Xu."
+        }
+      }
+    }
+  ]
+}

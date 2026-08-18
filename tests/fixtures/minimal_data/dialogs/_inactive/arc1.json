@@ -1,0 +1,421 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_arrival",
+      "npc": "npc_penerima_murid",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_penerima_murid",
+          "text": "Nama?",
+          "choices": [
+            {"label": "Chen Xu.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_penerima_murid",
+          "text": "Kau datang dari jauh. Apakah kau pernah mendengar tentang Tian Xu?",
+          "choices": [
+            {"label": "Akademi cultivation paling bergengsi di dunia.", "next": "n3"},
+            {"label": "Hanya tahu namanya.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_penerima_murid",
+          "text": "Itu jawaban yang jujur. Sekarang — pemeriksaan aptitude. Letakkan tanganmu di batu ini.",
+          "choices": [
+            {"label": "Ikuti pemeriksaan.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_penerima_murid",
+          "text": "Hasilmu... biasa saja. Tidak ada tanda bakat istimewa. Tetapi tidak ada alasan untuk menolakmu. Selamat datang di Tian Xu, Chen Xu.",
+          "choices": [
+            {"label": "Terima kasih.", "next": "n5"}
+          ]
+        },
+        "n5": {
+          "speaker": "player",
+          "text": "(Dalam perjalanan ke sini, kau bermimpi tentang koridor terbakar. Seseorang berteriak — \"Jangan buka gerbang itu!\" — sebelum kau sempat melihat wajahnya.)"
+        }
+      }
+    },
+    {
+      "id": "dlg_registration",
+      "npc": "npc_penerima_murid",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_penerima_murid",
+          "text": "Registrasi resmi. Nama lengkap dan asal, untuk dicatat dalam buku akademi.",
+          "choices": [
+            {"label": "Chen Xu. Aku siap dicatat.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_penerima_murid",
+          "text": "Tercatat. Mulai hari ini kau adalah murid Tian Xu. Semoga jalanmu panjang dan lurus."
+        }
+      }
+    },
+    {
+      "id": "dlg_penerima_general",
+      "npc": "npc_penerima_murid",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_penerima_murid",
+          "text": "Buku registrasi selalu terbuka bagi mereka yang serius. Tapi ingat — di Tian Xu, nama adalah janji."
+        }
+      }
+    },
+    {
+      "id": "dlg_lesson",
+      "npc": "npc_guru_utama",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Jadi kau murid baru. Baiklah. Pelajaran pertama: cultivation dimulai dari qi, dan qi dimulai dari pernapasan.",
+          "choices": [
+            {"label": "Ikuti gerakan Guru.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Tarik napas... kumpulkan qi di dantian... lalu lepaskan melalui tangan. Begitu. Hmm?",
+          "choices": [
+            {"label": "Ada apa, Guru?", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Gerakanmu terlalu tepat untuk seseorang yang baru belajar. Seolah tanganmu mengingat sesuatu yang kepalamu belum pernah tahu. Aneh. Tapi bukan hal buruk.",
+          "choices": [
+            {"label": "Pelajari Teknik Dasar.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Ini Teknik Dasar — fondasi dari segalanya. Latih sampai tak terasa asing. Nanti kau akan memilih paviliun, dan jalanmu akan menjadi lebih jelas."
+        }
+      }
+    },
+    {
+      "id": "dlg_guru_utama_general",
+      "npc": "npc_guru_utama",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Jangan buru-buru mengejar kekuatan. Di Tian Xu, yang kau pelajari pertama kali adalah siapa dirimu."
+        }
+      }
+    },
+    {
+      "id": "dlg_lin_yue_general",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n_briefing": {
+          "once": true,
+          "condition": {"quest_active": "q_a01_c04_005"},
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau datang tepat waktu, Chen Xu. Guru meminta kelompok kita menyelidiki gangguan spiritual di hutan. Kita semua pergi bersama — aku, Shen Luo, Mei Ruo, dan Gu Han.",
+          "choices": [
+            {"label": "Aku siap. Kita berangkat bersama.", "next": "n_briefing2"}
+          ]
+        },
+        "n_briefing2": {
+          "speaker": "player",
+          "text": "(Shen Luo menyeringai — \"jangan sampai kau tertinggal\". Mei Ruo mencatat sesuatu di buku kecilnya. Gu Han diam, tapi matanya menatap hutan dengan curiga. Kelompokmu berjalan ke hutan bersama.)"
+        },
+        "n_depart_outer": {
+          "once": true,
+          "condition": {"quest_active": "q_a02_c02_003"},
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau juga merasakannya, kan? Gangguan di luar pagar. Guru menugaskan kita berpatroli ke wilayah luar — di luar itu, kita hanya bisa mengandalkan satu sama lain. Aku, Shen Luo, Mei Ruo, Gu Han — dan kau.",
+          "choices": [
+            {"label": "Kita pergi bersama.", "next": "n_depart_outer2"}
+          ]
+        },
+        "n_depart_outer2": {
+          "speaker": "player",
+          "text": "(Mei Ruo menutup bukunya dengan tegas. Shen Luo merapikan pedangnya — kali ini tanpa menyeringai. Gu Han menatap pagar akademi lama, seperti sedang mengukur sesuatu yang tak terlihat. Kelompokmu melangkah keluar dari gerbang bersama.)"
+        },
+        "n_cave_obey": {
+          "once": true,
+          "condition": {
+            "quest_active": "q_a02_c04_009",
+            "flag": {"key": "branch_arc2_obey", "value": true}
+          },
+          "speaker": "npc:npc_shen_luo",
+          "text": "Gua itu... aku tidak suka cara lampunya berdenyut. Tapi keputusanmu sudah kita ambil bersama — kita serahkan ke Guru. Kalau akademi memang menyembunyikan sesuatu, mereka punya alasan. Untuk sekarang, itu cukup."
+        },
+        "n_cave_investigate": {
+          "once": true,
+          "condition": {
+            "quest_active": "q_a02_c04_009",
+            "flag": {"key": "branch_arc2_investigate", "value": true}
+          },
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Di gua tadi, aku mencatat sesuatu yang tidak bisa kubaca di cahaya itu — tapi aku membawanya pulang dalam ingatan. Artefak itu bukan satu-satunya rahasia di sana. Kita simpan dulu apa yang kita tahu. Diam-diam, seperti yang kita sepakati."
+        },
+        "n_cave_confront": {
+          "once": true,
+          "condition": {
+            "quest_active": "q_a02_c04_009",
+            "flag": {"key": "branch_arc2_confront", "value": true}
+          },
+          "speaker": "npc:npc_gu_han",
+          "text": "Gua itu membuktikan kata-kataku sejak awal — sesuatu di akademi ini tidak beres, dan artefak itu saksi bisunya. Kita sudah berdiri terbuka di forum. Sekarang kita berdiri di depan Guru dengan artefak di tangan. Jangan mundur."
+        },  "n_a03_deny": {
+   "once": true,
+   "condition": {
+    "quest_active": "q_a03_c05_005",
+    "flag": {
+     "key": "stance_deny",
+     "value": true
+    }
+   },
+   "speaker": "npc:npc_gu_han",
+   "text": "Kau menolak nama itu. Bagus. Identitas lama bukan kewajibanmu — kau memilih siapa dirimu hari ini, dan itu lebih dari cukup."
+  },
+  "n_a03_accept": {
+   "once": true,
+   "condition": {
+    "quest_active": "q_a03_c05_005",
+    "flag": {
+     "key": "stance_accept_cautious",
+     "value": true
+    }
+   },
+   "speaker": "npc:npc_lin_yue",
+   "text": "Kau memilih menerima tanpa tenggelam. Itu sikap yang bijak — dan apa pun yang kau temukan di balik gerbang itu, kau tetap bagian dari kelompok ini."
+  },    "n_a03_seek": {
+      "once": true,
+      "condition": {
+        "quest_active": "q_a03_c05_005",
+        "flag": {
+          "key": "stance_seek_truth",
+          "value": true
+        }
+      },
+      "speaker": "npc:npc_mei_ruo",
+      "text": "Kau memilih mengejar kebenaran. Kita telusuri sampai tuntas — aku di sisimu, seperti yang sudah kita sepakati."
+    },
+    "n_a04_formation": {
+      "once": true,
+      "condition": {
+        "quest_active": "q_a04_c04_004"
+      },
+      "speaker": "npc:npc_lin_yue",
+      "text": "Formation itu... aku sudah lama merasa ada sesuatu yang salah dengan tempat ini — tapi aku tidak pernah membayangkan sejauh ini. Kita semua bagian dari sistem ini, sejak hari pertama. Pertanyaannya bukan lagi apa yang disembunyikan Tian Xu. Pertanyaannya: apa yang akan kita lakukan sekarang?"
+    },
+  "n1": {
+   "speaker": "npc:npc_lin_yue",
+   "text": "Halo, Chen Xu. Kehidupan baru memang terasa janggal — tapi itu wajar. Kau tidak harus menjadi salinan siapa pun di sini."
+  }
+ }
+    },
+    {
+      "id": "dlg_night_lin_yue",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau kelihatan lelah. Mimpi buruk lagi?",
+          "choices": [
+            {"label": "Kali ini aku melihat diriku sendiri. Wajahku tidak terlihat.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Aku tidak mengerti semua ini. Tapi kalau kau butuh seseorang untuk sekadar duduk di dekatmu — aku di sini. Pagi ini kau menemukan sesuatu di mejamu?",
+          "choices": [
+            {"label": "Sebuah simbol kuno. Aku tidak pernah memilikinya.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Simbol? Simpan baik-baik. Ada sesuatu tentang dirimu yang lebih tua dari Tian Xu sendiri. Aku tidak tahu apa artinya — tapi aku percaya padamu.",
+          "choices": [
+            {"label": "Terima kasih, Lin Yue.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "player",
+          "text": "(Kau memegang simbol kuno itu di saku. Malam ini, kau yakin pada satu hal: kau harus mencari tahu siapa dirimu sebenarnya.)"
+        }
+      }
+    },
+    {
+      "id": "dlg_side_herba_offer",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Chen Xu, aku sedang meracik ramuan untuk kelompok kita. Bisakah kau mengumpulkan 3 Herba Qi dari hutan dekat akademi?",
+          "choices": [
+            {
+              "label": "Tentu, aku bantu.",
+              "effects": [{"type": "start_quest", "quest": "q_a01_side_herba"}],
+              "next": "n2"
+            },
+            {
+              "label": "Nanti saja.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Baik. Hati-hati di hutan — ada yang aneh dengan wilayah itu akhir-akhir ini."
+        }
+      }
+    },
+    {
+      "id": "dlg_side_herba_report",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau kembali! Apakah kau berhasil mengumpulkan herba-nya?",
+          "choices": [
+            {"label": "Ini, 3 Herba Qi.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Terima kasih, Chen Xu. Aku akan meracik ramuan untuk kelompok kita malam ini. Kau sungguh penyelamat."
+        }
+      }
+    },
+    {
+      "id": "dlg_shen_luo_general",
+      "npc": "npc_shen_luo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Chen Xu. Hasil aptitude-mu biasa saja, tapi kau tetap diterima. Menarik — mari kita lihat apakah kau bisa membuktikan dirimu di sini."
+        }
+      }
+    },
+    {
+      "id": "dlg_mei_ruo_general",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Aku sedang membaca catatan lama akademi. Ada begitu banyak halaman yang... hilang. Aneh, bukan? Sejarah selalu punya bagian yang tidak diceritakan."
+        }
+      }
+    },
+    {
+      "id": "dlg_gu_han_general",
+      "npc": "npc_gu_han",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_gu_han",
+          "text": "Kau percaya semua yang diajarkan di sini? Aku tidak. Sesuatu tentang tempat ini tidak beres — aku bisa merasakannya."
+        }
+      }
+    },
+    {
+      "id": "dlg_guru_wuxing",
+      "npc": "npc_guru_wuxing",
+      "start": "n1",
+      "nodes": {
+        "n_join": {
+          "once": true,
+          "condition": {"academy": "pav_wuxing"},
+          "speaker": "npc:npc_guru_wuxing",
+          "text": "Kau telah memilih Paviliun Lima Elemen. Bukan sekadar teknik — kau memilih cara hidup yang seimbang.",            "choices": [
+            {
+              "label": "Aku siap belajar di sini.",
+              "effects": [
+                {"type": "flag", "key": "branch_pav_wuxing", "value": true},
+                {"type": "technique", "id": "tebasan_wuxing"}
+              ],
+              "next": "n2"
+            }
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_guru_wuxing",
+          "text": "Lima elemen tidak saling bertarung — mereka saling menopang. Di paviliun ini, kau belajar menjadi bagian dari keseimbangan, bukan penguasanya."
+        },
+        "n2": {
+          "speaker": "npc:npc_guru_wuxing",
+          "text": "Baik. Mulai besok, latihanmu di sini dimulai."
+        }
+      }
+    },
+    {
+      "id": "dlg_guru_bingfeng",
+      "npc": "npc_guru_bingfeng",
+      "start": "n1",
+      "nodes": {
+        "n_join": {
+          "once": true,
+          "condition": {"academy": "pav_bingfeng"},
+          "speaker": "npc:npc_guru_bingfeng",
+          "text": "Kau telah memilih Paviliun Senjata. Ketajaman niat — itulah yang kami asah di sini.",            "choices": [
+            {
+              "label": "Aku siap mengasah teknikku.",
+              "effects": [
+                {"type": "flag", "key": "branch_pav_bingfeng", "value": true},
+                {"type": "technique", "id": "tusukan_bingfeng"}
+              ],
+              "next": "n2"
+            }
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_guru_bingfeng",
+          "text": "Senjata adalah perpanjangan niat. Di paviliun ini, kami mengasah ketajaman — teknik, senjata, dan tekad. Jalan yang lurus dan tajam."
+        },
+        "n2": {
+          "speaker": "npc:npc_guru_bingfeng",
+          "text": "Baik. Pedangmu akan belajar bicara di sini."
+        }
+      }
+    },
+    {
+      "id": "dlg_guru_yuling",
+      "npc": "npc_guru_yuling",
+      "start": "n1",
+      "nodes": {
+        "n_join": {
+          "once": true,
+          "condition": {"academy": "pav_yuling"},
+          "speaker": "npc:npc_guru_yuling",
+          "text": "Kau telah memilih Paviliun Panggilan. Makhluk roh memilih tuannya — dan tampaknya ada yang tertarik padamu.",            "choices": [
+            {
+              "label": "Aku siap mendengarkan.",
+              "effects": [
+                {"type": "flag", "key": "branch_pav_yuling", "value": true},
+                {"type": "technique", "id": "panggil_roh"}
+              ],
+              "next": "n2"
+            }
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_guru_yuling",
+          "text": "Makhluk roh memilih tuannya, bukan sebaliknya. Di paviliun ini, kau belajar mendengarkan — karena ikatan sejati lahir dari kepercayaan."
+        },
+        "n2": {
+          "speaker": "npc:npc_guru_yuling",
+          "text": "Baik. Aroma dupa ini akan segera terasa seperti rumah."
+        }
+      }
+    }
+  ]
+}

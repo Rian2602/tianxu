@@ -1,0 +1,160 @@
+{
+  "quests": [
+    {
+      "id": "q_a01_c01_001",
+      "kind": "main",
+      "title": "Tiba di Tian Xu",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_penerima_murid",
+        "target": 1,
+        "hint": "Ikuti pemeriksaan aptitude di gerbang Tian Xu."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "dream_a01_01_seen", "value": true}
+        ],
+        "memory_unlock": "memory_a01_m01",
+        "system_msg": "Pemeriksaan selesai. Hasilmu biasa saja — kau diterima sebagai murid baru."
+      },
+      "next": [
+        {"quest": "q_a01_c01_002"}
+      ]
+    },
+    {
+      "id": "q_a01_c01_002",
+      "kind": "main",
+      "title": "Registrasi",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_penerima_murid",
+        "target": 1,
+        "hint": "Selesaikan registrasimu sebagai murid Tian Xu."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "murid_status", "value": "registered"}
+        ],
+        "system_msg": "Namamu tercatat. Selamat datang di Tian Xu, Chen Xu."
+      },
+      "next": [
+        {"quest": "q_a01_c02_003"}
+      ]
+    },
+    {
+      "id": "q_a01_c02_003",
+      "kind": "main",
+      "title": "Pelajaran Pertama",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_guru_utama",
+        "target": 1,
+        "hint": "Datangi Guru Utama di lapangan latihan untuk pelajaran pertamamu."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "relation", "npc": "npc_lin_yue", "value": 1},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 1},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 1},
+          {"type": "relation", "npc": "npc_gu_han", "value": 1},
+          {"type": "technique", "id": "teknik_dasar"}
+        ],
+        "rewards": {"exp": 5},
+        "memory_unlock": "memory_a01_m02",
+        "system_msg": "Kau mempelajari Teknik Dasar. Gerakan pertamamu terasa anehnya familiar."
+      },
+      "next": [
+        {"quest": "q_a01_c03_004"}
+      ]
+    },
+    {
+      "id": "q_a01_c03_004",
+      "kind": "main",
+      "title": "Memilih Jalan",
+      "quest_type": "main",
+      "objective": {
+        "kind": "choose",
+        "hint": "Pilih paviliun yang akan menjadi jalan hidupmu.",
+        "options": [
+          {"value": "pav_wuxing", "label": "Paviliun Lima Elemen", "set": {"academy": "pav_wuxing"}},
+          {"value": "pav_bingfeng", "label": "Paviliun Senjata", "set": {"academy": "pav_bingfeng"}},
+          {"value": "pav_yuling", "label": "Paviliun Panggilan", "set": {"academy": "pav_yuling"}}
+        ]
+      },
+      "on_complete": {
+        "system_msg": "Paviliun terpilih. Jalan hidupmu di Tian Xu dimulai."
+      },
+      "next": [
+        {"quest": "q_a01_c04_005"}
+      ]
+    },
+    {
+      "id": "q_a01_c04_005",
+      "kind": "main",
+      "title": "Latihan Pertama & Ujian Pertama",
+      "quest_type": "main",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_hutan_formation",
+        "hint": "Selidiki gangguan spiritual di hutan dekat akademi bersama kelompokmu."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "formation_touched", "value": true}
+        ],
+        "rewards": {"exp": 10},
+        "memory_unlock": "memory_a01_m03",
+        "system_msg": "Kau menyentuh batu formation tua. Sesaat, dunia berputar — sebuah memori muncul."
+      },
+      "next": [
+        {"quest": "q_a01_c04_006"}
+      ]
+    },
+    {
+      "id": "q_a01_c04_006",
+      "kind": "main",
+      "title": "Insiden Malam",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Setelah malam yang panjang, temui Lin Yue."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "memory_awareness", "value": true},
+          {"type": "item", "id": "simbol_kuno", "count": 1}
+        ],
+        "memory_unlock": "memory_a01_m04",
+        "system_msg": "Di meja kamarmu pagi ini: sebuah simbol kuno yang tidak pernah kau miliki. Tangammu tahu cara menggambarnya."
+      },
+      "next": [
+        {"quest": "q_a02_c01_001"}
+      ]
+    },
+    {
+      "id": "q_a01_side_herba",
+      "kind": "side",
+      "title": "Mengumpulkan Herba Qi",
+      "quest_type": "side",
+      "objective": {
+        "kind": "gather",
+        "item": "herba_qi",
+        "target": 3,
+        "report_to": "npc_lin_yue",
+        "hint": "Kumpulkan 3 Herba Qi di hutan dekat akademi, lalu kembalilah ke Lin Yue untuk menyerahkannya."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "side_herba_done", "value": true}
+        ],
+        "rewards": {"exp": 5, "gold": 10},
+        "system_msg": "Lin Yue menerima herba itu dengan senyum kecil."
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Agent/tool configs (local only)
+.agents/
+.opencode/
+.claude/
+
+# Save files (player data, not code)
+saves/
+
+# Coverage/test artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db

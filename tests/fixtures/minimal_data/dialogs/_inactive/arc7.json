@@ -1,0 +1,354 @@
+{
+ "dialogs": [
+  {
+   "id": "dlg_a07_last_night",
+   "npc": "npc_lin_yue",
+   "start": "n_intro",
+   "nodes": {
+    "n_intro": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Lin Yue berdiri di depan kelompok. Di belakangnya: Mei Ruo, Shen Luo, Gu Han, Mentor, Grandmaster. Malam terakhir sebelum fajar.",
+     "next": "n_lin"
+    },
+    "n_lin": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Lin Yue menatapmu dengan tenang. 'Aku tidak akan bertanya apakah kau yakin. Kau sudah menjawab pertanyaan itu sejak pertama kali kau membuka mata di Tian Xu. Yang akan aku katakan hanya ini: aku percaya padamu. Bukan karena kau kuat — tapi karena kau tahu kapan harus meminta bantuan.'",
+     "next": "n_mei"
+    },
+    "n_mei": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Mei Ruo melangkah maju, tangan terkatup. 'Kau sudah melihat apa yang tidak berani dilihat orang lain — bahwa sejarah ini bukan anugerah, tapi siklus. Sekarang dunia tahu. Apapun yang terjadi di bawah sana, kebenaran tidak akan terkubur lagi.'",
+     "next": "n_shen"
+    },
+    "n_shen": {
+     "speaker": "npc:npc_shen_luo",
+     "text": "Shen Luo berdiri di sampingmu, senyumnya gelap tapi tulus. 'Kita pernah bertarung tentang bagaimana menangani ini. Aku masih berpikir menghancurkan sistemnya adalah jawaban yang benar. Tapi malam ini... aku tidak akan memaksamu memilih jalan yang sama denganku. Pilihlah apa yang kau yakini — bukan apa yang aku yakini.'",
+     "next": "n_gu"
+    },
+    "n_gu": {
+     "speaker": "npc:npc_gu_han",
+     "text": "Gu Han menepuk bahumu dengan ringan. 'Aku tidak pandai dengan kata-kata indah. Yang tahu kau akan melakukan hal yang benar. Bukan karena kau paling pintar — tapi karena kau satu-satunya yang benar-benar peduli.'",
+     "next": "n_mentor"
+    },
+    "n_mentor": {
+     "speaker": "npc:npc_mentor",
+     "text": "Mentor menatapmu lama. 'Semua yang kuajarkan — menangkis, menyerang, bertahan — itu semua teknik. Yang tidak bisa kuejarkan adalah cara kau menggenggam gagang itu. Karena itu bukan sesuatu yang bisa diajarkan. Itu milikmu. Selalu.'",
+     "next": "n_grand"
+    },
+    "n_grand": {
+     "speaker": "npc:npc_grandmaster",
+     "text": "Grandmaster mengangguk sekali. 'Kau sudah melihat semuanya — gerbang, kegagalan, Cycle Formation. Kau tahu mengapa aku mempertahankan sistem ini. Sekarang turunlah. Dan buktikan bahwa aku salah untuk takut.'",
+     "next": "n_ask"
+    },
+    "n_ask": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kelompok itu berdiri dalam keheningan. Malam hampir berakhir. Di balik cakrawala, fajar mulai menyingsing.",
+     "choices": [
+      {
+       "label": "Menatap gerbang — kau mengingat mimpi pertamamu.",
+       "condition": {
+        "flag": {
+         "key": "mountain_gate_changed",
+         "value": true
+        }
+       },
+       "next": "n_lin_variant_gate"
+      },
+      {
+       "label": "Memikirkan kebenaran yang sudah tersebar.",
+       "condition": {
+        "flag": {
+         "key": "stance_seek_truth",
+         "value": true
+        }
+       },
+       "next": "n_lin_variant_truth"
+      },
+       {
+        "label": "Mengingat malam yang tenang karena kau melindungi mereka.",
+        "condition": {
+         "flag": {
+          "key": "crisis_shield",
+          "value": true
+         }
+        },
+        "next": "n_crisis_shield"
+       },
+       {
+        "label": "Mengingat desas-desus yang mulai menyebar.",
+        "condition": {
+         "flag": {
+          "key": "crisis_dismantle",
+          "value": true
+         }
+        },
+        "next": "n_crisis_dismantle"
+       },
+       {
+        "label": "Mengingat prinsip yang kau pilih.",
+        "condition": {
+         "flag": {
+          "key": "final_principle_transform",
+          "value": true
+         }
+        },
+        "next": "n_lin_variant_principle"
+       },
+       {
+        "label": "Sudah cukup. Saatnya turun.",
+        "next": "n_descend"
+       }
+     ]
+    },
+    "n_lin_variant_gate": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Lin Yue mengikuti arah pandangmu ke gerbang. 'Berbeda dari yang dulu, kan? Kau mengubahnya. Bukan dengan kekuatan — tapi dengan keberanian untuk melakukan apa yang tidak dilakukan pada kehidupan pertama.'",
+     "next": "n_descend"
+    },
+    "n_lin_variant_truth": {
+     "speaker": "npc:npc_mei_ruo",
+     "text": "Mei Ruo tersenyum tipis. 'Dunia tahu sekarang. Apapun yang terjadi di bawah sana, kebenaran tidak akan terkubur lagi. Itu... itu sudah cukup, bagiku.'",
+     "next": "n_descend"
+    },
+     "n_crisis_shield": {
+      "speaker": "npc:npc_lin_yue",
+      "text": "Lin Yue tersenyum. 'Malam ini tenang — karena kau memilih melindungi mereka dulu. Para murid tidur dengan aman. Itu... itu sudah cukup, bagiku.'",
+      "next": "n_descend"
+     },
+     "n_crisis_dismantle": {
+      "speaker": "npc:npc_shen_luo",
+      "text": "Shen Luo berbisik: 'Ada desas-desus di antara murid. Mereka mulai bertanya-tanya. Kau menabur benih — dan besok, kita akan melihat apa yang tumbuh.'",
+      "next": "n_descend"
+     },
+     "n_lin_variant_principle": {
+      "speaker": "npc:npc_mentor",
+      "text": "Mentor mengangguk perlahan. 'Mengubah hubungan antara manusia dan sumber... itu jalan yang tidak pernah kutemukan. Mungkin karena aku terlalu takut untuk mencarinya.'",
+      "next": "n_descend"
+     },
+     "n_descend": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Lin Yue memberikan isyarat. Kelompok itu bergerak menuju pintu masuk bawah tanah. Fajar menyingsing di belakang mereka — untuk terakhir kalinya sebagai murid Tian Xu.",
+     "choices": [
+      {
+       "label": "Turun ke bawah Tian Xu.",
+       "next": null
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "dlg_a07_confrontation",
+   "npc": "npc_jiang_yan",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_jiang_yan",
+     "text": "Di depan formation raksasa, sesuatu terbentuk — bukan tubuh, bukan hantu. Imprint kesadaran. Sosok yang sama dengan wajahmu. Jiang Yan.",
+     "next": "n2"
+    },
+    "n2": {
+     "speaker": "npc:npc_jiang_yan",
+     "text": "Jiang Yan menatapmu. Matanya tua — lebih tua dari wajahnya. 'Kau membunuhku sekali.' Suara itu sama seperti yang kau dengar dalam mimpi. 'Bukan dengan pedang. Dengan pilihan. Kau memilih menjadi manusia, bukan menjadi aku.'",
+     "next": "n3"
+    },
+    "n3": {
+     "speaker": "player",
+     "text": "Entitas berbicara — suara yang bukan suara, denyut yang bukan denyut. 'Aku adalah alasan kalian menyebut dunia ini sebagai anugerah. Tapi sekarang kau tahu — anugerah itu punya biaya. Dan biaya itu adalah segalanya.'",
+     "next": "n4"
+    },
+    "n4": {
+     "speaker": "npc:npc_jiang_yan",
+     "text": "Jiang Yan menjelaskan: kegagalan kehidupan pertama, formation darurat, kesempatan eksperimental yang menjadi kenyataan. 'Aku menciptakanmu untuk menemukan jawaban yang tidak bisa kutemukan. Tapi jawabannya bukan mempertahankan, menghancurkan, atau mengorbankan. Jawabannya adalah melepaskan.'",
+     "choices": [
+      {
+       "label": "Aku bukan kau.",
+       "next": "n5",
+       "effects": [
+        {
+         "type": "flag",
+         "key": "flag_i_am_not_you",
+         "value": true
+        }
+       ]
+      }
+     ]
+    },
+    "n5": {
+     "speaker": "npc:npc_jiang_yan",
+     "text": "Jiang Yan terdiam. Lalu, untuk pertama kalinya, ia tersenyum. 'Ya. Kau bukan aku. Dan itulah yang tidak pernah bisa kulakukan — menjadi sesuatu yang baru.'",
+     "next": "n6"
+    },
+    "n6": {
+     "speaker": "player",
+     "text": "Entitas itu menerima. Bukan dengan kata-kata — tapi dengan keheningan yang lebih tua dari formation. Bukan musuh. Bukan korban. Bagian dari sumber. Dan untuk pertama kalinya, sumber itu tidak menuntut apa-apa.",
+     "next": null
+    }
+   }
+  },
+  {
+   "id": "dlg_a07_final_decision",
+   "npc": "npc_mentor",
+   "start": "n1",
+   "nodes": {
+    "n1": {
+     "speaker": "npc:npc_mentor",
+     "text": "Mentor berdiri di hadapanmu dengan pedang yang telah ia genggam sejak kehidupan pertama. 'Kau sudah melihat kebenarannya. Sekarang — apa yang akan kau lakukan tentangnya?'",
+     "next": "n2"
+    },
+    "n2": {
+     "speaker": "npc:npc_mentor",
+     "text": "Mentor meletakkan pedang di depanmu. 'Empat jalan. Pertahankan sistem — Tian Xu selamat, siklus belum berakhir. Hancurkan — cultivation menghilang, manusia bebas. Ubah — hubungan baru, siklus benar-benar berakhir. Korbankan — kau menjadi pengganti formation.'",
+     "next": "n3"
+    },
+    "n3": {
+     "speaker": "npc:npc_mentor",
+     "text": "Mentor menatapmu. 'Tapi kau sudah tahu lebih banyak dari yang pernah aku ketahui. Jadi mungkin ada jalan kelima — yang tidak bisa kulihat. Pilihlah, Chen Xu.'",
+     "next": "n4"
+    },
+    "n4": {
+     "speaker": "npc:npc_mentor",
+     "text": "Keputusan ada di tanganmu. Seluruh perjalananmu — dari mimpi gerbang itu hingga momen ini — bermuara pada satu pilihan.",
+     "choices": [
+      {
+       "label": "Pertahankan. (Preserve) — Dunia diselamatkan, siklus belum berakhir.",
+       "next": "n_preserve",
+       "option": "preserve"
+      },
+      {
+       "label": "Hancurkan. (Destroy) — Cultivation menghilang, manusia bebas.",
+       "next": "n_destroy",
+       "option": "destroy"
+      },
+      {
+       "label": "Ubah. (Transform) — Hubungan baru, siklus berakhir.",
+       "next": "n_transform",
+       "option": "transform"
+      },
+      {
+       "label": "Korbankan. (Sacrifice) — Kau menjadi pengganti formation.",
+       "next": "n_sacrifice",
+       "option": "sacrifice"
+      },
+      {
+       "label": "Melepaskan kendali. — Bukan mempertahankan, menghancurkan, atau mengorbankan. Tapi melepaskan.",
+       "condition": {
+        "flag": {
+         "key": "flag_the_gate_full_truth_known",
+         "value": true
+        },
+        "has_item": "catatan_formation",
+        "relation_min": {
+         "npc": "npc_grandmaster",
+         "value": 2
+        }
+       },
+       "next": "n_second_life",
+       "option": "second_life"
+      }
+     ]
+    },
+    "n_preserve": {
+     "speaker": "npc:npc_mentor",
+     "text": "Kau mempertahankan formation. Tian Xu selamat. Dunia stabil. Tapi di balik ketenangan itu, siklus masih berdenyut — menunggu untuk berulang.",
+     "choices": [
+       {
+        "label": "Aku memilih untuk mempertahankan.",
+        "next": "n_end",
+        "option": "ending_unbroken_heaven",
+        "effects": [
+         {
+          "type": "flag",
+          "key": "ending_unbroken_heaven",
+          "value": true
+         }
+        ]
+       }
+     ]
+    },
+    "n_destroy": {
+     "speaker": "npc:npc_mentor",
+     "text": "Kau menghancurkan formation. Cultivation perlahan menghilang. Entitas kehilangan bentuknya. Dunia memasuki zaman baru — tanpa keajaiban, tapi tanpa ketakutan.",
+     "choices": [
+       {
+        "label": "Aku memilih untuk menghancurkan.",
+        "next": "n_end",
+        "option": "ending_mortal_dawn",
+        "effects": [
+         {
+          "type": "flag",
+          "key": "ending_mortal_dawn",
+          "value": true
+         }
+        ]
+       }
+     ]
+    },
+    "n_transform": {
+     "speaker": "npc:npc_mentor",
+     "text": "Kau mengubah hubungan antara manusia dan sumber. Cultivation tidak dihancurkan — tapi manusia tidak lagi mengeksploitasi. Entitas dibebaskan dari penjara. Siklus benar-benar berakhir.",
+     "choices": [
+       {
+        "label": "Aku memilih untuk mengubah.",
+        "next": "n_end",
+        "option": "ending_new_heaven",
+        "effects": [
+         {
+          "type": "flag",
+          "key": "ending_new_heaven",
+          "value": true
+         }
+        ]
+       }
+     ]
+    },
+    "n_sacrifice": {
+     "speaker": "npc:npc_mentor",
+     "text": "Kau memilih menjadi pengganti formation. Protagonis mengorbankan dirinya. Dunia selamat. Siklus berhenti. Tapi kau kehilangan kehidupan keduamu.",
+     "choices": [
+       {
+        "label": "Aku memilih untuk mengorbankan diri.",
+        "next": "n_end",
+        "option": "ending_nameless_guardian",
+        "effects": [
+         {
+          "type": "flag",
+          "key": "ending_nameless_guardian",
+          "value": true
+         }
+        ]
+       }
+     ]
+    },
+    "n_second_life": {
+     "speaker": "npc:npc_mentor",
+     "text": "Mentor terdiam. Lalu, dengan suara yang hampir tak terdengar: 'Kau menemukan jalan yang tidak pernah kutemukan. Melepaskan. Bukan mempertahankan, menghancurkan, atau mengorbankan — tapi membiarkan sumber menjadi apa adanya.'",
+     "choices": [
+       {
+        "label": "Aku melepaskan kendali.",
+        "next": "n_end_second_life",
+        "option": "ending_second_life",
+        "effects": [
+         {
+          "type": "flag",
+          "key": "ending_second_life",
+          "value": true
+         }
+        ]
+       }
+     ]
+    },
+    "n_end_second_life": {
+     "speaker": "npc:npc_mentor",
+     "text": "Mentor mengangguk. 'Kalau kau bisa mengulang hidupmu... apakah kau akan memilih hal yang sama?' Kau tersenyum. 'Tidak.' Layar menjadi gelap.",
+     "next": null
+    },
+    "n_end": {
+     "speaker": "npc:npc_mentor",
+     "text": "Mentor menatapmu. 'Itulah pilihanmu. Dan dunia akan menanggung akibatnya — baik atau buruk. Pergilah, Chen Xu.'",
+     "next": null
+    }
+   }
+  }
+ ]
+}

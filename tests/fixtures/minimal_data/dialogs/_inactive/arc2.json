@@ -1,0 +1,264 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a02_midterm",
+      "npc": "npc_guru_utama",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Chen Xu. Kau dan kelompokmu — akademi menaruh perhatian pada kalian. Aku juga. Aku melihat kau tidak tidur nyenyak tadi malam.",
+          "choices": [
+            {"label": "Aku baik-baik saja, Guru.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Mimpi, mungkin. Jangan dipendam sendiri — murid yang menyimpan terlalu banyak akan pecah di tengah ujian.",
+          "choices": [
+            {"label": "Aku siap untuk ujian apa pun, Guru.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Ujian tim. Kalian berempat akan diuji sebagai satu kesatuan — dan lawan kalian adalah aku. Jangan berpikir soal menang atau kalah. Pikirkan bagaimana kalian bertarung bersama.",
+          "choices": [
+            {"label": "Kami siap, Guru.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Baik. Tunjukkan padaku apa artinya menjadi sebuah kelompok."
+        }
+      }
+    },
+    {
+      "id": "dlg_a02_decision",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau sudah membaca catatan itu. 'Siklus dimulai lagi.' Tiga kata yang mengubah segalanya.",
+          "choices": [
+            {"label": "Apa maksudnya?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Aku pernah melihat frasa ini di catatan akademi yang... hilang. Ini bukan kali pertama terjadi. Siklus. Seolah sesuatu berulang di tempat ini.",
+          "choices": [
+            {"label": "Kita tidak bisa diam saja.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_gu_han",
+          "text": "Aku dari awal bilang: sesuatu di tempat ini tidak beres. Sekarang kalian melihatnya sendiri — bukan firasat, tapi catatan di tangan kita.",
+          "choices": [
+            {"label": "Jadi apa yang harus kita lakukan?", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Itulah pertanyaannya. Ada tiga jalan di depan kita — dan tidak ada satu pun yang terasa aman. Apa pun yang kita pilih, kita pilih bersama."
+        }
+      }
+    },
+    {
+      "id": "dlg_arc2_branch",
+      "npc": "npc_lin_yue",
+      "start": "n_ask",
+      "nodes": {
+        "n_ask": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Bukti ini mengubah segalanya. Bagaimana kita meresponsnya?",
+          "choices": [
+            {
+              "label": "Serahkan ke Guru — percaya pada sistem.",
+              "option": "obey",
+              "effects": [
+                {"type": "flag", "key": "branch_arc2_obey", "value": true},
+                {"type": "relation", "npc": "npc_guru_utama", "value": 5},
+                {"type": "reputation", "faksi": "tianxu", "value": 2}
+              ],
+              "next": "n_obey"
+            },
+            {
+              "label": "Simpan sebagian, selidiki sendiri.",
+              "option": "investigate",
+              "effects": [
+                {"type": "flag", "key": "branch_arc2_investigate", "value": true},
+                {"type": "flag", "key": "flag_archive_suspicious", "value": true}
+              ],
+              "next": "n_investigate"
+            },
+            {
+              "label": "Konfrontasi terbuka di depan forum akademi.",
+              "option": "confront",
+              "effects": [
+                {"type": "flag", "key": "branch_arc2_confront", "value": true},
+                {"type": "relation", "npc": "npc_guru_utama", "value": -5},
+                {"type": "reputation", "faksi": "tianxu", "value": -5}
+              ],
+              "next": "n_confront"
+            }
+          ]
+        },
+        "n_obey": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Kau melakukan hal yang benar, Chen Xu. Kejujuran kelompokmu tidak akan kami lupakan. Akademi akan menangani ini."
+        },
+        "n_investigate": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Aku bisa menelusuri catatan tanpa diketahui. Tapi kita harus sangat hati-hati — kalau akademi tahu kita menyimpan bukti ini, semuanya berubah."
+        },
+        "n_confront": {
+          "speaker": "player",
+          "text": "(Forum hening. Beberapa murid menoleh. Guru Utama menatapmu lama — kau tahu harga dari kata-kata yang baru saja kau ucapkan.)"
+        }
+      }
+    },
+    {
+      "id": "dlg_a02_return",
+      "npc": "npc_guru_utama",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Kembali dengan selamat. Laporan ekspedisi kalian?",
+          "choices": [
+            {
+              "label": "Kami menemukan artefak ini di gua tersembunyi. (Patuh — serahkan laporan lengkap.)",
+              "condition": {"flag": {"key": "branch_arc2_obey", "value": true}},
+              "next": "n_obey"
+            },
+            {
+              "label": "Kami menemukan artefak ini. Catatan lengkapnya akan kami susun. (Simpan sebagian informasi.)",
+              "condition": {"flag": {"key": "branch_arc2_investigate", "value": true}},
+              "next": "n_investigate"
+            },
+            {
+              "label": "Artefak ini, Guru. Bersama catatan yang membuktikan akademi menyembunyikan sesuatu. (Konfrontasi.)",
+              "condition": {"flag": {"key": "branch_arc2_confront", "value": true}},
+              "next": "n_confront"
+            }
+          ]
+        },
+        "n_obey": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Artefak... Aku akan mempercayakan ini pada ahli yang tepat. Kalian telah bertindak sebagaimana murid seharusnya. Kepercayaan ini tidak akan sia-sia.",
+          "choices": [
+            {"label": "Terima kasih, Guru.", "next": "n_end"}
+          ]
+        },
+        "n_investigate": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Artefak ini... simpan dulu. Kita akan bicarakan lebih lanjut — ada hal-hal di akademi ini yang lebih rumit dari yang terlihat. Jangan ceritakan ini ke sembarang orang.",
+          "choices": [
+            {"label": "Aku mengerti, Guru.", "next": "n_end"}
+          ]
+        },
+        "n_confront": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Kau memilih untuk mempermalukan akademi di depan forum. Konsekuensinya akan kau rasakan — tetapi aku akan mencatat: keberanianmu tidak sepenuhnya salah. Simpan artefak itu. Kita belum selesai bicara.",
+          "choices": [
+            {"label": "Baik.", "next": "n_end"}
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Pergilah. Istirahat. Besok, dunia yang lebih besar menunggumu."
+        }
+      }
+    },
+    {
+      "id": "dlg_a02_patrol_offer",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "condition": {"flag": {"key": "branch_arc2_investigate", "value": true}},
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau memilih menyelidiki sendiri — bagus. Aku sudah mencatat beberapa hal dari catatan yang hilang itu. Bantu aku diam-diam: bersihkan sisa gangguan spiritual di wilayah luar. Dua makhluk, lalu kembali padaku.",
+          "choices": [
+            {
+              "label": "Aku bantu. Diam-diam.",
+              "effects": [{"type": "start_quest", "quest": "q_a02_side_patrol"}],
+              "next": "n2"
+            },
+            {
+              "label": "Nanti saja.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Hati-hati. Semakin sedikit orang yang tahu, semakin aman kita semua."
+        }
+      }
+    },
+    {
+      "id": "dlg_a02_patrol_report",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Sudah selesai?",
+          "choices": [
+            {"label": "Wilayah luar lebih aman sekarang.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Bagus. Dua gangguan lebih sedikit — dan tidak ada yang perlu tahu. Aku akan mencatatnya sebagai bagian dari investigasi kita, pelan-pelan."
+        }
+      }
+    },
+    {
+      "id": "dlg_a02_mineral_offer",
+      "npc": "npc_guru_utama",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Akademi butuh mineral qi untuk ramuan latihan. Bisa kau ambilkan beberapa dari wilayah luar? Biasanya bisa dicari di sekitar bebatuan.",
+          "choices": [
+            {
+              "label": "Tentu, aku cari.",
+              "effects": [{"type": "start_quest", "quest": "q_a02_side_mineral"}],
+              "next": "n2"
+            },
+            {
+              "label": "Nanti saja.",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Terima kasih. Hati-hati di sana."
+        }
+      }
+    },
+    {
+      "id": "dlg_a02_mineral_report",
+      "npc": "npc_guru_utama",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Mineralnya?",
+          "choices": [
+            {"label": "Ini dia.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_guru_utama",
+          "text": "Sempurna. Ramuan malam ini akan membuat kalian berlatih lebih keras besok — dan aku tidak akan minta maaf untuk itu."
+        }
+      }
+    }
+  ]
+}

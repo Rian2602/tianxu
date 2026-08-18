@@ -33,15 +33,33 @@ from src.loader import DataRegistry  # noqa: E402
 
 STATIC_DIR = ROOT / "web" / "static"
 
-registry = DataRegistry()
+registry = None  # lazy init — tidak crash saat import tanpa data/
 session: GameSession | None = None  # sesi aktif (single-player lokal)
 _session_lock = threading.Lock()  # K4: defense-in-depth — satu mutasi sesi per waktu
 
 
+def _ensure_registry() -> None:
+    global registry
+    if registry is None:
+        registry = DataRegistry()
+
+
 def _context() -> dict:
     """Konteks UI yang tidak ada di view engine: NPC di lokasi, teknik akademi & kurikulum."""
-    if session is None:
+    web_cfg = (registry.config.get("web") if registry else None) or {}
+    _meta = {
+        # aset visual data-driven (config.web) — tema story baru bisa
+        # menunjuk lagu/avatar/judul sendiri; fallback ke default xianxia
+        "audio": web_cfg.get("audio", "/static/assets/audio/dawn-over-tian-xu.mp3"),
+        "avatar": web_cfg.get("avatar", "/static/assets/img/avatar.jpg"),
+        "title": web_cfg.get("title", "天缘灵"),
+        "subtitle": web_cfg.get("subtitle", "TIAN XU: SECOND LIFE"),
+        "tagline": web_cfg.get("tagline", "天缘灵 · Tian Xu: Second Life"),
+        "panel": web_cfg.get("panel", "Tianyuan Ling"),
+    }
+    if registry is None or session is None:
         return {
+            "meta": _meta,
             "npcs": [],
             "techniques": [],
             "merchant_shop": None,
@@ -49,10 +67,12 @@ def _context() -> dict:
             "curriculum": [],
             "academy_curriculum": [],
             "relations": {},
-            "npc_names": {n["id"]: n["name"] for n in registry.npcs},
-            "loc_names": {l["id"]: l["name"] for l in registry.locations},
-            "item_names": {i["id"]: i["name"] for i in registry.items.values()},
+            "npc_names": {n["id"]: n["name"] for n in (registry.npcs if registry else [])},
+            "loc_names": {l["id"]: l["name"] for l in (registry.locations if registry else [])},
+            "item_names": {i["id"]: i["name"] for i in ((registry.items.values()) if registry else [])},
             "academy": None,
+            "hunts": [],
+            "character_status": [],
         }
     loc = session.state.location
     npcs = [
@@ -104,16 +124,14 @@ def _context() -> dict:
                 "merchant_id": n["id"],
                 "merchant_name": n["name"],
                 "buy": [
-                    {"item": s["item"], "name": i["name"],
-                     "price": s["price"], "type": i.get("type", "")}
+                    {"item": s["item"], "name": (registry.item(s["item"]) or {}).get("name", s["item"]),
+                     "price": s["price"], "type": (registry.item(s["item"]) or {}).get("type", "")}
                     for s in n["shop"].get("buy", [])
-                    for i in [registry.item(s["item"])]
                 ],
                 "sell": [
-                    {"item": s["item"], "name": i["name"],
-                     "price": s["price"], "type": i.get("type", "")}
+                    {"item": s["item"], "name": (registry.item(s["item"]) or {}).get("name", s["item"]),
+                     "price": s["price"], "type": (registry.item(s["item"]) or {}).get("type", "")}
                     for s in n["shop"].get("sell", [])
-                    for i in [registry.item(s["item"])]
                 ],
             }
             break
@@ -122,10 +140,13 @@ def _context() -> dict:
         {
             "id": r["id"],
             "result": r["result"],
-            "result_name": registry.item(r["result"])["name"],
+            # F1.2: resep dengan item tak dikenal (referensi putus dari save lama)
+            # → fallback id, bukan 500
+            "result_name": (registry.item(r["result"]) or {}).get("name", r["result"]),
             "count": r.get("count", 1),
             "ingredients": [
-                {"item": ing["item"], "name": registry.item(ing["item"])["name"], "count": ing["count"]}
+                {"item": ing["item"], "name": (registry.item(ing["item"]) or {}).get("name", ing["item"]),
+                 "count": ing["count"]}
                 for ing in r.get("ingredients", [])
             ],
             "description": r.get("description", ""),
@@ -134,6 +155,7 @@ def _context() -> dict:
     ]
 
     return {
+        "meta": _meta,
         "npcs": npcs,
         "merchant_shop": merchant_shop,
         "recipes": recipes,
@@ -150,6 +172,23 @@ def _context() -> dict:
         "academy": academy,
         "loc_names": {l["id"]: l["name"] for l in registry.locations},
         "item_names": {i["id"]: i["name"] for i in registry.items.values()},
+        # defense: id/location opsional di data → fallback aman (validator
+        # mewajibkannya, tapi web tidak boleh crash pada data lama/parsial)
+        "hunts": [{"id": h.get("id", "?"), "name": h.get("name", h.get("id", "?")),
+                    "location": h.get("location", ""),
+                    # label cari data-driven (nama item hasil cari, mis. herba)
+                    "search_item_name": (registry.item(h["search_item"]).get("name", "")
+                                          if h.get("search_item") else "")}
+                   for h in registry.hunts if h.get("location") == loc],
+        # status karakter (docs 04: Family Crisis status per anggota) —
+        # data-driven: flag `state_{npc}_status` (npc id tanpa prefix `npc_`,
+        # mis. npc_lin_yue → state_lin_yue_status) → nilai (loyal/separated/…)
+        "character_status": [
+            {"npc": n["id"], "name": n["name"],
+             "status": session.state.flags[f"state_{n['id'].removeprefix('npc_')}_status"]}
+            for n in registry.npcs
+            if session.state.flags.get(f"state_{n['id'].removeprefix('npc_')}_status")
+        ],
     }
 
 
@@ -160,12 +199,12 @@ def _payload() -> dict:
 
 def _tianyuan_payload() -> dict:
     """Panel Tianyuan Ling: ingatan terbuka (dengan teks) + log sistem."""
-    if not session:
+    if not session or not registry:
         return {
             "mission": {"main": None, "side_quests": []},
             "memories": [],
             "unlocked_count": 0,
-            "total_count": len(registry.memories),
+            "total_count": len(registry.memories) if registry else 0,
             "system_log": [],
         }
 
@@ -187,14 +226,19 @@ def _tianyuan_payload() -> dict:
     }
 
     memories = []
+    # memory state v3 = list of dicts {id, reliability} (bukan string) — cek
+    # id-nya, bukan membership list (mid in state.memories selalu False utk dict)
+    owned = {m["id"] if isinstance(m, dict) else m for m in session.state.memories}
     for mem in registry.memories:
         mid = mem["id"]
-        unlocked = mid in session.state.memories
+        unlocked = mid in owned
         memories.append({
             "id": mid,
             "title": mem["title"] if unlocked else "???",
             "text": mem.get("text", "") if unlocked else None,
             "unlocked": unlocked,
+            # docs 06: keandalan ingatan (kurva RENDAH→TINGGI) — dari data
+            "reliability": mem.get("reliability", "unknown"),
         })
 
     system_log = [e["text"] for e in session.state.log if e["type"] == "system"]
@@ -288,9 +332,11 @@ class Handler(BaseHTTPRequestHandler):
         body = self._read_body()
         with _session_lock:
             if self.path == "/api/new":
+                _ensure_registry()
                 session = GameSession.new(registry)
                 self._send_json({"ok": True, **_payload()})
             elif self.path == "/api/load":
+                _ensure_registry()
                 name = body.get("name", "save1")
                 try:
                     session = GameSession.load(registry, name)
@@ -300,7 +346,7 @@ class Handler(BaseHTTPRequestHandler):
                 except SaveError as e:
                     self._send_json({"ok": False, "error": f"Save '{name}' rusak: {e}"}, 400)
             elif self.path == "/api/action":
-                if session is None:
+                if session is None or registry is None:
                     self._send_json({"ok": False, "error": "Belum ada permainan. Mulai baru atau lanjut save."}, 400)
                     return
                 action = body.get("action")
@@ -326,7 +372,18 @@ class Handler(BaseHTTPRequestHandler):
 def main() -> None:
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"天缘灵 Tian Xu: Second Life — http://127.0.0.1:{port}")
+    # banner data-driven (config.web.tagline) — aman bila data/ kosong
+    try:
+        _ensure_registry()
+        tagline = (registry.config.get("web") or {}).get(
+            "tagline", "天缘灵 Tian Xu: Second Life")
+    except Exception as exc:
+        tagline = "天缘灵 Tian Xu: Second Life"
+        import traceback
+        print(f"[PERINGATAN] Gagal memuat data/: {exc}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+        print("[DAMPAK] Server berjalan tanpa data game — beberapa endpoint mungkin gagal.", file=sys.stderr)
+    print(f"{tagline} — http://127.0.0.1:{port}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

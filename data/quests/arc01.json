@@ -1,0 +1,127 @@
+{
+  "quests": [
+    {
+      "id": "quest_a01_c01_001",
+      "kind": "main",
+      "title": "Kedatangan",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_aptitude_examiner",
+        "target": 1,
+        "hint": "Bicaralah dengan pemeriksa aptitude di gerbang."
+      },
+      "on_complete": {
+        "memory_unlock": "memory_a01_m01",
+        "effects": [
+          {"type": "flag", "key": "flag_dream_a01_01_seen", "value": true}
+        ],
+        "rewards": {"exp": 5},
+        "system_msg": "Kau mengikuti pemeriksaan aptitude — hasilnya biasa saja, tidak menonjol."
+      },
+      "next": [{"quest": "quest_a01_c01_002"}]
+    },
+    {
+      "id": "quest_a01_c01_002",
+      "kind": "main",
+      "title": "Registrasi",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_aptitude_examiner",
+        "target": 1,
+        "hint": "Selesaikan registrasi resmi sebagai murid."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "state_murid_status", "value": "registered"}
+        ],
+        "rewards": {"gold": 10},
+        "system_msg": "Kau resmi menjadi murid Tian Xu."
+      },
+      "next": [{"quest": "quest_a01_c02_003"}]
+    },
+    {
+      "id": "quest_a01_c02_003",
+      "kind": "main",
+      "title": "Pelajaran Pertama",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Ikuti pelajaran pertama di ruang latihan dan kenali calon temanmu."
+      },
+      "on_complete": {
+        "memory_unlock": "memory_a01_m02",
+        "effects": [
+          {"type": "relation", "npc": "npc_lin_yue", "value": 2},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 1},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 1},
+          {"type": "relation", "npc": "npc_gu_han", "value": 1}
+        ],
+        "rewards": {"exp": 8},
+        "system_msg": "Gerakan dasar terasa anehnya familiar — seolah tanganmu pernah melakukannya."
+      },
+      "next": [{"quest": "quest_a01_c03_004"}]
+    },
+    {
+      "id": "quest_a01_c03_004",
+      "kind": "main",
+      "title": "Pilihan Jalan",
+      "objective": {
+        "kind": "choose",
+        "hint": "Pilih pavilion yang sesuai dengan cara hidupmu. Pilihan ini permanen.",
+        "options": [
+          {"value": "pavilion_wuxin", "label": "Pavilion Wuxin — lepaskan keterikatan", "set": {"academy": "pavilion_wuxin"}},
+          {"value": "pavilion_jianxin", "label": "Pavilion Jianxin — disiplin dan ketepatan", "set": {"academy": "pavilion_jianxin"}},
+          {"value": "pavilion_yanzhi", "label": "Pavilion Yanzhi — pahami prinsip", "set": {"academy": "pavilion_yanzhi"}},
+          {"value": "pavilion_liuguang", "label": "Pavilion Liuguang — beradaptasi", "set": {"academy": "pavilion_liuguang"}}
+        ]
+      },
+      "on_complete": {
+        "rewards": {"exp": 6},
+        "system_msg": "Pavilion dipilih. Jalanmu kini terbentuk."
+      },
+      "next": [{"quest": "quest_a01_c04_005"}]
+    },
+    {
+      "id": "quest_a01_c04_005",
+      "kind": "main",
+      "title": "Percobaan Pertama",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_outer_region",
+        "hint": "Pergilah ke wilayah formation tua di luar tembok akademi."
+      },
+      "on_complete": {
+        "memory_unlock": "memory_a01_m03",
+        "effects": [
+          {"type": "flag", "key": "flag_formation_touched", "value": true},
+          {"type": "relation", "npc": "npc_lin_yue", "value": 1},
+          {"type": "relation", "npc": "npc_gu_han", "value": 1}
+        ],
+        "rewards": {"exp": 12},
+        "system_msg": "Saat kau menyentuh formasi tua, kilasan citra menyerbu: formasi yang sama, hancur."
+      },
+      "next": [{"quest": "quest_a01_c04_006"}]
+    },
+    {
+      "id": "quest_a01_c04_006",
+      "kind": "main",
+      "title": "Insiden Malam",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_protagonist_room",
+        "hint": "Kembalilah ke kamarmu dan beristirahat."
+      },
+      "on_complete": {
+        "memory_unlock": "memory_a01_m04",
+        "effects": [
+          {"type": "flag", "key": "flag_memory_awareness", "value": true},
+          {"type": "item", "id": "simbol_kuno", "count": 1}
+        ],
+        "rewards": {"exp": 15},
+        "system_msg": "Kau terbangun dari mimpi. Di meja kamarmu, sebuah simbol kuno — dan tanganmu tahu cara menggambarnya."
+      },
+      "next": [{"quest": "quest_a02_c01_001"}]
+    }
+  ]
+}

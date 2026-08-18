@@ -1,0 +1,12 @@
+{
+  "companions": [
+    {
+      "id": "companion_serigala",
+      "name": "Serigala",
+      "base_hp": 20,
+      "base_attack": 4,
+      "base_defense": 2,
+      "base_speed": 5
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "starting": {
+    "player": {
+      "name": "Chen Xu",
+      "hp": 50,
+      "qi": 30,
+      "realm": "realm_awal",
+      "realm_level": 1,
+      "gold": 50,
+      "roots": "akar_biasa",
+      "equipment": {"weapon": null}
+    },
+    "location": "loc_gerbang",
+    "current_quest": "q_min_intro",
+    "inventory": [
+      {"id": "pil_qi", "count": 2},
+      {"id": "pedang_kayu", "count": 1}
+    ],
+    "flags": {}
+  },
+  "time": {
+    "start_day": 1,
+    "start_hour": 8,
+    "month_length_days": 30
+  },
+  "academies": [
+    {
+      "id": "akademi_bambu",
+      "name": "Akademi Bambu",
+      "curriculum": ["teknik_dasar"],
+      "companion": "companion_serigala",
+      "starter_kit": [{"id": "pil_qi", "count": 1}]
+    },
+    {
+      "id": "akademi_batu",
+      "name": "Akademi Batu",
+      "curriculum": ["teknik_dasar"]
+    },
+    {
+      "id": "akademi_serigala",
+      "name": "Akademi Serigala",
+      "curriculum": ["teknik_dasar"]
+    }
+  ],
+  "companion": {
+    "hp_per_level": 12,
+    "attack_per_level": 2,
+    "defense_per_level": 1,
+    "speed_per_level": 0.5
+  },
+  "cultivation": {
+    "spar_win_exp": 5,
+    "spar_loss_exp": 2,
+    "grounding_max_hours_per_day": 8,
+    "grounding_exp_per_hour": 4
+  },
+  "battle": {
+    "statuses": {
+      "racun": {
+        "name": "Racun",
+        "kind": "dot",
+        "power": 2,
+        "duration": 3
+      }
+    }
+  },
+  "world": {
+    "hunts": [
+      {
+        "id": "hunt_hutan",
+        "location": "loc_hutan",
+        "pool": ["musuh_hutan"],
+        "search_item": "herba_qi"
+      }
+    ],
+    "monster_respawn_hours": 1
+  },
+  "morality": {
+    "min": -100,
+    "max": 100
+  },
+  "arcs": [],
+  "roots": {
+    "tiers": [
+      {"id": "akar_biasa", "name": "Akar Biasa", "exp_multiplier": 1.0}
+    ]
+  }
+}

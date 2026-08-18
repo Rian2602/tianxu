@@ -10,6 +10,8 @@ Invariant:
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field as dc_field
+
 from ..loader import DataRegistry
 from .cultivation import gain_exp, gain_grind_exp
 from .effects import apply as apply_effects
@@ -18,6 +20,30 @@ from .memory import unlock as unlock_memory
 from .state import GameState
 
 OBJECTIVE_KINDS = {"talk", "defeat", "gather", "reach", "choose", "spar", "advance_time"}
+
+# Dispatch table — validate.py derives OBJECTIVE_KINDS from this.
+# ponytail: keys-only dict, actual handlers are in _check_objective.
+@dataclass
+class ObjectiveSpec:
+    text: str = ""
+    on_dialog_end: str = ""
+    required_fields: set = dc_field(default_factory=set)
+
+OBJECTIVE_HANDLERS: dict[str, ObjectiveSpec] = {
+    "talk": ObjectiveSpec(text="Bicara dengan NPC", on_dialog_end="Selesai bicara", required_fields={"npc"}),
+    "defeat": ObjectiveSpec(text="Kalahkan musuh", required_fields={"target"}),
+    "gather": ObjectiveSpec(text="Kumpulkan item", required_fields={"item", "target"}),
+    "reach": ObjectiveSpec(text="Capai lokasi", required_fields={"location"}),
+    "choose": ObjectiveSpec(text="Pilih opsi", required_fields={"options"}),
+    "spar": ObjectiveSpec(text="Sparing dengan NPC", on_dialog_end="Selesai sparing", required_fields={"npc"}),
+    "advance_time": ObjectiveSpec(text="Tunggu waktu", required_fields={"hour"}),
+}
+
+# Field yang sah di `options[].set` untuk objektif `choose`.
+CHOOSE_SET_FIELDS = {"academy": "str", "name": "str", "roots": "str", "morality": "int", "gold": "int"}
+
+# Jenis objektif yang TIDAK didukung untuk side quest (butuh UI mode main-only).
+SIDE_UNSUPPORTED = frozenset({"choose"})
 
 
 class QuestEngine:
@@ -136,45 +162,97 @@ class QuestEngine:
                 prog["talk"] = prog.get("talk", 0) + 1
                 if prog.get("defeated", 0) >= obj.get("target", 1):
                     self._complete_side(qid)
-        # gather dengan `report_to`: saat lapor ke pemberi, ambil item dari inventori
-        # lalu selesaikan — satu set herba hanya untuk SATU quest (tidak sekaligus)
+        # main quest gather dengan `report_to`: selesai saat lapor ke pemberi
+        # (pola sama seperti main defeat — adaptif terhadap quest utama kind apa pun).
+        # Item BENAR-BENAR diserahkan (dikurangi dari inventori) — konsisten dengan
+        # log "Menyerahkan" dan komentar desain "ambil item dari inventori".
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "gather" and q.get("objective", {}).get("report_to") == npc_id:
+            obj = q["objective"]
+            iid = obj.get("item", "")
+            target = obj.get("target", 1)
+            if self.state.inventory.get(iid, 0) >= target:
+                self._handover_item(iid, target)
+                self._complete_main(q["id"])
+        # side quest talk: selesai saat dialog dengan NPC yang benar berakhir
         for qid in list(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             obj = sq.get("objective", {})
-            if obj.get("report_to") == npc_id:
-                if obj.get("kind") == "gather":
-                    iid = obj.get("item", "")
-                    target = obj.get("target", 1)
-                    have = self.state.inventory.get(iid, 0)
-                    if have >= target:
-                        add_log(self.state, "system", f"Menyerahkan {target} × {self.reg.item(iid)['name'] if self.reg.item(iid) else iid}.")
-                        self._complete_side(qid)
+            if sq.get("kind") == "side" and obj.get("kind") == "talk" and obj.get("npc") == npc_id:
+                prog = self.state.active_side_quests[qid]
+                prog["talk"] = prog.get("talk", 0) + 1
+                if prog["talk"] >= obj.get("target", 1):
+                    self._complete_side(qid)
+        # gather side dengan `report_to`: saat lapor ke pemberi, ambil item dari
+        # inventori lalu selesaikan — satu set item hanya untuk SATU quest
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if sq.get("kind") == "side" and obj.get("report_to") == npc_id and obj.get("kind") == "gather":
+                iid = obj.get("item", "")
+                target = obj.get("target", 1)
+                if self.state.inventory.get(iid, 0) >= target:
+                    self._handover_item(iid, target)
+                    self._complete_side(qid)
+
+    def _handover_item(self, iid: str, count: int) -> None:
+        """Serahkan item ke pemberi quest — kurangi dari inventori (hapus bila habis)
+        + log narasi. Dipakai handler gather ber-`report_to` (main & side)."""
+        self.state.inventory[iid] -= count
+        if self.state.inventory[iid] <= 0:
+            del self.state.inventory[iid]
+        it = self.reg.item(iid)
+        nama = it["name"] if it else iid
+        add_log(self.state, "system", f"Menyerahkan {count} × {nama}.")
 
     def notify_spar_won(self, npc_id: str) -> None:
         """Objektif `spar` selesai saat pemain MENANG battle melawan NPC itu."""
         q = self.current_main()
         if q and q.get("objective", {}).get("kind") == "spar" and q.get("objective", {}).get("npc") == npc_id:
             self._complete_main(q["id"])
+        # F3 (adaptifitas): side quest spar — selesai saat menang melawan NPC yang
+        # benar. Sebelumnya softlock diam-diam: validator mengizinkan kind spar utk
+        # side, tapi engine tidak pernah menyelesaikannya.
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if sq.get("kind") == "side" and obj.get("kind") == "spar" and obj.get("npc") == npc_id:
+                self._complete_side(qid)
 
     def notify_spar_loss(self, npc_id: str) -> None:
         """G4a: kalah sparring tetap menyelesaikan objektif `spar` (dialog berbeda,
-        sesuai STORY_FASE1 #19) — tanpa game over permanen; penalti KO tetap berlaku."""
+        sesuai STORY_FASE1 #19) — tanpa game over permanen; penalti KO tetap berlaku.
+        Berlaku untuk quest utama ATAU side (konsisten)."""
         q = self.current_main()
         if q and q.get("objective", {}).get("kind") == "spar" and q.get("objective", {}).get("npc") == npc_id:
             self.state.flags["spar_kalah"] = True
             self._complete_main(q["id"])
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = sq.get("objective", {})
+            if sq.get("kind") == "side" and obj.get("kind") == "spar" and obj.get("npc") == npc_id:
+                self._complete_side(qid)
 
     def notify_move(self) -> None:
         q = self.current_main()
-        if not q or q.get("objective", {}).get("kind") != "reach":
-            return
-        obj = q["objective"]
-        if obj.get("location") != self.state.location:
-            return
-        tw = obj.get("time_window")
-        if tw and not self._in_window(tw):
-            return
-        self._complete_main(q["id"])
+        if q and q.get("objective", {}).get("kind") == "reach":
+            obj = q["objective"]
+            if obj.get("location") == self.state.location:
+                tw = obj.get("time_window")
+                if not tw or self._in_window(tw):
+                    self._complete_main(q["id"])
+        # R1b: side quest reach selesai saat pemain tiba di lokasi target
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = (sq or {}).get("objective", {})
+            if sq.get("kind") != "side" or obj.get("kind") != "reach":
+                continue
+            if obj.get("location") != self.state.location:
+                continue
+            tw = obj.get("time_window")
+            if tw and not self._in_window(tw):
+                continue
+            self._complete_side(qid)
 
     def notify_battle_won(self, defeated_enemy_ids: list[str]) -> None:
         """Pembunuhan musuh (berburu) — progres objektif defeat.
@@ -199,8 +277,9 @@ class QuestEngine:
             obj = sq.get("objective", {})
             if obj.get("kind") != "defeat":
                 continue
+            # BUG-9: tanpa `enemies` → musuh apa pun memenuhi (handler `not allowed or ...`)
             allowed = obj.get("enemies", [])
-            killed = [e for e in defeated_enemy_ids if e in allowed]
+            killed = [e for e in defeated_enemy_ids if not allowed or e in allowed]
             if killed:
                 prog = self.state.active_side_quests[qid]
                 prog["defeated"] = prog.get("defeated", 0) + len(killed)
@@ -211,11 +290,20 @@ class QuestEngine:
     def notify_gather(self) -> None:
         """Kumpul item — quest gather TANPA `report_to` selesai otomatis saat cukup;
         quest dengan `report_to` menunggu lapor ke pemberi (pola q_side_berburu),
-        sehingga dua quest herba tidak "memakan" satu set item yang sama sekaligus."""
+        sehingga dua quest tidak "memakan" satu set item yang sama sekaligus.
+
+        Main quest gather TIDAK perlu tercatat di active_side_quests — dibaca
+        langsung dari current_main() (adaptif: quest utama kind apa pun didukung)."""
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "gather" and not q.get("objective", {}).get("report_to"):
+            obj = q["objective"]
+            have = self.state.inventory.get(obj.get("item", ""), 0)
+            if have >= obj.get("target", 1):
+                self._complete_main(q["id"])
         for qid in list(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             obj = sq.get("objective", {})
-            if obj.get("kind") == "gather" and not obj.get("report_to"):
+            if sq.get("kind") == "side" and obj.get("kind") == "gather" and not obj.get("report_to"):
                 have = self.state.inventory.get(obj.get("item", ""), 0)
                 if have >= obj.get("target", 1):
                     self._complete_side(qid)
@@ -231,24 +319,34 @@ class QuestEngine:
     # ---------- lanjutkan DAG ----------
 
     def resolve_choose(self, option: str) -> None:
-        """Objektif `choose` (mis. pilih akademi) — set nilai lalu selesaikan."""
+        """Objektif `choose` (mis. pilih akademi) — tulis field `set` lalu selesaikan.
+
+        F2.2b: `options[].set` menulis field state pemain (closed-set
+        CHOOSE_SET_FIELDS, assign bukan tambah). Field `academy` inti — grant
+        starter kit & companion otomatis dari config.academies setelah ditulis.
+        Opsi tanpa `set` = pilihan naratif (quest selesai tanpa perubahan state)."""
         q = self.current_main()
         if not q or q.get("objective", {}).get("kind") != "choose":
             return
         obj = q["objective"]
-        matched = False
-        if obj.get("options"):
-            for o in obj["options"]:
-                if o.get("value") == option:
-                    self.state.player.academy = option
-                    matched = True
-                    break
-        if matched:
-            self._grant_companion(option)
-            self._grant_starter_kit(option)
-            self._complete_main(q["id"])
-        else:
-            add_log(self.state, "system", "Pilihan tidak valid.")
+        o = next((o for o in obj.get("options", []) if o.get("value") == option), None)
+        if o is None:
+            add_log(self.state, "system", f"Pilihan tidak valid: '{option}'.")
+            return
+        oset = o.get("set") or {}
+        if "academy" in oset:
+            self.state.player.academy = oset["academy"]
+        if "name" in oset:
+            self.state.player.name = oset["name"]
+        if "roots" in oset:
+            self.state.player.roots = oset["roots"]
+        if "morality" in oset:
+            self.state.player.morality = int(oset["morality"])
+        if "gold" in oset:
+            self.state.player.gold = int(oset["gold"])
+        self._grant_companion(self.state.player.academy)
+        self._grant_starter_kit(self.state.player.academy)
+        self._complete_main(q["id"])
 
     def _grant_starter_kit(self, academy: str) -> None:
         """Akademi dengan field `starter_kit` di config (data-driven) memberi perlengkapan pemula."""
@@ -286,31 +384,44 @@ class QuestEngine:
                 break
         if not cid:
             return
-        comp = next((c for c in self.reg.companions if c["id"] == cid), None)
+        comp = next((c for c in self.reg.companions if c.get("id") == cid), None)
         if not comp:
             return
         scale = self.reg.config.get("companion", {})
-        hp_max = int(comp["base_hp"]) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
+        hp_max = int(comp.get("base_hp", 10)) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
         self.state.companion = {"id": cid, "hp": hp_max, "active": True}
         add_log(self.state, "narration", f"{comp['name']} mendekat dan menempel padamu — binatang roh akademimu.")
 
     def advance_time_target_met(self) -> None:
-        q = self.current_main()
-        if not q or q.get("objective", {}).get("kind") != "advance_time":
-            return
-        obj = q["objective"]
-        qid = q["id"]
-        prog = self.state.active_side_quests.get(qid)
-        if prog is None:
-            self._note_main_start(qid)
-            prog = self.state.active_side_quests[qid]
-        # A5: bandingkan waktu ABSOLUT (day*24+hour), bukan `hour >= target` terpisah —
-        # overshoot (melewati target) otomatis memenuhi; tanpa ini pemain yang menunggu
-        # terlalu lama malah molor hampir satu hari penuh.
         now_abs = self.state.day * 24 + self.state.hour
-        target_abs = (prog["start_day"] + obj.get("day_offset", 0)) * 24 + obj.get("hour", 0)
-        if now_abs >= target_abs:
-            self._complete_main(qid)
+        # quest utama
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "advance_time":
+            obj = q["objective"]
+            qid = q["id"]
+            prog = self.state.active_side_quests.get(qid)
+            if prog is None:
+                self._note_main_start(qid)
+                prog = self.state.active_side_quests[qid]
+            # A5: bandingkan waktu ABSOLUT (day*24+hour), bukan `hour >= target` terpisah —
+            # overshoot (melewati target) otomatis memenuhi; tanpa ini pemain yang menunggu
+            # terlalu lama malah molor hampir satu hari penuh.
+            target_abs = (prog["start_day"] + obj.get("day_offset", 0)) * 24 + obj.get("hour", 0)
+            if now_abs >= target_abs:
+                self._complete_main(qid)
+        # R1b: side quest advance_time selesai saat waktu absolut melewati target
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = (sq or {}).get("objective", {})
+            if sq.get("kind") != "side" or obj.get("kind") != "advance_time":
+                continue
+            prog = self.state.active_side_quests[qid]
+            if "start_day" not in prog:  # save lama tanpa start → anggap mulai sekarang
+                prog["start_day"] = self.state.day
+                prog["start_hour"] = self.state.hour
+            target_abs = (prog["start_day"] + obj.get("day_offset", 0)) * 24 + obj.get("hour", 0)
+            if now_abs >= target_abs:
+                self._complete_side(qid)
 
     def _complete_main(self, qid: str) -> None:
         if self.state.current_quest != qid:
@@ -339,9 +450,12 @@ class QuestEngine:
             self.state.current_quest = nexts[0]["quest"]
             self._note_main_start(self.state.current_quest)
             return
-        # percabangan: minta dialog pilihan; opsi = cabang
+        # percabangan: minta dialog pilihan; opsi = cabang.
+        # branch_quest dicatat eksplisit (bukti, bukan pencarian mundur) —
+        # `select_branch` memakainya; fallback pencarian hanya utk save lama.
         cid = nexts[0].get("choice_id")
         self.state.branch_pending = cid
+        self.state.branch_quest = q["id"]
 
     def _note_main_start(self, qid: str) -> None:
         """Catat hari/jam quest utama mulai aktif (untuk objektif advance_time)."""
@@ -351,22 +465,31 @@ class QuestEngine:
         }
 
     def select_branch(self, option: str) -> None:
-        """Setelah dialog percabangan selesai — pilih cabang berdasarkan opsi."""
-        q = None
-        for qid in reversed(self.state.completed_quests):
-            candidate = self.reg.quest(qid)
-            if candidate and candidate.get("kind") == "main" and candidate.get("next"):
-                q = candidate
-                break
+        """Setelah dialog percabangan selesai — pilih cabang berdasarkan opsi.
+
+        Quest pemicu diambil dari `state.branch_quest` (bukti eksplisit).
+        Fallback: pencarian mundur di completed_quests — HANYA untuk save lama
+        (sebelum field branch_quest ada)."""
+        qid = self.state.branch_quest
+        q = self.reg.quest(qid) if qid else None
         if not q:
+            for qid2 in reversed(self.state.completed_quests):
+                candidate = self.reg.quest(qid2)
+                if candidate and candidate.get("kind") == "main" and candidate.get("next"):
+                    q = candidate
+                    break
+        if not q:
+            self.state.branch_pending = None
             return
         for edge in q.get("next", []):
             if edge.get("option") == option:
                 self.state.current_quest = edge["quest"]
                 self._note_main_start(self.state.current_quest)
                 self.state.branch_pending = None
+                self.state.branch_quest = None
                 return
         self.state.branch_pending = None
+        self.state.branch_quest = None
 
     # ---------- quest sampingan ----------
 

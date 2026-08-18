@@ -33,7 +33,8 @@ const AudioManager = (() => {
     audio.preload = "auto";
     audio.volume = enabled ? volume : 0;
 
-    // Error handling — graceful degradation
+    // Error handling — graceful degradation (configure() dapat membuat ulang
+    // dengan path data-driven bila lagu default tidak tersedia untuk tema baru)
     audio.addEventListener("error", (e) => {
       console.warn("[AudioManager] Audio load error:", e);
       audio = null; // prevent further attempts
@@ -41,6 +42,24 @@ const AudioManager = (() => {
 
     // Update UI after init
     updateUI();
+  }
+
+  function configure(path) {
+    // Data-driven (config.web.audio) — tema story baru boleh memakai lagu
+    // sendiri; dipanggil setelah ctx termuat (startNew/loadGame).
+    if (!path) return;
+    if (audio && audio.getAttribute("src") === path) return;
+    const el = new Audio(path);
+    el.loop = true;
+    el.preload = "auto";
+    el.volume = enabled ? volume : 0;
+    el.addEventListener("error", (e) => {
+      console.warn("[AudioManager] Audio load error:", e);
+      audio = null;
+    });
+    audio = el;
+    started = true; // konteks user-gesture (tombol Mulai/Lanjut)
+    if (enabled) el.play().catch(() => { /* autoplay ditolak — diam */ });
   }
 
   function persist() {
@@ -160,6 +179,7 @@ const AudioManager = (() => {
 
   return {
     init,
+    configure,
     start,
     play,
     pause,
@@ -298,16 +318,38 @@ function showGame() {
   $("game-screen").classList.remove("hidden");
 }
 
+// Judul game data-driven (config.web) — tema story baru boleh punya judul sendiri
+function applyMeta(m) {
+  if (!m) return;
+  const title = m.title || "天缘灵";
+  const subtitle = m.subtitle || "TIAN XU: SECOND LIFE";
+  const tagline = m.tagline || "天缘灵 · Tian Xu: Second Life";
+  const panel = m.panel || "Tianyuan Ling";
+  document.title = tagline;
+  const gt = $("game-title");   if (gt) gt.textContent = title;
+  const gs = $("game-subtitle"); if (gs) gs.textContent = subtitle;
+  const tg = $("game-tagline");  if (tg) tg.textContent = tagline;
+  const bt = $("btn-tianyuan");  if (bt) bt.textContent = `${title} · Panel`;
+}
+
 async function startNew() {
   const data = await api("/api/new");
-  if (data.ok) { currentSave = "save1"; view = data.view; ctx = data.context; showGame(); render(); }
+  if (data.ok) {
+    currentSave = "save1"; view = data.view; ctx = data.context;
+    applyMeta(ctx.meta);
+    AudioManager.configure((ctx.meta || {}).audio); // lagu dari config.web
+    showGame(); render();
+  }
   else { window.alert(data.error || "Gagal memulai."); }
 }
 
 async function loadGame(name) {
   const data = await api("/api/load", { body: { name } });
   if (!data.ok) { $("title-msg").textContent = data.error || "Gagal memuat."; return; }
-  currentSave = name; view = data.view; ctx = data.context; showGame(); render();
+  currentSave = name; view = data.view; ctx = data.context;
+  applyMeta(ctx.meta);
+  AudioManager.configure((ctx.meta || {}).audio);
+  showGame(); render();
 }
 
 // ---------- render utama ----------
@@ -325,7 +367,9 @@ function render() {
   const logEl = $("log");
   logEl.scrollTop = logEl.scrollHeight;
 
-  if (view.arc_summary && localStorage.getItem("arc-seen:" + currentSave) !== "1") {
+  // arc_summary per-arc: simpan JUDUL arc yang sudah di-dismiss — bukan flag
+  // sekali-saja — agar seluruh 7 arc menampilkan summary-nya masing-masing.
+  if (view.arc_summary && localStorage.getItem("arc-seen:" + currentSave) !== view.arc_summary.title) {
     openArcSummaryModal(view.arc_summary);
   }
 }
@@ -365,7 +409,9 @@ function customIcon(name) {
     moral: "/static/assets/img/ui/icon_jade.png"
   };
   if (map[name]) {
-    return `<img src="${map[name]}" style="width:16px;height:16px;vertical-align:text-bottom;margin-right:6px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5))">`;
+    // onerror → sembunyikan bila PNG khusus tema tidak ada (fallback rapi,
+    // bukan ikon rusak); icon Lucide (map miss) sudah generic lintas tema
+    return `<img src="${map[name]}" onerror="this.style.display='none'" style="width:16px;height:16px;vertical-align:text-bottom;margin-right:6px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5))">`;
   }
   return icon(name);
 }
@@ -377,9 +423,13 @@ function renderLeft(v) {
   const w = wid ? (names[wid] || wid) : "—";
   const comp = v.companion;
   
+  // avatar data-driven (config.web.avatar); bila gagal dimuat → fallback
+  // inisial nama pemain (tema baru boleh tanpa avatar.jpg)
+  const avatarPath = (ctx && ctx.meta && ctx.meta.avatar) || "/static/assets/img/avatar.jpg";
   let html = `
     <div style="text-align: center; margin-bottom: 16px;">
-      <img src="/static/assets/img/avatar.jpg" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);">
+      <img src="${esc(avatarPath)}" alt="Avatar" onerror="this.style.display='none';var f=document.getElementById('avatar-fallback');if(f)f.style.display='flex';" style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);">
+      <div id="avatar-fallback" class="avatar-fallback" style="display:none;">${esc((p.name || "?").charAt(0))}</div>
     </div>
     <div class="player-name-row">
       <div class="seal">Lv${p.realm_level || 1}</div>
@@ -400,7 +450,7 @@ function renderLeft(v) {
   const ic = customIcon;
   html += statRow(ic("gold") + "Koin Emas", p.gold, "gold");
   html += statRow(ic("moral") + "Moral", p.morality, p.morality > 0 ? "green" : (p.morality < 0 ? "red" : ""));
-  html += statRow(icon("landmark") + "Paviliun", (ctx && ctx.academy) || "—");
+  html += statRow(icon("landmark") + "Akademi", (ctx && ctx.academy) || "—");
   html += statRow(ic("sword") + "Senjata", w);
   if (comp) {
     html += `<h3 class="stat-title" style="margin-top:18px">✦ Roh</h3>`;
@@ -447,7 +497,7 @@ function renderRight(v) {
   
   // kurikulum paviliun
   if (ctx && ctx.curriculum && ctx.curriculum.length) {
-    html += `<div class="section"><h3 class="stat-title">${icon("book-open")}Kurikulum Paviliun</h3>`;
+    html += `<div class="section"><h3 class="stat-title">${icon("book-open")}Kurikulum Akademi</h3>`;
     ctx.curriculum.forEach((t) => {
       let badge = "";
       if (t.status === "learned") {
@@ -480,6 +530,34 @@ function renderRight(v) {
   }
   html += `</div>`;
   
+  // status karakter (docs 04: Family Crisis state_*_status per anggota) —
+  // data-driven dari context.character_status; label + warna tema-agnostik
+  if (ctx && ctx.character_status && ctx.character_status.length) {
+    const statusLabel = { loyal: "Setia", separated: "Terpisah", disillusioned: "Kecewa" };
+    const statusCls = { loyal: "badge-close", separated: "badge-locked", disillusioned: "badge-hostile" };
+    html += `<div class="section"><h3 class="stat-title">${icon("heart")}Status Karakter</h3>`;
+    ctx.character_status.forEach((cs) => {
+      const label = statusLabel[cs.status] || cs.status;
+      const cls = statusCls[cs.status] || "badge-neutral";
+      html += `<div class="relation-row"><span class="item-name">${esc(cs.name)}</span>` +
+              `<span class="badge ${esc(cls)}">${esc(label)}</span></div>`;
+    });
+    html += `</div>`;
+  }
+
+  // faksi (docs 05/13: state_rep_* — reputasi per faksi dari data)
+  if (v.factions && v.factions.length) {
+    html += `<div class="section"><h3 class="stat-title">${icon("landmark")}Fraksi</h3>`;
+    v.factions.forEach((f) => {
+      const num = Number(f.score) || 0;
+      const tier = getRelationTier(num);
+      const sign = num > 0 ? `+${num}` : `${num}`;
+      html += `<div class="relation-row"><span class="item-name">${esc(f.name)}</span>` +
+              `<span class="badge badge-${esc(tier.cls)}">${esc(tier.label)} (${sign})</span></div>`;
+    });
+    html += `</div>`;
+  }
+
   // inventori
   html += `<div class="section"><h3 class="stat-title">${icon("backpack")}Inventori</h3>`;
   if (v.inventory && v.inventory.length) {
@@ -492,8 +570,9 @@ function renderRight(v) {
   }
   html += `</div>`;
   
-  // ingatan
-  html += `<div class="section"><h3 class="stat-title">${icon("sparkles")}天缘灵 · Ingatan</h3>`;
+  // ingatan — judul panel data-driven (config.web.title)
+  const gameTitle = (ctx && ctx.meta && ctx.meta.title) || "天缘灵";
+  html += `<div class="section"><h3 class="stat-title">${icon("sparkles")}${esc(gameTitle)} · Ingatan</h3>`;
   if (v.memories && v.memories.length) {
     v.memories.forEach((m, idx) => {
       let num = String(idx+1).padStart(2, '0');
@@ -586,10 +665,14 @@ function renderExplore(v, c, box) {
     html += `<div class="action-row"><button class="btn" onclick='act({type:"move",to:"${cid}"})'>${icon("map-pin")}Pindah → ${esc(ctx.loc_names[cid] || cid)}</button></div>`;
   });
 
-  // wilayah berburu
-  if (loc.id === "loc_wilayah_berburu") {
-    html += `<div class="action-row"><button class="btn" onclick='act({type:"hunt"})'>Berburu</button>` +
-            `<button class="btn" onclick='act({type:"search"})'>Cari herba</button></div>`;
+  // wilayah berburu (data-driven — multi-zona; kirim hunt id agar zona eksplisit)
+  const huntsHere = (c.hunts || []).filter((h) => h.location === loc.id);
+  if (huntsHere.length) {
+    huntsHere.forEach((h) => {
+      const searchLabel = h.search_item_name ? `Cari ${h.search_item_name}` : "Cari";
+      html += `<div class="action-row"><button class="btn" onclick='act({type:"hunt",hunt:"${esc(h.id)}"})'>${esc(h.name || "Berburu")}</button>` +
+              `<button class="btn" onclick='act({type:"search"})'>${esc(searchLabel)}</button></div>`;
+    });
   }
 
   // lokasi aman
@@ -620,6 +703,14 @@ function renderExplore(v, c, box) {
     html += `<div class="action-row"><span class="action-label">Pakai:</span>` +
             `<select id="sel-use">${consumables.map((i) => `<option value="${i.id}">${esc(i.name)} (×${i.count})</option>`).join("")}</select>` +
             `<button class="btn" onclick='act({type:"use_item",item:$("sel-use").value})'>Pakai</button></div>`;
+  }
+
+  // gunakan kunci (key_item)
+  const keyItems = (v.inventory || []).filter((i) => i.type === "key_item");
+  if (keyItems.length) {
+    html += `<div class="action-row"><span class="action-label">Kunci:</span>` +
+            `<select id="sel-key">${keyItems.map((i) => `<option value="${i.id}">${esc(i.name)} (×${i.count})</option>`).join("")}</select>` +
+            `<button class="btn" onclick='act({type:"use_key_item",item:$("sel-key").value})'>Gunakan</button></div>`;
   }
 
   // racik (hanya di lokasi aman)
@@ -851,7 +942,7 @@ function openArcSummaryModal(s) {
   html += `<div style="margin-bottom: 20px;">
     ${statRow("Kultivator", s.player_name)}
     ${statRow("Ranah", `${s.realm} Lv.${s.realm_level}`)}
-    ${statRow("Paviliun", s.academy || "—")}
+    ${statRow("Akademi", s.academy || "—")}
     ${statRow("Moralitas", s.morality)}
     ${statRow("Ingatan Terbuka", s.memories_unlocked)}
     ${statRow("Waktu Berlalu", `Hari ${s.day}`)}
@@ -870,7 +961,8 @@ function openArcSummaryModal(s) {
 }
 
 function dismissArcSummary() {
-  localStorage.setItem("arc-seen:" + currentSave, "1");
+  localStorage.setItem("arc-seen:" + currentSave,
+                      (view && view.arc_summary && view.arc_summary.title) || "1");
   closeModal("modal-arc-summary");
   render();
 }
@@ -915,14 +1007,15 @@ function closeRightDrawer() {
 async function openTianyuan() {
   const data = await api("/api/tianyuan", { method: "GET" });
   const t = data.tianyuan;
-  let html = `<h3>天缘灵 · Tianyuan Ling</h3>`;
+  const meta = (ctx && ctx.meta) || {};
+  let html = `<h3>${esc(meta.title || "天缘灵")} · ${esc(meta.panel || "Tianyuan Ling")}</h3>`;
   
   html += `<h3 style="margin-top:18px;font-size:15px">Status Misi</h3>`;
   if (t.mission.main) {
     html += `<div class="mem-full"><div class="mem-title">[Misi Utama] ${esc(t.mission.main.title)}</div>` +
             `<div class="mem-text">${esc(t.mission.main.objective)}</div></div>`;
   } else {
-    html += `<p class="hint">[Misi Utama] Belum ada misi utama aktif (Arc 1 Tamat / Eksplorasi Bebas).</p>`;
+    html += `<p class="hint">[Misi Utama] Belum ada misi utama aktif (Eksplorasi Bebas).</p>`;
   }
   if (t.mission.side_quests && t.mission.side_quests.length) {
     t.mission.side_quests.forEach(sq => {
@@ -935,7 +1028,9 @@ async function openTianyuan() {
   if (t.memories && t.memories.length) {
     t.memories.forEach((m) => {
       if (m.unlocked) {
-        html += `<div class="mem-full"><div class="mem-title">${esc(m.title)}</div>` +
+        const rel = (m.reliability && m.reliability !== "unknown")
+          ? ` <span class="badge badge-reliability">${esc(m.reliability)}</span>` : "";
+        html += `<div class="mem-full"><div class="mem-title">${esc(m.title)}${rel}</div>` +
                 `<div class="mem-text">${esc(m.text)}</div></div>`;
       } else {
         html += `<div class="mem-locked">• ${esc(m.title)} (Belum Terbuka)</div>`;
@@ -971,6 +1066,13 @@ $("btn-new").onclick = () => { AudioManager.start(); startNew(); };
 $("btn-tianyuan").onclick = openTianyuan;
 refreshSaveSlots();
 loadIcons();  // C2: icon Lucide self-host — dimuat async, re-render bila sudah masuk
+
+// judul data-driven dari config.web — di-fetch sekali saat halaman dimuat
+// (bekerja tanpa sesi: context.meta selalu ada di /api/state)
+(async () => {
+  const metaData = await api("/api/state", { method: "GET" });
+  if (metaData.ok && metaData.context) applyMeta(metaData.context.meta);
+})();
 
 // ---------- Audio Controls Event Handlers ----------
 

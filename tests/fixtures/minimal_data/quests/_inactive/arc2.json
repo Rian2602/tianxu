@@ -1,0 +1,244 @@
+{
+  "quests": [
+    {
+      "id": "q_a02_c01_001",
+      "kind": "main",
+      "title": "Ujian Tengah Semester",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_guru_utama",
+        "target": 1,
+        "hint": "Guru Utama memanggil kelompokmu — ujian tengah semester akan segera dimulai."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "reputation", "faksi": "academic", "value": 3}
+        ],
+        "rewards": {"exp": 5},
+        "system_msg": "Ujian tengah semester selesai. Namamu mulai dikenal para pengajar."
+      },
+      "next": [
+        {"quest": "q_a02_c01_002"}
+      ]
+    },
+    {
+      "id": "q_a02_c01_002",
+      "kind": "main",
+      "title": "Ujian Tim",
+      "quest_type": "main",
+      "objective": {
+        "kind": "spar",
+        "npc": "npc_guru_utama",
+        "hint": "Hadapi Guru Utama dalam ujian tim — menang atau kalah, kelompokmu dinilai sebagai satu kesatuan."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "team_recognized", "value": true},
+          {"type": "relation", "npc": "npc_lin_yue", "value": 1},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 1},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 1},
+          {"type": "relation", "npc": "npc_gu_han", "value": 1}
+        ],
+        "rewards": {"exp": 8},
+        "system_msg": "Kelompokmu lulus ujian tim. Kini kalian diakui sebagai unit resmi akademi."
+      },
+      "next": [
+        {"quest": "q_a02_c02_003"}
+      ]
+    },
+    {
+      "id": "q_a02_c02_003",
+      "kind": "main",
+      "title": "Wilayah Luar",
+      "quest_type": "main",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_outer_region",
+        "hint": "Tugaskan kelompokmu berpatroli ke wilayah luar akademi — area yang jarang dijamah murid."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "outer_region_unlocked", "value": true}
+        ],
+        "rewards": {"exp": 6},
+        "system_msg": "Kalian menyeberangi pagar akademi untuk pertama kalinya. Di kejauhan, udara terasa berat — seperti ada sesuatu yang menunggu."
+      },
+      "next": [
+        {"quest": "q_a02_c02_004"}
+      ]
+    },
+    {
+      "id": "q_a02_c02_004",
+      "kind": "main",
+      "title": "Gangguan Spiritual",
+      "quest_type": "main",
+      "objective": {
+        "kind": "defeat",
+        "enemies": ["monster_gangguan_spiritual"],
+        "target": 1,
+        "hint": "Selidiki sumber gangguan spiritual di wilayah luar — makhluk itu tampak sebagai biangnya."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "disturbance_investigated", "value": true}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Makhluk itu gugur, dan gangguan mereda — tetapi di sela-sela keheningan, kalian melihat jejak: seseorang pernah bersembunyi di sekitar sini."
+      },
+      "next": [
+        {"quest": "q_a02_c02_005"}
+      ]
+    },
+    {
+      "id": "q_a02_c02_005",
+      "kind": "main",
+      "title": "Murid yang Hilang",
+      "quest_type": "main",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_persembunyian",
+        "hint": "Telusuri tempat persembunyian di balik semak — jejak itu mengarah ke sana."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "evidence_missing_disciple", "value": true},
+          {"type": "item", "id": "catatan_siklus", "count": 1}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Di antara lilin meleleh, kau menemukan catatan yang digenggam erat. Tulisannya miring dan tergesa: \"Siklus dimulai lagi. Kali ini aku tidak akan diam saja. Mereka bilang aku kabur — biarkan. Aku harus mencari jawaban.\" Tidak ada nama. Tapi kau tahu siapa yang menulisnya: murid senior yang dilaporkan hilang."
+      },
+      "next": [
+        {"quest": "q_a02_c03_006"}
+      ]
+    },
+    {
+      "id": "q_a02_c03_006",
+      "kind": "main",
+      "title": "Keputusan Kelompok",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Kembalilah ke akademi dan putuskan bersama kelompok: apa yang harus dilakukan dengan bukti ini?"
+      },
+      "on_complete": {
+        "rewards": {"exp": 5},
+        "system_msg": "Keputusan telah dibuat. Apapun jalannya, kelompokmu berdiri bersama."
+      },
+      "next": [
+        {"quest": "q_a02_c04_007", "option": "obey", "choice_id": "dlg_arc2_branch"},
+        {"quest": "q_a02_c04_007", "option": "investigate", "choice_id": "dlg_arc2_branch"},
+        {"quest": "q_a02_c04_007", "option": "confront", "choice_id": "dlg_arc2_branch"}
+      ]
+    },
+    {
+      "id": "q_a02_c04_007",
+      "kind": "main",
+      "title": "Gua Tersembunyi",
+      "quest_type": "main",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_hidden_cave",
+        "hint": "Jejak dari tempat persembunyian mengarah ke gua tersembunyi di kedalaman wilayah luar."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "hidden_cave_explored", "value": true}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Gua itu lebih dalam dari yang terlihat. Udara di dalamnya menahan napas — dan di ujung lorong, sesuatu menunggu dengan cahaya samar."
+      },
+      "next": [
+        {"quest": "q_a02_c04_008"}
+      ]
+    },
+    {
+      "id": "q_a02_c04_008",
+      "kind": "main",
+      "title": "Artefak Pertama",
+      "quest_type": "main",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_dalam_gua",
+        "hint": "Dekati artefak yang berdenyut di ruang dalam gua."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "memory_lin_yue_elder_seen", "value": true},
+          {"type": "item", "id": "artefak_pertama", "count": 1}
+        ],
+        "rewards": {"exp": 12},
+        "memory_unlock": "memory_a02_m01",
+        "system_msg": "Saat jari-jarimu menyentuh artefak itu, dunia terbalik. Sesaat kemudian kau tersadar di lantai gua, keringat dingin, artefak hangat di telapak tangan. Sebuah memori yang bukan milikmu tinggal di kepalamu."
+      },
+      "next": [
+        {"quest": "q_a02_c04_009"}
+      ]
+    },
+    {
+      "id": "q_a02_c04_009",
+      "kind": "main",
+      "title": "Laporan Penutup",
+      "quest_type": "main",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_guru_utama",
+        "target": 1,
+        "hint": "Kembali ke akademi dan laporkan hasil ekspedisi kepada Guru Utama."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "arc2_complete", "value": true},
+          {"type": "relation", "npc": "npc_guru_utama", "value": 2}
+        ],
+        "rewards": {"exp": 8},
+        "system_msg": "Arc II selesai. Artefak itu hangat di sakumu — dan untuk pertama kalinya, kau punya pertanyaan yang spesifik, bukan sekadar rasa janggal."
+      },
+      "next": [
+        {"quest": "q_a03_c01_001"}
+      ]
+    },
+    {
+      "id": "q_a02_side_patrol",
+      "kind": "side",
+      "title": "Berpatroli di Wilayah Luar",
+      "quest_type": "side",
+      "objective": {
+        "kind": "defeat",
+        "enemies": ["monster_gangguan_spiritual"],
+        "target": 2,
+        "report_to": "npc_mei_ruo",
+        "hint": "Jalur investigasi mandiri: bersihkan sisa gangguan spiritual di wilayah luar, lalu laporkan ke Mei Ruo."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "side_patrol_done", "value": true}
+        ],
+        "rewards": {"exp": 8, "gold": 15},
+        "system_msg": "Mei Ruo mencatat laporan patrolimu. \"Setidaknya wilayah itu lebih aman sekarang — dan tidak ada yang perlu tahu.\""
+      }
+    },
+    {
+      "id": "q_a02_side_mineral",
+      "kind": "side",
+      "title": "Mineral Qi untuk Akademi",
+      "quest_type": "side",
+      "objective": {
+        "kind": "gather",
+        "item": "mineral_qi",
+        "target": 2,
+        "report_to": "npc_guru_utama",
+        "hint": "Kumpulkan 2 Mineral Qi dari wilayah luar untuk kebutuhan akademi, lalu serahkan ke Guru Utama."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "side_mineral_done", "value": true}
+        ],
+        "rewards": {"exp": 6, "gold": 12},
+        "system_msg": "Mineral itu terasa dingin dan pekat saat diserahkan. Lin Yue menyimpannya dengan hati-hati."
+      }
+    }
+  ]
+}

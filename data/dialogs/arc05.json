@@ -1,0 +1,179 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a05_d01",
+      "npc": "npc_villager_elder",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_villager_elder",
+          "text": "Kau dari akademi? Lihatlah desa kami. Semalam semua masih normal — sekarang tanah menolak benih, dan ternak mulai... berubah. Apa yang kalian lakukan di gunung itu?",
+          "choices": [
+            {"label": "Aku akan menyelidiki ini.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_villager_elder",
+          "text": "Jangan janjikan apa yang tidak bisa kau tepati. Tapi kalau kau bisa membantu... desa ini pernah hidup. Kami hanya ingin hidup lagi.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_d02",
+      "npc": "npc_mountain_guard",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mountain_guard",
+          "text": "Konvoi warga terjebak di tengah celah! Kabut spiritual membiru — sesuatu datang dari gerbang, dan kali ini lebih cepat dari catatan mana pun. Kami tidak punya waktu untuk menunggu perintah akademi.",
+          "choices": [
+            {"label": "Aku di sini. Katakan apa yang terjadi.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mountain_guard",
+          "text": "Gerbang itu... bergemuruh seperti jantung. Setiap kali ia berdenyut, kabut menelan lebih banyak jalan. Kalau kita tidak bertindak sekarang, konvoi itu hilang — persis seperti yang tercatat dulu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_branch_mg",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "narration",
+          "text": "Kabut spiritual menyentuh gerbang batu. Warga di celah itu berteriak — dan kau tahu, di tulangmu, bahwa kau pernah berada di tempat ini sebelumnya. Perbedaan kali ini: kau hadir, dan kau bisa memilih.",
+          "choices": [
+            {
+              "label": "Terjun langsung — selamatkan konvoi sekarang.",
+              "option": "changed",
+              "effects": [
+                {"type": "flag", "key": "flag_mountain_gate_changed", "value": true},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 2},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+              ]
+            },
+            {
+              "label": "Evakuasi dulu — biarkan konvoi itu, selamatkan yang bisa diselamatkan.",
+              "option": "repeated",
+              "effects": [
+                {"type": "flag", "key": "flag_mountain_gate_repeated", "value": true},
+                {"type": "relation", "npc": "npc_gu_han", "value": 2},
+                {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -2}
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_d03",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau kembali. Aku mendengar apa yang terjadi di gerbang. Dan aku mendengar suara-suara lain di kelompok kita — suara yang mulai saling menuduh.",
+          "choices": [
+            {"label": "Aku tahu. Kita harus bicara.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Lin Yue ingin melindungi murid-murid. Shen Luo bilang sistem ini harus dihancurkan. Mei Ruo menuntut kebenaran penuh. Gu Han yakin Tian Xu tak bisa diperbaiki. Aku tidak tahu mana yang benar lagi. Aku hanya tahu aku tidak ingin kehilangan kalian.",
+          "choices": [
+            {"label": "Aku akan memutuskan. Dan aku akan hidup dengan akibatnya.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "narration",
+          "text": "Empat anggota keluargamu menatapmu. Apa pun yang kau pilih, sebagian dari mereka akan setuju — dan sebagian mungkin tidak akan pernah memaafkanmu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_branch_family",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "narration",
+          "text": "Krisis ini memaksa kalian memilih. Bukan satu pilihan benar — hanya pilihan yang menentukan siapa yang tetap berdiri di sisimu.",
+          "choices": [
+            {
+              "label": "Lindungi murid-murid — pertahankan Tian Xu dari dalam (Lin Yue).",
+              "option": "protect",
+              "effects": [
+                {"type": "flag", "key": "state_lin_yue_status", "value": "loyal"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "separated"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 3}
+              ]
+            },
+            {
+              "label": "Hancurkan sistem — Tian Xu layak runtuh (Shen Luo).",
+              "option": "destroy",
+              "effects": [
+                {"type": "flag", "key": "state_shen_luo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "loyal"},
+                {"type": "flag", "key": "state_lin_yue_status", "value": "separated"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_shen_luo", "value": 3}
+              ]
+            },
+            {
+              "label": "Cari kebenaran penuh — apa pun harganya (Mei Ruo).",
+              "option": "truth",
+              "effects": [
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_lin_yue_status", "value": "loyal"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "separated"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 3}
+              ]
+            },
+            {
+              "label": "Aku tidak tahu lagi — aku hanya tidak mau kehilangan kalian.",
+              "option": "despair",
+              "effects": [
+                {"type": "flag", "key": "state_lin_yue_status", "value": "separated"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "separated"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "disillusioned"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "disillusioned"}
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_d04",
+      "npc": "npc_entity",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_entity",
+          "text": "Kau membunuhku sekali. Kau sudah lupa. Aku tidak.",
+          "choices": [
+            {"label": "Siapa kau?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_entity",
+          "text": "Aku adalah alasan kalian menyebut dunia ini sebagai anugerah. Tanpa aku, tidak ada cultivation. Tanpa aku, tidak ada Tian Xu. Tanpa aku — tidak ada kau. Dan kau membunuhku.",
+          "choices": [
+            {"label": "Aku tidak ingat itu.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_entity",
+          "text": "Tentu. Kau tidak ingat. Tapi tubuhmu ingat. Lihatlah dirimu — kehidupan yang kembali dari kematian. Apakah kau pikir itu hadiah?",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

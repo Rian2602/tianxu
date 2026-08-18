@@ -1,0 +1,2 @@
+id,name,hp,attack,defense,exp_reward,speed,drop_item,drop_chance
+musuh_hutan,Monster Hutan,20,5,2,8,5,herba_qi,0.5
