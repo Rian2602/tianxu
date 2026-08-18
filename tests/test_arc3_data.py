@@ -10,8 +10,6 @@ I/II tidak ada (data tidak di-commit — AGENTS.md).
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from src.loader import DataRegistry, DATA_DIR
@@ -22,15 +20,10 @@ pytestmark = pytest.mark.skipif(
     reason="data story Arc III belum ada di data/",
 )
 
-REGISTRY: DataRegistry | None = None
-
 
 @pytest.fixture(scope="module")
 def registry() -> DataRegistry:
-    global REGISTRY
-    if REGISTRY is None:
-        REGISTRY = DataRegistry()
-    return REGISTRY
+    return DataRegistry()
 
 
 def _new_session(registry: DataRegistry) -> GameSession:
@@ -135,27 +128,31 @@ def test_arc3_mural_room_and_mo_chen(registry):
     assert s._is_npc_available(npc) is False
 
 
-def test_arc3_deceased_and_stance_branch(registry):
-    """Q3 Deceased (flag) → Q4 diskusi Lin Yue → branch 3-cabang state_identity_stance."""
+def _to_stance_branch(registry: DataRegistry) -> GameSession:
+    """Mainkan Arc I-II → mural → Mo Chen → archive clerk → dialog branch
+    Lin Yue (DRY: dipakai deceased, stance branches, gate memory)."""
     s = _through_arc1_2(registry)
     _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_hidden_room_mural")
     _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_training_hall")
     _reach(s, "loc_mo_chen_meeting")
     _talk(s, "npc_mo_chen")
-    # Q3
     _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
     _talk(s, "npc_archive_clerk")
     assert s.state.current_quest == "quest_a03_c04_004"
-    assert s.state.flags.get("flag_jiang_yan_deceased_confirmed") is True
-    # Q4: diskusi Lin Yue → branch dialog
     _reach(s, "loc_training_hall")
     _talk(s, "npc_lin_yue", close=False)
     s.apply_action({"type": "dialog_choice", "choice_index": -1})
     assert s.state.branch_pending == "dlg_a03_branch"
+    return s
+
+
+def test_arc3_deceased_and_stance_branch(registry):
+    """Q3 Deceased (flag) → Q4 diskusi Lin Yue → branch 3-cabang state_identity_stance."""
+    s = _to_stance_branch(registry)
+    assert s.state.flags.get("flag_jiang_yan_deceased_confirmed") is True
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # deny
     assert s.state.current_quest == "quest_a03_c05_005"
     assert s.state.flags.get("state_identity_stance") == "deny"
-    # efek branch deny: Gu Han mendukung (+), Mei Ruo sedikit frustrasi (−)
     assert s.state.relations.get("npc_gu_han", 0) >= 2
     assert s.state.relations.get("npc_mei_ruo", 0) >= -1
 
@@ -168,48 +165,20 @@ def test_arc3_deceased_and_stance_branch(registry):
 def test_arc3_stance_three_branches(registry, idx, stance, rel_npc, rel_min):
     """Tiga stance → state_identity_stance berbeda → semua konvergen ke quest_a03_c05_005
     (prinsip convergence docs 03). Seek Truth memberi relation Mei Ruo TERBESAR."""
-    s = _through_arc1_2(registry)
-    _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_hidden_room_mural")
-    _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_training_hall")
-    _reach(s, "loc_mo_chen_meeting")
-    _talk(s, "npc_mo_chen")
-    _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
-    _talk(s, "npc_archive_clerk")
-    _reach(s, "loc_training_hall")
-    _talk(s, "npc_lin_yue", close=False)
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    s = _to_stance_branch(registry)
     s.apply_action({"type": "dialog_choice", "choice_index": idx})
     assert s.state.current_quest == "quest_a03_c05_005", f"stance {stance} harus konvergen"
     assert s.state.flags.get("state_identity_stance") == stance
     assert s.state.relations.get(rel_npc, 0) >= rel_min
     if stance == "seek_truth":
-        # relation Mei Ruo lebih besar dari branch lain (docs: lebih besar dari branch lain)
-        s2 = _through_arc1_2(registry)
-        _reach(s2, "loc_pavilion_yanzhi"); _reach(s2, "loc_hidden_room_mural")
-        _reach(s2, "loc_pavilion_yanzhi"); _reach(s2, "loc_training_hall")
-        _reach(s2, "loc_mo_chen_meeting")
-        _talk(s2, "npc_mo_chen")
-        _reach(s2, "loc_training_hall"); _reach(s2, "loc_archive_public")
-        _talk(s2, "npc_archive_clerk")
-        _reach(s2, "loc_training_hall")
-        _talk(s2, "npc_lin_yue", close=False)
-        s2.apply_action({"type": "dialog_choice", "choice_index": -1})
+        s2 = _to_stance_branch(registry)
         s2.apply_action({"type": "dialog_choice", "choice_index": 0})  # deny
         assert s.state.relations.get("npc_mei_ruo", 0) > s2.state.relations.get("npc_mei_ruo", 0)
 
 
 def test_arc3_gate_memory_and_ending(registry):
     """Q5 memory gerbang (memory_a03_m01) → arc_summary + ending end_a03_gate_opened."""
-    s = _through_arc1_2(registry)
-    _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_hidden_room_mural")
-    _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_training_hall")
-    _reach(s, "loc_mo_chen_meeting")
-    _talk(s, "npc_mo_chen")
-    _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
-    _talk(s, "npc_archive_clerk")
-    _reach(s, "loc_training_hall")
-    _talk(s, "npc_lin_yue", close=False)
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    s = _to_stance_branch(registry)
     s.apply_action({"type": "dialog_choice", "choice_index": 2})  # seek_truth
     # Q5: kembali ke ruang mural → memory gerbang
     _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_hidden_room_mural")
