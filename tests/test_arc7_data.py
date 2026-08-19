@@ -17,9 +17,8 @@ import pytest
 
 from src.loader import DataRegistry, DATA_DIR
 from src.engine.session import GameSession
-from tests.test_arc6_data import _through_arc1_2_3_4 as _through_arc1_2_3_4_5_6_base
 from tests.test_arc6_data import _play_arc5, _to_arc6_q4
-from tests.test_arc5_data import _talk, _reach
+from tests.test_arc5_data import _to_family_crisis_branch, _talk, _reach
 
 pytestmark = pytest.mark.skipif(
     not (DATA_DIR / "quests" / "arc07.json").exists(),
@@ -30,10 +29,6 @@ pytestmark = pytest.mark.skipif(
 @pytest.fixture(scope="module")
 def registry() -> DataRegistry:
     return DataRegistry()
-
-
-def _through_arc1_2_3_4(registry, branch_idx: int = 1) -> GameSession:
-    return _through_arc1_2_3_4_5_6_base(registry, branch_idx)
 
 
 def _play_arc6(s: GameSession, principle_idx: int = 0) -> None:
@@ -52,35 +47,17 @@ def _play_arc6(s: GameSession, principle_idx: int = 0) -> None:
     assert s.state.current_quest == "quest_a07_c01_001", s.state.current_quest
 
 
-def _play_arc5_family(s: GameSession, family_idx: int = 0) -> None:
+def _play_arc5_family(registry: DataRegistry, family_idx: int = 0, branch_idx: int = 1, stance_idx: int = 2) -> GameSession:
     """Arc V penuh — MG changed + Family Crisis family_idx (0=protect, 1=destroy,
-    2=truth, 3=despair). Dipakai uji status permanen docs 04."""
-    _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
-    _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region")
-    _reach(s, "loc_affected_village")
-    _talk(s, "npc_villager_elder")                       # Q1
-    _reach(s, "loc_outer_region"); _reach(s, "loc_mountain_gate")
-    _talk(s, "npc_mountain_guard", close=False)          # Q2
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})
-    s.apply_action({"type": "dialog_choice", "choice_index": 0})  # changed
-    _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
-    for npc in ("npc_lin_yue", "npc_shen_luo", "npc_mei_ruo", "npc_gu_han"):
-        s.apply_action({"type": "talk", "npc": npc})
-        if s.state.pending_dialog:
-            break
-    guard = 0
-    while s.state.pending_dialog and guard < 20:
-        v = s.view()
-        if v.get("dialog", {}).get("dialog_id") == "dlg_a05_branch_family":
-            break
-        s.apply_action({"type": "dialog_choice", "choice_index": -1})
-        guard += 1
+    2=truth, 3=despair). DRY: uses _to_family_crisis_branch."""
+    s = _to_family_crisis_branch(registry, branch_idx=branch_idx, stance_idx=stance_idx)
     s.apply_action({"type": "dialog_choice", "choice_index": family_idx})  # Q3
     _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_tianxu_deepest_chamber")
     _talk(s, "npc_entity")                                # Q4
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_tianxu_deepest_chamber")  # Q5
     assert s.state.current_quest == "quest_a06_c01_001", s.state.current_quest
+    return s
 
 
 def _play_arc7(s: GameSession, decision_idx: int) -> None:
@@ -120,8 +97,7 @@ def test_arc5_family_status_persists_to_arc7_ending(registry, family_idx, persis
     """docs 04: status Family Crisis = branching PERMANEN yang dibawa ke Arc
     VI-VII — status anggota tidak hilang saat convergence Arc V→VI→VII, dan
     ending tetap tercapai dari 4 jalur (protect/destroy/truth/despair)."""
-    s = _through_arc1_2_3_4(registry)
-    _play_arc5_family(s, family_idx)
+    s = _play_arc5_family(registry, family_idx=family_idx)
     _play_arc6(s, principle_idx=0)   # preserve
     _play_arc7(s, decision_idx=0)    # preserve
     # status dari keputusan Family Crisis MASIH ada di akhir game
@@ -235,8 +211,12 @@ def test_arc7_hidden_resolution_blocked_by_forbidden(registry):
     """Forbidden condition (docs 11): deny + sacrifice → opsi hidden TIDAK muncul.
 
     Hanya 4 pilihan di quest 3 — memilih sacrifice → ending_nameless_guardian.
+    Uses stance_idx=0 to truly set Arc III stance to 'deny'.
     """
-    s = _play_arc5(registry)
+    s = _play_arc5(registry, stance_idx=0)           # deny (Arc III)
+    # verify precondition: Arc III stance is deny
+    assert s.state.flags.get("state_identity_stance") == "deny", \
+        f"precondition failed: stance={s.state.flags.get('state_identity_stance')}"
     _play_arc6(s, principle_idx=3)                   # sacrifice
     # mainkan Q1 + Q2 sampai quest 3 aktif
     _reach(s, "loc_training_hall")

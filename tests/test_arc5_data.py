@@ -56,8 +56,14 @@ def _reach(s: GameSession, loc: str) -> None:
     s.apply_action({"type": "move", "to": loc})
 
 
-def _through_arc1_2_3_4(registry, branch_idx: int = 1) -> GameSession:
-    """Mainkan Arc I + II + III + IV penuh sampai quest_a05_c01_001."""
+def _through_arc1_2_3_4(registry, branch_idx: int = 1, stance_idx: int = 2) -> GameSession:
+    """Mainkan Arc I + II + III + IV penuh sampai quest_a05_c01_001.
+
+    Args:
+        registry: Data registry
+        branch_idx: Arc II branch choice (0=obey, 1=investigate, 2=confront)
+        stance_idx: Arc III identity stance (0=deny, 1=accept_cautious, 2=seek_truth)
+    """
     s = _new_session(registry)
     # Arc I
     _talk(s, "npc_aptitude_examiner")
@@ -99,7 +105,7 @@ def _through_arc1_2_3_4(registry, branch_idx: int = 1) -> GameSession:
     _reach(s, "loc_training_hall")
     _talk(s, "npc_lin_yue", close=False)
     s.apply_action({"type": "dialog_choice", "choice_index": -1})
-    s.apply_action({"type": "dialog_choice", "choice_index": 2})  # seek_truth
+    s.apply_action({"type": "dialog_choice", "choice_index": stance_idx})
     _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_hidden_room_mural")
     # Arc IV
     _reach(s, "loc_pavilion_yanzhi"); _reach(s, "loc_training_hall")
@@ -141,10 +147,10 @@ def test_arc5_data_contract_ok(registry):
     assert registry.dialog("dlg_a05_branch_family") is not None
 
 
-def _to_mountain_gate_branch(registry: DataRegistry) -> GameSession:
+def _to_mountain_gate_branch(registry: DataRegistry, branch_idx: int = 1, stance_idx: int = 2) -> GameSession:
     """Arc I-IV → desa terdampak → gerbang gunung → dialog branch.
     DRY: dipakai spiritual_collapse, mountain_gate, family_crisis, entity."""
-    s = _through_arc1_2_3_4(registry)
+    s = _through_arc1_2_3_4(registry, branch_idx=branch_idx, stance_idx=stance_idx)
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
     _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region")
     _reach(s, "loc_affected_village")
@@ -196,10 +202,10 @@ def test_arc5_mountain_gate_two_branches(registry, idx, flag, rel_npc, rel_min):
 ])
 
 
-def _to_family_crisis_branch(registry: DataRegistry, mg_idx: int = 0) -> GameSession:
+def _to_family_crisis_branch(registry: DataRegistry, mg_idx: int = 0, branch_idx: int = 1, stance_idx: int = 2) -> GameSession:
     """Mountain Gate resolved → loop dialog krisis sampai branch Family Crisis.
     DRY: dipakai family_crisis + entity_and_memory."""
-    s = _to_mountain_gate_branch(registry)
+    s = _to_mountain_gate_branch(registry, branch_idx=branch_idx, stance_idx=stance_idx)
     s.apply_action({"type": "dialog_choice", "choice_index": mg_idx})
     _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
     for npc in ("npc_lin_yue", "npc_shen_luo", "npc_mei_ruo", "npc_gu_han"):

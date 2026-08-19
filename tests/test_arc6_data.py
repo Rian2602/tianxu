@@ -27,13 +27,13 @@ def registry() -> DataRegistry:
     return DataRegistry()
 
 
-def _play_arc5(registry: DataRegistry) -> GameSession:
+def _play_arc5(registry: DataRegistry, branch_idx: int = 1, stance_idx: int = 2) -> GameSession:
     """Mainkan Arc V penuh sampai quest_a06_c01_001 (data Arc V nyata).
 
     DRY: bangun session dari _to_family_crisis_branch, lalu selesaikan
     Family Crisis + Entity + Memory → Arc VI.
     """
-    s = _to_family_crisis_branch(registry)
+    s = _to_family_crisis_branch(registry, branch_idx=branch_idx, stance_idx=stance_idx)
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # protect
     _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_tianxu_deepest_chamber")
