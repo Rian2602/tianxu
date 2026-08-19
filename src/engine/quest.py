@@ -522,6 +522,12 @@ class QuestEngine:
             rel = af.get("relation_min")
             if rel and self.state.relations.get(rel.get("npc"), 0) < rel.get("value", 0):
                 return False
+            # has_memory: quest hanya ditawarkan bila memory sudah terbuka
+            mem_id = af.get("has_memory")
+            if mem_id:
+                owned = {m["id"] if isinstance(m, dict) else m for m in self.state.memories}
+                if mem_id not in owned:
+                    return False
         return True
 
     def start_side(self, qid: str) -> bool:

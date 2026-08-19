@@ -144,9 +144,9 @@
    "final_quest": "quest_a02_c04_009",
    "memories_total": 5,
    "branches": {
-    "flag_archive_suspicious": "Investigate",
-    "flag_branch_obey": "Obey",
-    "flag_branch_confront": "Confront"
+    "flag_investigate_solo": "Investigate",
+    "flag_obey_reported": "Obey",
+    "flag_confront_public": "Confront"
    },
    "endings": [
     {
