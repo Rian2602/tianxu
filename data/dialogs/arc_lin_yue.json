@@ -1,0 +1,165 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_lin_yue_char_001_low",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau... ada sesuatu yang ingin kubicarakan. Tapi mungkin kau tidak peduli.",
+          "choices": [
+            {
+              "label": "Aku peduli. Ceritakan padaku.",
+              "next": "n2a"
+            },
+            {
+              "label": "Jika kau tidak ingin bercerita, tidak apa-apa.",
+              "next": "n2b"
+            },
+            {
+              "label": "Apakah ini tentang akademi? Seharusnya kau laporkan ke guru.",
+              "next": "n2c"
+            }
+          ]
+        },
+        "n2a": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau tahu... ada murid yang tidak bisa membayar biaya pendidikan. Aku mencoba membantu, tapi jika ketahuan, aku yang akan dihukum. Aku tidak yakin harus berapa jauh aku harus melanggar aturan untuk hal ini.",
+          "choices": [
+            {
+              "label": "Privasimu aman denganku. Aku tidak akan menceritakannya.",
+              "option": "privacy_respected",
+              "effects": [
+                {"type": "flag", "key": "flag_lin_yue_privacy_respected", "value": true},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 3}
+              ],
+              "next": "n3"
+            },
+            {
+              "label": "Ceritakan lebih banyak. Aku ingin membantu.",
+              "option": "ask_directly",
+              "effects": [
+                {"type": "flag", "key": "flag_lin_yue_secret_known", "value": true},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 1}
+              ],
+              "next": "n3"
+            }
+          ]
+        },
+        "n2b": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Terima kasih. Mungkin suatu hari nanti aku akan bercerita. Untuk sekarang, biar aku sendiri dulu.",
+          "option": "privacy_respected",
+          "effects": [
+            {"type": "flag", "key": "flag_lin_yue_privacy_respected", "value": true},
+            {"type": "relation", "npc": "npc_lin_yue", "value": 2}
+          ],
+          "next": "n3"
+        },
+        "n2c": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Laporkan? Kau... kau benar. Mungkin memang harus dilaporkan. Terima kasih sudah mengingatkan.",
+          "option": "reported",
+          "effects": [
+            {"type": "flag", "key": "flag_lin_yue_reported", "value": true},
+            {"type": "relation", "npc": "npc_lin_yue", "value": -2}
+          ],
+          "next": "n3"
+        },
+        "n3": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Aku akan memikirkannya. Terima kasih sudah mendengarkan.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_lin_yue_char_001_high",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau tahu, sejak pertama kali bertemu, aku merasa kau berbeda. Seperti kau... mengerti sesuatu yang tidak bisa kujelaskan.",
+          "choices": [
+            {
+              "label": "Mungkin aku memang mengerti lebih dari yang kukira.",
+              "next": "n2a"
+            },
+            {
+              "label": "Kita semua punya beban masing-masing.",
+              "next": "n2b"
+            }
+          ]
+        },
+        "n2a": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Ada murid yang tidak bisa membayar biaya pendidikan. Aku membantu mereka secara diam-diam. Jika ketahuan, aku yang akan dihukum. Tapi aku tidak bisa berhenti — mereka membutuhkan bantuan.",
+          "choices": [
+            {
+              "label": "Privasimu aman. Aku tidak akan menceritakan.",
+              "option": "privacy_respected",
+              "effects": [
+                {"type": "flag", "key": "flag_lin_yue_privacy_respected", "value": true},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 3}
+              ],
+              "next": "n3"
+            },
+            {
+              "label": "Aku ingin membantu. Ceritakan lebih banyak.",
+              "option": "ask_directly",
+              "effects": [
+                {"type": "flag", "key": "flag_lin_yue_secret_known", "value": true},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 1}
+              ],
+              "next": "n3"
+            }
+          ]
+        },
+        "n2b": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Ya... kau benar. Terima kasih sudah mengingatkan aku akan hal itu.",
+          "option": "privacy_respected",
+          "effects": [
+            {"type": "flag", "key": "flag_lin_yue_privacy_respected", "value": true},
+            {"type": "relation", "npc": "npc_lin_yue", "value": 2}
+          ],
+          "next": "n3"
+        },
+        "n3": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Aku akan memikirkannya. Terima kasih sudah mendengarkan.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_lin_yue_char_002",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Aku sudah memikirkan semuanya. Dan aku telah mengambil keputusan.",
+          "choices": [
+            {
+              "label": "Apa keputusanmu?",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Aku akan terus membantu mereka. Tapi kali ini, aku akan melakukannya dengan cara yang lebih aman — dengan mencari solusi jangka panjang, bukan hanya menutupi masalah.",
+          "option": "protect_students",
+          "effects": [
+            {"type": "flag", "key": "state_lin_yue_stance", "value": "protect"},
+            {"type": "relation", "npc": "npc_lin_yue", "value": 2}
+          ],
+          "choices": []
+        }
+      }
+    }
+  ]
+}

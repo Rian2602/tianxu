@@ -43,6 +43,8 @@ class SaveError(Exception):
 
 
 class GameSession:
+    """Sesi game — orkestrasi semua aksi pemain (web & CLI)."""
+
     def __init__(self, registry: DataRegistry, state: GameState) -> None:
         self.reg = registry
         self.state = state
@@ -63,6 +65,7 @@ class GameSession:
 
     @classmethod
     def new(cls, registry: DataRegistry) -> "GameSession":
+        """Buat sesi baru dari config starting."""
         # F1.2: `starting`/`time` wajib di kontrak validator — tapi tetap defensif
         # (save lama / data parsial): default aman, bukan KeyError diam-diam.
         start = registry.config.get("starting") or {}
@@ -95,6 +98,7 @@ class GameSession:
 
     @classmethod
     def load(cls, registry: DataRegistry, save_name: str) -> "GameSession":
+        """Muat sesi dari save file."""
         path = _safe_save_path(save_name)
         try:
             with open(path, encoding="utf-8") as f:
@@ -112,6 +116,7 @@ class GameSession:
     # ---------- aksi utama ----------
 
     def apply_action(self, action: dict) -> dict:
+        """Terapkan aksi pemain — return view terbaru."""
         t = action.get("type")
         # battle aktif: hanya aksi battle yang sah (cegah pindah/bicara saat bertarung)
         if self.state.pending_battle and t != "battle_action":
@@ -771,6 +776,7 @@ class GameSession:
     # ---------- tampilan UI ----------
 
     def view(self) -> dict:
+        """Tampilan UI lengkap — location, player, quests, inventory, dll."""
         self._maybe_start_branch_dialog()
         s = self.state
         loc = self.reg.location(s.location)

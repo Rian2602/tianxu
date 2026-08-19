@@ -47,6 +47,8 @@ SIDE_UNSUPPORTED = frozenset({"choose"})
 
 
 class QuestEngine:
+    """Mesin quest (DAG) — mengelola progres quest utama dan sampingan."""
+
     def __init__(self, registry: DataRegistry, state: GameState) -> None:
         self.reg = registry
         self.state = state
@@ -54,17 +56,18 @@ class QuestEngine:
     # ---------- akses ----------
 
     def current_main(self) -> dict | None:
+        """Quest utama yang aktif saat ini (atau None)."""
         if not self.state.current_quest:
             return None
         return self.reg.quest(self.state.current_quest)
 
     def active_side(self) -> list[dict]:
-        # catatan progres quest utama (mis. talk/advance_time) juga ada di
-        # active_side_quests — hanya quest ber-kind side yang ditampilkan
+        """Quest sampingan yang aktif — hanya kind=side."""
         return [self.reg.quest(qid) for qid in self.state.active_side_quests
                 if (self.reg.quest(qid) or {}).get("kind") == "side"]
 
     def objective_text(self, quest: dict) -> str:
+        """Teks objektif quest untuk UI."""
         obj = quest.get("objective", {})
         hint = obj.get("hint", "")
         # G3-T1: quest ber-timeout menampilkan sisa waktu (jam)

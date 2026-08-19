@@ -23,6 +23,23 @@ SCHEMA_VERSION = 3
 
 @dataclass
 class PlayerState:
+    """Data status pemain — semua stat yang berubah selama sesi.
+
+    Attributes:
+        name: Nama karakter pemain.
+        hp: Poin kesehatan saat ini.
+        qi: Energi qi saat ini.
+        realm: ID ranah kultivasi aktif.
+        level: Level dalam ranah saat ini.
+        gold: Jumlah emas.
+        roots: Tipe akar spiritual.
+        academy: ID akademi (opsional).
+        equipment: Peralatan yang dipasang.
+        exp: Pengalaman saat ini.
+        morality: Skor moralitas.
+        techniques: Daftar ID teknik yang dimiliki.
+        technique_levels: Level per teknik {id: level}.
+    """
     name: str
     hp: int
     qi: int
@@ -39,7 +56,12 @@ class PlayerState:
 
 
 class UIState:
-    """Helper proxy agar `state.ui.mode` dan `state.ui.battle` dapat diakses/diubah."""
+    """Proxy untuk state.ui.mode dan state.ui.battle — akses/ubah UI state.
+
+    Attributes:
+        mode: Mode UI saat ini ('explore', 'battle', 'dialog').
+        battle: Data battle aktif (dict atau kosong).
+    """
 
     def __init__(self, state: "GameState") -> None:
         self._state = state
@@ -79,6 +101,12 @@ class UIState:
 
 @dataclass
 class GameState:
+    """State utama game — satu-satunya sumber kebenaran runtime.
+
+    Semua perubahan state dilakukan lewat GameSession (session.py)
+    yang juga menulis log. State ini di-serialize/deserialize
+    untuk save/load game.
+    """
     player: PlayerState
     location: str
     day: int
@@ -126,10 +154,12 @@ class GameState:
     # ---------- waktu: bulan (derived — C2, GDD §7) ----------
 
     def month(self, registry) -> int:
+        """Hitung nomor bulan berdasarkan hari saat ini."""
         mld = int((registry.config.get("time", {}) or {}).get("month_length_days", 30))
         return max(1, (self.day - 1) // mld + 1)
 
     def month_name(self, registry) -> str:
+        """Nama bulan dari config (opsional, fallback ke 'Bulan N')."""
         names = (registry.config.get("time", {}) or {}).get("month_names")
         if isinstance(names, list) and len(names) >= self.month(registry):
             return names[self.month(registry) - 1]
@@ -138,6 +168,7 @@ class GameState:
     # ---------- batas stat ----------
 
     def max_hp(self, registry) -> int:
+        """HP maksimum = base_hp + (level-1) × hp_per_level dari ranah."""
         r = registry.realm_by_id(self.player.realm)
         if not r or not r.get("base_hp"):
             return 50  # sane default — returning current HP makes rest/heal no-op
@@ -147,6 +178,7 @@ class GameState:
         return base + (lvl - 1) * per
 
     def max_qi(self, registry) -> int:
+        """Qi maksimum = base_qi + (level-1) × qi_per_level dari ranah."""
         r = registry.realm_by_id(self.player.realm)
         if not r or not r.get("base_qi"):
             return 30  # sane default
@@ -156,18 +188,21 @@ class GameState:
         return base + (lvl - 1) * per
 
     def exp_next(self, registry) -> int:
+        """Exp yang dibutuhkan untuk level berikutnya."""
         c = registry.config.get("cultivation", {})
         base = c.get("exp_per_level_base", 10)
         growth = c.get("exp_growth_per_level", 1.2)
         return round(base * (growth ** (self.player.realm_level - 1)))
 
     def exp_multiplier(self, registry) -> float:
+        """Multiplier exp berdasarkan tier akar spiritual."""
         tier = registry.roots_tier.get(self.player.roots)
         return tier.get("exp_multiplier", 1.0) if tier else 1.0
 
     # ---------- serialisasi ----------
 
     def to_dict(self) -> dict:
+        """Serialisasi state ke dict untuk save file (JSON-safe)."""
         return {
             "schema_version": SCHEMA_VERSION,
             "player": {
@@ -202,7 +237,10 @@ class GameState:
             "last_hunt_time": self.last_hunt_time,
             "grounding_hours_today": self.grounding_hours_today,
             "exp_grind_today": self.exp_grind_today,
-            "daily_spar_counts": {k: v for k, v in self.daily_spar_counts.items() if isinstance(k, str) and isinstance(v, int) and v >= 0} if isinstance(self.daily_spar_counts, dict) else {},
+            "daily_spar_counts": {
+                k: v for k, v in self.daily_spar_counts.items()
+                if isinstance(k, str) and isinstance(v, int) and v >= 0
+            } if isinstance(self.daily_spar_counts, dict) else {},
             "branch_pending": self.branch_pending,
             "branch_quest": self.branch_quest,
             "pending_dialog": self.pending_dialog,
@@ -214,6 +252,7 @@ class GameState:
 
     @classmethod
     def from_dict(cls, d: dict) -> "GameState":
+        """Deserialisasi state dari dict — handle migrasi save lama (v0→v3)."""
         ver = d.get("schema_version")
         if ver is not None and ver > SCHEMA_VERSION:
             raise ValueError(f"save versi {ver} lebih baru dari engine (v{SCHEMA_VERSION}) — perbarui game dulu")

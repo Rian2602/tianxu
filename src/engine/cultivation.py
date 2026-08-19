@@ -14,6 +14,7 @@ from .state import GameState
 
 
 def gain_exp(state: GameState, registry: DataRegistry, amount: int) -> None:
+    """Tambah exp ke pemain — handle level-up otomatis."""
     if amount <= 0:
         return
     amount = round(amount * state.exp_multiplier(registry))
@@ -51,6 +52,7 @@ def gain_grind_exp(state: GameState, registry: DataRegistry, amount: int) -> Non
 
 
 def _level_up(state: GameState, registry: DataRegistry) -> bool:
+    """Naikkan level dalam ranah. Return False jika sudah puncak."""
     """Naikkan level. Return False bila sudah di puncak ranah (level tidak bisa naik)."""
     realm_data = registry.realms.get(state.player.realm)
     if not realm_data:
@@ -69,6 +71,7 @@ def _level_up(state: GameState, registry: DataRegistry) -> bool:
 
 
 def _breakthrough(state: GameState, registry: DataRegistry) -> bool:
+    """Terobosan ke ranah berikutnya. Return False jika sudah max."""
     """Terobosan ke ranah berikutnya. Return False bila sudah ranah tertinggi."""
     realm_id = state.player.realm
     cur = registry.realms.get(realm_id)

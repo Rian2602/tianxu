@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "tian-xu-second-life"
+version = "1.0.0"
+description = "天缘灵 · Tian Xu: Second Life — Xianxia cultivation RPG with data-driven engine"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Tian Xu Studio"},
+]
+keywords = ["rpg", "xianxia", "cultivation", "text-adventure", "python"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment :: Role-Playing",
+]
+
+[project.scripts]
+tianxu = "src.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/tianxu-studio/tian-xu-second-life"
+Repository = "https://github.com/tianxu-studio/tian-xu-second-life"
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"

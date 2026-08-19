@@ -19,6 +19,8 @@ from .state import GameState
 
 
 class DialogEngine:
+    """Mesin dialog — mengelola percakapan NPC, pilihan, dan integrasi quest."""
+
     def __init__(self, registry: DataRegistry, state: GameState, quest_engine) -> None:
         self.reg = registry
         self.state = state
@@ -221,6 +223,7 @@ class DialogEngine:
         return {"ended": True}
 
     def view(self) -> dict | None:
+        """Tampilan dialog untuk UI — speaker, text, choices."""
         if not self.current or not self.node_id:
             if self.state.pending_dialog:
                 if self.start(self.state.pending_dialog):

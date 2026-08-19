@@ -106,6 +106,8 @@ def _calc_damage(
 
 
 class BattleEngine:
+    """Mesin battle giliran — mengelola serangan, status, dan resolusi."""
+
     def __init__(self, registry: DataRegistry, state: GameState, quest_engine) -> None:
         self.reg = registry
         self.state = state
@@ -477,6 +479,7 @@ class BattleEngine:
     # ---------- tampilan ----------
 
     def view(self) -> dict:
+        """Tampilan battle untuk UI — player stats, foes, companion, status."""
         b = self.state.pending_battle
         if not b:
             return {"mode": "explore"}

@@ -55,11 +55,35 @@
      "choices": [
       {
        "label": "Kita harus memutuskan apa yang dilakukan dengan ini.",
-       "next": "n2"
+       "condition": {
+         "flag": {"key": "flag_lin_yue_privacy_respected", "value": true}
+       },
+       "next": "n2a"
+      },
+      {
+       "label": "Kita harus memutuskan apa yang dilakukan dengan ini.",
+       "condition": {
+         "flag": {"key": "flag_lin_yue_secret_known", "value": true}
+       },
+       "next": "n2b"
+      },
+      {
+       "label": "Kita harus memutuskan apa yang dilakukan dengan ini.",
+       "next": "n2c"
       }
      ]
     },
-    "n2": {
+    "n2a": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Ya. Apa pun yang kita pilih, ini akan mengubah segalanya. Dan karena kau sudah membuktikan kepercayaanmu, aku akan berdiri di sampingmu — apa pun yang terjadi.",
+     "choices": []
+    },
+    "n2b": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau sudah tahu bebanku, dan kau tetap di sini. Aku... aku tidak yakin harus berterima kasih atau minta maaf. Tapi aku percaya padamu.",
+     "choices": []
+    },
+    "n2c": {
      "speaker": "npc:npc_lin_yue",
      "text": "Ya. Apa pun yang kita pilih, ini akan mengubah segalanya. Aku percaya padamu.",
      "choices": []

@@ -1,0 +1,16 @@
+include LICENSE
+include README.md
+include CHANGELOG.md
+include pyproject.toml
+
+recursive-include src *.py
+recursive-include data *.json *.csv
+recursive-include web *.py *.js *.css *.html
+recursive-include tests *.py
+recursive-include docs *.md
+
+global-exclude __pycache__
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .coverage
+global-exclude .pytest_cache
