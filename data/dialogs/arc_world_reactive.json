@@ -1,0 +1,64 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a05_reactive_villager",
+      "npc": "npc_villager_elder",
+      "start": "n1",
+      "nodes": {
+        "n_knows_seal": {
+          "speaker": "npc:npc_villager_elder",
+          "text": "Kau dari akademi? Lihatlah desa kami. Tanah menolak benih, ternak mulai berubah. Aku dengar kalian tahu sesuatu tentang apa yang sebenarnya terjadi — tentang segel itu. Apakah itu benar? Tian Xu memberi makan segel dengan energi kalian?",
+          "condition": {"flag": {"key": "flag_tianxu_feeds_segel_known", "value": true}},
+          "choices": [
+            {"label": "Ya. Dan aku akan menemukan cara untuk menghentikannya.", "next": "n2a"},
+            {"label": "Aku tidak bisa bicara tentang itu sekarang.", "next": "n2"}
+          ]
+        },
+        "n2a": {
+          "speaker": "npc:npc_villager_elder",
+          "text": "Kau tahu kebenarannya... dan kau masih datang ke sini. Itu... itu lebih dari yang pernah Grandmaster lakukan. Kalau kau bisa menghentikan ini, desa ini akan mengingat namamu selamanya.",
+          "choices": []
+        },
+        "n1": {
+          "speaker": "npc:npc_villager_elder",
+          "text": "Kau dari akademi? Lihatlah desa kami. Semalam semua masih normal — sekarang tanah menolak benih, dan ternak mulai... berubah. Apa yang kalian lakukan di gunung itu?",
+          "choices": [
+            {"label": "Aku akan menyelidiki ini.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_villager_elder",
+          "text": "Jangan janjikan apa yang tidak bisa kau tepati. Tapi kalau kau bisa membantu... desa ini pernah hidup. Kami hanya ingin hidup lagi.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_reactive_guard",
+      "npc": "npc_mountain_guard",
+      "start": "n1",
+      "nodes": {
+        "n_seek_truth": {
+          "speaker": "npc:npc_mountain_guard",
+          "text": "Konvoi warga terjebak di tengah celah! Kabut spiritual membiru — sesuatu datang dari gerbang. Kau mencari kebenaran, kan? Maka lihatlah sendiri apa yang terjadi ketika segel ini mulai gagal.",
+          "condition": {"flag": {"key": "state_identity_stance", "value": "seek_truth"}},
+          "choices": [
+            {"label": "Aku akan melihat sendiri. Terima kasih.", "next": "n2"}
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_mountain_guard",
+          "text": "Konvoi warga terjebak di tengah celah! Kabut spiritual membiru — sesuatu datang dari gerbang, dan kali ini lebih cepat dari catatan mana pun. Kami tidak punya waktu untuk menunggu perintah akademi.",
+          "choices": [
+            {"label": "Aku di sini. Katakan apa yang terjadi.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mountain_guard",
+          "text": "Gerbang itu... bergemuruh seperti jantung. Setiap kali ia berdenyut, kabut menelan lebih banyak jalan. Kalau kita tidak bertindak sekarang, konvoi itu hilang — persis seperti yang tercatat dulu.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

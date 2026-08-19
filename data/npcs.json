@@ -202,27 +202,25 @@
         }
       ]
   },
-  {
-   "id": "npc_villager_elder",
-   "name": "Tetua Desa",
-   "location": "loc_affected_village",
-   "dialog_routes": {
-    "general": "dlg_a05_d01",
-    "main": {
-     "quest_a05_c01_001": "dlg_a05_d01"
-    }
-   }
+  {      "id": "npc_villager_elder",
+      "name": "Tetua Desa",
+      "location": "loc_affected_village",
+      "dialog_routes": {
+        "general": "dlg_a05_d01",
+        "main": {
+          "quest_a05_c01_001": "dlg_a05_reactive_villager"
+        }
+      }
   },
-  {
-   "id": "npc_mountain_guard",
-   "name": "Penjaga Gerbang Gunung",
-   "location": "loc_mountain_gate",
-   "dialog_routes": {
-    "general": "dlg_a05_d02",
-    "main": {
-     "quest_a05_c02_002": "dlg_a05_d02"
-    }
-   }
+  {      "id": "npc_mountain_guard",
+      "name": "Penjaga Gerbang Gunung",
+      "location": "loc_mountain_gate",
+      "dialog_routes": {
+        "general": "dlg_a05_d02",
+        "main": {
+          "quest_a05_c02_002": "dlg_a05_reactive_guard"
+        }
+      }
   },
   {
    "id": "npc_entity",
