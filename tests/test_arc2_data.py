@@ -96,6 +96,8 @@ def test_arc2_data_contract_ok(registry):
         "quest_char_lin_yue_001", "quest_char_lin_yue_002",
         # Mei Ruo Character Arc (Phase 4)
         "quest_char_mei_ruo_001", "quest_char_mei_ruo_002", "quest_char_mei_ruo_003",
+        # Memory Investigation (GAP-B1)
+        "quest_memory_a01_m01_investigate", "quest_memory_a01_m04_investigate",
         # Shen Luo Character Arc (Phase 3)
         "quest_char_shen_luo_001", "quest_char_shen_luo_002",
     ]

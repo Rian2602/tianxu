@@ -1,0 +1,184 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_memory_a01_m01_investigate",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau punya ingatan tentang koridor yang terbakar — 'Koridor Terbakar.' Aku sudah melihat catatanmu. Ada sesuatu yang tidak konsisten.",
+          "choices": [
+            {"label": "Apa masalahnya?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ingatanmu bilang 'tidak ada wajah yang terlihat' dan 'suara berteriak terdistorsi.' Tapi catatan resmi Tian Xu bilang koridor itu tidak pernah terbakar — setidaknya tidak ada catatan kebakaran di arsip.",
+          "choices": [
+            {"label": "Mungkin itu mimpi, bukan ingatan.", "next": "n3"},
+            {"label": "Mungkin catatan resmi yang salah.", "next": "n3b"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Bisa jadi. Tapi ingatan dengan emosi kuat — ketakutan, urgensi — jarang sekali muncul dari mimpi biasa. Ini lebih seperti fragment dari sesuatu yang nyata.",
+          "choices": [
+            {"label": "Jadi ada yang menutupi kejadian ini?", "next": "n4"}
+          ]
+        },
+        "n3b": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Pikiran yang bagus. Catatan resmi bisa dihapus, diubah, atau bahkan tidak pernah ditulis. Tapi ingatan — ingatan tidak bisa dihapus begitu saja.",
+          "choices": [
+            {"label": "Aku ingin mencari bukti.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Aku sudah menemukan sesuatu — ada fragmen arsip yang tidak terindeks. Catatan pribadi seseorang yang tinggal di dekat koridor itu. Kau mau melihatnya?",
+          "choices": [
+            {"label": "Ya. Tunjukkan padaku.", "next": "n5"}
+          ]
+        },
+        "n5": {
+          "speaker": "narration",
+          "text": "Mei Ruo membawamu ke ruangan kecil di bawah arsip. Di atas meja tua, sebuah gulungan catatan — tulisan tangan, buram oleh waktu. Ini bukan catatan resmi. Ini catatan pribadi saksi mata.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_memory_a01_m01_reinterpret",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah membaca catatan itu. Sekarang pertanyaannya: apa yang kau percaya tentang Koridor Terbakar?",
+          "choices": [
+            {
+              "label": "Koridor itu benar-benar terbakar — seseorang menutupi kejadian ini.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m01_reinterpretation", "value": "coverup"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Itu hanya mimpi — tidak ada koridor yang terbakar.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m01_reinterpretation", "value": "dream"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Aku tidak tahu. Mungkin keduanya benar sebagian.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m01_reinterpretation", "value": "uncertain"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            }
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kebenaran tidak selalu tunggal. Yang penting adalah kau TIDAK lagi hanya menerima ingatan pertamamu sebagai satu-satunya versi. Itu langkah pertama untuk memahami siapa kau sebenarnya.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_memory_a01_m04_investigate",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ingatanmu tentang 'Jangan Percaya Sejarah' — itu salah satu ingatanmu yang paling jelas. Tapi ada masalah.",
+          "choices": [
+            {"label": "Masalah apa?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ingatanmu bilang seseorang berkata 'Kalau kau kembali, jangan percaya sejarah.' Tapi sejarah Tian Xu — yang tertulis di arsip — adalah sejarah yang sama selama ratusan tahun. Tidak ada yang mengubahnya.",
+          "choices": [
+            {"label": "Mungkin sejarah itu memang tidak boleh dipercaya.", "next": "n3"},
+            {"label": "Mungkin yang bicara itu salah.", "next": "n3b"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Pemikiran yang berbahaya — dan mungkin benar. Tapi kita perlu bukti. Aku sudah menemukan sesuatu yang menarik — ada catatan lama yang tidak pernah dimasukkan ke arsip utama.",
+          "choices": [
+            {"label": "Aku ingin melihatnya.", "next": "n4"}
+          ]
+        },
+        "n3b": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Bisa jadi. Tapi ingatan dengan detail spesifik — simbol kuno di meja, tangan yang tahu cara menggambarnya — itu bukan hal yang bisa dibuat-buat. Ada sesuatu yang nyata di balik ingatan ini.",
+          "choices": [
+            {"label": "Jadi ada sesuatu yang disembunyikan?", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Catatan itu ditulis oleh seseorang yang mengaku sebagai 'saksi mata' — tapi tidak ada catatan resmi tentang siapa yang selamat dari kejadian di balik Gerbang. Kau mau melihatnya?",
+          "choices": [
+            {"label": "Ya. Tunjukkan padaku.", "next": "n5"}
+          ]
+        },
+        "n5": {
+          "speaker": "narration",
+          "text": "Mei Ruo membawamu ke ruangan kecil di bawah arsip. Di atas meja tua, sebuah gulungan catatan — tulisan tangan, buram oleh waktu. Ini bukan catatan resmi. Ini catatan pribadi saksi mata.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_memory_a01_m04_reinterpret",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah membaca catatan itu. Sekarang pertanyaannya: apa yang kau percaya tentang 'Jangan Percaya Sejarah'?",
+          "choices": [
+            {
+              "label": "Sejarah Tian Xu memang dimanipulasi — ada yang disembunyikan.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m04_reinterpretation", "value": "manipulated"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Itu hanya peringatan umum — tidak spesifik tentang Tian Xu.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m04_reinterpretation", "value": "general"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Aku tidak tahu. Mungkin keduanya benar sebagian.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m04_reinterpretation", "value": "uncertain"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            }
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kebenaran tidak selalu tunggal. Yang penting adalah kau TIDAK lagi hanya menerima ingatan pertamamu sebagai satu-satunya versi. Itu langkah pertama untuk memahami siapa kau sebenarnya.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

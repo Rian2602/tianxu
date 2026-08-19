@@ -1,0 +1,46 @@
+{
+  "quests": [
+    {
+      "id": "quest_memory_a01_m01_investigate",
+      "kind": "side",
+      "title": "Investigasi: Koridor Terbakar",
+      "description": "Selidiki ingatan tentang koridor yang terbakar — apakah itu mimpi atau kenyataan?",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "has_memory": "memory_a01_m01"
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a01_m01_investigated", "value": true}
+        ]
+      }
+    },
+    {
+      "id": "quest_memory_a01_m04_investigate",
+      "kind": "side",
+      "title": "Investigasi: Jangan Percaya Sejarah",
+      "description": "Selidiki ingatan tentang peringatan untuk tidak mempercayai sejarah.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "has_memory": "memory_a01_m04"
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a01_m04_investigated", "value": true}
+        ]
+      }
+    }
+  ]
+}

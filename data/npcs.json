@@ -73,6 +73,14 @@
      },
      "quest_char_mei_ruo_003": {
       "report": "dlg_mei_ruo_char_002"
+     },
+     "quest_memory_a01_m01_investigate": {
+      "offer": "dlg_memory_a01_m01_investigate",
+      "report": "dlg_memory_a01_m01_reinterpret"
+     },
+     "quest_memory_a01_m04_investigate": {
+      "offer": "dlg_memory_a01_m04_investigate",
+      "report": "dlg_memory_a01_m04_reinterpret"
      }
     }
    }

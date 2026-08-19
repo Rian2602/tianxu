@@ -13,7 +13,7 @@ pytest tests/test_smoke.py     # Smoke tests only
 node --check web/static/app.js # JS syntax check
 ```
 
-No `pyproject.toml`, `requirements.txt`, or build tooling. No pip install needed — stdlib only. Both `src/cli.py` and `web/app.py` manually add the project root to `sys.path`.
+`pyproject.toml` exists for build config; no `requirements.txt` — stdlib only, no pip install needed. Both `src/cli.py` and `web/app.py` manually add the project root to `sys.path`.
 
 ## Structure
 
@@ -34,7 +34,7 @@ No `pyproject.toml`, `requirements.txt`, or build tooling. No pip install needed
 - **Engine is UI-agnostic** — `session.view()` returns a plain dict. Both CLI and web render from the same dict.
 - **Data-driven** — Game content is JSON/CSV in `data/`. Adding quests/dialogs/NPCs = adding files. Zero code changes.
 - **Validator runs at startup** — `validate.py` checks schema, duplicates, cross-references, unknown types, illegal `start_quest`, branching quests, timeouts. All violations collected before throwing.
-- **Save system is versioned** — `SCHEMA_VERSION = 2` with forward migration. Path traversal protected.
+- **Save system is versioned** — `SCHEMA_VERSION = 3` with forward migration. Path traversal protected.
 - **No walrus operator** (`:=`) in engine code — project convention is conservative Python style.
 
 ## Testing
@@ -43,7 +43,7 @@ Tests copy `tests/fixtures/minimal_data/` to `tmp_path` — never touches real `
 
 ## Gotchas
 
-- No `.gitignore` — `.venv/`, `.coverage`, `saves/`, `__pycache__/` may show in `git status`.
+- `.gitignore` exists — `.venv/`, `.coverage`, `saves/`, `__pycache__/` are excluded but may show in `git status`.
 - Single-player only — one active web session per process, protected by mutex.
 - Web static files served with `Cache-Control: no-cache`.
 - `data/` is NOT empty — 7 arcs of story data live there. Don't assume data files are missing.
