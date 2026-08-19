@@ -151,6 +151,7 @@ class GameSession:
             "shop_sell": self._shop_sell,
             "craft": self._craft,
             "upgrade_technique": self._upgrade_technique,
+            "switch_companion": self._switch_companion,
             "save": self._save,
         }
         fn = handler.get(t)
@@ -270,6 +271,26 @@ class GameSession:
         o = quest.get("objective", {})
         return o.get("npc") == nid or o.get("report_to") == nid
 
+    def _side_objective_met(self, qid: str) -> bool:
+        """Cek apakah objektif side quest sudah terpenuhi untuk report."""
+        sq = self.reg.quest(qid)
+        obj = sq.get("objective", {})
+        kind = obj.get("kind")
+        if kind == "gather":
+            item = obj.get("item", "")
+            return self.state.inventory.get(item, 0) >= obj.get("target", 1)
+        if kind == "defeat":
+            prog = self.state.active_side_quests.get(qid, {})
+            return prog.get("defeated", 0) >= obj.get("target", 1)
+        if kind == "talk":
+            prog = self.state.active_side_quests.get(qid, {})
+            return prog.get("talk", 0) >= obj.get("target", 1)
+        if kind == "spar":
+            return True
+        if kind == "reach":
+            return self.state.location == obj.get("location")
+        return True
+
     def _offerable_side_for(self, nid: str) -> list[str]:
         out = []
         for sq in self.reg.quests:
@@ -309,10 +330,15 @@ class GameSession:
                 return rid, forced_node
             return general, forced_node
 
-        # 2. side quest aktif → report (tie-break deterministik: urut quest id)
+        # 2. side quest aktif → report (hanya bila objektif terpenuhi)
         for qid in sorted(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             if sq and sq.get("kind") == "side" and self._quest_involves_npc(sq, nid):
+                if not self._side_objective_met(qid):
+                    nrid = (routes.get("side") or {}).get(qid, {}).get("not_ready")
+                    if nrid and self.dialog.can_start(nrid):
+                        return nrid, None
+                    continue
                 rid = (routes.get("side") or {}).get(qid, {}).get("report")
                 if rid and self.dialog.can_start(rid):
                     return rid, None
@@ -637,20 +663,53 @@ class GameSession:
         # kompanion KO bangkit kembali di titik aman (§9.4)
         revived = False
         comp_name = None
-        if self.state.companion and not self.state.companion.get("active"):
-            cid = self.state.companion["id"]
-            comp = next((c for c in self.reg.companions if c.get("id") == cid), None)
-            if comp:
-                scale = self.reg.config.get("companion", {})
-                hp_max = int(comp.get("base_hp", 10)) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
-                self.state.companion["active"] = True
-                self.state.companion["hp"] = hp_max
-                revived = True
-                comp_name = comp["name"]
+        for c in self.state.companions:
+            if not c.get("active"):
+                cid = c["id"]
+                comp = next((x for x in self.reg.companions if x.get("id") == cid), None)
+                if comp:
+                    scale = self.reg.config.get("companion", {})
+                    hp_max = int(comp.get("base_hp", 10)) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
+                    c["active"] = True
+                    c["hp"] = hp_max
+                    revived = True
+                    comp_name = comp["name"]
+                    break  # only log first revival
+        # backward compat sync
+        if self.state.companions:
+            active_id = self.state.active_companion
+            active_entry = next((c for c in self.state.companions if c.get("id") == active_id), None)
+            if active_entry:
+                self.state.companion = active_entry
         msg = f"Kau beristirahat selama {hours} jam. HP & Qi pulih penuh."
         if revived and comp_name:
             msg += f" {comp_name} bangkit kembali."
         add_log(self.state, "narration", msg)
+        return self.view()
+
+    def _switch_companion(self, action: dict) -> dict:
+        """Ganti kompanion aktif — hanya di lokasi aman."""
+        loc = self.reg.location(self.state.location)
+        if not loc or not loc.get("is_safe"):
+            add_log(self.state, "system", "Hanya bisa mengganti kawan di lokasi aman.")
+            return self.view()
+        cid = action.get("companion")
+        if not cid:
+            add_log(self.state, "system", "Pilih kawan yang ingin diganti.")
+            return self.view()
+        entry = next((c for c in self.state.companions if c.get("id") == cid), None)
+        if not entry:
+            add_log(self.state, "system", "Kawan itu tidak ada di rombonganmu.")
+            return self.view()
+        if entry.get("hp", 0) <= 0:
+            add_log(self.state, "system", "Kawan itu sedang pingsan. Istirahatkan dulu.")
+            return self.view()
+        self.state.active_companion = cid
+        comp = next((x for x in self.reg.companions if x.get("id") == cid), None)
+        name = comp["name"] if comp else cid
+        add_log(self.state, "narration", f"{name} menjadi kawan aktifmu.")
+        # backward compat
+        self.state.companion = entry
         return self.view()
 
     def _shop_buy(self, action: dict) -> dict:
@@ -905,6 +964,16 @@ class GameSession:
                 if self.reg.memory(m["id"] if isinstance(m, dict) else m)
             ],
             "companion": companion_stats(s, self.reg),
+            "companions": [
+                {"id": c["id"],
+                 "name": (next((x for x in self.reg.companions if x.get("id") == c["id"]), None) or {}).get("name", c["id"]),
+                 "hp": c.get("hp", 0),
+                 "hp_max": int((next((x for x in self.reg.companions if x.get("id") == c["id"]), None) or {}).get("base_hp", 10)) + s.player.realm_level * int((self.reg.config.get("companion") or {}).get("hp_per_level", 12)),
+                 "active": c.get("active", True),
+                 "selected": c["id"] == s.active_companion}
+                for c in s.companions
+            ],
+            "active_companion": s.active_companion,
             "mode": self._mode(),
             "dialog": self.dialog.view() if s.pending_dialog else None,
             "battle": self.battle.view() if s.pending_battle else None,

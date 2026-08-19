@@ -70,6 +70,20 @@
       }
     },
     {
+      "id": "dlg_pedagang_side_herbs_not_ready",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Belum dapat herba-nya? Tidak masalah, ambil waktumu. Hati-hati di hutan.",
+          "choices": [
+            {"label": "Baik, aku akan kembali."}
+          ]
+        }
+      }
+    },
+    {
       "id": "dlg_pedagang_side_letter_offer",
       "npc": "npc_pedagang_jalanan",
       "start": "n1",
@@ -116,6 +130,20 @@
           "speaker": "npc:npc_pedagang_jalanan",
           "text": "Tentu saja dia tahu. Kami pernah sekelas. Tapi topik itu... nanti. Sekarang, ada masalah lain.",
           "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_side_letter_not_ready",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Suratnya sudah disampaikan ke Lin Yue? Belum? Tidak masalah, ambil waktumu.",
+          "choices": [
+            {"label": "Baik, aku akan kembali."}
+          ]
         }
       }
     },
@@ -167,6 +195,20 @@
           "speaker": "npc:npc_pedagang_jalanan",
           "text": "Karena formasi di bawah akademi ini... tidak stabil. Dan ada yang tahu cara memperbaikinya — tapi mereka memilih menutupinya. Aku tidak bisa tinggal di tempat yang menutupi kebenaran.",
           "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_side_threat_not_ready",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Binatang-binatang itu masih berkeliaran? Hati-hati, jangan terlalu memaksakan diri.",
+          "choices": [
+            {"label": "Baik, aku akan kembali."}
+          ]
         }
       }
     },

@@ -2,14 +2,26 @@
  "npcs": [
   {
    "id": "npc_aptitude_examiner",
-   "name": "Pemeriksa Aptitude",
+   "name": "Xu Ming",
    "location": "loc_tianxu_gate",
    "dialog_routes": {
-    "general": "dlg_a01_d001",
+    "general": "dlg_a01_examiner_post",
     "main": {
      "quest_a01_c01_001": "dlg_a01_d001",
      "quest_a01_c01_002": "dlg_a01_d002"
     }
+   },
+   "profile": {
+    "full_name": "Xu Ming",
+    "realm": "Ranah 4",
+    "realm_level": 7,
+    "weapon": "Tongkat Pemeriksa",
+    "element": "logam",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Pemeriksa aptitude yang sudah bertugas puluhan tahun. Tenang dan teliti, tidak pernah salah menilai bakat seseorang.",
+    "companion": null,
+    "hp_max": 35,
+    "qi_max": 25
    }
   },
   {
@@ -31,8 +43,23 @@
      },
      "quest_char_lin_yue_002": {
       "report": "dlg_lin_yue_char_002"
+     },
+     "quest_side_pedagang_letter": {
+      "report": "dlg_lin_yue_merchant_letter"
      }
     }
+   },
+   "profile": {
+    "full_name": "Lin Yue",
+    "realm": "Ranah 2",
+    "realm_level": 3,
+    "weapon": "Pedang Ringan",
+    "element": "angin",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Murid baru yang cerdas dan waspada. Memiliki ingatan aneh tentang formasi kuno yang seharusnya tidak pernah dilihatnya.",
+    "companion": null,
+    "hp_max": 25,
+    "qi_max": 18
    }
   },
   {
@@ -61,6 +88,18 @@
      "dialog": "dlg_a07_reactive_shen_luo",
      "relation_min": 5
     }
+   },
+   "profile": {
+    "full_name": "Shen Luo",
+    "realm": "Ranah 2",
+    "realm_level": 4,
+    "weapon": "Tombak Besi",
+    "element": "api",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Murid yang ambisius dan tidak kenal kompromi. Percaya bahwa yang lemah harus tertinggal, tidak ada tempat untuk kelemahan di Tian Xu.",
+    "companion": null,
+    "hp_max": 30,
+    "qi_max": 15
    }
   },
   {
@@ -106,6 +145,18 @@
      "dialog": "dlg_a07_reactive_mei_ruo",
      "relation_min": 5
     }
+   },
+   "profile": {
+    "full_name": "Mei Ruo",
+    "realm": "Ranah 3",
+    "realm_level": 2,
+    "weapon": "Gulungan Sihir",
+    "element": "air",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Sejarawan muda yang mencatat setiap detail tentang Tian Xu. percaya bahwa pemahaman masa lalu adalah kunci masa depan.",
+    "companion": null,
+    "hp_max": 20,
+    "qi_max": 30
    }
   },
   {
@@ -123,43 +174,103 @@
       "report": "dlg_gu_han_char_002"
      }
     }
+   },
+   "profile": {
+    "full_name": "Gu Han",
+    "realm": "Ranah 2",
+    "realm_level": 5,
+    "weapon": "Tinju Besi",
+    "element": "tanah",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Murid yang skeptis dan waspada. Tidak percaya pada apa pun yang tidak bisa dibuktikan sendiri. Kewaspadaannya menyelamatkannya lebih dari sekali.",
+    "companion": null,
+    "hp_max": 32,
+    "qi_max": 12
    }
   },
   {
    "id": "npc_teacher_wuxin",
-   "name": "Guru Wuxin",
+   "name": "Xu Wuxin",
    "location": "loc_pavilion_wuxin",
    "dialog_routes": {
     "general": "dlg_a01_d007"
+   },
+   "profile": {
+    "full_name": "Xu Wuxin",
+    "realm": "Ranah 5",
+    "realm_level": 8,
+    "weapon": "Tangan Kosong",
+    "element": "angin",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Guru Pavilion Wuxin. Filosofinya: kekuatan lahir dari melepaskan keterikatan. Murid-muridnya belajar untuk mengosongkan hati.",
+    "companion": null,
+    "hp_max": 50,
+    "qi_max": 40
    }
   },
   {
    "id": "npc_teacher_jianxin",
-   "name": "Guru Jianxin",
+   "name": "Xu Jianxin",
    "location": "loc_pavilion_jianxin",
    "dialog_routes": {
     "general": "dlg_a01_d008"
+   },
+   "profile": {
+    "full_name": "Xu Jianxin",
+    "realm": "Ranah 5",
+    "realm_level": 6,
+    "weapon": "Pedang Tepat",
+    "element": "logam",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Guru Pavilion Jianxin. Disiplin dan ketepatan adalah segalanya. Satu pedang, satu disiplin, satu tujuan.",
+    "companion": null,
+    "hp_max": 45,
+    "qi_max": 35
    }
   },
   {
    "id": "npc_teacher_yanzhi",
-   "name": "Guru Yanzhi",
+   "name": "Xu Yanzhi",
    "location": "loc_pavilion_yanzhi",
    "dialog_routes": {
     "general": "dlg_a01_d009"
+   },
+   "profile": {
+    "full_name": "Xu Yanzhi",
+    "realm": "Ranah 5",
+    "realm_level": 7,
+    "weapon": "Tongkat Pengetahuan",
+    "element": "air",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Guru Pavilion Yanzhi. Pahami prinsip di balik gerakan, dan gerakan itu menjadi milikmu selamanya.",
+    "companion": null,
+    "hp_max": 40,
+    "qi_max": 45
    }
   },
   {
    "id": "npc_teacher_liuguang",
-   "name": "Guru Liuguang",
+   "name": "Xu Liuguang",
    "location": "loc_pavilion_liuguang",
    "dialog_routes": {
     "general": "dlg_a01_d010"
+   },
+   "profile": {
+    "full_name": "Xu Liuguang",
+    "realm": "Ranah 5",
+    "realm_level": 5,
+    "weapon": "Sikat Air",
+    "element": "air",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Guru Pavilion Liuguang. Air mengalir tidak memaksa jalannya — ia menyesuaikan. Begitu pula cultivation.",
+    "companion": null,
+    "hp_max": 38,
+    "qi_max": 42
    }
   },
   {
    "id": "npc_proctor",
-   "name": "Guru Pengawas Ujian",
+   "name": "Xu Zhiyuan",
    "location": "loc_training_hall",
    "can_spar": true,
    "combat": {
@@ -175,6 +286,18 @@
      "quest_a02_c01_002": "dlg_a02_d012",
      "quest_a02_c04_007a": "dlg_a02_obey_report"
     }
+   },
+   "profile": {
+    "full_name": "Xu Zhiyuan",
+    "realm": "Ranah 4",
+    "realm_level": 9,
+    "weapon": "Tongkat Pengawas",
+    "element": "logam",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Guru pengawas ujian yang ketat tapi adil. Percaya bahwa ujian sejati bukan di lapangan, tapi di hati.",
+    "companion": null,
+    "hp_max": 40,
+    "qi_max": 30
    }
   },
   {
@@ -186,22 +309,46 @@
     "main": {
      "quest_a03_c02_002": "dlg_a03_d02"
     }
+   },
+   "profile": {
+    "full_name": "Mo Chen",
+    "realm": "Ranah 3",
+    "realm_level": 6,
+    "weapon": "Pedang Bayangan",
+    "element": "bayangan",
+    "faction": "Independent",
+    "bio": "Pertemuan misterius di koridor sunyi. Sesuatu tentangnya terasa familiar, tapi kamu tidak bisa menempatkan kenapa.",
+    "companion": null,
+    "hp_max": 28,
+    "qi_max": 22
    }
   },
   {
    "id": "npc_archive_clerk",
-   "name": "Arsiparis",
+   "name": "Xu Lan",
    "location": "loc_archive_public",
    "dialog_routes": {
     "general": "dlg_a03_d03",
     "main": {
      "quest_a03_c03_003": "dlg_a03_d03"
     }
+   },
+   "profile": {
+    "full_name": "Xu Lan",
+    "realm": "Ranah 3",
+    "realm_level": 4,
+    "weapon": "Tongkat Arsip",
+    "element": "tanah",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Arsiparis yang menjaga catatan akademi. Tahu lebih banyak dari yang dikatakannya, tapi kejujuran adalah sumpahnya.",
+    "companion": null,
+    "hp_max": 25,
+    "qi_max": 20
    }
   },
   {
    "id": "npc_grandmaster",
-   "name": "Grandmaster",
+   "name": "Xu Tianming",
    "location": "loc_grandmaster_chamber",
    "dialog_routes": {
     "general": "dlg_a04_d03",
@@ -222,44 +369,92 @@
      "dialog": "dlg_a07_reactive_grandmaster",
      "relation_min": 5
     }
+   },
+   "profile": {
+    "full_name": "Xu Tianming",
+    "realm": "Ranah 7",
+    "realm_level": 3,
+    "weapon": "Tangan Kosong",
+    "element": "semua",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Grandmaster Tian Xu. Kekuatan dan kebijaksanaan yang langka. Membawa beban seluruh akademi di pundaknya.",
+    "companion": null,
+    "hp_max": 80,
+    "qi_max": 70
    }
   },
   {
    "id": "npc_villager_elder",
-   "name": "Tetua Desa",
+   "name": "Chen Bo",
    "location": "loc_affected_village",
    "dialog_routes": {
     "general": "dlg_a05_d01",
     "main": {
      "quest_a05_c01_001": "dlg_a05_reactive_villager"
     }
+   },
+   "profile": {
+    "full_name": "Chen Bo",
+    "realm": "Ranah 1",
+    "realm_level": 5,
+    "weapon": "Tongkat Kayu",
+    "element": "tanah",
+    "faction": "Independent",
+    "bio": "Tetua desa yang已经看透了一切. Spiritual Collapse已经夺走了他的everything, tapi dia masih berdiri untuk desanya.",
+    "companion": null,
+    "hp_max": 15,
+    "qi_max": 8
    }
   },
   {
    "id": "npc_mountain_guard",
-   "name": "Penjaga Gerbang Gunung",
+   "name": "Li Feng",
    "location": "loc_mountain_gate",
    "dialog_routes": {
     "general": "dlg_a05_d02",
     "main": {
      "quest_a05_c02_002": "dlg_a05_reactive_guard"
     }
+   },
+   "profile": {
+    "full_name": "Li Feng",
+    "realm": "Ranah 3",
+    "realm_level": 7,
+    "weapon": "Tombak Gunung",
+    "element": "tanah",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Penjaga gerbang gunung yang setia. Sudah bertugas selama 20 tahun, tidak pernah sekali pun meninggalkan posnya.",
+    "companion": null,
+    "hp_max": 35,
+    "qi_max": 20
    }
   },
   {
    "id": "npc_entity",
-   "name": "Entity",
+   "name": "??? (Entity)",
    "location": "loc_tianxu_deepest_chamber",
    "dialog_routes": {
     "general": "dlg_a05_d04",
     "main": {
      "quest_a05_c04_004": "dlg_a05_d04"
     }
+   },
+   "profile": {
+    "full_name": "??? (Entity)",
+    "realm": "Ranah ???",
+    "realm_level": 0,
+    "weapon": "Tidak Diketahui",
+    "element": "tidak diketahui",
+    "faction": "Unknown",
+    "bio": "Entitas misterius di ruang terdalam Tian Xu. Bentuknya tidak jelas, dan kehadirannya membuat formasi bergetar.",
+    "companion": null,
+    "hp_max": 100,
+    "qi_max": 100
    }
   },
   {
    "id": "npc_mentor",
-   "name": "Mentor",
+   "name": "Xu Yu",
    "location": "loc_mentor_ground",
    "dialog_routes": {
     "general": "dlg_a06_d03",
@@ -267,6 +462,18 @@
      "quest_a06_c02_002": "dlg_a06_d01",
      "quest_a06_c04_004": "dlg_a06_d03"
     }
+   },
+   "profile": {
+    "full_name": "Xu Yu",
+    "realm": "Ranah 6",
+    "realm_level": 2,
+    "weapon": "Pedang Spiritual",
+    "element": "api",
+    "faction": "Tian Xu Orthodox",
+    "bio": "Mentor yang已经消失. Kehadirannya masih terasa di lapangan latihan, dan murid-muridnya masih mengingat setiap pelajarannya.",
+    "companion": null,
+    "hp_max": 55,
+    "qi_max": 50
    }
   },
   {
@@ -279,6 +486,109 @@
      "quest_a07_c02_002": "dlg_a07_d02",
      "quest_a07_c03_003": "dlg_a07_d03"
     }
+   },
+   "profile": {
+    "full_name": "Jiang Yan",
+    "realm": "Ranah 8",
+    "realm_level": 5,
+    "weapon": "Tidak Diketahui",
+    "element": "semua",
+    "faction": "Ancient",
+    "bio": "Jejak dari kehidupan pertama. Catatan-catatan pribadinya menyimpan kebenaran yang bisa mengubah segalanya.",
+    "companion": null,
+    "hp_max": 90,
+    "qi_max": 85
+   }
+  },
+  {
+   "id": "npc_pedagang_jalanan",
+   "name": "Zhao Wu",
+   "location": "loc_tianxu_approach_road",
+    "dialog_routes": {
+     "general": "dlg_pedagang_greeting",
+     "side": {
+      "quest_side_pedagang_herbs": {
+       "offer": "dlg_pedagang_side_herbs_offer",
+       "report": "dlg_pedagang_side_herbs_report",
+       "not_ready": "dlg_pedagang_side_herbs_not_ready"
+      },
+      "quest_side_pedagang_letter": {
+       "offer": "dlg_pedagang_side_letter_offer",
+       "report": "dlg_pedagang_side_letter_report",
+       "not_ready": "dlg_pedagang_side_letter_not_ready"
+      },
+      "quest_side_pedagang_threat": {
+       "offer": "dlg_pedagang_side_threat_offer",
+       "report": "dlg_pedagang_side_threat_report",
+       "not_ready": "dlg_pedagang_side_threat_not_ready"
+      }
+     }
+    },
+   "shop": {
+    "buy": [
+     {
+      "item": "pedang_besi",
+      "price": 15
+     },
+     {
+      "item": "pedang_spirit",
+      "price": 40
+     },
+     {
+      "item": "jubah_latih",
+      "price": 8
+     },
+     {
+      "item": "pil_pemulihan",
+      "price": 10
+     },
+     {
+      "item": "pil_qi_besar",
+      "price": 15
+     },
+     {
+      "item": "herba_qi",
+      "price": 5
+     },
+     {
+      "item": "gulung_teknik_pedang",
+      "price": 25
+     },
+     {
+      "item": "gulung_teknik_pemulihan",
+      "price": 25
+     },
+     {
+      "item": "gulung_teknik_pertahanan",
+      "price": 25
+     }
+    ],
+    "sell": [
+     {
+      "item": "herba_qi",
+      "price": 2
+     },
+     {
+      "item": "pil_qi",
+      "price": 4
+     },
+     {
+      "item": "pil_pemulihan",
+      "price": 5
+     }
+    ]
+   },
+   "profile": {
+    "full_name": "Zhao Wu",
+    "realm": "Ranah 2",
+    "realm_level": 6,
+    "weapon": "Tidak Ada",
+    "element": "tidak ada",
+    "faction": "Independent",
+    "bio": "Mantan murid Tian Xu yang memilih pergi. Sekarang berdagang di jalan pendakian, menunggu seseorang yang bisa menyelesaikan apa yang tidak bisa ia selesaikan.",
+    "companion": null,
+    "hp_max": 20,
+    "qi_max": 15
    }
   }
  ]
