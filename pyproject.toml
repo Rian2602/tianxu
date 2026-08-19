@@ -24,9 +24,6 @@ classifiers = [
     "Topic :: Games/Entertainment :: Role-Playing",
 ]
 
-[project.scripts]
-tianxu = "src.cli:main"
-
 [project.urls]
 Homepage = "https://github.com/tianxu-studio/tian-xu-second-life"
 Repository = "https://github.com/tianxu-studio/tian-xu-second-life"
