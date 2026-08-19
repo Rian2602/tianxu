@@ -51,25 +51,23 @@ After completing Phases 0-7, the game has:
 
 #### GAP-A2: Missing Characters in Arcs I-III
 
-**Current State:**
-- Characters (Lin Yue, Shen Luo, Mei Ruo, Gu Han) only have character quests in standalone side quest files
-- No character development in the main Arc I-III questlines
-- Character relationships only change via side quest effects
+**Status: ✅ RESOLVED**
+
+**Resolution:**
+- Added `dialog_routes.side` for Shen Luo, Mei Ruo, Gu Han, Grandmaster
+  (engine can now route to character quest offer/report dialogs)
+- Added `available_from.relation_min` to all character quests
+  (quests only offered when relationship threshold met)
+- Added relationship-gated dialogue variants in Arc IV and Arc V
+  (Grandmaster dialogue changes when Shen Luo relationship ≥ 5)
+  (Lin Yue dialogue changes when Gu Han relationship ≥ 5)
+- Removed unused `side_offers` field from NPCs
 
 **Impact:**
-- Main story feels disconnected from character arcs
-- Players may not encounter character quests
-- Character development is optional, not integrated
-
-**Design Decision Needed:**
-- Should character quests be required or optional?
-- How should character development be integrated into main quest flow?
-- Should character relationships affect main quest availability?
-
-**Recommendation:**
-- Character quests should be discoverable but not required for main progression
-- Add character interaction opportunities in main quest dialogues
-- Consider making character relationship thresholds gate certain content
+- Players discover character quests through NPC conversations
+- Character quests require minimum relationship to unlock
+- Main quest dialogues react to character relationships
+- Character development is now integrated into main story flow
 
 ---
 
@@ -278,7 +276,7 @@ After completing Phases 0-7, the game has:
 | Gap | Priority | Effort | Impact | Recommendation |
 |-----|----------|--------|--------|----------------|
 | ~~A1: Realm Progression~~ | ~~HIGH~~ | ~~HIGH~~ | ~~HIGH~~ | ✅ RESOLVED |
-| A2: Missing Characters | HIGH | HIGH | HIGH | Integrate into main quests |
+| ~~A2: Missing Characters~~ | ~~HIGH~~ | ~~HIGH~~ | ~~HIGH~~ | ✅ RESOLVED |
 | A3: Branching Shallow | MEDIUM | HIGH | MEDIUM | Keep for testing, expand later |
 | B1: Memory Investigation | MEDIUM | MEDIUM | MEDIUM | Add 2 more prototypes |
 | B2: Faction System | MEDIUM | MEDIUM | MEDIUM | Add 1 more faction |
