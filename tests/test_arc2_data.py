@@ -90,6 +90,8 @@ def test_arc2_data_contract_ok(registry):
         "quest_a07_c01_001", "quest_a07_c02_002", "quest_a07_c03_003",
         # Tian Xu Orthodox Faction (Phase 6)
         "quest_faction_orthodox_001", "quest_faction_orthodox_002",
+        # Reformation Faction (GAP-B2)
+        "quest_faction_reform_001", "quest_faction_reform_002",
         # Gu Han Character Arc (Phase 5)
         "quest_char_gu_han_001", "quest_char_gu_han_002",
         # Lin Yue Character Arc (Phase 1)

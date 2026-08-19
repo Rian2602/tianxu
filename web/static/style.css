@@ -462,7 +462,7 @@ body.ambience-library #col-center {
 .log-entry.log-npc.speaker-line { color: var(--cream); }
 .log-entry.log-player.speaker-line { color: var(--c-player); }
 
-#interact { margin-top: 18px; }
+#interact { margin-top: 18px; padding-bottom: env(safe-area-inset-bottom, 0); }
 
 /* B5 — dialog sebagai "story card": accent emas kiri, beda dari panel statistik */
 .interact-box {

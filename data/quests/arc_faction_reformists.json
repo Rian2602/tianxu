@@ -1,0 +1,54 @@
+{
+  "quests": [
+    {
+      "id": "quest_faction_reform_001",
+      "kind": "side",
+      "title": "Permintaan dari Shen Luo",
+      "description": "Shen Luo meminta bantuanmu untuk menyebarkan informasi tentang ketidakadilan di Tian Xu.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_shen_luo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_shen_luo",
+          "value": 2
+        }
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_reform_task_accepted", "value": true},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+        ]
+      }
+    },
+    {
+      "id": "quest_faction_reform_002",
+      "kind": "side",
+      "title": "Pilihan Reformis",
+      "description": "Shen Luo meminta pendapatmu tentang masa depan pergerakan reformasi.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_shen_luo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_shen_luo",
+          "value": 4
+        }
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_reform_arc_complete", "value": true},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 3}
+        ]
+      }
+    }
+  ]
+}

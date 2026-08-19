@@ -1,0 +1,97 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_reform_faction_001",
+      "npc": "npc_shen_luo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Kau datang. Aku butuh seseorang yang bisa kupercaya — dan setelah semua yang terjadi, sepertinya kau orangnya. Ada sesuatu yang tidak beres di Tian Xu.",
+          "choices": [
+            {"label": "Apa masalahnya?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Formasi penjaga — yang katanya melindungi kita — sebenarnya memakan sesuatu. Dan kita semua membayarnya tanpa sadar. Aku sudah melihat cukup banyak untuk tahu bahwa sesuatu tidak beres.",
+          "choices": [
+            {"label": "Aku juga merasakan sesuatu yang aneh.", "next": "n3"},
+            {"label": "Kau yakin tidak terlalu berlebihan?", "next": "n3b"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Bagus. Setidaknya kau tidak langsung menyangkal. Aku butuh seseorang yang bisa melihat apa yang kulihat. Kau mau membantuku menyebarkan informasi ini?",
+          "choices": [
+            {"label": "Ya. Kita harus memberitahu orang lain.", "next": "n4"}
+          ]
+        },
+        "n3b": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Mungkin. Tapi lebih baik berlebihan daripada tidak peduli sama sekali. Kalau aku salah, kita hanya membuang waktu. Kalau aku benar... kita menyelamatkan banyak nyawa.",
+          "choices": [
+            {"label": "Baiklah, aku akan membantumu.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Terima kasih. Aku tidak mudah mempercayai orang — tapi kau berbeda. Aku akan menghubungimu ketika aku menemukan sesuatu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_reform_faction_002",
+      "npc": "npc_shen_luo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Situasinya memburuk. Aku sudah bicara dengan orang-orang di luar — mereka ingin bertindak. Tapi aku tidak yakin apakah kita harus menghancurkan semuanya atau hanya mengubahnya dari dalam.",
+          "choices": [
+            {
+              "label": "Aku pikir kita harus mengubah dari dalam.",
+              "effects": [
+                {"type": "flag", "key": "state_reform_stance", "value": "reform"},
+                {"type": "reputation", "faksi": "faction_reformists", "value": 2}
+              ],
+              "next": "n_end_reform"
+            },
+            {
+              "label": "Mungkin memang harus dihancurkan.",
+              "effects": [
+                {"type": "flag", "key": "state_reform_stance", "value": "liberation"},
+                {"type": "reputation", "faksi": "faction_reformists", "value": 3}
+              ],
+              "next": "n_end_liberation"
+            },
+            {
+              "label": "Aku tidak tahu. Kau yang putuskan.",
+              "effects": [
+                {"type": "flag", "key": "state_reform_stance", "value": "stay"},
+                {"type": "reputation", "faksi": "faction_reformists", "value": 1}
+              ],
+              "next": "n_end_stay"
+            }
+          ]
+        },
+        "n_end_reform": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Mengubah dari dalam... sulit, tapi mungkin lebih aman. Kita akan mencoba jalan itu — untuk sekarang.",
+          "choices": []
+        },
+        "n_end_liberation": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Kau berani. Aku menghargai itu. Tapi berhati-hatilah — ada batas antara keberanian dan kecerobohan.",
+          "choices": []
+        },
+        "n_end_stay": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Kau membiarkanku memutuskan? Itu... jujur. Dan langka. Aku akan memikirkannya — baik-baik.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

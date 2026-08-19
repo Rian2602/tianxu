@@ -48,6 +48,13 @@
      },
      "quest_char_shen_luo_002": {
       "report": "dlg_shen_luo_char_002"
+     },
+     "quest_faction_reform_001": {
+      "offer": "dlg_reform_faction_001",
+      "report": "dlg_reform_faction_002"
+     },
+     "quest_faction_reform_002": {
+      "report": "dlg_reform_faction_002"
      }
     }
    }
