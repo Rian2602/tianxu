@@ -80,6 +80,14 @@ class DataRegistry:
         except (FileNotFoundError, KeyError, TypeError):
             pass  # factions.json is optional
 
+        # Jadwal NPC — NPC berpindah lokasi berdasarkan waktu (opsional).
+        self.npc_schedules: dict[str, list[dict]] = {}
+        try:
+            sched_data = self._json("npc_schedules.json")["schedules"]
+            self.npc_schedules = sched_data
+        except (FileNotFoundError, KeyError, TypeError):
+            pass  # npc_schedules.json is optional
+
         self.items_raw = self._csv("items.csv")
         self.items = {r["id"]: r for r in self.items_raw}
         self.enemies_raw = self._csv("enemies.csv")

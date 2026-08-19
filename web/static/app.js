@@ -273,7 +273,8 @@ const ICON_CACHE = {};
 
 async function loadIcons() {
   const names = ["sword", "shield", "book-open", "map-pin", "message-circle", "x",
-                 "heart", "backpack", "scroll-text", "target", "sparkles", "landmark"];
+                 "heart", "backpack", "scroll-text", "target", "sparkles", "landmark",
+                 "trophy"];
   await Promise.all(names.map(async (n) => {
     try {
       const r = await fetch(`/static/assets/icons/${n}.svg`);
@@ -582,6 +583,17 @@ function renderRight(v) {
     html += `<div class="mem-row locked"><span class="seal seal-ghost seal-sm">？</span> Belum Terbuka</div>`;
   }
   html += `</div>`;
+
+  // GAP-C3: Pencapaian
+  if (unlockedAchievements.size > 0) {
+    html += `<div class="section"><h3 class="stat-title">${icon("trophy")}Pencapaian</h3>`;
+    unlockedAchievements.forEach(id => {
+      const a = ACHIEVEMENTS[id];
+      if (a) html += `<div class="achievement-badge badge-achievement">${a.icon} ${esc(a.title)}</div> `;
+    });
+    html += `</div>`;
+  }
+
   $("col-right").innerHTML = html;
 }
 
@@ -630,9 +642,14 @@ async function act(action) {
   setLoading(true);
   closeTianyuan();
   try {
+    const prevState = view ? JSON.parse(JSON.stringify(view)) : null;
     const data = await api("/api/action", { body: { action } });
     if (data.ok) {
-      view = data.view; ctx = data.context; render();
+      const prevBattle = prevState;
+      view = data.view; ctx = data.context;
+      detectBattleChanges(prevBattle, view);
+      checkAchievements(view);
+      render();
       if (data.error) window.alert(data.error);  // penolakan aksi (guard dialog/battle, dll)
     }
     else { window.alert(data.error || "Aksi ditolak."); }
@@ -1143,4 +1160,142 @@ function typewriter(el, text, speed) {
     }
   }
   step();
+}
+
+// ═══ GAP-C2: Battle Animation System ═══
+
+let lastBattleState = null;
+let battleAnimQueue = [];
+
+function animateDamage(element, type, value) {
+  const dmg = document.createElement("span");
+  dmg.className = "damage-number " + type;
+  if (type === "miss") dmg.textContent = "Miss";
+  else if (type === "heal") dmg.textContent = "+" + value;
+  else dmg.textContent = "-" + value;
+  element.style.position = "relative";
+  element.appendChild(dmg);
+  setTimeout(() => dmg.remove(), 1000);
+}
+
+function animateCardHit(element, type) {
+  element.classList.remove("hit", "healed");
+  void element.offsetWidth;
+  element.classList.add(type === "heal" ? "healed" : "hit");
+  setTimeout(() => element.classList.remove("hit", "healed"), 500);
+}
+
+function animateHpBar(element, isDamage) {
+  element.classList.remove("damage", "heal");
+  void element.offsetWidth;
+  element.classList.add(isDamage ? "damage" : "heal");
+  setTimeout(() => element.classList.remove("damage", "heal"), 600);
+}
+
+function detectBattleChanges(oldState, newState) {
+  if (!oldState || !newState || !newState.battle) return;
+  const nb = newState.battle;
+  const ob = oldState.battle;
+  if (!ob) return;
+
+  // Player HP change
+  if (ob.player.hp !== nb.player.hp) {
+    const card = document.querySelector(".combatant-card.ally");
+    const bar = card ? card.querySelector(".stat-bar-fill") : null;
+    if (bar) animateHpBar(bar, nb.player.hp < ob.player.hp);
+    if (card) animateCardHit(card, nb.player.hp < ob.player.hp ? "damage" : "heal");
+    const val = Math.abs(nb.player.hp - ob.player.hp);
+    const type = nb.player.hp < ob.player.hp ? "damage" : "heal";
+    if (card) animateDamage(card, type, val);
+  }
+
+  // Foe HP changes
+  (nb.foes || []).forEach((nf, idx) => {
+    const of_ = (ob.foes || [])[idx];
+    if (!of_ || of_.hp === nf.hp) return;
+    const cards = document.querySelectorAll(".combatant-card.foe");
+    const card = cards[idx];
+    if (!card) return;
+    const bar = card.querySelector(".stat-bar-fill");
+    if (bar) animateHpBar(bar, nf.hp < of_.hp);
+    animateCardHit(card, "damage");
+    const val = Math.abs(nf.hp - of_.hp);
+    animateDamage(card, "damage", val);
+  });
+}
+
+// Patch act() to capture pre-action state
+const _origAct = typeof act === "function" ? act : null;
+
+// ═══ GAP-C3: Achievement System ═══
+
+const ACHIEVEMENTS = {
+  "first_battle": { icon: "⚔️", title: "Pejuang Pertama", desc: "Menyelesaikan pertarungan pertama" },
+  "first_memory": { icon: "🧠", title: "Ingatan Kembali", desc: "Membuka ingatan pertama" },
+  "arc_complete_1": { icon: "📜", title: "Lulusan Akademi", desc: "Menyelesaikan Arc I" },
+  "arc_complete_all": { icon: "🏆", title: "Kultivator Sejati", desc: "Menyelesaikan ketujuh Arc" },
+  "friendship_max": { icon: "💎", title: "Sahabat Sejati", desc: "Mencapai kedekatan maksimal dengan NPC" },
+  "faction_leader": { icon: "👑", title: "Pemimpin Faksi", desc: "Mencapai reputasi tinggi dengan faksi" },
+  "memory_investigator": { icon: "🔍", title: "Peneliti Ingatan", desc: "Menyelidiki 3 ingatan berbeda" },
+  "hidden_ending": { icon: "🌟", title: "Second Life", desc: "Mencapai ending tersembunyi" },
+};
+
+let unlockedAchievements = new Set();
+
+function checkAchievements(v) {
+  if (!v) return;
+  const newUnlocks = [];
+
+  // first_battle
+  if (!unlockedAchievements.has("first_battle") && v.battle && v.battle.foes && v.battle.foes.length > 0) {
+    unlockedAchievements.add("first_battle");
+    newUnlocks.push("first_battle");
+  }
+
+  // first_memory
+  if (!unlockedAchievements.has("first_memory") && v.memories && v.memories.length > 0) {
+    unlockedAchievements.add("first_memory");
+    newUnlocks.push("first_memory");
+  }
+
+  // arc_complete_1
+  if (!unlockedAchievements.has("arc_complete_1") && v.completed_quests && v.completed_quests.includes("quest_a01_c05_005")) {
+    unlockedAchievements.add("arc_complete_1");
+    newUnlocks.push("arc_complete_1");
+  }
+
+  // arc_complete_all
+  if (!unlockedAchievements.has("arc_complete_all") && v.flags && v.flags["state_ending_achieved"]) {
+    unlockedAchievements.add("arc_complete_all");
+    newUnlocks.push("arc_complete_all");
+  }
+
+  // memory_investigator
+  if (!unlockedAchievements.has("memory_investigator")) {
+    let investigated = 0;
+    if (v.flags) {
+      Object.keys(v.flags).forEach(k => {
+        if (k.startsWith("state_memory_") && k.endsWith("_reinterpretation")) investigated++;
+      });
+    }
+    if (investigated >= 3) {
+      unlockedAchievements.add("memory_investigator");
+      newUnlocks.push("memory_investigator");
+    }
+  }
+
+  newUnlocks.forEach(id => showAchievement(id));
+}
+
+function showAchievement(id) {
+  const a = ACHIEVEMENTS[id];
+  if (!a) return;
+  const popup = document.createElement("div");
+  popup.className = "achievement-popup";
+  popup.innerHTML = `<div class="achievement-icon">${a.icon}</div><div class="achievement-title">PENCAPAIAN TERBUKA</div><div class="achievement-name">${a.title}</div><div class="achievement-desc">${a.desc}</div>`;
+  document.body.appendChild(popup);
+  setTimeout(() => {
+    popup.classList.add("hiding");
+    setTimeout(() => popup.remove(), 500);
+  }, 4000);
 }

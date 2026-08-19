@@ -184,10 +184,24 @@ class GameSession:
         return self.reg.hunts_for_location(self.state.location)
 
     def npc_location(self, npc: dict) -> str:
-        """Lokasi NPC — override efek npc_state menang atas data statis npcs.json."""
-        ov = self.state.npc_states.get(npc.get("id", ""), {})
+        """Lokasi NPC — override efek npc_state menang atas data statis npcs.json.
+        Jadwal dinamis dari npc_schedules.json menentukan lokasi berdasarkan waktu."""
+        nid = npc.get("id", "")
+        ov = self.state.npc_states.get(nid, {})
         if ov.get("location"):
             return ov["location"]
+        # Cek jadwal dinamis dari npc_schedules.json
+        schedules = self.reg.npc_schedules.get(nid)
+        if schedules:
+            for s in schedules:
+                h_start = s.get("hour_start", 0)
+                h_end = s.get("hour_end", 24)
+                h = self.state.hour
+                if h_start <= h_end:
+                    if h_start <= h < h_end:
+                        return s["location"]
+                elif h >= h_start or h < h_end:  # lintas tengah malam
+                    return s["location"]
         return npc.get("location", "")
 
     def _is_npc_available(self, npc: dict) -> bool:
@@ -368,6 +382,12 @@ class GameSession:
             else:
                 self._maybe_start_branch_dialog()
 
+    def _allowed_connections(self, loc: dict) -> list:
+        """Filter connections by connection_gates + state.flags."""
+        gates = loc.get("connection_gates") or {}
+        return [c for c in loc.get("connections", [])
+                if not gates.get(c) or self.state.flags.get(gates[c])]
+
     def _move(self, action: dict) -> dict:
         if self.state.pending_battle or self.state.pending_dialog:
             return self.view()
@@ -377,7 +397,7 @@ class GameSession:
         if not loc:
             add_log(self.state, "system", "Lokasi tidak dikenal.")
             return self.view()
-        if to not in cur.get("connections", []):
+        if to not in self._allowed_connections(cur):
             add_log(self.state, "system", f"Kau tidak bisa langsung pergi ke {loc['name']} dari sini.")
             return self.view()
         self.state.location = to
@@ -834,7 +854,7 @@ class GameSession:
                 "id": loc["id"], "name": loc["name"],
                 # F1.2: description opsional (pola .get sama seperti is_safe/connections/ambience)
                 "description": loc.get("description", ""),
-                "is_safe": loc.get("is_safe", False), "connections": loc.get("connections", []),
+                "is_safe": loc.get("is_safe", False), "connections": self._allowed_connections(loc),
                 # C4: ambience lokasi (data-driven, opsional) → atmosfer visual web
                 "ambience": loc.get("ambience", "academy"),
             },
