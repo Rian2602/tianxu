@@ -108,9 +108,9 @@
         "system_msg": "Kelompok berkumpul. Keputusan harus diambil — jalanmu di Arc ini terkunci."
       },
       "next": [
-        {"quest": "quest_a02_c04_007", "option": "obey", "choice_id": "dlg_a02_branch"},
-        {"quest": "quest_a02_c04_007", "option": "investigate", "choice_id": "dlg_a02_branch"},
-        {"quest": "quest_a02_c04_007", "option": "confront", "choice_id": "dlg_a02_branch"}
+        {"quest": "quest_a02_c04_007a", "option": "obey", "choice_id": "dlg_a02_branch"},
+        {"quest": "quest_a02_c04_007b", "option": "investigate", "choice_id": "dlg_a02_branch"},
+        {"quest": "quest_a02_c04_007c", "option": "confront", "choice_id": "dlg_a02_branch"}
       ]
     },
     {

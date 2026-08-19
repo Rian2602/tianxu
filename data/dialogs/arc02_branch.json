@@ -1,0 +1,61 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a02_obey_report",
+      "npc": "npc_proctor",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_proctor",
+          "text": "Kau membawa bukti? Tunjukkan. ...Catatan ini serius. 'Siklus dimulai lagi' — kalau ini benar, ada yang perlu dijelaskan akademi.",
+          "choices": [
+            {"label": "Aku percaya akademi akan menanganinya dengan benar.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_proctor",
+          "text": "Kau murid yang baik. Kami akan menyelidikinya secara internal — dan kau tidak perlu khawatir tentang konsekuensinya.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a02_investigate_solo",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau juga menemukan sesuatu? Aku sudah lama mencurigai arsip ini — tapi aku tidak sendirian sekarang.",
+          "choices": [
+            {"label": "Aku menemukan catatan tentang 'siklus'. Apa artinya?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Siklus... kalau benar, berarti sejarah yang kita pelajari adalah versi yang sudah diedit. Kita harus mencari bukti lebih dalam.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a02_confront_public",
+      "npc": "npc_grandmaster",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau datang dengan tuduhan serius. Sebelum kau melanjutkan — kau tahu apa konsekuensi dari membuat tuduhan palsu terhadap akademi?",
+          "choices": [
+            {"label": "Aku tidak takut. Ini kebenaran.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Keberanianmu terpuji. Tapi kebenaran tidak sesederhana yang kau kira. Pergi — dan pikirkan baik-baik apa yang sebenarnya kau inginkan.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

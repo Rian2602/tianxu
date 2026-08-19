@@ -1,0 +1,66 @@
+{
+  "quests": [
+    {
+      "id": "quest_a02_c04_007a",
+      "kind": "main",
+      "title": "Lapor ke Guru",
+      "description": "Kau memilih menyerahkan bukti kepada otoritas. Laporkan temuanmu kepada guru pengawas.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_proctor",
+        "target": 1,
+        "hint": "Laporkan bukti catatan kepada guru pengawas."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_obey_reported", "value": true},
+          {"type": "relation", "npc": "npc_proctor", "value": 3}
+        ],
+        "rewards": {"exp": 5},
+        "system_msg": "Guru pengawas menerima buktimu. 'Kau murid yang bertanggung jawab. Kami akan menangani ini.'"
+      },
+      "next": [{"quest": "quest_a02_c04_007"}]
+    },
+    {
+      "id": "quest_a02_c04_007b",
+      "kind": "main",
+      "title": "Selidiki Sendiri",
+      "description": "Kau memilih menyelidiki sendiri tanpa memberitahu siapa pun. Cari bukti tambahan di arsip.",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_archive_public",
+        "hint": "Selidiki arsip publik untuk menemukan bukti tambahan."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_investigate_solo", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+        ],
+        "rewards": {"exp": 8},
+        "system_msg": "Kau menemukan catatan tambahan yang mengonfirmasi kecurigaanmu — tapi tidak ada yang tahu kau melakukan ini."
+      },
+      "next": [{"quest": "quest_a02_c04_007"}]
+    },
+    {
+      "id": "quest_a02_c04_007c",
+      "kind": "main",
+      "title": "Konfrontasi Terbuka",
+      "description": "Kau memilih menghadapi akademi secara terbuka. Siapkan argumenmu.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_grandmaster",
+        "target": 1,
+        "hint": "Hadapi grandmaster dengan bukti yang kau miliki."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_confront_public", "value": true},
+          {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -3}
+        ],
+        "rewards": {"exp": 10},
+        "system_msg": "Grandmaster mendengarmu dalam diam. 'Kau berani. Tapi keberanian tanpa pemahaman bisa merusak.'"
+      },
+      "next": [{"quest": "quest_a02_c04_007"}]
+    }
+  ]
+}

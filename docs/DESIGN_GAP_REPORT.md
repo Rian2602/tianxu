@@ -73,25 +73,22 @@ After completing Phases 0-7, the game has:
 
 #### GAP-A3: Branching Content Still Shallow
 
-**Current State:**
-- 4 branching quests exist, but all converge to the same next quest
-- Branch consequences are primarily dialogue variants
-- No unique objectives or locations per branch
+**Status: ✅ RESOLVED**
+
+**Resolution:**
+- Added unique branch quests for Arc II Obey/Investigate/Confront paths:
+  - Obey: quest_a02_c04_007a (talk to proctor)
+  - Investigate: quest_a02_c04_007b (reach archive)
+  - Confront: quest_a02_c04_007c (confront grandmaster)
+- Added unique dialogues for each branch path
+- All branches now have unique objectives before convergence
+- Branch-specific dialog routes added to NPCs
 
 **Impact:**
-- Branching feels cosmetic rather than meaningful
-- Players don't experience truly different content
-- Replay value is limited
-
-**Design Decision Needed:**
-- Should branches lead to different quests?
-- Should branches unlock different locations?
-- How deep should branching go (1 quest vs 1 arc)?
-
-**Recommendation:**
-- For player testing, current depth is sufficient
-- For full release, consider 1-2 branches with unique quest chains
-- Focus on quality over quantity (1 meaningful branch > 5 cosmetic ones)
+- Each branch now has unique content (dialogue + objective)
+- Players experience different gameplay per branch
+- Replay value increased
+- Quality over quantity maintained (1 meaningful branch deepened)
 
 ---
 
@@ -277,7 +274,7 @@ After completing Phases 0-7, the game has:
 |-----|----------|--------|--------|----------------|
 | ~~A1: Realm Progression~~ | ~~HIGH~~ | ~~HIGH~~ | ~~HIGH~~ | ✅ RESOLVED |
 | ~~A2: Missing Characters~~ | ~~HIGH~~ | ~~HIGH~~ | ~~HIGH~~ | ✅ RESOLVED |
-| A3: Branching Shallow | MEDIUM | HIGH | MEDIUM | Keep for testing, expand later |
+| ~~A3: Branching Shallow~~ | ~~MEDIUM~~ | ~~HIGH~~ | ~~MEDIUM~~ | ✅ RESOLVED |
 | B1: Memory Investigation | MEDIUM | MEDIUM | MEDIUM | Add 2 more prototypes |
 | B2: Faction System | MEDIUM | MEDIUM | MEDIUM | Add 1 more faction |
 | B3: Reactive World | MEDIUM | LOW | MEDIUM | Add to The Last Night |

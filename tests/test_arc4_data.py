@@ -77,7 +77,15 @@ def _through_arc1_2_3(registry, branch_idx: int = 1) -> GameSession:
     _talk(s, "npc_lin_yue", close=False)
     s.apply_action({"type": "dialog_choice", "choice_index": -1})
     s.apply_action({"type": "dialog_choice", "choice_index": branch_idx})
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
+    # Branch-specific quests (GAP-A3: deeper branching)
+    if branch_idx == 0:  # obey → talk to proctor
+        _reach(s, "loc_training_hall"); _talk(s, "npc_proctor")
+    elif branch_idx == 1:  # investigate → reach archive
+        _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
+    else:  # confront → talk to grandmaster
+        _reach(s, "loc_training_hall"); _reach(s, "loc_grandmaster_chamber"); _talk(s, "npc_grandmaster")
+    # Convergence: reach hidden cave (x2: quest 007 + 008) then training_hall (quest 009)
+    _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
     _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
     _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
     # Arc III

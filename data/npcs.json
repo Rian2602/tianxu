@@ -60,7 +60,8 @@
     "general": "dlg_a01_d005",
     "main": {
      "quest_a04_c01_001": "dlg_a04_d01",
-     "quest_a04_c02_002": "dlg_a04_d02"
+     "quest_a04_c02_002": "dlg_a04_d02",
+     "quest_a02_c04_007b": "dlg_a02_investigate_solo"
     },
     "side": {
      "quest_char_mei_ruo_001": {
@@ -140,7 +141,8 @@
     "general": "dlg_a02_d011",
     "main": {
      "quest_a02_c01_001": "dlg_a02_d011",
-     "quest_a02_c01_002": "dlg_a02_d012"
+     "quest_a02_c01_002": "dlg_a02_d012",
+     "quest_a02_c04_007a": "dlg_a02_obey_report"
     }
    }
   },
@@ -173,7 +175,8 @@
    "dialog_routes": {
     "general": "dlg_a04_d03",
     "main": {
-     "quest_a04_c03_003": "dlg_a04_d03"
+     "quest_a04_c03_003": "dlg_a04_d03",
+     "quest_a02_c04_007c": "dlg_a02_confront_public"
     },
     "side": {
      "quest_faction_orthodox_001": {
@@ -186,25 +189,27 @@
     }
    }
   },
-  {      "id": "npc_villager_elder",
-      "name": "Tetua Desa",
-      "location": "loc_affected_village",
-      "dialog_routes": {
-        "general": "dlg_a05_d01",
-        "main": {
-          "quest_a05_c01_001": "dlg_a05_reactive_villager"
-        }
-      }
+  {
+   "id": "npc_villager_elder",
+   "name": "Tetua Desa",
+   "location": "loc_affected_village",
+   "dialog_routes": {
+    "general": "dlg_a05_d01",
+    "main": {
+     "quest_a05_c01_001": "dlg_a05_reactive_villager"
+    }
+   }
   },
-  {      "id": "npc_mountain_guard",
-      "name": "Penjaga Gerbang Gunung",
-      "location": "loc_mountain_gate",
-      "dialog_routes": {
-        "general": "dlg_a05_d02",
-        "main": {
-          "quest_a05_c02_002": "dlg_a05_reactive_guard"
-        }
-      }
+  {
+   "id": "npc_mountain_guard",
+   "name": "Penjaga Gerbang Gunung",
+   "location": "loc_mountain_gate",
+   "dialog_routes": {
+    "general": "dlg_a05_d02",
+    "main": {
+     "quest_a05_c02_002": "dlg_a05_reactive_guard"
+    }
+   }
   },
   {
    "id": "npc_entity",

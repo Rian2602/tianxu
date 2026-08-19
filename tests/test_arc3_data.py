@@ -76,7 +76,10 @@ def _through_arc1_2(registry) -> GameSession:
     _talk(s, "npc_lin_yue", close=False)
     s.apply_action({"type": "dialog_choice", "choice_index": -1})
     s.apply_action({"type": "dialog_choice", "choice_index": 1})  # investigate
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
+    # Branch quest: investigate → reach archive (GAP-A3: deeper branching)
+    _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
+    # Convergence: reach hidden cave (x2: quest 007 + 008) then training_hall (quest 009)
+    _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
     _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
     _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
     assert s.state.current_quest == "quest_a03_c01_001", s.state.current_quest

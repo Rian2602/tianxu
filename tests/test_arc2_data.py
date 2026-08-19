@@ -78,6 +78,7 @@ def test_arc2_data_contract_ok(registry):
         "quest_a02_c01_001", "quest_a02_c01_002", "quest_a02_c02_003",
         "quest_a02_c02_004", "quest_a02_c02_005", "quest_a02_c03_006",
         "quest_a02_c04_007", "quest_a02_c04_008", "quest_a02_c04_009",
+        "quest_a02_c04_007a", "quest_a02_c04_007b", "quest_a02_c04_007c",
         "quest_a03_c01_001", "quest_a03_c02_002", "quest_a03_c03_003",
         "quest_a03_c04_004", "quest_a03_c05_005",
         "quest_a04_c01_001", "quest_a04_c02_002", "quest_a04_c03_003",
@@ -158,12 +159,14 @@ def _to_accusation_branch(registry: DataRegistry) -> GameSession:
     (2, "state_rep_tianxu_orthodox", "confront"),
 ])
 def test_arc2_accusation_three_branches(registry, idx, flag, needle):
-    """First Major Choice: 3 cabang → efek state berbeda → semua konvergen ke
-    quest_a02_c04_007 (prinsip convergence docs 03)."""
+    """First Major Choice: 3 cabang → efek state berbeda → branch-specific quests
+    (GAP-A3: deeper branching) → konvergen ke quest_a02_c04_007."""
     s = _to_accusation_branch(registry)
     assert s.view()["mode"] == "dialog"
     s.apply_action({"type": "dialog_choice", "choice_index": idx})
-    assert s.state.current_quest == "quest_a02_c04_007", f"branch {needle} harus konvergen"
+    # Branch-specific quest (not directly 007 anymore)
+    branch_quests = {0: "quest_a02_c04_007a", 1: "quest_a02_c04_007b", 2: "quest_a02_c04_007c"}
+    assert s.state.current_quest == branch_quests[idx], f"branch {needle} harus masuk quest branch-specific"
     # efek branch sesuai docs 03 (obey→rel master+, investigate→archive_suspicious, confront→rep tianxu-)
     if needle == "obey":
         assert s.state.relations.get("npc_proctor", 0) >= 5
@@ -179,11 +182,14 @@ def test_arc2_accusation_three_branches(registry, idx, flag, needle):
 
 
 def test_arc2_convergence_to_ending(registry):
-    """Konvergensi: hidden cave → artefak (memory_a02_m01) → return → arc_summary."""
+    """Konvergensi: branch quest → hidden cave → artefak (memory_a02_m01) → return → arc_summary."""
     s = _to_accusation_branch(registry)
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # obey
+    # 6b. obey branch quest: talk to proctor
+    _talk(s, "npc_proctor")
+    assert s.state.current_quest == "quest_a02_c04_007", f"after obey branch, should converge"
     # 7. hidden cave
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
+    _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
     assert s.state.current_quest == "quest_a02_c04_008"
     assert s.state.flags.get("flag_hidden_cave_explored") is True
     # 8. artifact
