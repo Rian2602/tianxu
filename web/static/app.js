@@ -353,6 +353,16 @@ async function loadGame(name) {
   showGame(); render();
 }
 
+async function reloadData() {
+  await api("/api/reload", { method: "GET" });
+  if (currentSave) {
+    await loadGame(currentSave);
+  } else {
+    const data = await api("/api/state", { method: "GET" });
+    if (data.view) { view = data.view; ctx = data.context; render(); }
+  }
+}
+
 // ---------- render utama ----------
 
 function render() {

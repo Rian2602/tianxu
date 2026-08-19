@@ -319,6 +319,10 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/api/saves":
             names = sorted(p.stem for p in (ROOT / "saves").glob("*.json"))
             self._send_json({"ok": True, "saves": names})
+        elif self.path == "/api/reload":
+            global registry
+            registry = DataRegistry()
+            self._send_json({"ok": True, "message": "Data reloaded."})
         elif self.path == "/api/tianyuan":
             with _session_lock:
                 self._send_json({"ok": True, "tianyuan": _tianyuan_payload()})
