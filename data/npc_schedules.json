@@ -55,18 +55,24 @@
    }
   ],
   "npc_gu_han": [
-   {
-    "location": "loc_mountain_gate",
-    "hour_start": 6,
-    "hour_end": 18,
-    "note": "Berjaga di gerbang gunung"
-   },
-   {
-    "location": "loc_outer_region",
-    "hour_start": 18,
-    "hour_end": 22,
-    "note": "Berpatroli di wilayah luar"
-   }
+    {
+     "location": "loc_training_hall",
+     "hour_start": 6,
+     "hour_end": 12,
+     "note": "Latihan pagi di aula pelatihan"
+    },
+    {
+     "location": "loc_mountain_gate",
+     "hour_start": 12,
+     "hour_end": 18,
+     "note": "Berjaga di gerbang gunung"
+    },
+    {
+     "location": "loc_outer_region",
+     "hour_start": 18,
+     "hour_end": 22,
+     "note": "Berpatroli di wilayah luar"
+    }
   ]
  }
 }

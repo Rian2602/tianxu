@@ -134,7 +134,12 @@ def test_web_arc1_playthrough_summary_tianyuan(web_app):
     _talk_through_http(base, "npc_aptitude_examiner")
     r = _post(base, "/api/action", {"action": {"type": "move", "to": "loc_training_hall"}})
     assert r["ok"] is True
+    # Complete lesson chain: proctor → lin_yue → shen_luo → gu_han → proctor
+    _talk_through_http(base, "npc_proctor")
     _talk_through_http(base, "npc_lin_yue")
+    _talk_through_http(base, "npc_shen_luo")
+    _talk_through_http(base, "npc_gu_han")
+    _talk_through_http(base, "npc_proctor")
     r = _post(base, "/api/action", {"action": {"type": "choose", "option": "pavilion_jianxin"}})
     assert r["ok"] is True
     r = _post(base, "/api/action", {"action": {"type": "move", "to": "loc_outer_region"}})

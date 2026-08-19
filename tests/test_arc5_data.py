@@ -69,7 +69,12 @@ def _through_arc1_2_3_4(registry, branch_idx: int = 1, stance_idx: int = 2) -> G
     _talk(s, "npc_aptitude_examiner")
     _talk(s, "npc_aptitude_examiner")
     _reach(s, "loc_training_hall")
+    # Complete lesson chain: proctor → lin_yue → shen_luo → gu_han → proctor
+    _talk(s, "npc_proctor")
     _talk(s, "npc_lin_yue")
+    _talk(s, "npc_shen_luo")
+    _talk(s, "npc_gu_han")
+    _talk(s, "npc_proctor")
     s.apply_action({"type": "choose", "option": "pavilion_jianxin"})
     _reach(s, "loc_outer_region")
     _reach(s, "loc_training_hall")

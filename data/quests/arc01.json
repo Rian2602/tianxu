@@ -45,20 +45,83 @@
       "title": "Pelajaran Pertama",
       "objective": {
         "kind": "talk",
+        "npc": "npc_proctor",
+        "target": 1,
+        "hint": "Ikuti pelajaran pertama dari Xu Zhiyuan di ruang latihan."
+      },
+      "on_complete": {
+        "rewards": {"exp": 3}
+      },
+      "next": [{"quest": "quest_a01_c02_003b"}]
+    },
+    {
+      "id": "quest_a01_c02_003b",
+      "kind": "main",
+      "title": "Kenali Teman Sekelas",
+      "objective": {
+        "kind": "talk",
         "npc": "npc_lin_yue",
         "target": 1,
-        "hint": "Ikuti pelajaran pertama di ruang latihan dan kenali calon temanmu."
+        "hint": "Bicaralah dengan Lin Yue untuk berkenalan."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "relation", "npc": "npc_lin_yue", "value": 1}
+        ]
+      },
+      "next": [{"quest": "quest_a01_c02_003c"}]
+    },
+    {
+      "id": "quest_a01_c02_003c",
+      "kind": "main",
+      "title": "Kenali Teman Sekelas",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_shen_luo",
+        "target": 1,
+        "hint": "Bicaralah dengan Shen Luo untuk berkenalan."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "relation", "npc": "npc_shen_luo", "value": 1}
+        ]
+      },
+      "next": [{"quest": "quest_a01_c02_003d"}]
+    },
+    {
+      "id": "quest_a01_c02_003d",
+      "kind": "main",
+      "title": "Kenali Teman Sekelas",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_gu_han",
+        "target": 1,
+        "hint": "Bicaralah dengan Gu Han untuk berkenalan."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "relation", "npc": "npc_gu_han", "value": 1}
+        ]
+      },
+      "next": [{"quest": "quest_a01_c02_003e"}]
+    },
+    {
+      "id": "quest_a01_c02_003e",
+      "kind": "main",
+      "title": "Laporan ke Mentor",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_proctor",
+        "target": 1,
+        "hint": "Laporkan ke Xu Zhiyuan bahwa kau sudah berkenalan dengan semua teman."
       },
       "on_complete": {
         "memory_unlock": "memory_a01_m02",
         "effects": [
-          {"type": "relation", "npc": "npc_lin_yue", "value": 2},
-          {"type": "relation", "npc": "npc_shen_luo", "value": 1},
-          {"type": "relation", "npc": "npc_mei_ruo", "value": 1},
-          {"type": "relation", "npc": "npc_gu_han", "value": 1},
+          {"type": "relation", "npc": "npc_lin_yue", "value": 1},
           {"type": "flag", "key": "flag_first_lesson_done", "value": true}
         ],
-        "rewards": {"exp": 8},
+        "rewards": {"exp": 5},
         "system_msg": "Gerakan dasar terasa anehnya familiar — seolah tanganmu pernah melakukannya."
       },
       "next": [{"quest": "quest_a01_c03_004"}]

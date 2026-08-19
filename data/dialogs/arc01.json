@@ -46,6 +46,18 @@
       }
     },
     {
+      "id": "dlg_a01_examiner_post",
+      "npc": "npc_aptitude_examiner",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_aptitude_examiner",
+          "text": "Registrasi selesai. Pergilah ke ruang latihan umum.",
+          "choices": []
+        }
+      }
+    },
+    {
       "id": "dlg_a01_d003",
       "npc": "npc_lin_yue",
       "start": "n1",
@@ -66,6 +78,32 @@
         "n3": {
           "speaker": "npc:npc_lin_yue",
           "text": "Hmm, mungkin. Tapi hati-hati — 'berbakat' di sini bisa berarti banyak hal, dan tidak semuanya baik.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_lin_yue_merchant_letter",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Ada surat untukku? Dari siapa?",
+          "choices": [
+            {"label": "(Menyerahkan surat tertutup)", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "... Tulisan tangan ini. Aku mengenalinya. Dia... masih ingat aku?",
+          "choices": [
+            {"label": "Pedagang itu bilang 'seseorang yang pernah berjalan di jalan yang sama'.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Ya. Kami pernah sekelas — dulu. Tapi dia memilih pergi. Surat ini... berisi peringatan tentang formasi. Terima kasih sudah mengantarkannya. Aku harus memikirkan ini.",
           "choices": []
         }
       }
@@ -199,6 +237,51 @@
         "n2": {
           "speaker": "npc:npc_teacher_liuguang",
           "text": "Tidak ada satu jalan yang benar. Yang ada hanyalah jalan yang tepat untukmu — dan kau bebas mengubahnya.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d003_proctor",
+      "npc": "npc_proctor",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_proctor",
+          "text": "Aku Xu Zhiyuan — mentor kalian. Selamat datang di Tian Xu. Hari ini kau akan belajar dasar qi dan combat. Dengarkan baik-baik.",
+          "choices": [
+            {"label": "Baik, aku siap belajar.", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_proctor",
+          "text": "Qi adalah energi kehidupan. Kau bisa mengalirkannya ke anggota tubuh untuk memperkuat serangan, bertahan, atau berlari lebih cepat. Atau ke senjata — membuatnya lebih tajam atau memantulkan serangan.",
+          "choices": [
+            {"label": "Bagaimana cara mengalirkannya?", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_proctor",
+          "text": "Fokus. Rasakan qi di丹田mu — perut bawah. Tarik ke atas, alirkan ke tangan atau kaki. Untuk senjata, alirkan dari tangan ke ujung bilah. Latihan ini butuh waktu, tapi kau akan terbiasa.",
+          "choices": [
+            {"label": "Aku akan berlatih.", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_proctor",
+          "text": "Bagus. Sekarang, sebelum kau berlatih sendiri — kenali teman sekelasmu dulu. Bicaralah dengan Lin Yue, Shen Luo, dan Gu Han. Mereka juga murid baru seperti kau.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a01_d003_proctor_report",
+      "npc": "npc_proctor",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_proctor",
+          "text": "Kau sudah bicara dengan semua orang? Bagus. Kekuatan seorang kultivator bukan hanya qi — tapi juga hubungan dengan orang lain. Ingat itu.",
           "choices": []
         }
       }

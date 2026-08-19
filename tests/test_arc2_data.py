@@ -60,7 +60,12 @@ def _through_arc1(registry) -> GameSession:
     _talk(s, "npc_aptitude_examiner")
     _talk(s, "npc_aptitude_examiner")
     _reach(s, "loc_training_hall")
+    # Complete lesson chain: proctor → lin_yue → shen_luo → gu_han → proctor
+    _talk(s, "npc_proctor")
     _talk(s, "npc_lin_yue")
+    _talk(s, "npc_shen_luo")
+    _talk(s, "npc_gu_han")
+    _talk(s, "npc_proctor")
     s.apply_action({"type": "choose", "option": "pavilion_jianxin"})
     _reach(s, "loc_outer_region")
     _reach(s, "loc_training_hall")
@@ -74,7 +79,11 @@ def test_arc2_data_contract_ok(registry):
     ids = [q["id"] for q in registry.quests]
     assert ids == [
         "quest_a01_c01_001", "quest_a01_c01_002", "quest_a01_c02_003",
-        "quest_a01_c03_004", "quest_a01_c04_005", "quest_a01_c04_006",
+        "quest_a01_c02_003b", "quest_a01_c02_003c", "quest_a01_c02_003d",
+        "quest_a01_c02_003e", "quest_a01_c03_004", "quest_a01_c04_005",
+        "quest_a01_c04_006",
+        "quest_side_pedagang_herbs", "quest_side_pedagang_letter",
+        "quest_side_pedagang_threat",
         "quest_a02_c01_001", "quest_a02_c01_002", "quest_a02_c02_003",
         "quest_a02_c02_004", "quest_a02_c02_005", "quest_a02_c03_006",
         "quest_a02_c04_007", "quest_a02_c04_008", "quest_a02_c04_009",

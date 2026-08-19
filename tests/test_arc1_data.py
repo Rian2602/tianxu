@@ -41,14 +41,16 @@ def _talk_through(s: GameSession, npc: str) -> None:
 def test_arc1_data_contract_ok(registry):
     """Data Arc I memenuhi seluruh kontrak validator saat load."""
     arc1_ids = [q["id"] for q in registry.quests if q["id"].startswith("quest_a01")]
-    assert len(arc1_ids) == 6
+    assert len(arc1_ids) == 10
     assert len(registry.memories) >= 4
     assert {a["id"] for a in registry.config["academies"]} == {
         "pavilion_wuxin", "pavilion_jianxin", "pavilion_yanzhi", "pavilion_liuguang"}
     # quest chain Arc I lengkap & berurutan
     assert arc1_ids == [
         "quest_a01_c01_001", "quest_a01_c01_002", "quest_a01_c02_003",
-        "quest_a01_c03_004", "quest_a01_c04_005", "quest_a01_c04_006"]
+        "quest_a01_c02_003b", "quest_a01_c02_003c", "quest_a01_c02_003d",
+        "quest_a01_c02_003e", "quest_a01_c03_004", "quest_a01_c04_005",
+        "quest_a01_c04_006"]
     # keputusan docs: TIDAK ada main quest yang bisa gagal karena waktu habis
     # (MSB tidak merancang fail-state waktu untuk quest utama 7 arc) — guard
     # agar timeout tidak terselip di data secara tidak sengaja
@@ -70,9 +72,21 @@ def test_arc1_full_playthrough_yellow(registry):
     assert s.state.current_quest == "quest_a01_c02_003"
     assert s.state.flags.get("state_murid_status") == "registered"
 
-    # Ch 1.2: first lesson — pindah ke ruang latihan, bicara Lin Yue
+    # Ch 1.2: first lesson — pindah ke ruang latihan, bicara Xu Zhiyuan
     s.apply_action({"type": "move", "to": "loc_training_hall"})
+    _talk_through(s, "npc_proctor")
+    assert s.state.current_quest == "quest_a01_c02_003b"
+
+    # Kenali teman sekelas
     _talk_through(s, "npc_lin_yue")
+    assert s.state.current_quest == "quest_a01_c02_003c"
+    _talk_through(s, "npc_shen_luo")
+    assert s.state.current_quest == "quest_a01_c02_003d"
+    _talk_through(s, "npc_gu_han")
+    assert s.state.current_quest == "quest_a01_c02_003e"
+
+    # Laporan ke mentor
+    _talk_through(s, "npc_proctor")
     assert s.state.current_quest == "quest_a01_c03_004"
     assert s.state.relations.get("npc_lin_yue", 0) >= 2
     assert len(s.state.memories) == 2  # memory_a01_m02
@@ -159,7 +173,12 @@ def test_arc1_hunt_and_battle(registry):
     _talk_through(s, "npc_aptitude_examiner")
     _talk_through(s, "npc_aptitude_examiner")
     s.apply_action({"type": "move", "to": "loc_training_hall"})
+    # Complete lesson chain: proctor → lin_yue → shen_luo → gu_han → proctor
+    _talk_through(s, "npc_proctor")
     _talk_through(s, "npc_lin_yue")
+    _talk_through(s, "npc_shen_luo")
+    _talk_through(s, "npc_gu_han")
+    _talk_through(s, "npc_proctor")
     s.apply_action({"type": "move", "to": "loc_outer_region"})
     s.apply_action({"type": "move", "to": "loc_hutan_akademi"})
     assert s.can_hunt() is True
