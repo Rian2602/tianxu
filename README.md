@@ -7,11 +7,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Tests](https://img.shields.io/badge/tests-287%20passing-brightgreen)]()
-[![Platform](https://img.shields.io/badge/platform-CLI%20%2B%20Web-lightgrey)]()
+[![Platform](https://img.shields.io/badge/platform-Web-lightgrey)]()
 
 *A data-driven text RPG engine where every choice shapes your destiny across seven arcs of cultivation, mystery, and consequence.*
 
-[Play CLI](#quick-start) · [Play Web](#web-mode) · [Story Bible](docs/) · [Changelog](CHANGELOG.md)
+[Play Web](#web-mode) · [Story Bible](docs/) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -57,16 +57,6 @@ Tian Xu: Second Life is a **single-player xianxia cultivation RPG** built with a
 - Python 3.10 or higher
 - No pip install needed — stdlib only
 
-### CLI Mode
-
-```bash
-# Start new game
-python3 src/cli.py
-
-# Load save file
-python3 src/cli.py -l save1
-```
-
 ### Web Mode
 
 ```bash
@@ -99,7 +89,6 @@ tian-xu-second-life/
 │   │   ├── cultivation.py # Realm progression
 │   │   ├── state.py      # Game state + save/load
 │   │   └── effects.py    # Data-driven effects
-│   ├── cli.py            # Terminal frontend
 │   ├── loader.py         # Data registry
 │   └── validate.py       # Data contract validator
 ├── web/
@@ -135,7 +124,7 @@ All game content lives in `data/`. To add a new quest, NPC, or dialog:
 ### Engine Architecture
 
 - **Dispatch Tables**: `CONDITION_CHECKERS`, `OBJECTIVE_HANDLERS`, `EFFECT_HANDLERS` — add new types by adding dict keys
-- **UI-Agnostic**: `session.view()` returns a plain dict; both CLI and web render from the same data
+- **UI-Agnostic**: `session.view()` returns a plain dict; web renders from this data
 - **Save System**: Versioned schema (v3) with forward migration and path traversal protection
 - **Validator**: 7-rule data contract validator that fails fast with all violations
 
