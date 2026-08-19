@@ -161,8 +161,7 @@ def test_arc7_data_contract_ok(registry):
 
 def test_arc7_last_night_opens_final_confrontation(registry):
     """Q1 The Last Night (talk Lin Yue, crisis) → Q2 I Am Not You (imprint)."""
-    s = _through_arc1_2_3_4(registry)
-    _play_arc5(s)
+    s = _play_arc5(registry)
     _play_arc6(s, principle_idx=0)
     _reach(s, "loc_training_hall")
     _talk(s, "npc_lin_yue")
@@ -197,8 +196,7 @@ def test_arc7_im_not_you_verbatim_and_entity_truth(registry):
 ])
 def test_arc7_four_main_endings(registry, idx, principle, ending):
     """FINAL DECISION: 4 prinsip → state_ending_achieved berbeda → 4 ending utama."""
-    s = _through_arc1_2_3_4(registry)
-    _play_arc5(s)
+    s = _play_arc5(registry)
     _play_arc6(s, principle_idx=idx)
     _play_arc7(s, decision_idx=idx)
     assert s.state.flags.get("state_ending_achieved") == principle
@@ -214,8 +212,7 @@ def test_arc7_hidden_resolution_unlocked(registry):
     Jalur: stance seek_truth (Arc III) + family protect/lin_yue loyal (Arc V)
     + prinsip preserve (Arc VI) — kombinasi kondisi docs 11 MSB §36.
     """
-    s = _through_arc1_2_3_4(registry, branch_idx=2)  # seek_truth
-    _play_arc5(s)
+    s = _play_arc5(registry)
     _play_arc6(s, principle_idx=0)                   # preserve
     # Hidden Resolution menuntut: flag_the_gate_full_truth_known, flag_tianxu_
     # feeds_segel_known, flag_version_iii_read, flag_jiang_yan_origin_known,
@@ -239,8 +236,7 @@ def test_arc7_hidden_resolution_blocked_by_forbidden(registry):
 
     Hanya 4 pilihan di quest 3 — memilih sacrifice → ending_nameless_guardian.
     """
-    s = _through_arc1_2_3_4(registry, branch_idx=0)  # deny
-    _play_arc5(s)
+    s = _play_arc5(registry)
     _play_arc6(s, principle_idx=3)                   # sacrifice
     # mainkan Q1 + Q2 sampai quest 3 aktif
     _reach(s, "loc_training_hall")

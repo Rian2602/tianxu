@@ -14,8 +14,7 @@ import pytest
 
 from src.loader import DataRegistry, DATA_DIR
 from src.engine.session import GameSession
-from tests.test_arc5_data import _through_arc1_2_3_4 as _through_arc1_2_3_4_5_base
-from tests.test_arc5_data import _talk, _reach
+from tests.test_arc5_data import _through_arc1_2_3_4, _to_family_crisis_branch, _talk, _reach
 
 pytestmark = pytest.mark.skipif(
     not (DATA_DIR / "quests" / "arc06.json").exists(),
@@ -28,33 +27,13 @@ def registry() -> DataRegistry:
     return DataRegistry()
 
 
-def _through_arc1_2_3_4(registry, branch_idx: int = 1) -> GameSession:
-    return _through_arc1_2_3_4_5_base(registry, branch_idx)
+def _play_arc5(registry: DataRegistry) -> GameSession:
+    """Mainkan Arc V penuh sampai quest_a06_c01_001 (data Arc V nyata).
 
-
-def _play_arc5(s: GameSession) -> None:
-    """Mainkan Arc V penuh sampai quest_a06_c01_001 (data Arc V nyata)."""
-    _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
-    _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region")
-    _reach(s, "loc_affected_village")
-    _talk(s, "npc_villager_elder")                       # Q1
-    _reach(s, "loc_outer_region"); _reach(s, "loc_mountain_gate")
-    _talk(s, "npc_mountain_guard", close=False)          # Q2
-    s.apply_action({"type": "dialog_choice", "choice_index": -1})
-    s.apply_action({"type": "dialog_choice", "choice_index": 0})  # changed
-    _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
-    for npc in ("npc_lin_yue", "npc_shen_luo", "npc_mei_ruo", "npc_gu_han"):
-        s.apply_action({"type": "talk", "npc": npc})
-        if s.state.pending_dialog:
-            break
-    guard = 0
-    while s.state.pending_dialog and guard < 20:
-        v = s.view()
-        did = v["dialog"]["dialog_id"] if v.get("dialog") else None
-        if did == "dlg_a05_branch_family":
-            break
-        s.apply_action({"type": "dialog_choice", "choice_index": -1})
-        guard += 1
+    DRY: bangun session dari _to_family_crisis_branch, lalu selesaikan
+    Family Crisis + Entity + Memory → Arc VI.
+    """
+    s = _to_family_crisis_branch(registry)
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # protect
     _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_tianxu_deepest_chamber")
@@ -62,6 +41,7 @@ def _play_arc5(s: GameSession) -> None:
     _reach(s, "loc_forbidden_archive")
     _reach(s, "loc_tianxu_deepest_chamber")               # Q5 memory
     assert s.state.current_quest == "quest_a06_c01_001", s.state.current_quest
+    return s
 
 
 def _to_arc6_q4(s: GameSession) -> None:
@@ -103,8 +83,7 @@ def test_arc6_data_contract_ok(registry):
 
 def test_arc6_jiang_yan_origin_and_betrayal(registry):
     """Q1 Someone Like Me (reach catatan) → Q2 reveal pengkhianat = Mentor."""
-    s = _through_arc1_2_3_4(registry)
-    _play_arc5(s)
+    s = _play_arc5(registry)
     # Q1: catatan Jiang Yan
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
     _reach(s, "loc_jiang_yan_records")
@@ -121,8 +100,7 @@ def test_arc6_jiang_yan_origin_and_betrayal(registry):
 
 def test_arc6_gate_memory_truth(registry):
     """Q3 The Gate → memory_a06_m01 (ground truth) + makna Second Life."""
-    s = _through_arc1_2_3_4(registry)
-    _play_arc5(s)
+    s = _play_arc5(registry)
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_archive_public")
     _reach(s, "loc_jiang_yan_records")
     _reach(s, "loc_archive_public"); _reach(s, "loc_training_hall")
@@ -145,8 +123,7 @@ def test_arc6_gate_memory_truth(registry):
 ])
 def test_arc6_final_choice_four_principles(registry, idx, principle):
     """Final Choice: 4 prinsip → state_final_principle berbeda → Arc VI selesai."""
-    s = _through_arc1_2_3_4(registry)
-    _play_arc5(s)
+    s = _play_arc5(registry)
     _to_arc6_q4(s)
     # Q4: talk Mentor → revelation pedang → pilih prinsip
     s.apply_action({"type": "talk", "npc": "npc_mentor"})
