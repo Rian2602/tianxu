@@ -1,0 +1,101 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_a07_reactive_grandmaster",
+      "npc": "npc_grandmaster",
+      "start": "n1",
+      "nodes": {
+        "n_orthodox_loyal": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau datang tepat waktu. Sebagai seseorang yang setia pada tradisi Tian Xu, aku ingin kau tahu: malam ini, kita mempertahankan segalanya. Bukan karena kita tidak tahu harganya — tapi karena kita tahu harganya lebih besar jika kita menyerah.",
+          "condition": {"flag": {"key": "state_orthodox_stance", "value": "loyal"}},
+          "choices": [
+            {"label": "Aku akan mempertahankan Tian Xu.", "next": "n_end"}
+          ]
+        },
+        "n_reform_stance": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau datang. Aku tahu kau punya pandangan berbeda tentang masa depan Tian Xu. Tapi malam ini, bukan waktunya untuk berdebat. Malam ini, kita harus bersatu — atau kita semua akan kalah.",
+          "condition": {"flag": {"key": "state_reform_stance", "value": "reform"}},
+          "choices": [
+            {"label": "Aku setuju. Kita harus bersatu.", "next": "n_end"}
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau datang. Malam ini adalah malam terakhir Tian Xu seperti yang kita kenal. Apa pun yang terjadi di bawah sana, aku ingin kau tahu: Grandmaster ini tidak pernah berniat menyembunyikan kebenaran. Hanya melindunginya.",
+          "choices": [
+            {"label": "Aku mengerti.", "next": "n_end"}
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Pergilah. Dan apa pun yang kau pilih di bawah sana — aku akan menerimanya. Kau sudah membuktikan dirimu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a07_reactive_shen_luo",
+      "npc": "npc_shen_luo",
+      "start": "n1",
+      "nodes": {
+        "n_reform_liberation": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Kau datang. Aku tahu kau akan datang. Malam ini, kita akan menghancurkan sistem ini — atau kita akan kehilangan kesempatan selamanya. Kau siap?",
+          "condition": {"flag": {"key": "state_reform_stance", "value": "liberation"}},
+          "choices": [
+            {"label": "Aku siap. Mari kita akhiri ini.", "next": "n_end"}
+          ]
+        },
+        "n_stay": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Kau datang. Aku masih memikirkan apa yang harus dilakukan — tapi setidaknya kau ada di sini. Itu... itu lebih dari yang pernah kulakukan.",
+          "condition": {"flag": {"key": "state_reform_stance", "value": "stay"}},
+          "choices": [
+            {"label": "Kita akan menemukan jalan bersama.", "next": "n_end"}
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Kau datang. Malam ini, segalanya akan berakhir — atau segalanya akan dimulai. Aku tidak tahu mana yang lebih menakutkan. Tapi setidaknya kau ada di sini.",
+          "choices": [
+            {"label": "Aku akan kembali.", "next": "n_end"}
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_shen_luo",
+          "text": "Pergilah. Dan apa pun yang kau temukan di bawah sana — ingat: kebenaran selalu bernilai. Bahkan jika harganya mahal.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a07_reactive_mei_ruo",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n_memory_investigated": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Aku tahu kau akan datang. Kita sudah berbicara tentang ingatan — tentang kebenaran yang tersembunyi. Malam ini, kau akan menemukan kebenaran terakhir. Kau siap?",
+          "condition": {"flag": {"key": "flag_memory_a03_m01_investigated", "value": true}},
+          "choices": [
+            {"label": "Aku siap. Terima kasih atas bantuanmu.", "next": "n_end"}
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Malam ini adalah malam terakhir — dan aku ingin kau tahu: apa pun yang terjadi, kita sudah mencari kebenaran bersama. Itu... itu cukup.",
+          "choices": [
+            {"label": "Aku akan kembali.", "next": "n_end"}
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Pergilah. Dan ingat: kebenaran tidak selalu tunggal. Tapi selalu bernilai untuk dicari.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

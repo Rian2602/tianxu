@@ -56,6 +56,10 @@
      "quest_faction_reform_002": {
       "report": "dlg_reform_faction_002"
      }
+    },
+    "intimacy": {
+     "dialog": "dlg_a07_reactive_shen_luo",
+     "relation_min": 5
     }
    }
   },
@@ -89,6 +93,10 @@
       "offer": "dlg_memory_a01_m04_investigate",
       "report": "dlg_memory_a01_m04_reinterpret"
      }
+    },
+    "intimacy": {
+     "dialog": "dlg_a07_reactive_mei_ruo",
+     "relation_min": 5
     }
    }
   },
@@ -201,6 +209,10 @@
      "quest_faction_orthodox_002": {
       "report": "dlg_orthodox_faction_002"
      }
+    },
+    "intimacy": {
+     "dialog": "dlg_a07_reactive_grandmaster",
+     "relation_min": 5
     }
    }
   },
