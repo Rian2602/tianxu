@@ -94,7 +94,16 @@
           "text": "Kau sudah membaca yang tidak seharusnya kau baca. Dan aku tahu Shen Luo juga mulai bertanya — dia tidak pandai menyembunyikan keraguannya. Kalian berdua di sini sekarang. Apa yang akan kau lakukan dengan pengetahuan itu?",
           "condition": {"flag": {"key": "flag_shen_luo_doubts_shared", "value": true}},
           "choices": [
-            {"label": "Aku akan mencari kebenaran sendiri.", "next": "n2"}
+            {"label": "Aku akan mencari kebenaran sendiri.", "next": "n2"},
+            {"label": "Shen Luo sudah tahu. Kita harus bekerja sama.", "condition": {"relation_min": {"npc": "npc_shen_luo", "value": 4}}, "next": "n2"}
+          ]
+        },
+        "n_shen_luo_close": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Shen Luo sangat vokal dengan keraguannya — bahkan Grandmaster tahu. Kalian berdua sudah dekat. Aku harap kau bisa menjaganya tetap stabil.",
+          "condition": {"relation_min": {"npc": "npc_shen_luo", "value": 5}},
+          "choices": [
+            {"label": "Aku akan mencoba.", "next": "n2"}
           ]
         },
         "n_confront": {

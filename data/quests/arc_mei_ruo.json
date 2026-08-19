@@ -4,60 +4,76 @@
       "id": "quest_char_mei_ruo_001",
       "kind": "side",
       "title": "Pertanyaan yang Tersisa",
+      "description": "Mei Ruo meminta bantuanmu untuk menyelidiki memori yang mencurigakan.",
       "objective": {
         "kind": "talk",
         "npc": "npc_mei_ruo",
-        "target": 1,
-        "hint": "Bicara dengan Mei Ruo tentang inkonsistensi dalam ingatanmu."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_mei_ruo",
+          "value": 1
+        }
       },
       "on_complete": {
         "effects": [
           {"type": "flag", "key": "flag_memory_a03_m01_questioned", "value": true},
           {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
-        ],
-        "rewards": {"exp": 8},
-        "system_msg": "Mei Ruo menunjukkan inkonsistensi dalam ingatanmu — Gerbang yang Kubuka mungkin tidak seperti yang kau ingat."
-      },
-      "next": []
+        ]
+      }
     },
     {
       "id": "quest_char_mei_ruo_002",
       "kind": "side",
       "title": "Bukti yang Tersembunyi",
+      "description": "Mei Ruo menemukan kontradiksi dalam catatan kuno. Carilah bukti tambahan.",
       "objective": {
         "kind": "talk",
         "npc": "npc_mei_ruo",
-        "target": 1,
-        "hint": "Temukan bukti yang bertentangan dengan ingatanmu tentang Gerbang."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_mei_ruo",
+          "value": 3
+        }
       },
       "on_complete": {
         "effects": [
           {"type": "flag", "key": "flag_memory_a03_m01_evidence_found", "value": true},
-          {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
-        ],
-        "rewards": {"exp": 10},
-        "system_msg": "Kau menemukan catatan yang menunjukkan Jiang Yan tidak membuka Gerbang untuk menghancurkan — ia mencoba memisahkan Entity dari sumber cultivation."
-      },
-      "next": []
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 3}
+        ]
+      }
     },
     {
       "id": "quest_char_mei_ruo_003",
       "kind": "side",
       "title": "Kebenaran yang Berbeda",
+      "description": "Mei Ruo siap memberikan interpretasi barunya. Pilihlah dengan bijak.",
       "objective": {
         "kind": "talk",
         "npc": "npc_mei_ruo",
-        "target": 1,
-        "hint": "Putuskan bagaimana kau memahami kebenaran tentang Gerbang."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_mei_ruo",
+          "value": 5
+        }
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_mei_ruo_arc_complete", "value": true}
-        ],
-        "rewards": {"exp": 12},
-        "system_msg": "Kau mencapai pemahaman baru tentang apa yang sebenarnya terjadi di Gerbang."
-      },
-      "next": []
+          {"type": "flag", "key": "flag_mei_ruo_arc_complete", "value": true},
+          {"type": "relation", "npc": "npc_mei_ruo", "value": 3}
+        ]
+      }
     }
   ]
 }

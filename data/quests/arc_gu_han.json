@@ -4,40 +4,51 @@
       "id": "quest_char_gu_han_001",
       "kind": "side",
       "title": "Yang Tidak Bisa Dihancurkan",
+      "description": "Gu Han ingin berbagi keyakinannya tentang mengapa Tian Xu harus bertahan.",
       "objective": {
         "kind": "talk",
         "npc": "npc_gu_han",
-        "target": 1,
-        "hint": "Bicara dengan Gu Han tentang mengapa ia percaya Tian Xu harus tetap berdiri."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_gu_han",
+          "value": 1
+        }
       },
       "on_complete": {
         "effects": [
           {"type": "flag", "key": "flag_gu_han_beliefs_shared", "value": true},
-          {"type": "relation", "npc": "npc_gu_han", "value": 2}
-        ],
-        "rewards": {"exp": 8},
-        "system_msg": "Gu Han membuka diri tentang keyakinannya — Tian Xu bukan sekadar akademi, tapi penjaga keseimbangan dunia."
-      },
-      "next": []
+          {"type": "relation", "npc": "npc_gu_han", "value": 3}
+        ]
+      }
     },
     {
       "id": "quest_char_gu_han_002",
       "kind": "side",
       "title": "Harga yang Harus Dibayar",
+      "description": "Gu Han menghadapi dilema antara kesetiaan pada Tian Xu dan kemanusiaannya.",
       "objective": {
         "kind": "talk",
         "npc": "npc_gu_han",
-        "target": 1,
-        "hint": "Hadapi pilihan Gu Han: tetap setia atau mengorbankan diri."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_gu_han",
+          "value": 3
+        }
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_gu_han_arc_complete", "value": true}
-        ],
-        "rewards": {"exp": 10},
-        "system_msg": "Gu Han membuat keputusannya — dan keputusan itu akan menentukan apakah ia tetap menjadi teman atau menjadi legenda."
-      },
-      "next": []
+          {"type": "flag", "key": "flag_gu_han_arc_complete", "value": true},
+          {"type": "relation", "npc": "npc_gu_han", "value": 2}
+        ]
+      }
     }
   ]
 }

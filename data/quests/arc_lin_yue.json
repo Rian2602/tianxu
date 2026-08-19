@@ -1,0 +1,44 @@
+{
+  "quests": [
+    {
+      "id": "quest_char_lin_yue_001",
+      "kind": "side",
+      "title": "Beban Seorang Teman",
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {"npc": "npc_lin_yue", "value": 2}
+      },
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Lin Yue terlihat gelisah. Bicaralah dengannya."
+      },
+      "on_complete": {
+        "system_msg": "Lin Yue membuka sedikit tentang beban yang ia pikul — dan pilihanmu akan menentukan bagaimana ia merespons."
+      }
+    },
+    {
+      "id": "quest_char_lin_yue_002",
+      "kind": "side",
+      "title": "Garis yang Kita Gambar",
+      "available_from": {
+        "day": 1,
+        "hour": 0
+      },
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Lin Yue telah mengambil keputusan. Dengarkan apa yang ia pilih."
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_lin_yue_arc_complete", "value": true}
+        ],
+        "system_msg": "Keputusan Lin Yue terbentuk — dan hubungan kalian kini memiliki kedalaman baru."
+      }
+    }
+  ]
+}

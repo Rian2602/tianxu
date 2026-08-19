@@ -95,6 +95,14 @@
             {"label": "Aku akan memutuskan. Dan aku akan hidup dengan akibatnya.", "next": "n3"}
           ]
         },
+        "n_close_gu_han": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Gu Han sudah bicara denganku sebelumnya — dia bilang kau satu-satunya yang benar-benar mendengarkan. Mungkin dia benar. Mungkin aku yang terlalu takut untuk menghadapi kenyataan.",
+          "condition": {"relation_min": {"npc": "npc_gu_han", "value": 5}},
+          "choices": [
+            {"label": "Kita semua punya alasan. Tapi kita harus tetap bersama.", "next": "n3"}
+          ]
+        },
         "n3": {
           "speaker": "narration",
           "text": "Empat anggota keluargamu menatapmu. Apa pun yang kau pilih, sebagian dari mereka akan setuju — dan sebagian mungkin tidak akan pernah memaafkanmu.",

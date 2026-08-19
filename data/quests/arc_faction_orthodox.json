@@ -4,40 +4,51 @@
       "id": "quest_faction_orthodox_001",
       "kind": "side",
       "title": "Tugas dari Grandmaster",
+      "description": "Grandmaster memberikan misi investigasi tentang gangguan formasi.",
       "objective": {
         "kind": "talk",
         "npc": "npc_grandmaster",
-        "target": 1,
-        "hint": "Terima tugas dari Grandmaster untuk menyelidiki gangguan di formasi."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_grandmaster",
+          "value": 2
+        }
       },
       "on_complete": {
         "effects": [
           {"type": "flag", "key": "flag_orthodox_task_accepted", "value": true},
-          {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": 2}
-        ],
-        "rewards": {"exp": 8},
-        "system_msg": "Grandmaster mempercayaimu dengan tugas penting — menyelidiki gangguan di formasi penjaga."
-      },
-      "next": []
+          {"type": "relation", "npc": "npc_grandmaster", "value": 2}
+        ]
+      }
     },
     {
       "id": "quest_faction_orthodox_002",
       "kind": "side",
       "title": "Pilihan yang Sulit",
+      "description": "Grandmaster meminta pendapatmu tentang masa depan Tian Xu.",
       "objective": {
         "kind": "talk",
         "npc": "npc_grandmaster",
-        "target": 1,
-        "hint": "Hadapi pilihan: setia pada faksi atau mengejar kebenaran."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_grandmaster",
+          "value": 4
+        }
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_orthodox_arc_complete", "value": true}
-        ],
-        "rewards": {"exp": 10},
-        "system_msg": "Kau membuat pilihanmu — dan faksi Tian Xu Ortodoks akan mengingatnya."
-      },
-      "next": []
+          {"type": "flag", "key": "flag_orthodox_arc_complete", "value": true},
+          {"type": "relation", "npc": "npc_grandmaster", "value": 3}
+        ]
+      }
     }
   ]
 }

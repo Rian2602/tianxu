@@ -35,77 +35,63 @@
     }
    }
   },
-  {      "id": "npc_shen_luo",
-      "name": "Shen Luo",
-      "location": "loc_training_hall",
-      "dialog_routes": {
-        "general": "dlg_a01_d004"
-      },
-      "side_offers": [
-        {
-          "quest": "quest_char_shen_luo_001",
-          "dialog": "dlg_shen_luo_char_001_low",
-          "min_relation": 0,
-          "max_relation": 3
-        },
-        {
-          "quest": "quest_char_shen_luo_001",
-          "dialog": "dlg_shen_luo_char_001_high",
-          "min_relation": 4
-        },
-        {
-          "quest": "quest_char_shen_luo_002",
-          "dialog": "dlg_shen_luo_char_002",
-          "requires": "flag_shen_luo_doubts_shared"
-        }
-      ]
+  {
+   "id": "npc_shen_luo",
+   "name": "Shen Luo",
+   "location": "loc_training_hall",
+   "dialog_routes": {
+    "general": "dlg_a01_d004",
+    "side": {
+     "quest_char_shen_luo_001": {
+      "offer": "dlg_shen_luo_char_001_low",
+      "report": "dlg_shen_luo_char_002"
+     },
+     "quest_char_shen_luo_002": {
+      "report": "dlg_shen_luo_char_002"
+     }
+    }
+   }
   },
-  {      "id": "npc_mei_ruo",
-      "name": "Mei Ruo",
-      "location": "loc_pavilion_yanzhi",
-      "dialog_routes": {
-        "general": "dlg_a01_d005",
-        "main": {
-          "quest_a04_c01_001": "dlg_a04_d01",
-          "quest_a04_c02_002": "dlg_a04_d02"
-        }
-      },
-      "side_offers": [
-        {
-          "quest": "quest_char_mei_ruo_001",
-          "dialog": "dlg_mei_ruo_char_001",
-          "requires": "memory_a03_m01"
-        },
-        {
-          "quest": "quest_char_mei_ruo_002",
-          "dialog": "dlg_mei_ruo_char_002",
-          "requires": "flag_memory_a03_m01_questioned"
-        },
-        {
-          "quest": "quest_char_mei_ruo_003",
-          "dialog": "dlg_mei_ruo_char_002",
-          "requires": "flag_memory_a03_m01_evidence_found"
-        }
-      ]
+  {
+   "id": "npc_mei_ruo",
+   "name": "Mei Ruo",
+   "location": "loc_pavilion_yanzhi",
+   "dialog_routes": {
+    "general": "dlg_a01_d005",
+    "main": {
+     "quest_a04_c01_001": "dlg_a04_d01",
+     "quest_a04_c02_002": "dlg_a04_d02"
+    },
+    "side": {
+     "quest_char_mei_ruo_001": {
+      "offer": "dlg_mei_ruo_char_001",
+      "report": "dlg_mei_ruo_char_002"
+     },
+     "quest_char_mei_ruo_002": {
+      "report": "dlg_mei_ruo_char_002"
+     },
+     "quest_char_mei_ruo_003": {
+      "report": "dlg_mei_ruo_char_002"
+     }
+    }
+   }
   },
-  {      "id": "npc_gu_han",
-      "name": "Gu Han",
-      "location": "loc_training_hall",
-      "dialog_routes": {
-        "general": "dlg_a01_d006"
-      },
-      "side_offers": [
-        {
-          "quest": "quest_char_gu_han_001",
-          "dialog": "dlg_gu_han_char_001",
-          "min_relation": 0
-        },
-        {
-          "quest": "quest_char_gu_han_002",
-          "dialog": "dlg_gu_han_char_002",
-          "requires": "flag_gu_han_beliefs_shared"
-        }
-      ]
+  {
+   "id": "npc_gu_han",
+   "name": "Gu Han",
+   "location": "loc_training_hall",
+   "dialog_routes": {
+    "general": "dlg_a01_d006",
+    "side": {
+     "quest_char_gu_han_001": {
+      "offer": "dlg_gu_han_char_001",
+      "report": "dlg_gu_han_char_002"
+     },
+     "quest_char_gu_han_002": {
+      "report": "dlg_gu_han_char_002"
+     }
+    }
+   }
   },
   {
    "id": "npc_teacher_wuxin",
@@ -180,27 +166,25 @@
     }
    }
   },
-  {      "id": "npc_grandmaster",
-      "name": "Grandmaster",
-      "location": "loc_grandmaster_chamber",
-      "dialog_routes": {
-        "general": "dlg_a04_d03",
-        "main": {
-          "quest_a04_c03_003": "dlg_a04_d03"
-        }
-      },
-      "side_offers": [
-        {
-          "quest": "quest_faction_orthodox_001",
-          "dialog": "dlg_orthodox_faction_001",
-          "min_relation": 2
-        },
-        {
-          "quest": "quest_faction_orthodox_002",
-          "dialog": "dlg_orthodox_faction_002",
-          "requires": "flag_orthodox_task_accepted"
-        }
-      ]
+  {
+   "id": "npc_grandmaster",
+   "name": "Grandmaster",
+   "location": "loc_grandmaster_chamber",
+   "dialog_routes": {
+    "general": "dlg_a04_d03",
+    "main": {
+     "quest_a04_c03_003": "dlg_a04_d03"
+    },
+    "side": {
+     "quest_faction_orthodox_001": {
+      "offer": "dlg_orthodox_faction_001",
+      "report": "dlg_orthodox_faction_002"
+     },
+     "quest_faction_orthodox_002": {
+      "report": "dlg_orthodox_faction_002"
+     }
+    }
+   }
   },
   {      "id": "npc_villager_elder",
       "name": "Tetua Desa",

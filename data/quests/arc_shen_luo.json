@@ -3,41 +3,52 @@
     {
       "id": "quest_char_shen_luo_001",
       "kind": "side",
-      "title": "Beratnya Mengetahui",
+      "title": "Bayangan di Balik Senyum",
+      "description": "Shen Luo menyimpan keraguan tentang Tian Xu. Bicaralah dengannya untuk memahami apa yang mengganggunya.",
       "objective": {
         "kind": "talk",
         "npc": "npc_shen_luo",
-        "target": 1,
-        "hint": "Bicara dengan Shen Luo tentang keraguannya terhadap Tian Xu."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_shen_luo",
+          "value": 1
+        }
       },
       "on_complete": {
         "effects": [
           {"type": "flag", "key": "flag_shen_luo_doubts_shared", "value": true},
-          {"type": "relation", "npc": "npc_shen_luo", "value": 2}
-        ],
-        "rewards": {"exp": 8},
-        "system_msg": "Shen Luo membuka diri tentang keraguannya — sesuatu yang tidak ia lakukan kepada sembarang orang."
-      },
-      "next": []
+          {"type": "relation", "npc": "npc_shen_luo", "value": 3}
+        ]
+      }
     },
     {
       "id": "quest_char_shen_luo_002",
       "kind": "side",
-      "title": "Garis Di Antara Kita",
+      "title": "Garis yang Tidak Bisa Dilukis",
+      "description": "Shen Luo menghadapi pilihan antara kesetiaan pada sistem dan keyakinannya sendiri.",
       "objective": {
         "kind": "talk",
         "npc": "npc_shen_luo",
-        "target": 1,
-        "hint": "Hadapi pilihan Shen Luo: tetap atau pergi."
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "relation_min": {
+          "npc": "npc_shen_luo",
+          "value": 3
+        }
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_shen_luo_arc_complete", "value": true}
-        ],
-        "rewards": {"exp": 10},
-        "system_msg": "Shen Luo membuat keputusannya — dan keputusan itu akan menentukan siapa yang tetap berdiri di sisimu."
-      },
-      "next": []
+          {"type": "flag", "key": "flag_shen_luo_arc_complete", "value": true},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+        ]
+      }
     }
   ]
 }
