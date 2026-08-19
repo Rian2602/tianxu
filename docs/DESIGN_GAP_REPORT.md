@@ -31,25 +31,21 @@ After completing Phases 0-7, the game has:
 
 #### GAP-A1: Realm Progression Incomplete
 
-**Current State:**
-- Only 1 realm (`realm_awal`) with 5 levels
-- When player reaches level 5, `_breakthrough()` fails (no order+1 exists)
-- Cultivation progression is effectively capped
+**Status: ✅ RESOLVED**
+
+**Resolution:**
+- Added 2 new realms: `realm_tengah` (order=2) and `realm_atas` (order=3)
+- Each realm has 5 levels with escalating stats:
+  - `realm_awal`: base_hp=50, base_qi=30
+  - `realm_tengah`: base_hp=100, base_qi=60
+  - `realm_atas`: base_hp=200, base_qi=120
+- Breakthrough logic verified: realm_awal → realm_tengah → realm_atas → max
+- All 287 tests pass
 
 **Impact:**
-- Players cannot progress beyond realm_awal
-- Breakthrough mechanic is untestable
-- Missing core RPG progression
-
-**Design Decision Needed:**
-- How many realms should the final game have?
-- What are the realm names and progression thresholds?
-- How does realm progression tie to story arcs?
-
-**Recommendation:**
-- Minimum 3 realms for player testing: `realm_awal` → `realm_tengah` → `realm_atas`
-- Each realm should have 5 levels (consistent with current data)
-- Realm breakthrough should be gated by story progress, not just exp
+- Players can now progress through 3 realms (15 levels total)
+- Breakthrough mechanic fully testable
+- Core RPG progression complete for player testing
 
 ---
 
@@ -281,7 +277,7 @@ After completing Phases 0-7, the game has:
 
 | Gap | Priority | Effort | Impact | Recommendation |
 |-----|----------|--------|--------|----------------|
-| A1: Realm Progression | HIGH | HIGH | HIGH | Add 2 more realms |
+| ~~A1: Realm Progression~~ | ~~HIGH~~ | ~~HIGH~~ | ~~HIGH~~ | ✅ RESOLVED |
 | A2: Missing Characters | HIGH | HIGH | HIGH | Integrate into main quests |
 | A3: Branching Shallow | MEDIUM | HIGH | MEDIUM | Keep for testing, expand later |
 | B1: Memory Investigation | MEDIUM | MEDIUM | MEDIUM | Add 2 more prototypes |

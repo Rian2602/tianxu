@@ -1,2 +1,4 @@
 id,order,levels,base_hp,hp_per_level,base_qi,qi_per_level,name_pinyin,name
 realm_awal,1,5,50,5,30,3,Ranah Awal,Ranah Awal
+realm_tengah,2,5,100,10,60,6,Ranah Tengah,Ranah Tengah
+realm_atas,3,5,200,20,120,12,Ranah Atas,Ranah Atas
