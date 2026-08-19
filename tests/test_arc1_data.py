@@ -156,7 +156,10 @@ def test_arc1_key_item_usable(registry):
 def test_arc1_hunt_and_battle(registry):
     """Hunt di hutan akademi → battle melawan binatang; menang memberi exp."""
     s = _new_session(registry)
+    _talk_through(s, "npc_aptitude_examiner")
+    _talk_through(s, "npc_aptitude_examiner")
     s.apply_action({"type": "move", "to": "loc_training_hall"})
+    _talk_through(s, "npc_lin_yue")
     s.apply_action({"type": "move", "to": "loc_outer_region"})
     s.apply_action({"type": "move", "to": "loc_hutan_akademi"})
     assert s.can_hunt() is True

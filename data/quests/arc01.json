@@ -55,7 +55,8 @@
           {"type": "relation", "npc": "npc_lin_yue", "value": 2},
           {"type": "relation", "npc": "npc_shen_luo", "value": 1},
           {"type": "relation", "npc": "npc_mei_ruo", "value": 1},
-          {"type": "relation", "npc": "npc_gu_han", "value": 1}
+          {"type": "relation", "npc": "npc_gu_han", "value": 1},
+          {"type": "flag", "key": "flag_first_lesson_done", "value": true}
         ],
         "rewards": {"exp": 8},
         "system_msg": "Gerakan dasar terasa anehnya familiar — seolah tanganmu pernah melakukannya."
@@ -122,6 +123,77 @@
         "system_msg": "Kau terbangun dari mimpi. Di meja kamarmu, sebuah simbol kuno — dan tanganmu tahu cara menggambarnya."
       },
       "next": [{"quest": "quest_a02_c01_001"}]
+    },
+    {
+      "id": "quest_side_pedagang_herbs",
+      "kind": "side",
+      "title": "Herba Mistis",
+      "description": "Pedagang jalanan meminta herba langka dari hutan dekat jalan pendakian.",
+      "objective": {
+        "kind": "gather",
+        "item": "herba_qi",
+        "target": 3,
+        "report_to": "npc_pedagang_jalanan",
+        "hint": "Kumpulkan Herba Qi dari hutan dekat jalan pendakian, lalu laporkan ke pedagang."
+      },
+      "available_from": {"day": 1, "hour": 0},
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_merchant_herbs_delivered", "value": true},
+          {"type": "gold", "value": 15}
+        ],
+        "rewards": {"exp": 5},
+        "system_msg": "Pedagang menerima herba dengan ekspresi lega. 'Terima kasih. Ini... lebih berarti dari yang kau kira.'"
+      }
+    },
+    {
+      "id": "quest_side_pedagang_letter",
+      "kind": "side",
+      "title": "Surat Tertutup",
+      "description": "Pedagang meminta surat diantarkan ke seseorang di ruang latihan.",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Bawa surat tertutup ke Lin Yue di ruang latihan."
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "requires_flags": ["flag_merchant_herbs_delivered"]
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_merchant_letter_delivered", "value": true},
+          {"type": "relation", "npc": "npc_lin_yue", "value": 1}
+        ],
+        "rewards": {"gold": 20, "exp": 8},
+        "system_msg": "Lin Yue membaca surat, lalu menatapmu dengan tatapan berbeda. 'Ternyata pedagang itu... aku tahu siapa dia.'"
+      }
+    },
+    {
+      "id": "quest_side_pedagang_threat",
+      "kind": "side",
+      "title": "Binatang Pengganggu",
+      "description": "Binatang liar mulai mengganggu jalanan. Pedagang minta bantuan.",
+      "objective": {
+        "kind": "defeat",
+        "enemies": ["binatang_hutan"],
+        "target": 2,
+        "hint": "Kalahkan binatang hutan di hutan akademi."
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "requires_flags": ["flag_merchant_letter_delivered"]
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_merchant_arc_complete", "value": true}
+        ],
+        "rewards": {"gold": 25, "exp": 10},
+        "system_msg": "Pedagang menatapmu lama. 'Kau mengingatkan aku pada diriku sendiri... dulu. Aku pernah menjadi murid Tian Xu — tapi aku memilih pergi. Sekarang kau tahu.'"
+      }
     }
   ]
 }

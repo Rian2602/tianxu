@@ -21,9 +21,8 @@
     "loc_tianxu_main_hall"
    ],
    "connection_gates": {
-    "loc_tianxu_approach_road": "state_murid_status",
     "loc_training_hall": "state_murid_status",
-    "loc_tianxu_main_hall": "state_murid_status"
+    "loc_tianxu_main_hall": "state_final_principle"
    },
    "ambience": "academy"
   },
@@ -45,6 +44,17 @@
     "loc_grandmaster_chamber",
     "loc_mentor_ground"
    ],
+   "connection_gates": {
+    "loc_pavilion_wuxin": "flag_first_lesson_done",
+    "loc_pavilion_jianxin": "flag_first_lesson_done",
+    "loc_pavilion_yanzhi": "flag_first_lesson_done",
+    "loc_pavilion_liuguang": "flag_first_lesson_done",
+    "loc_outer_region": "flag_first_lesson_done",
+    "loc_mo_chen_meeting": "flag_arc2_complete",
+    "loc_archive_public": "flag_evidence_missing_disciple",
+    "loc_grandmaster_chamber": "flag_evidence_missing_disciple",
+    "loc_mentor_ground": "flag_entity_first_contact"
+   },
    "ambience": "hall"
   },
   {
@@ -76,6 +86,9 @@
     "loc_training_hall",
     "loc_hidden_room_mural"
    ],
+   "connection_gates": {
+    "loc_hidden_room_mural": "flag_arc2_complete"
+   },
    "ambience": "library"
   },
   {
