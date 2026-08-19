@@ -1,6 +1,6 @@
 # knowledge.md — Tian Xu: Second Life (天缘灵)
 
-Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party deps, no pip install). CLI + web frontend render from the same UI-agnostic engine dict. All UI text/comments in **Indonesian**; code identifiers are English.
+Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party deps, no pip install). Web frontend renders from the same UI-agnostic engine dict. All UI text/comments in **Indonesian**; code identifiers are English.
 
 ## Key code
 
@@ -18,7 +18,6 @@ Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party dep
   - `items.py` — key_item data
 - `src/loader.py` — `DataRegistry` loads JSON/CSV game data; exposes `.realms`, `.npcs`, `.quests`, `.dialogs`, `.items`, `.locations`, `.hunts`, `.recipes`, `.techniques`, `.enemies`, `.memories`, `.companions`, `.factions`, `.config`
 - `src/validate.py` — Strict data contract validator (7 rules, fails fast with all violations); derives allowed types from dispatch tables
-- `src/cli.py` — Terminal frontend (data-driven header from `config.web`)
 - `web/app.py` — stdlib `ThreadingHTTPServer` JSON API + static files; `context()` exposes character_status, factions, meta (title/subtitle/tagline/panel/avatar/audio)
 - `web/static/app.js` — Vanilla JS frontend; applyMeta() for data-driven title/assets; avatar fallback (initials); faction panel; character status badges
 - `web/static/index.html` + `style.css` — Layout + theme (ink-wash textures, Lucide icons)
@@ -29,8 +28,6 @@ Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party dep
 ## Commands
 
 ```bash
-python3 src/cli.py            # CLI game
-python3 src/cli.py -l save1   # CLI with a save file
 python3 web/app.py            # Web server on http://127.0.0.1:8000
 pytest                        # Run full test suite (287 tests, ~3.7s)
 pytest tests/test_smoke.py    # Smoke tests only
@@ -44,7 +41,7 @@ No package/build tooling: no `pyproject.toml`, `requirements.txt`, or build conf
 
 - **Dispatch tables everywhere** — `CONDITION_CHECKERS`, `OBJECTIVE_HANDLERS`. New type = new dict key, no if/elif chains. `EFFECT_TYPES`, `TECHNIQUE_KINDS`, and `STATUS_KINDS` are frozensets (single source of truth for validator).
 - **Data-driven** — quests/dialogs/NPCs/locations/items/enemies/hunts/recipes/techniques/memories/companions/factions are JSON/CSV in `data/`. Adding content = adding files, zero code changes.
-- **Engine is UI-agnostic** — `session.view()` returns a plain dict that both CLI and web render.
+- **Engine is UI-agnostic** — `session.view()` returns a plain dict that web renders.
 - **config.web** — data-driven title/subtitle/tagline/panel/audio/avatar (all with xianxia defaults)
 - **Save system versioned** — `SCHEMA_VERSION` with forward migration; path traversal protected.
 - **branch_quest** — explicit quest ID stored in state when branch pending (hardened against backward-search fragility)
