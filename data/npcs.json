@@ -92,6 +92,14 @@
      "quest_memory_a01_m04_investigate": {
       "offer": "dlg_memory_a01_m04_investigate",
       "report": "dlg_memory_a01_m04_reinterpret"
+     },
+     "quest_memory_a01_m02_investigate": {
+      "offer": "dlg_memory_a01_m02_investigate",
+      "report": "dlg_memory_a01_m02_reinterpret"
+     },
+     "quest_memory_a02_m01_investigate": {
+      "offer": "dlg_memory_a02_m01_investigate",
+      "report": "dlg_memory_a02_m01_reinterpret"
      }
     },
     "intimacy": {

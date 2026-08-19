@@ -1,0 +1,184 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_memory_a01_m02_investigate",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau punya ingatan tentang 'Tangan yang Mengingat.' Aku sudah membacanya. Ada sesuatu yang menarik — ingatan tubuh bukan penglihatan biasa.",
+          "choices": [
+            {"label": "Apa maksudmu?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ingatan tubuh — memori otot — biasanya terbentuk dari pengulangan ribuan kali. Tapi di ingatanmu, kau bilang 'gerakan dasar pertama.' Kalau ini benar-benar pertama kali, bagaimana tubuhmu sudah tahu caranya?",
+          "choices": [
+            {"label": "Mungkin aku pernah melakukannya sebelumnya.", "next": "n3"},
+            {"label": "Mungkin ini bakat alami.", "next": "n3b"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Benar — dan itu pertanyaan besar. Kalau kau pernah melakukannya sebelumnya, di kehidupan mana? Dan siapa kau di kehidupan itu?",
+          "choices": [
+            {"label": "Aku ingin mencari tahu.", "next": "n4"}
+          ]
+        },
+        "n3b": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Bakat alami tidak menjelaskan ingatan tubuh. Bahkan kultivator terhebat pun harus berlatih untuk menguasai gerakan. Tapi kau... kau langsung bisa. Itu bukan bakat — itu memori.",
+          "choices": [
+            {"label": "Jadi aku pernah menjadi kultivator sebelumnya?", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Mungkin. Atau mungkin kau pernah menjadi sesuatu yang lebih dari kultivator. Aku sudah menemukan catatan tentang gerakan yang mirip dengan yang kau ingat — ada di arsip bawah tanah. Kau mau melihatnya?",
+          "choices": [
+            {"label": "Ya. Tunjukkan padaku.", "next": "n5"}
+          ]
+        },
+        "n5": {
+          "speaker": "narration",
+          "text": "Mei Ruo membawamu ke ruangan kecil di bawah arsip. Di atas meja tua, sebuah gulungan catatan — tulisan tangan, buram oleh waktu. Ini bukan catatan resmi. Ini catatan pribadi saksi mata.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_memory_a01_m02_reinterpret",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah membaca catatan itu. Sekarang pertanyaannya: apa yang kau percaya tentang Tangan yang Mengingat?",
+          "choices": [
+            {
+              "label": "Aku pernah menjadi kultivator kuat di kehidupan sebelumnya.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m02_reinterpretation", "value": "past_life"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Itu hanya kebetulan — tubuhku biasa saja.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m02_reinterpretation", "value": "coincidence"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Aku tidak tahu. Mungkin keduanya benar sebagian.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a01_m02_reinterpretation", "value": "uncertain"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            }
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kebenaran tidak selalu tunggal. Yang penting adalah kau TIDAK lagi hanya menerima ingatan pertamamu sebagai satu-satunya versi. Itu langkah pertama untuk memahami siapa kau sebenarnya.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_memory_a02_m01_investigate",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ingatanmu tentang 'Apa yang Tidak Akan Kau Kembali' — itu salah satu ingatanmu yang paling jelas. Tapi ada masalah.",
+          "choices": [
+            {"label": "Masalah apa?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ingatanmu bilang Lin Yue versi tua berkata 'Kalau kau melakukan ini, kau tidak akan kembali.' Tapi Lin Yue yang kau kenal sekarang... dia tidak mungkin tahu tentang masa depan.",
+          "choices": [
+            {"label": "Mungkin itu Lin Yue dari kehidupan sebelumnya.", "next": "n3"},
+            {"label": "Mungkin ingatanku salah.", "next": "n3b"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Pemikiran yang menarik. Kalau Lin Yue versi tua ada di ingatanmu, itu berarti dia pernah ada di kehidupan sebelumnya — atau kau pernah ada di kehidupannya. Tapi bagaimana dia bisa tahu tentang masa depan?",
+          "choices": [
+            {"label": "Mungkin dia sudah melalui semua ini sebelumnya.", "next": "n4"}
+          ]
+        },
+        "n3b": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Bisa jadi. Tapi ingatan dengan detail spesifik — artefak memancarkan cahaya, Lin Yue versi tua, urgensi — itu bukan hal yang bisa dibuat-buat. Ada sesuatu yang nyata di balik ingatan ini.",
+          "choices": [
+            {"label": "Jadi ada hubungan antara aku dan Lin Yue?", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Aku sudah menemukan sesuatu — ada catatan lama yang menyebutkan 'pasangan kultivasi' yang saling terhubung lintas kehidupan. Kau mau melihatnya?",
+          "choices": [
+            {"label": "Ya. Tunjukkan padaku.", "next": "n5"}
+          ]
+        },
+        "n5": {
+          "speaker": "narration",
+          "text": "Mei Ruo membawamu ke ruangan kecil di bawah arsip. Di atas meja tua, sebuah gulungan catatan — tulisan tangan, buram oleh waktu. Ini bukan catatan resmi. Ini catatan pribadi saksi mata.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_memory_a02_m01_reinterpret",
+      "npc": "npc_mei_ruo",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah membaca catatan itu. Sekarang pertanyaannya: apa yang kau percaya tentang Lin Yue versi tua?",
+          "choices": [
+            {
+              "label": "Lin Yue dan aku terhubung lintas kehidupan.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a02_m01_reinterpretation", "value": "connected"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Itu hanya mimpi — tidak ada hubungan khusus.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a02_m01_reinterpretation", "value": "dream"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            },
+            {
+              "label": "Aku tidak tahu. Mungkin keduanya benar sebagian.",
+              "effects": [
+                {"type": "flag", "key": "state_memory_a02_m01_reinterpretation", "value": "uncertain"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 1}
+              ],
+              "next": "n_end"
+            }
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kebenaran tidak selalu tunggal. Yang penting adalah kau TIDAK lagi hanya menerima ingatan pertamamu sebagai satu-satunya versi. Itu langkah pertama untuk memahami siapa kau sebenarnya.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}

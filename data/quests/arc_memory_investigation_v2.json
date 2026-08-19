@@ -1,0 +1,46 @@
+{
+  "quests": [
+    {
+      "id": "quest_memory_a01_m02_investigate",
+      "kind": "side",
+      "title": "Investigasi: Tangan yang Mengingat",
+      "description": "Selidiki ingatan tentang tangan yang sudah tahu cara bergerak — apakah itu bakat atau memori?",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "has_memory": "memory_a01_m02"
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a01_m02_investigated", "value": true}
+        ]
+      }
+    },
+    {
+      "id": "quest_memory_a02_m01_investigate",
+      "kind": "side",
+      "title": "Investigasi: Apa yang Tidak Akan Kau Kembali",
+      "description": "Selidiki ingatan tentang Lin Yue versi tua — siapa dia dan mengapa dia ada di ingatanmu?",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "has_memory": "memory_a02_m01"
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a02_m01_investigated", "value": true}
+        ]
+      }
+    }
+  ]
+}
