@@ -398,7 +398,12 @@ class GameSession:
             add_log(self.state, "system", "Lokasi tidak dikenal.")
             return self.view()
         if to not in self._allowed_connections(cur):
-            add_log(self.state, "system", f"Kau tidak bisa langsung pergi ke {loc['name']} dari sini.")
+            gates = cur.get("connection_gates") or {}
+            flag_key = gates.get(to)
+            if flag_key:
+                add_log(self.state, "system", f"Kau harus menyelesaikan urusan di sini dulu sebelum pergi ke {loc['name']}.")
+            else:
+                add_log(self.state, "system", f"Kau tidak bisa langsung pergi ke {loc['name']} dari sini.")
             return self.view()
         self.state.location = to
         add_log(self.state, "narration", f"Kau pindah ke {loc['name']}.")

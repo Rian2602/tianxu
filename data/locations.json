@@ -20,6 +20,11 @@
     "loc_training_hall",
     "loc_tianxu_main_hall"
    ],
+   "connection_gates": {
+    "loc_tianxu_approach_road": "state_murid_status",
+    "loc_training_hall": "state_murid_status",
+    "loc_tianxu_main_hall": "state_murid_status"
+   },
    "ambience": "academy"
   },
   {
