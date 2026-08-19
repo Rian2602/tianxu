@@ -1,0 +1,186 @@
+{
+  "dialogs": [
+    {
+      "id": "dlg_pedagang_greeting",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Selamat datang, murid baru! Jalanan ini sepi — tapi aku bisa bantu persenjataanmu sebelum masuk akademi.",
+          "choices": [
+            {"label": "(Beli barang)", "next": "n2"},
+            {"label": "(Terima kasih, tidak perlu)", "next": "n3"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Pilih barang yang kau butuhkan. Pedang, pil, atau sesuatu yang lain?",
+          "choices": []
+        },
+        "n3": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Baiklah. Kalau butuh nanti, aku selalu di sini.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_side_herbs_offer",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Hei, kau murid baru kan? Aku butuh bantuan kecil. Herba qi — tumbuh di hutan dekat sini, dekat formasi batu tua. Tapi sekarang area itu agak berbahaya.",
+          "choices": [
+            {"label": "Aku bisa mengambilnya. Berapa yang kau butuhkan?", "effects": [{"type": "start_quest", "quest": "quest_side_pedagang_herbs"}], "next": "n2"},
+            {"label": "Maaf, aku sedang sibuk.", "next": "n3"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Tiga ikat cukup. Hati-hati di hutan — binatang liar mulai berani mendekat ke jalan utama. Kembali ke sini setelah kau mendapatkannya.",
+          "choices": []
+        },
+        "n3": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Tidak masalah. Kalau berubah pikiran, aku di sini.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_side_herbs_report",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Kau mendapatkannya? Bagus... sangat bagus. Herba ini... bukan untuk dijual. Ada yang lain yang membutuhkannya.",
+          "choices": [
+            {"label": "Siapa yang membutuhkannya?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Seseorang di dalam akademi. Tapi aku tidak bisa masuk sendiri — aku bukan murid lagi. Apakah kau bersedia mengantarkan surat untukku?",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_side_letter_offer",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Kau kembali. Apakah kau siap mengantarkan surat ini? Penerimaannya bernama Lin Yue — di ruang latihan umum.",
+          "choices": [
+            {"label": "Aku akan mengantarkannya.", "effects": [{"type": "start_quest", "quest": "quest_side_pedagang_letter"}], "next": "n2"},
+            {"label": "Maaf, belum sekarang.", "next": "n3"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Terima kasih. Surat ini... jangan dibuka. Dan jika Lin Yue bertanya siapa pengirimnya, katakan saja 'seseorang yang pernah berjalan di jalan yang sama'.",
+          "choices": []
+        },
+        "n3": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Tidak masalah. Aku menunggu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_side_letter_report",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Kau sudah menemuinya? Apa katanya?",
+          "choices": [
+            {"label": "Dia mengenali tulisan tanganmu.", "next": "n2"},
+            {"label": "Dia terkejut. Dia tahu siapa kamu.", "next": "n3"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Jadi dia masih ingat. Aku harap surat itu cukup... hati-hati. Ada satu lagi yang perlu kulakukan sebelum aku bisa tenang.",
+          "choices": []
+        },
+        "n3": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Tentu saja dia tahu. Kami pernah sekelas. Tapi topik itu... nanti. Sekarang, ada masalah lain.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_side_threat_offer",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Binatang-binatang di hutan makin berani. Mereka sudah mulai mendekati jalan utama. Kalau tidak dihentikan, murid-murid baru yang lewat bisa celaka.",
+          "choices": [
+            {"label": "Aku akan menanganinya.", "effects": [{"type": "start_quest", "quest": "quest_side_pedagang_threat"}], "next": "n2"},
+            {"label": "Bukankah ada penjaga akademi?", "next": "n3"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Dua ekor cukup untuk mengusir yang lain. Hati-hati — mereka cepat dan licik. Kembali ke sini setelah selesai.",
+          "choices": []
+        },
+        "n3": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Penjaga akademi sibuk dengan masalah yang lebih besar. Ini... urusan kecil yang bisa diselesaikan oleh murid baru yang cukup berani.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_side_threat_report",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Kau sudah melakukannya? Bagus. Sekarang jalanan ini lebih aman untuk semua orang.",
+          "choices": [
+            {"label": "Siapa kamu sebenarnya?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Aku... dulu murid Tian Xu. Tahun yang sama dengan Lin Yue. Tapi aku memilih pergi — karena aku melihat sesuatu yang tidak bisa kuubah. Sekarang kau tahu.",
+          "choices": [
+            {"label": "Kenapa kamu pergi?", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Karena formasi di bawah akademi ini... tidak stabil. Dan ada yang tahu cara memperbaikinya — tapi mereka memilih menutupinya. Aku tidak bisa tinggal di tempat yang menutupi kebenaran.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_pedagang_post_arc",
+      "npc": "npc_pedagang_jalanan",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_pedagang_jalanan",
+          "text": "Kau sudah tahu semuanya sekarang. Jaga dirimu di dalam sini — dan jika suatu hari kau menemukan jawaban yang aku tidak bisa temukan, ceritakan padaku.",
+          "choices": []
+        }
+      }
+    }
+  ]
+}
