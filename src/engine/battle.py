@@ -14,7 +14,7 @@ from __future__ import annotations
 import random
 
 from ..loader import DataRegistry
-from .cultivation import gain_exp, gain_grind_exp
+from .cultivation import gain_exp
 from .events import add_log
 from .state import GameState
 
@@ -32,7 +32,9 @@ def companion_stats(state: GameState, registry: DataRegistry) -> dict | None:
 
     level = level ranah pemain; HP disimpan di state (persisten antar battle).
     """
-    c = state.companion
+    # Use active_companion ID to find in companions list
+    cid = state.active_companion
+    c = next((x for x in state.companions if x.get("id") == cid), None)
     if not c or not c.get("active"):
         return None
     comp = next((x for x in registry.companions if x.get("id") == c["id"]), None)
@@ -56,20 +58,64 @@ def companion_stats(state: GameState, registry: DataRegistry) -> dict | None:
     }
 
 
+def companion_stats_for(state: GameState, registry: DataRegistry, companion_id: str) -> dict | None:
+    """Stat kompanion berdasarkan ID — untuk team spar (bukan harus active)."""
+    c = next((x for x in state.companions if x.get("id") == companion_id), None)
+    if not c:
+        return None
+    comp = next((x for x in registry.companions if x.get("id") == c["id"]), None)
+    if not comp:
+        return None
+    scale = registry.config.get("companion", {})
+    lvl = state.player.realm_level
+    hp_max = int(comp.get("base_hp", 10)) + lvl * int(scale.get("hp_per_level", 12))
+    return {
+        "id": c["id"],
+        "name": comp["name"],
+        "element": comp.get("element"),
+        "hp": min(hp_max if c.get("hp") is None else int(c.get("hp")), hp_max),
+        "hp_max": hp_max,
+        "attack": int(comp.get("base_attack", 3)) + lvl * int(scale.get("attack_per_level", 2)),
+        "defense": int(comp.get("base_defense", 1)) + lvl * int(scale.get("defense_per_level", 1)),
+        "speed": int(comp.get("base_speed", 5)) + round(lvl * float(scale.get("speed_per_level", 0.5))),
+    }
+
+
 def player_combat(state: GameState, registry: DataRegistry) -> dict:
     lvl = state.player.realm_level
     weapon = state.player.equipment.get("weapon")
     wpower = int(registry.item(weapon)["power"]) if weapon and registry.item(weapon) else 0
+    atk = 6 + lvl + wpower
+    dfn = 3 + lvl // 2
+    for eff in state.status_effects:
+        if "atk_mult" in eff:
+            atk = int(atk * eff["atk_mult"])
     return {
         "hp": state.player.hp,
         "hp_max": state.max_hp(registry),
         "qi": state.player.qi,
         "qi_max": state.max_qi(registry),
-        "attack": 6 + lvl + wpower,
-        "defense": 3 + lvl // 2,
+        "attack": max(1, atk),
+        "defense": max(0, dfn),
         "speed": 8 + lvl,
         "element": None,
     }
+
+
+REALM_BONUS = {
+    "realm_xuanshi": "tahan_racun",
+    "realm_dishi": "perisai_jiwa",
+    "realm_tianshi": "kuasa_domain",
+    "realm_shenwu": "kekal_awet_muda",
+}
+
+
+def has_realm_bonus(state: GameState, bonus: str) -> bool:
+    """Cek apakah pemain memiliki bonus ranah tertentu."""
+    for rid in state.realms_unlocked:
+        if REALM_BONUS.get(rid) == bonus:
+            return True
+    return False
 
 
 DEFAULT_ELEMENT_ADVANTAGE = {
@@ -115,8 +161,10 @@ class BattleEngine:
 
     # ---------- mulai ----------
 
-    def start(self, foes: list[dict], context: str = "hunt") -> dict:
-        """foes = daftar stat musuh (baris enemies.csv atau npc['combat'])."""
+    def start(self, foes: list[dict], context: str = "hunt", allies: list[dict] | None = None,
+              use_companion: bool = True) -> dict:
+        """foes = daftar stat musuh (baris enemies.csv atau npc['combat']).
+        allies = stat sekutu quest untuk spar_team — menyerang otomatis."""
         b = {
             "foes": [dict(f) for f in foes],
             "context": context,
@@ -125,6 +173,9 @@ class BattleEngine:
             "over": False,
             "won": False,
             "player_fled": False,
+            "allies": allies or [],
+            "ally_turn_index": 0,
+            "use_companion": use_companion,
         }
         self.state.pending_battle = b
         for f in b["foes"]:
@@ -188,6 +239,7 @@ class BattleEngine:
         else:
             add_log(self.state, "battle", "Kau terpana — tidak bisa bergerak giliran ini!")
         self._companion_turn(b)
+        self._ally_turns(b)
         self._regen(pc, b)
         if not b["over"] and self._all_dead(b):
             return self._victory(b, pc)
@@ -203,7 +255,10 @@ class BattleEngine:
     # ---------- serangan ----------
 
     def _attack(self, pc: dict, b: dict, foe: dict) -> None:
-        dmg, crit = self._calc_damage(pc["attack"], foe["defense"], None, foe.get("element"))
+        atk = pc["attack"]
+        if has_realm_bonus(self.state, "kuasa_domain"):
+            atk = int(atk * 1.15)
+        dmg, crit = self._calc_damage(atk, foe["defense"], None, foe.get("element"))
         foe["hp"] -= dmg
         add_log(self.state, "battle", f"Serangan! {foe['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
 
@@ -338,32 +393,62 @@ class BattleEngine:
     # ---------- giliran musuh ----------
 
     def _enemy_turn(self, pc: dict, b: dict) -> None:
-        comp = companion_stats(self.state, self.reg)
+        comp = companion_stats(self.state, self.reg) if b.get("use_companion", True) else None
+        # Kumpulan target: pemain selalu ada; kompanion/sekutu hanya bila hidup.
+        targets = ["player"]
+        if comp and comp["hp"] > 0:
+            targets.append(("companion", comp))
+        for i, ally in enumerate(b.get("allies", [])):
+            if ally["hp"] > 0:
+                targets.append(("ally", i))
         for foe in b["foes"]:
             if foe["hp"] <= 0:
                 continue
-            # musuh 50% menarget kompanion bila aktif (punya HP sendiri)
-            if comp and comp["hp"] > 0 and random.random() < 0.5:
-                dmg, crit = self._calc_damage(foe["attack"], comp["defense"], foe.get("element"), comp.get("element"))
-                comp["hp"] -= dmg
-                if comp["hp"] <= 0:
-                    comp["hp"] = 0
-                    self.state.companion["active"] = False
-                    add_log(self.state, "battle", f"{comp['name']} KO — tidak akan bertarung sampai kau istirahat di titik aman!")
-                else:
-                    add_log(self.state, "battle", f"{foe['name']} menyerang {comp['name']}! {comp['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
-                self.state.companion["hp"] = comp["hp"]
-            else:
+            target = random.choice(targets)
+            if target == "player":
                 dmg, crit = self._calc_damage(foe["attack"], pc["defense"], foe.get("element"), None)
                 if b["player_guard"]:
                     dmg = max(1, int(dmg * (100 - b["player_guard"]) / 100))
                 pc["hp"] -= dmg
                 add_log(self.state, "battle", f"{foe['name']} menyerang! Kau kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
                 self._maybe_apply_status(b, foe)
+            elif target[0] == "companion":
+                c = target[1]
+                dmg, crit = self._calc_damage(foe["attack"], c["defense"], foe.get("element"), c.get("element"))
+                c["hp"] -= dmg
+                if c["hp"] <= 0:
+                    c["hp"] = 0
+                    for sc in self.state.companions:
+                        if sc.get("id") == c["id"]:
+                            sc["active"] = False
+                            break
+                    add_log(self.state, "battle", f"{c['name']} KO — tidak akan bertarung sampai kau istirahat di titik aman!")
+                else:
+                    add_log(self.state, "battle", f"{foe['name']} menyerang {c['name']}! {c['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
+                for sc in self.state.companions:
+                    if sc.get("id") == c["id"]:
+                        sc["hp"] = c["hp"]
+                        break
+            elif target[0] == "ally":
+                ally = b["allies"][target[1]]
+                dmg, crit = self._calc_damage(foe["attack"], ally["defense"], foe.get("element"), ally.get("element"))
+                ally["hp"] -= dmg
+                if ally["hp"] <= 0:
+                    ally["hp"] = 0
+                    add_log(self.state, "battle", f"{ally['name']} KO — gugur dalam ujian!")
+                else:
+                    add_log(self.state, "battle", f"{foe['name']} menyerang {ally['name']}! {ally['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
+                # Sinkronkan bila ally ini ternyata berasal dari state kompanion lama.
+                for sc in self.state.companions:
+                    if sc.get("id") == ally["id"]:
+                        sc["hp"] = ally["hp"]
+                        break
         b["player_guard"] = False
 
     def _companion_turn(self, b: dict) -> None:
         """Kompanion aktif bertindak otomatis tiap giliran pemain (§9.4)."""
+        if not b.get("use_companion", True):
+            return
         comp = companion_stats(self.state, self.reg)
         if not comp or comp["hp"] <= 0:
             return
@@ -374,9 +459,32 @@ class BattleEngine:
         foe["hp"] -= dmg
         add_log(self.state, "battle", f"{comp['name']} menerjang! {foe['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
 
+    def _ally_turns(self, b: dict) -> None:
+        """Sekutu quest (spar_team) — satu sekutu menyerang per giliran, bergantian."""
+        allies = b.get("allies", [])
+        if not allies:
+            return
+        idx = b.get("ally_turn_index", 0)
+        for _ in range(len(allies)):
+            ally = allies[idx % len(allies)]
+            if ally["hp"] > 0:
+                foe = next((f for f in b["foes"] if f["hp"] > 0), None)
+                if not foe:
+                    break
+                dmg, crit = self._calc_damage(ally["attack"], foe["defense"], ally.get("element"), foe.get("element"))
+                foe["hp"] -= dmg
+                add_log(self.state, "battle", f"{ally['name']} menyerang! {foe['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
+                b["ally_turn_index"] = (idx + 1) % len(allies)
+                break
+            idx += 1
+
     def _regen(self, pc: dict, b: dict) -> None:
         pct = self.reg.config.get("battle", {}).get("qi_regen_percent_per_turn", 5)
         pc["qi"] = min(pc["qi_max"], pc["qi"] + round(pc["qi_max"] * pct / 100))
+        # Kekal Awet Muda: +5% HP regen per turn
+        if has_realm_bonus(self.state, "kekal_awet_muda"):
+            hp_regen = max(1, round(pc["hp_max"] * 0.05))
+            pc["hp"] = min(pc["hp_max"], pc["hp"] + hp_regen)
 
     def _regen_foes(self, b: dict) -> None:
         pct = self.reg.config.get("battle", {}).get("qi_regen_percent_per_turn", 5)
@@ -404,10 +512,14 @@ class BattleEngine:
         # di cultivation._level_up; tanpa urutan ini snapshot pra-reward menimpa
         # heal level-up diam-diam.
         self._sync_player(pc)
+        # Sinkronkan bila ally ini ternyata berasal dari state kompanion lama.
+        for ally in b.get("allies", []):
+            for sc in self.state.companions:
+                if sc.get("id") == ally["id"]:
+                    sc["hp"] = ally["hp"]
+                    break
         killed = [f["id"] for f in b["foes"] if f.get("id")]
-        # exp — sumber grinding (spar/berburu) dibatasi cap harian (A2, keputusan §17)
-        if b["context"] == "spar":
-            gain_grind_exp(self.state, self.reg, self.reg.config.get("cultivation", {}).get("spar_win_exp", 5))
+        if b["context"] in ("spar", "spar_team"):
             arr = self.reg.config.get("cultivation", {}).get("spar_relation_diminishing") or [5, 3, 1]
             if b.get("spar_npc"):
                 npc_id = b["spar_npc"]
@@ -424,9 +536,6 @@ class BattleEngine:
                     npc_name = npc["name"] if npc else npc_id
                     add_log(self.state, "battle", f"Hubungan dengan {npc_name} membaik (+{rel}).")
                 self.quest_engine.notify_spar_won(npc_id)
-        else:
-            total = sum(int(f.get("exp_reward", 0)) for f in b["foes"])
-            gain_grind_exp(self.state, self.reg, total)
         # drop
         for f in b["foes"]:
             di = f.get("drop_item")
@@ -435,26 +544,31 @@ class BattleEngine:
                 self.state.inventory[di] = self.state.inventory.get(di, 0) + 1
                 it = self.reg.item(di)
                 add_log(self.state, "battle", f"Menemukan: {it['name'] if it else di}.")
-        add_log(self.state, "battle", f"🏆 Kemenangan! (+{self._last_exp(b)} exp)")
+        add_log(self.state, "battle", "🏆 Kemenangan!")
         self.quest_engine.notify_battle_won(killed)
         return self.view()
 
     def _last_exp(self, b: dict) -> int:
-        if b["context"] == "spar":
-            return self.reg.config.get("cultivation", {}).get("spar_win_exp", 5)
-        return sum(int(f.get("exp_reward", 0)) for f in b["foes"])
+        return 0
 
     def _ko(self, b: dict) -> dict:
+        # Perisai Jiwa: one free KO recovery per battle
+        if has_realm_bonus(self.state, "perisai_jiwa") and not b.get("ko_shield_used"):
+            b["ko_shield_used"] = True
+            recover = int(self.state.max_hp(self.reg) * 0.3)
+            pc = player_combat(self.state, self.reg)
+            pc["hp"] = max(1, recover)
+            self._sync_player(pc)
+            add_log(self.state, "battle", f"🛡️ Perisai Jiwa! Kau bertahan dari KO (+{recover} HP).")
+            return self.view()
         b["over"] = True
         b["won"] = False
         self.state.pending_battle = None
-        # penalti exp ringan
         ratio = self.reg.config.get("ko_penalty", {}).get("exp_loss_ratio", 0.1)
         loss = round(self.state.exp_next(self.reg) * ratio)
-        self.state.player.exp = max(0, self.state.player.exp - loss)
-        if b["context"] == "spar":
-            gain_exp(self.state, self.reg, self.reg.config.get("cultivation", {}).get("spar_loss_exp", 2))
-            # G4a: kalah sparring tetap menyelesaikan objektif `spar` (dialog berbeda)
+        self.state.player.dantian_exp = max(0, self.state.player.dantian_exp - loss)
+        if b["context"] in ("spar", "spar_team"):
+            # G4a: kalah sparring tetap menyelesaikan objektif `spar`
             if b.get("spar_npc"):
                 self.quest_engine.notify_spar_loss(b["spar_npc"])
         # respawn titik aman — data-driven (B2): last_safe → config.world.safe_fallback_location
@@ -496,8 +610,26 @@ class BattleEngine:
                 {"name": f["name"], "hp": f["hp"], "hp_max": f["hp_max"], "element": f.get("element")}
                 for f in b.get("foes", [])
             ],
-            "companion": companion_stats(self.state, self.reg),
+            "companion": companion_stats(self.state, self.reg) if b.get("use_companion", True) else None,
+            "allies": [
+                {"name": a["name"], "hp": a["hp"], "hp_max": a["hp_max"], "element": a.get("element")}
+                for a in b.get("allies", [])
+            ],
+            "ally_turn_index": b.get("ally_turn_index", 0),
+            "active_ally_index": self._active_ally_index(b),
             "over": b.get("over", False),
             "won": b.get("won", False),
             "fled": b.get("player_fled", False),
         }
+
+    def _active_ally_index(self, b: dict) -> int | None:
+        allies = b.get("allies", [])
+        if not allies:
+            return None
+        idx = b.get("ally_turn_index", 0)
+        for _ in range(len(allies)):
+            current = idx % len(allies)
+            if allies[current]["hp"] > 0:
+                return current
+            idx += 1
+        return None

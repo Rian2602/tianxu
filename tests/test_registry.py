@@ -40,9 +40,11 @@ def test_validator_kind_sets_match_registry_keys():
     (subsumes cek "tabel terisi": perbandingan himpunan eksplisit di bawah ini
     sudah memastikan set tidak kosong dan tidak berubah dari kontrak)."""
     assert EFFECT_TYPES == {"morality", "relation", "reputation", "flag",
-                            "item", "gold", "technique", "start_quest", "npc_state"}
+                            "item", "gold", "technique", "start_quest", "npc_state",
+                            "grant_companion", "exp", "unlock_realm_bonus",
+                            "status_effect"}
     assert set(OBJECTIVE_HANDLERS) == {"talk", "defeat", "gather", "reach", "choose",
-                                       "spar", "advance_time"}
+                                       "spar", "advance_time", "rest"}
     assert TECHNIQUE_KINDS == {"attack", "defend", "heal"}
     assert STATUS_KINDS == {"dot", "stun"}
     assert CONDITION_KEYS == set(CONDITION_CHECKERS)

@@ -315,8 +315,12 @@ async function refreshSaveSlots() {
 }
 
 function showGame() {
-  $("title-screen").classList.add("hidden");
-  $("game-screen").classList.remove("hidden");
+  const ts = $("title-screen");
+  ts.classList.add("screen-out");
+  setTimeout(() => {
+    ts.classList.add("hidden");
+    $("game-screen").classList.remove("hidden");
+  }, 400);
 }
 
 // Judul game data-driven (config.web) — tema story baru boleh punya judul sendiri
@@ -388,7 +392,7 @@ function render() {
 function renderHeader(v) {
   const loc = v.location;
   $("header-title").textContent =
-    `Bulan ${v.month} — Hari ${v.day}, jam ${String(v.hour).padStart(2, "0")}:00 — ${loc.name}`;
+    `Bulan ${v.month} — Hari ${v.day} — ${loc.name}`;
 }
 
 function statRow(label, value, cls) {
@@ -454,8 +458,38 @@ function renderLeft(v) {
 
   html += statBarRow("HP", p.hp, p.hp_max, "hp");
   html += statBarRow("Qi", p.qi, p.qi_max, "qi");
-  if (p.exp_next > 0) {
-    html += statBarRow("Exp", p.exp, p.exp_next, "exp");
+  html += statBarRow("Dantian", p.dantian_exp || 0, p.dantian_capacity || 20, "exp");
+
+  // time display
+  const hour = v.hour || 0;
+  const remaining = 24 - hour;
+  html += `<div style="margin: 8px 0; font-size: 12px; color: var(--gray);">` +
+    `${icon("clock")} Jam ${String(hour).padStart(2, "0")}:00 · Sisa ${remaining} jam</div>`;
+
+  // fatigue warning
+  if (!p.rested_today) {
+    const pen = p.fatigue_days * 2;
+    html += `<div style="margin: 2px 0; font-size: 11px; color: #d96b5f;">⚠ Belum istirahat! (−${pen} HP max)</div>`;
+  }
+
+  // meditasi weekly counter
+  const medLimit = (ctx && ctx.meditate_weekly_limit) || 3;
+  const medCount = p.meditate_week_count || 0;
+  html += `<div style="margin: 4px 0 8px; font-size: 12px; color: var(--gray);">` +
+    `${icon("moon")} Meditasi: ${medCount}/${medLimit} minggu ini</div>`;
+
+  // status effects
+  if (p.status_effects && p.status_effects.length > 0) {
+    p.status_effects.forEach(e => {
+      const name = e.type === "cultivation_deviation" ? "Debuff Qi Deviasi" : e.type;
+      html += `<div style="margin: 2px 0; font-size: 11px; color: #d96b5f;">⚠ ${esc(name)} (${e.days_left} hari)</div>`;
+    });
+  }
+  if (p.pil_sukses_active) {
+    html += `<div style="margin: 2px 0; font-size: 11px; color: #8fbf8f;">✦ Pil Sukses aktif (+30%)</div>`;
+  }
+  if (p.pil_aman_active) {
+    html += `<div style="margin: 2px 0; font-size: 11px; color: #8fbf8f;">✦ Pil Aman aktif</div>`;
   }
 
   const ic = customIcon;
@@ -466,6 +500,21 @@ function renderLeft(v) {
   if (comp) {
     html += `<h3 class="stat-title" style="margin-top:18px">✦ Roh</h3>`;
     html += statRow(comp.name, `HP ${comp.hp}/${comp.hp_max}`, comp.hp <= 0 ? "red" : "");
+  }
+  // Companion list (multi-companion)
+  const companions = v.companions || [];
+  if (companions.length > 1) {
+    html += `<h3 class="stat-title" style="margin-top:18px">✦ Kawan</h3>`;
+    for (const c of companions) {
+      const sel = c.selected ? " selected" : "";
+      const dead = c.hp <= 0 ? " dead" : "";
+      const safe = v.location && v.location.is_safe;
+      const onclick = (safe && !c.selected) ? ` onclick="act({type:'switch_companion',companion:'${esc(c.id)}'})"` : "";
+      html += `<div class="companion-row${sel}${dead}"${onclick}>`;
+      html += `<span class="companion-name">${c.selected ? "▸ " : ""}${esc(c.name)}</span>`;
+      html += `<span class="companion-hp">HP ${c.hp}/${c.hp_max}</span>`;
+      html += `</div>`;
+    }
   }
   $("col-left").innerHTML = html;
 }
@@ -541,6 +590,9 @@ function renderRight(v) {
   }
   html += `</div>`;
   
+  // NPC Codex button
+  html += `<div class="section"><button class="codex-btn" onclick="openNpcCodex()">${icon("users")}Kodex NPC</button></div>`;
+  
   // status karakter (docs 04: Family Crisis state_*_status per anggota) —
   // data-driven dari context.character_status; label + warna tema-agnostik
   if (ctx && ctx.character_status && ctx.character_status.length) {
@@ -605,6 +657,168 @@ function renderRight(v) {
   }
 
   $("col-right").innerHTML = html;
+}
+
+// ---------- NPC Codex ----------
+
+function openNpcCodex() {
+  const profiles = (ctx && ctx.npc_profiles) || {};
+  const relations = (ctx && ctx.relations) || {};
+  
+  let html = `<div class="codex-overlay" onclick="closeNpcCodex(event)">`;
+  html += `<div class="codex-panel" onclick="event.stopPropagation()">`;
+  html += `<div class="codex-header">`;
+  html += `<h2>${icon("users")}Kodex NPC</h2>`;
+  html += `<button class="codex-close" onclick="closeNpcCodex()">&times;</button>`;
+  html += `</div>`;
+  html += `<div class="codex-list">`;
+  
+  // Sort NPCs by relation score (highest first)
+  const sorted = Object.entries(profiles).sort((a, b) => {
+    const relA = (a[1].relation || 0);
+    const relB = (b[1].relation || 0);
+    return relB - relA;
+  });
+  
+  for (const [nid, data] of sorted) {
+    const profile = data.profile || {};
+    const relation = data.relation || 0;
+    const tier = getRelationTier(relation);
+    
+    // Progressive reveal based on relation tier
+    let revealLevel = 0;
+    if (relation >= -20) revealLevel = 1; // Name + title
+    if (relation < 0) revealLevel = 1; // Distrustful — still shows name
+    if (relation === 0) revealLevel = 1; // Neutral
+    if (relation > 0) revealLevel = 2; // Friendly — shows bio
+    if (relation >= 5) revealLevel = 3; // Close — shows all stats
+    if (relation >= 20) revealLevel = 4; // Very close — shows everything
+    
+    html += `<div class="codex-card" onclick="showNpcDetail('${esc(nid)}')">`;
+    html += `<div class="codex-card-header">`;
+    html += `<div class="codex-card-initial">${esc((data.name || "?").charAt(0))}</div>`;
+    html += `<div class="codex-card-info">`;
+    html += `<div class="codex-card-name">${esc(data.name)}</div>`;
+    html += `<div class="codex-card-tier badge badge-${esc(tier.cls)}">${esc(tier.label)}</div>`;
+    html += `</div>`;
+    html += `</div>`;
+    
+    if (revealLevel >= 2 && profile.bio) {
+      html += `<div class="codex-card-bio">${esc(profile.bio)}</div>`;
+    }
+    if (revealLevel >= 3) {
+      html += `<div class="codex-card-stats">`;
+      if (profile.realm) html += `<span>${icon("star")}${esc(profile.realm)}</span>`;
+      if (profile.weapon && profile.weapon !== "Tidak Ada") html += `<span>${icon("sword")}${esc(profile.weapon)}</span>`;
+      if (profile.element && profile.element !== "tidak ada") html += `<span>${icon("flame")}${esc(profile.element)}</span>`;
+      html += `</div>`;
+    }
+    if (revealLevel >= 4) {
+      html += `<div class="codex-card-extra">`;
+      if (profile.faction) html += `<span>${icon("landmark")}${esc(profile.faction)}</span>`;
+      if (profile.companion) html += `<span>${icon("heart")}${esc(profile.companion)}</span>`;
+      html += `</div>`;
+    }
+    
+    html += `</div>`;
+  }
+  
+  html += `</div></div></div>`;
+  
+  // Add overlay to body
+  const overlay = document.createElement("div");
+  overlay.innerHTML = html;
+  document.body.appendChild(overlay.firstElementChild);
+}
+
+function closeNpcCodex(e) {
+  if (e && e.target && !e.target.classList.contains("codex-overlay")) return;
+  const overlay = document.querySelector(".codex-overlay");
+  if (overlay) overlay.remove();
+}
+
+function showNpcDetail(nid) {
+  const profiles = (ctx && ctx.npc_profiles) || {};
+  const data = profiles[nid];
+  if (!data) return;
+  
+  const profile = data.profile || {};
+  const relation = data.relation || 0;
+  const tier = getRelationTier(relation);
+  
+  // Determine reveal level
+  let revealLevel = 0;
+  if (relation >= -20) revealLevel = 1;
+  if (relation < 0) revealLevel = 1;
+  if (relation === 0) revealLevel = 1;
+  if (relation > 0) revealLevel = 2;
+  if (relation >= 5) revealLevel = 3;
+  if (relation >= 20) revealLevel = 4;
+  
+  let html = `<div class="codex-overlay" onclick="closeNpcCodex(event)">`;
+  html += `<div class="codex-detail" onclick="event.stopPropagation()">`;
+  html += `<div class="codex-detail-header">`;
+  html += `<div class="codex-detail-initial">${esc((data.name || "?").charAt(0))}</div>`;
+  html += `<div class="codex-detail-info">`;
+  html += `<h2>${esc(data.name)}</h2>`;
+  html += `<div class="badge badge-${esc(tier.cls)}">${esc(tier.label)} (${relation > 0 ? "+" : ""}${relation})</div>`;
+  html += `</div>`;
+  html += `<button class="codex-close" onclick="closeNpcCodex()">&times;</button>`;
+  html += `</div>`;
+  
+  html += `<div class="codex-detail-body">`;
+  
+  if (revealLevel >= 2 && profile.bio) {
+    html += `<div class="codex-detail-section">`;
+    html += `<h3>${icon("scroll-text")}Bio</h3>`;
+    html += `<p>${esc(profile.bio)}</p>`;
+    html += `</div>`;
+  }
+  
+  if (revealLevel >= 3) {
+    html += `<div class="codex-detail-section">`;
+    html += `<h3>${icon("star")}Status</h3>`;
+    html += `<div class="codex-stat-grid">`;
+    if (profile.realm) html += `<div class="codex-stat"><span class="codex-stat-label">Ranah</span><span class="codex-stat-value">${esc(profile.realm)}</span></div>`;
+    if (profile.realm_level) html += `<div class="codex-stat"><span class="codex-stat-label">Level</span><span class="codex-stat-value">${profile.realm_level}</span></div>`;
+    if (profile.weapon && profile.weapon !== "Tidak Ada") html += `<div class="codex-stat"><span class="codex-stat-label">Senjata</span><span class="codex-stat-value">${esc(profile.weapon)}</span></div>`;
+    if (profile.element && profile.element !== "tidak ada") html += `<div class="codex-stat"><span class="codex-stat-label">Elemen</span><span class="codex-stat-value">${esc(profile.element)}</span></div>`;
+    html += `</div></div>`;
+    
+    if (profile.hp_max || profile.qi_max) {
+      html += `<div class="codex-detail-section">`;
+      html += `<h3>${icon("heart")}Kekuatan</h3>`;
+      html += `<div class="codex-stat-grid">`;
+      if (profile.hp_max) html += `<div class="codex-stat"><span class="codex-stat-label">HP</span><span class="codex-stat-value">${profile.hp_max}</span></div>`;
+      if (profile.qi_max) html += `<div class="codex-stat"><span class="codex-stat-label">Qi</span><span class="codex-stat-value">${profile.qi_max}</span></div>`;
+      html += `</div></div>`;
+    }
+  }
+  
+  if (revealLevel >= 4) {
+    html += `<div class="codex-detail-section">`;
+    html += `<h3>${icon("landmark")}Lainnya</h3>`;
+    html += `<div class="codex-stat-grid">`;
+    if (profile.faction) html += `<div class="codex-stat"><span class="codex-stat-label">Faksi</span><span class="codex-stat-value">${esc(profile.faction)}</span></div>`;
+    if (profile.companion) html += `<div class="codex-stat"><span class="codex-stat-label">Kawan</span><span class="codex-stat-value">${esc(profile.companion)}</span></div>`;
+    html += `</div></div>`;
+  }
+  
+  if (revealLevel < 4) {
+    html += `<div class="codex-detail-section codex-locked">`;
+    html += `<p>${icon("lock")}Tingkatkan hubungan untuk membuka lebih banyak informasi.</p>`;
+    html += `</div>`;
+  }
+  
+  html += `</div></div></div>`;
+  
+  // Close existing overlay and show detail
+  const existing = document.querySelector(".codex-overlay");
+  if (existing) existing.remove();
+  
+  const overlay = document.createElement("div");
+  overlay.innerHTML = html;
+  document.body.appendChild(overlay.firstElementChild);
 }
 
 // ---------- kolom tengah ----------
@@ -676,7 +890,8 @@ function renderExplore(v, c, box) {
   // NPC di lokasi
   (c.npcs || []).forEach((n) => {
     const tag = n.can_spar ? " (sparing)" : n.shop ? " (toko)" : "";
-    html += `<div class="action-row"><button class="btn" onclick='act({type:"talk",npc:"${n.id}"})'>${icon("message-circle")}Bicara ${esc(n.name)}${tag}</button></div>`;
+    const npcAvatar = n.avatar ? `<img src="${esc(n.avatar)}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">` : "";
+    html += `<div class="action-row"><button class="btn" onclick='act({type:"talk",npc:"${n.id}"})'>${npcAvatar}${icon("message-circle")}Bicara ${esc(n.name)}${tag}</button></div>`;
     if (n.can_spar) {
       html += `<div class="action-row"><button class="btn" onclick='act({type:"spar",npc:"${n.id}"})'>Sparring vs ${esc(n.name)}</button></div>`;
     }
@@ -696,18 +911,36 @@ function renderExplore(v, c, box) {
   const huntsHere = (c.hunts || []).filter((h) => h.location === loc.id);
   if (huntsHere.length) {
     huntsHere.forEach((h) => {
-      const searchLabel = h.search_item_name ? `Cari ${h.search_item_name}` : "Cari";
+      const searchLabel = h.search_item_name ? `Cari ${h.search_item_name.split(",")[0].trim()}` : "Cari";
       html += `<div class="action-row"><button class="btn" onclick='act({type:"hunt",hunt:"${esc(h.id)}"})'>${esc(h.name || "Berburu")}</button>` +
               `<button class="btn" onclick='act({type:"search"})'>${esc(searchLabel)}</button></div>`;
     });
   }
 
+  // menambang (unsafe locations with mines)
+  if (!loc.is_safe) {
+    html += `<div class="action-row"><button class="btn" onclick='act({type:"mine"})'>${icon("pickaxe")}Menambang</button></div>`;
+  }
+
   // lokasi aman
   if (loc.is_safe) {
-    html += `<div class="action-row"><span class="action-label">Meditasi (jam):</span>` +
-            `<input type="number" id="inp-ground" min="1" max="8" value="4">` +
-            `<button class="btn" onclick='act({type:"grounding",hours:Number($("inp-ground").value)})'>Meditasi</button>` +
-            `<button class="btn" onclick='act({type:"rest"})'>Istirahat</button></div>`;
+    html += `<div class="action-row"><span class="action-label">Meditasi:</span>` +
+            `<button class="btn" onclick='act({type:"meditate"})'>Meditasi</button>`;
+    // istirahat hanya di kamar pemain
+    if (v.player.is_rest_location) {
+      html += `<button class="btn" onclick='act({type:"rest"})'>Istirahat</button>`;
+    }
+    html += `</div>`;
+    // meracik (crafting)
+    const ownedRecipes = v.recipes || [];
+    if (ownedRecipes.length) {
+      html += `<div class="action-row"><span class="action-label">Meracik:</span>` +
+              `<select id="sel-craft">${ownedRecipes.map((r) => {
+                const ings = r.ingredients.map(i => `${i.count}×${esc(i.name || i.item)}`).join("+");
+                return `<option value="${r.id}">${esc(r.name)} (${ings})</option>`;
+              }).join("")}</select>` +
+              `<button class="btn" onclick='act({type:"craft",recipe:$("sel-craft").value})'>Meracik</button></div>`;
+    }
     // C1: tingkatkan teknik yang dimiliki
     if (c.techniques && c.techniques.length) {
       html += `<div class="action-row"><span class="action-label">Tingkatkan teknik:</span>` +
@@ -718,11 +951,6 @@ function renderExplore(v, c, box) {
             `<input type="text" id="inp-save" value="save1">` +
             `<button class="btn" onclick='act({type:"save",save_name:$("inp-save").value})'>Simpan</button></div>`;
   }
-
-  // tunggu
-  html += `<div class="action-row"><span class="action-label">Tunggu (jam):</span>` +
-          `<input type="number" id="inp-wait" min="1" max="12" value="4">` +
-          `<button class="btn" onclick='act({type:"advance_time",hours:Number($("inp-wait").value)})'>Tunggu</button></div>`;
 
   // pakai item (consumable)
   const consumables = (v.inventory || []).filter((i) => i.type === "consumable");
@@ -784,18 +1012,27 @@ function renderDialog(v, box) {
   const d = v.dialog;
   if (!d) { box.innerHTML = ""; return; }
   const npcNames = (ctx && ctx.npc_names) || {};
+  const npcAvatars = (ctx && ctx.npc_avatars) || {};
   let speaker = d.speaker;
-  if (speaker.startsWith("npc:")) speaker = npcNames[speaker.slice(4)] || speaker.slice(4);
+  let speakerNpcId = null;
+  if (speaker.startsWith("npc:")) {
+    speakerNpcId = speaker.slice(4);
+    speaker = npcNames[speakerNpcId] || speakerNpcId;
+  }
   else if (speaker === "narration") speaker = "Narasi";
   
   let html = `<div class="interact-box">`;
+  const avatarPath = speakerNpcId ? npcAvatars[speakerNpcId] : null;
   if (speaker === "Narasi") {
     html += `<div class="dialog-speaker-row"><div class="dialog-speaker">${esc(speaker)}</div></div>`;
+  } else if (avatarPath) {
+    html += `<div class="dialog-speaker-row"><img src="${esc(avatarPath)}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);margin-right:8px;" onerror="this.style.display='none'"><div class="dialog-speaker">${esc(speaker)}</div></div>`;
   } else {
     html += `<div class="dialog-speaker-row"><div class="seal seal-ghost seal-sm">${esc(speaker[0])}</div><div class="dialog-speaker">${esc(speaker)}</div></div>`;
   }
   
-  html += `<div class="dialog-text" id="dlg-text-live"></div>`;
+  const dlgCls = speaker === "Narasi" ? "dialog-text" : "dialog-text npc-dialog";
+  html += `<div class="${dlgCls}" id="dlg-text-live"></div>`;
   if (d.choices && d.choices.length) {
     d.choices.forEach((c) => {
       html += `<button class="choice-btn" onclick='act({type:"dialog_choice",choice_index:${c.index}})'><span class="seal seal-sm">${c.index + 1}</span> ${esc(c.label)}</button>`;
@@ -831,6 +1068,18 @@ function renderBattle(v, c, box) {
       <span class="c-name">${esc(b.companion.name)}</span>
       <div class="c-bar"><div class="stat-bar-track"><div class="stat-bar-fill hp" data-target="${pct(b.companion.hp, b.companion.hp_max)}%" style="width:${pct(b.companion.hp, b.companion.hp_max)}%"></div></div></div>
     </div>`;
+  }
+  
+  // Sekutu ujian kelompok
+  if (b.allies && b.allies.length) {
+    const allyIdx = b.active_ally_index;
+    b.allies.forEach((a, i) => {
+      const activeCls = i === allyIdx ? " ally-active" : "";
+      html += `<div class="combatant-card ally${activeCls}">
+        <span class="c-name">${esc(a.name)}</span>
+        <div class="c-bar"><div class="stat-bar-track"><div class="stat-bar-fill hp" data-target="${pct(a.hp, a.hp_max)}%" style="width:${pct(a.hp, a.hp_max)}%"></div></div></div>
+      </div>`;
+    });
   }
   
   // Foes
@@ -1231,6 +1480,20 @@ function detectBattleChanges(oldState, newState) {
     animateCardHit(card, "damage");
     const val = Math.abs(nf.hp - of_.hp);
     animateDamage(card, "damage", val);
+  });
+
+  // Perubahan HP sekutu tim; kartu ally pertama adalah pemain.
+  (nb.allies || []).forEach((na, idx) => {
+    const oa = (ob.allies || [])[idx];
+    if (!oa || oa.hp === na.hp) return;
+    const allyCards = document.querySelectorAll(".combatant-card.ally");
+    const card = allyCards[idx + (nb.companion ? 2 : 1)];
+    if (!card) return;
+    const bar = card.querySelector(".stat-bar-fill");
+    const isDmg = na.hp < oa.hp;
+    if (bar) animateHpBar(bar, isDmg);
+    animateCardHit(card, isDmg ? "damage" : "heal");
+    animateDamage(card, isDmg ? "damage" : "heal", Math.abs(na.hp - oa.hp));
   });
 }
 

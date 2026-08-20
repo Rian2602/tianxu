@@ -133,12 +133,16 @@ def test_hunt_timer_per_zone_independent(tmp_path):
 
 
 def test_hunt_cooldown_blocks_same_zone(tmp_path):
-    reg, session = _session(_two_zone_data(tmp_path))
+    dst = _copy(tmp_path)
+    cfg = json.loads((dst / "config.json").read_text(encoding="utf-8"))
+    cfg["world"]["monster_respawn_hours"] = 5
+    (dst / "config.json").write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
+    reg, session = _session(dst)
     session.apply_action({"type": "move", "to": "loc_hutan"})
     session.apply_action({"type": "hunt", "hunt": "hunt_hutan"})
     session.state.pending_battle = None
     session.apply_action({"type": "hunt", "hunt": "hunt_hutan"})
-    assert session.state.pending_battle is None  # masih cooldown
+    assert session.state.pending_battle is None  # masih cooldown (2h time cost < 5h respawn)
     msgs = "\n".join(e["text"] for e in session.state.log)
     assert "sepi" in msgs
 
@@ -159,13 +163,13 @@ def test_legacy_world_hunt_wrapped_as_legacy_zone(tmp_path):
 # ---------- save: v1 → v2 migrasi ----------
 
 def test_schema_version_bumped():
-    assert SCHEMA_VERSION == 3
+    assert SCHEMA_VERSION == 7
 
 
 def test_save_v1_last_hunt_time_int_migrates():
     d = {
         "schema_version": 1,
-        "player": {"name": "X", "hp": 10, "qi": 5, "realm": "realm_awal", "realm_level": 1},
+        "player": {"name": "X", "hp": 10, "qi": 5, "realm": "realm_chuji", "realm_level": 1},
         "location": "loc_gerbang", "day": 1, "hour": 8,
         "last_hunt_time": 120,  # v1: int global
     }
@@ -219,7 +223,7 @@ def test_save_v2_roundtrip_dict(registry, session):
 def test_save_without_last_hunt_time_defaults_empty():
     d = {
         "schema_version": 2,
-        "player": {"name": "X", "hp": 10, "qi": 5, "realm": "realm_awal", "realm_level": 1},
+        "player": {"name": "X", "hp": 10, "qi": 5, "realm": "realm_chuji", "realm_level": 1},
         "location": "loc_gerbang", "day": 1, "hour": 8,
     }
     gs = GameState.from_dict(d)

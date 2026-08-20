@@ -5,7 +5,7 @@
       "name": "Guru",
       "location": "loc_gerbang",
       "can_spar": true,
-      "spar_require": {"realm_min": "realm_awal"},
+      "spar_require": {"realm_min": "realm_chuji"},
       "combat": {
         "hp": 40,
         "attack": 8,

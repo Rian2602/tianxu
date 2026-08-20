@@ -28,9 +28,7 @@
             "value": 1
           }
         ],
-        "rewards": {
-          "exp": 12
-        },
+        "rewards": {},
         "system_msg": "Desa itu hancur dalam semalam — tanaman busuk, formasi retak, ternak bermutasi. Spiritual Collapse bukan lagi rumor: ia di sini. Dan sesuatu di dalamnya terasa familier."
       },
       "next": [
@@ -119,9 +117,7 @@
             "value": true
           }
         ],
-        "rewards": {
-          "exp": 15
-        },
+        "rewards": {},
         "system_msg": "'Kau membunuhku sekali.' Suara itu datang dari mana-mana dan tidak dari mana-mana. 'Aku adalah alasan kalian menyebut dunia ini sebagai anugerah.'"
       },
       "next": [
@@ -151,14 +147,14 @@
             "type": "flag",
             "key": "flag_cycle_formation_known_partial",
             "value": true
-          },   {
-    "type": "flag",
-    "key": "belief_protagonist_may_be_cause",
-    "value": false
-   }
-  ],
+          },
+          {
+            "type": "flag",
+            "key": "belief_protagonist_may_be_cause",
+            "value": false
+          }
+        ],
         "rewards": {
-          "exp": 25,
           "gold": 20
         },
         "system_msg": "Kau melihat — kehidupan pertamamu mencoba membunuh Entity, gagal, karena ia tidak bisa dibunuh tanpa menghancurkan sumber cultivation itu sendiri. Lalu ia menciptakan Cycle Formation sebagai solusi darurat. Bukan rencana besar. Kegagalan yang menjadi segalanya."

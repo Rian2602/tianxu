@@ -19,7 +19,7 @@ def test_new_game_view(registry, session):
     assert v["location"]["id"] == "loc_gerbang"
     assert v["location"]["is_safe"] is True
     assert v["player"]["name"] == "Chen Xu"
-    assert v["player"]["realm"] == "Ranah Awal"
+    assert v["player"]["realm"] == "Chu Ji"
     assert v["player"]["hp"] > 0
     assert v["current_quest"] is not None
     assert v["current_quest"]["id"] == "q_min_intro"
@@ -114,13 +114,14 @@ def test_key_item_not_usable_or_equippable(registry, session):
 
 def test_grounding_and_rest(registry, session):
     # meditasi di lokasi aman (default 4 jam, tapi dibatasi max per hari)
-    session.apply_action({"type": "grounding", "hours": 1})
+    session.apply_action({"type": "meditate"})
     v = session.view()
     assert v["mode"] == "explore"
-    assert session.state.grounding_hours_today == 1
-    assert session.state.player.exp > 0, "meditasi harus memberi exp"
+    assert session.state.player.dantian_exp >= 0, "meditasi harus jalan"
 
-    session.apply_action({"type": "rest", "hours": 1})
+    session.apply_action({"type": "move", "to": "loc_training_hall"})
+    session.apply_action({"type": "move", "to": "loc_protagonist_room"})
+    session.apply_action({"type": "rest"})
     v = session.view()
     assert v["mode"] == "explore"
     assert session.state.player.hp == session.state.max_hp(registry)

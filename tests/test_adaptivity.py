@@ -23,8 +23,9 @@ from src.engine.session import GameSession
 # ---------- pembuat data sintetis ----------
 
 DEFAULT_REALMS = [{
-    "id": "r1", "name": "R1", "name_pinyin": "R1", "order": "1", "levels": "5",
-    "base_hp": "50", "hp_per_level": "5", "base_qi": "30", "qi_per_level": "3",
+    "id": "r1", "name": "R1", "name_pinyin": "R1", "order": "1", "tiers": "5",
+    "base_hp": "50", "hp_per_tier": "5", "base_qi": "30", "qi_per_tier": "3",
+    "dantian_capacity": "20", "meditation_success_rate": "1.0",
 }]
 
 DEFAULT_LOCATIONS = [{
@@ -440,25 +441,32 @@ def test_minimal_mechanics_columns(tmp_path):
     assert s.view()["player"]["hp_max"] >= 1  # max_hp default, bukan KeyError
     gain_exp(s.state, reg, 100)  # level-up dengan levels default
     s.state.companion = {"id": "c1", "hp": 10, "active": True}
+    s.state.companions = [{"id": "c1", "hp": 10, "active": True}]
+    s.state.active_companion = "c1"
     assert companion_stats(s.state, reg) is not None
     s.battle.start([dict(reg.enemies["e1"])], "hunt")
     assert s.state.pending_battle is not None  # battle start tanpa kolom hp
 
 
 def test_breakthrough_to_second_realm(tmp_path):
-    """Dua ranah → exp cukup memicu level-up & terobosan otomatis (fungsi engine)."""
+    """Dua ranah → dantian penuh + meditasi berkali-kali memicu terobosan."""
     realms = DEFAULT_REALMS + [{
-        "id": "r2", "name": "R2", "name_pinyin": "R2", "order": "2", "levels": "3",
-        "base_hp": "80", "hp_per_level": "8", "base_qi": "50", "qi_per_level": "5",
+        "id": "r2", "name": "R2", "name_pinyin": "R2", "order": "2", "tiers": "3",
+        "base_hp": "80", "hp_per_tier": "8", "base_qi": "50", "qi_per_tier": "5",
+        "dantian_capacity": "40", "meditation_success_rate": "1.0",
     }]
     reg, s = _session(tmp_path, quests=[
         {"id": "q1", "kind": "main", "title": "T", "objective": {"kind": "choose", "options": [{"value": "a", "label": "A"}]}},
     ], npcs=[], realms=realms)
-    from src.engine.cultivation import gain_exp
-    s.state.player.exp = 0
-    gain_exp(s.state, reg, 1000)  # jauh melebihi kebutuhan 5 level r1
-    assert s.state.player.realm == "r2", "terobosan otomatis ke ranah berikutnya"
-    assert 1 <= s.state.player.realm_level <= 3  # naik level lanjut di ranah baru
+    from src.engine.cultivation import gain_exp, meditate
+    # r1 has 5 tiers — need to fill dantian + meditate through all tiers to breakthrough
+    for _ in range(5):
+        s.state.player.dantian_exp = 0
+        gain_exp(s.state, reg, 1000)
+        result = meditate(s.state, reg)
+        assert result["success"], f"meditasi berhasil: {result}"
+    assert s.state.player.realm == "r2", "terobosan ke ranah berikutnya"
+    assert 1 <= s.state.player.realm_level <= 3
     msgs = "\n".join(e["text"] for e in s.state.log)
     assert "Terobosan" in msgs
 
@@ -543,7 +551,7 @@ def test_main_quest_timeout_fail_next(tmp_path):
         {"id": "q2", "kind": "main", "title": "T2", "objective": {"kind": "choose", "options": [{"value": "a", "label": "A"}]}},
     ], npcs=[])
     assert s.state.current_quest == "q1"
-    s.apply_action({"type": "rest", "hours": 24})  # l_start aman → maju 24 jam
+    s.apply_action({"type": "advance_time", "hours": 24})
     assert "q1" in s.state.failed_quests
     assert s.state.flags.get("misi_gagal") is True, "fail_effects harus diterapkan"
     assert s.state.current_quest == "q2", "fail_next harus meneruskan DAG"
@@ -559,7 +567,7 @@ def test_side_quest_timeout_removes(tmp_path):
          "timeout": {"hours": 24}},
     ], npcs=[])
     assert s.quest.start_side("qside") is True
-    s.apply_action({"type": "rest", "hours": 24})
+    s.apply_action({"type": "advance_time", "hours": 24})
     assert "qside" in s.state.failed_quests
     assert "qside" not in s.state.active_side_quests
     assert s.state.current_quest == "qmain"

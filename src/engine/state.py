@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 # tetap dihormati oleh zona legacy.
 #
 # v2 → v3: factions dari flags (rep_*) + memories string → dict{reliability}
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 7
 
 
 @dataclass
@@ -30,12 +30,13 @@ class PlayerState:
         hp: Poin kesehatan saat ini.
         qi: Energi qi saat ini.
         realm: ID ranah kultivasi aktif.
-        level: Level dalam ranah saat ini.
+        level: Level (tier) dalam ranah saat ini.
         gold: Jumlah emas.
         roots: Tipe akar spiritual.
         academy: ID akademi (opsional).
         equipment: Peralatan yang dipasang.
-        exp: Pengalaman saat ini.
+        exp: Pengalaman total yang dimiliki.
+        dantian_exp: Exp di dantian (mengisi ke dantian_capacity untuk breakthrough).
         morality: Skor moralitas.
         techniques: Daftar ID teknik yang dimiliki.
         technique_levels: Level per teknik {id: level}.
@@ -50,9 +51,10 @@ class PlayerState:
     academy: str | None = None
     equipment: dict = field(default_factory=lambda: {"weapon": None})
     exp: int = 0
+    dantian_exp: int = 0  # exp in dantian, fills toward dantian_capacity
     morality: int = 0
-    techniques: list[str] = field(default_factory=list)  # C1: teknik yang dimiliki (reward quest/dialog)
-    technique_levels: dict[str, int] = field(default_factory=dict)  # C1: level per teknik (default 1)
+    techniques: list[str] = field(default_factory=list)
+    technique_levels: dict[str, int] = field(default_factory=dict)
 
 
 class UIState:
@@ -132,9 +134,19 @@ class GameState:
     #                                   hindari pencarian mundur di completed_quests)
     pending_dialog: str | None = None
     pending_battle: dict | None = None  # data battle aktif (dict, lihat battle.py)
-    companion: dict | None = None  # {"id", "hp", "active"} — jalur Summoning (ENGINE §9.4)
+    companion: dict | None = None  # {"id", "hp", "active"} — backward compat (v3 save)
+    companions: list = field(default_factory=list)  # [{"id", "hp", "active"}] — all owned companions
+    active_companion: str | None = None  # ID of companion in battle
     npc_states: dict = field(default_factory=dict)  # npc_id -> {"location"?, "available"?} — efek npc_state
     factions: dict = field(default_factory=dict)  # faksi_id -> skor (orthodox, reformation, dll.)
+    realms_unlocked: list = field(default_factory=list)  # list of realm IDs with bonus unlocked
+    status_effects: list = field(default_factory=list)  # [{"type", "days_left", ...}] — temporary buffs/debuffs
+    meditate_week_count: int = 0  # berapa kali meditasi minggu ini
+    meditate_week_start: int = 1  # hari pertama minggu ini (reset when day - start >= 7)
+    pil_sukses_active: bool = False  # +30% success rate meditasi
+    pil_aman_active: bool = False  # batalkan debuff gagal meditasi
+    fatigue_days: int = 0  # hari berturut-turut tanpa istirahat
+    rested_today: bool = False  # apakah sudah istirahat hari ini
     _ui_proxy: UIState | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -168,31 +180,49 @@ class GameState:
     # ---------- batas stat ----------
 
     def max_hp(self, registry) -> int:
-        """HP maksimum = base_hp + (level-1) × hp_per_level dari ranah."""
+        """HP maksimum = base_hp + (tier-1) × hp_per_tier dari ranah, dikurangi fatigue."""
         r = registry.realm_by_id(self.player.realm)
         if not r or not r.get("base_hp"):
-            return 50  # sane default — returning current HP makes rest/heal no-op
+            return 50
         base = int(r["base_hp"])
-        per = int(r.get("hp_per_level", 0) or 0)
-        lvl = max(1, self.player.realm_level)  # guard: realm_level=0 from corrupt save
-        return base + (lvl - 1) * per
+        per = int(r.get("hp_per_tier", 0) or 0)
+        lvl = max(1, self.player.realm_level)
+        result = base + (lvl - 1) * per
+        for eff in self.status_effects:
+            if "hp_mult" in eff:
+                result = int(result * eff["hp_mult"])
+        rest_cfg = (registry.config.get("rest") or {})
+        hp_penalty = int(rest_cfg.get("hp_penalty_per_day", 2))
+        max_penalty = int(rest_cfg.get("max_hp_penalty", 20))
+        fatigue_penalty = min(self.fatigue_days * hp_penalty, max_penalty)
+        result -= fatigue_penalty
+        return max(1, result)
 
     def max_qi(self, registry) -> int:
-        """Qi maksimum = base_qi + (level-1) × qi_per_level dari ranah."""
+        """Qi maksimum = base_qi + (tier-1) × qi_per_tier dari ranah, dikurangi fatigue."""
         r = registry.realm_by_id(self.player.realm)
         if not r or not r.get("base_qi"):
-            return 30  # sane default
+            return 30
         base = int(r["base_qi"])
-        per = int(r.get("qi_per_level", 0) or 0)
+        per = int(r.get("qi_per_tier", 0) or 0)
         lvl = max(1, self.player.realm_level)
-        return base + (lvl - 1) * per
+        result = base + (lvl - 1) * per
+        for eff in self.status_effects:
+            if "qi_mult" in eff:
+                result = int(result * eff["qi_mult"])
+        rest_cfg = (registry.config.get("rest") or {})
+        qi_penalty = int(rest_cfg.get("qi_penalty_per_day", 1))
+        max_penalty = int(rest_cfg.get("max_qi_penalty", 10))
+        fatigue_penalty = min(self.fatigue_days * qi_penalty, max_penalty)
+        result -= fatigue_penalty
+        return max(1, result)
 
     def exp_next(self, registry) -> int:
-        """Exp yang dibutuhkan untuk level berikutnya."""
-        c = registry.config.get("cultivation", {})
-        base = c.get("exp_per_level_base", 10)
-        growth = c.get("exp_growth_per_level", 1.2)
-        return round(base * (growth ** (self.player.realm_level - 1)))
+        """Dantian capacity — exp needed to fill dantian for breakthrough."""
+        r = registry.realm_by_id(self.player.realm)
+        if r and r.get("dantian_capacity"):
+            return int(r["dantian_capacity"])
+        return 20  # sane default
 
     def exp_multiplier(self, registry) -> float:
         """Multiplier exp berdasarkan tier akar spiritual."""
@@ -216,6 +246,7 @@ class GameState:
                 "academy": self.player.academy,
                 "equipment": copy.deepcopy(self.player.equipment),
                 "exp": self.player.exp,
+                "dantian_exp": self.player.dantian_exp,
                 "morality": self.player.morality,
                 "techniques": copy.deepcopy(self.player.techniques),
                 "technique_levels": copy.deepcopy(self.player.technique_levels),
@@ -246,8 +277,18 @@ class GameState:
             "pending_dialog": self.pending_dialog,
             "pending_battle": copy.deepcopy(self.pending_battle) if self.pending_battle else None,
             "companion": copy.deepcopy(self.companion) if self.companion else None,
+            "companions": copy.deepcopy(self.companions),
+            "active_companion": self.active_companion,
             "npc_states": copy.deepcopy(self.npc_states),
             "factions": copy.deepcopy(self.factions),
+            "realms_unlocked": copy.deepcopy(self.realms_unlocked),
+            "status_effects": copy.deepcopy(self.status_effects),
+            "meditate_week_count": self.meditate_week_count,
+            "meditate_week_start": self.meditate_week_start,
+            "pil_sukses_active": self.pil_sukses_active,
+            "pil_aman_active": self.pil_aman_active,
+            "fatigue_days": self.fatigue_days,
+            "rested_today": self.rested_today,
         }
 
     @classmethod
@@ -286,7 +327,27 @@ class GameState:
         else:
             memories = copy.deepcopy(raw_mems)
 
+        # v3 → v4: companion single → companions list
+        companions = copy.deepcopy(d.get("companions", []))
+        active_companion = d.get("active_companion")
+        if v < 4:
+            old_comp = d.get("companion")
+            if old_comp and isinstance(old_comp, dict) and old_comp.get("id"):
+                if not companions:
+                    companions = [copy.deepcopy(old_comp)]
+                if not active_companion:
+                    active_companion = old_comp["id"]
+
+        # v4 → v5: dantian system, realms_unlocked, status_effects
+        # Map old realm IDs to new ones
+        _realm_map = {
+            "realm_awal": "realm_chuji",
+            "realm_tengah": "realm_xuanshi",
+            "realm_atas": "realm_dishi",
+        }
         p = d["player"]
+        if v < 5 and p.get("realm") in _realm_map:
+            p["realm"] = _realm_map[p["realm"]]
         raw_spar = d.get("daily_spar_counts")
         cleaned_spar = {k: v for k, v in raw_spar.items() if isinstance(k, str) and isinstance(v, int) and v >= 0} if isinstance(raw_spar, dict) else {}
         return cls(
@@ -301,6 +362,7 @@ class GameState:
                 academy=p.get("academy"),
                 equipment=copy.deepcopy(p.get("equipment", {"weapon": None})),
                 exp=p.get("exp", 0),
+                dantian_exp=p.get("dantian_exp", 0),
                 morality=p.get("morality", 0),
                 techniques=copy.deepcopy(p.get("techniques", [])),
                 technique_levels=copy.deepcopy(p.get("technique_levels", {})),
@@ -328,6 +390,16 @@ class GameState:
             pending_dialog=d.get("pending_dialog"),
             pending_battle=copy.deepcopy(d.get("pending_battle")),
             companion=copy.deepcopy(d.get("companion")),
+            companions=companions,
+            active_companion=active_companion,
             npc_states=copy.deepcopy(d.get("npc_states", {})),
             factions=factions,
+            realms_unlocked=copy.deepcopy(d.get("realms_unlocked", [])),
+            status_effects=copy.deepcopy(d.get("status_effects", [])),
+            meditate_week_count=d.get("meditate_week_count", 0),
+            meditate_week_start=d.get("meditate_week_start", 1),
+            pil_sukses_active=d.get("pil_sukses_active", False),
+            pil_aman_active=d.get("pil_aman_active", False),
+            fatigue_days=d.get("fatigue_days", 0),
+            rested_today=d.get("rested_today", False),
         )

@@ -8,16 +8,31 @@
         "kind": "spar",
         "npc": "npc_proctor",
         "target": 1,
-        "hint": "Ikuti ujian tengah semester — sparring dengan guru pengawas."
+        "hint": "Ikuti ujian tengah semester — sparring dengan guru pengawas.",
+        "spar_debuff": {
+          "hp_mult": 0.6,
+          "atk_mult": 0.6,
+          "def_mult": 0.6
+        }
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "state_reputation_academic", "value": 1}
+          {
+            "type": "flag",
+            "key": "state_reputation_academic",
+            "value": 1
+          }
         ],
-        "rewards": {"exp": 10, "gold": 10},
+        "rewards": {
+          "gold": 10
+        },
         "system_msg": "Ujian tengah semester selesai — kinerjamu tercatat di mata guru."
       },
-      "next": [{"quest": "quest_a02_c01_002"}]
+      "next": [
+        {
+          "quest": "quest_a02_c01_002"
+        }
+      ]
     },
     {
       "id": "quest_a02_c01_002",
@@ -26,19 +41,37 @@
       "objective": {
         "kind": "spar",
         "npc": "npc_proctor",
+        "context": "spar_team",
         "target": 1,
-        "hint": "Ujian kelompok — tunjukkan kerja sama dengan found family."
+        "hint": "Ujian kelompok — bertarung bersama Lin Yue, Shen Luo, dan Gu Han.",
+        "allies": ["npc_lin_yue", "npc_shen_luo", "npc_gu_han"]
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_team_recognized", "value": true},
-          {"type": "relation", "npc": "npc_lin_yue", "value": 2},
-          {"type": "relation", "npc": "npc_gu_han", "value": 2}
+          {
+            "type": "flag",
+            "key": "flag_team_recognized",
+            "value": true
+          },
+          {
+            "type": "relation",
+            "npc": "npc_lin_yue",
+            "value": 2
+          },
+          {
+            "type": "relation",
+            "npc": "npc_gu_han",
+            "value": 2
+          }
         ],
-        "rewards": {"exp": 12},
+        "rewards": {},
         "system_msg": "Kelompokmu resmi diakui sebagai unit oleh akademi."
       },
-      "next": [{"quest": "quest_a02_c02_003"}]
+      "next": [
+        {
+          "quest": "quest_a02_c02_003"
+        }
+      ]
     },
     {
       "id": "quest_a02_c02_003",
@@ -51,29 +84,46 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_outer_region_unlocked", "value": true}
+          {
+            "type": "flag",
+            "key": "flag_outer_region_unlocked",
+            "value": true
+          }
         ],
-        "rewards": {"exp": 8},
+        "rewards": {},
         "system_msg": "Wilayah luar terbuka untuk kelompokmu."
       },
-      "next": [{"quest": "quest_a02_c02_004"}]
+      "next": [
+        {
+          "quest": "quest_a02_c02_004"
+        }
+      ]
     },
     {
       "id": "quest_a02_c02_004",
       "kind": "main",
-      "title": "Gangguan Spiritual",  "objective": {
-   "kind": "reach",
-   "location": "loc_outer_region",
-   "hint": "Selidiki sumber gangguan spiritual di wilayah luar."
-  },
+      "title": "Gangguan Spiritual",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_outer_region",
+        "hint": "Selidiki sumber gangguan spiritual di wilayah luar."
+      },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_disturbance_investigated", "value": true}
+          {
+            "type": "flag",
+            "key": "flag_disturbance_investigated",
+            "value": true
+          }
         ],
-        "rewards": {"exp": 10},
+        "rewards": {},
         "system_msg": "Gangguan spiritual mengarah ke gua tersembunyi — dan jejak murid yang hilang."
       },
-      "next": [{"quest": "quest_a02_c02_005"}]
+      "next": [
+        {
+          "quest": "quest_a02_c02_005"
+        }
+      ]
     },
     {
       "id": "quest_a02_c02_005",
@@ -86,13 +136,25 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_evidence_missing_disciple", "value": true},
-          {"type": "item", "id": "catatan_siklus", "count": 1}
+          {
+            "type": "flag",
+            "key": "flag_evidence_missing_disciple",
+            "value": true
+          },
+          {
+            "type": "item",
+            "id": "catatan_siklus",
+            "count": 1
+          }
         ],
-        "rewards": {"exp": 12},
+        "rewards": {},
         "system_msg": "Kau menemukan catatan di gua: 'Siklus dimulai lagi.' — bertentangan dengan narasi resmi akademi."
       },
-      "next": [{"quest": "quest_a02_c03_006"}]
+      "next": [
+        {
+          "quest": "quest_a02_c03_006"
+        }
+      ]
     },
     {
       "id": "quest_a02_c03_006",
@@ -108,9 +170,21 @@
         "system_msg": "Kelompok berkumpul. Keputusan harus diambil — jalanmu di Arc ini terkunci."
       },
       "next": [
-        {"quest": "quest_a02_c04_007a", "option": "obey", "choice_id": "dlg_a02_branch"},
-        {"quest": "quest_a02_c04_007b", "option": "investigate", "choice_id": "dlg_a02_branch"},
-        {"quest": "quest_a02_c04_007c", "option": "confront", "choice_id": "dlg_a02_branch"}
+        {
+          "quest": "quest_a02_c04_007a",
+          "option": "obey",
+          "choice_id": "dlg_a02_branch"
+        },
+        {
+          "quest": "quest_a02_c04_007b",
+          "option": "investigate",
+          "choice_id": "dlg_a02_branch"
+        },
+        {
+          "quest": "quest_a02_c04_007c",
+          "option": "confront",
+          "choice_id": "dlg_a02_branch"
+        }
       ]
     },
     {
@@ -124,12 +198,20 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_hidden_cave_explored", "value": true}
+          {
+            "type": "flag",
+            "key": "flag_hidden_cave_explored",
+            "value": true
+          }
         ],
-        "rewards": {"exp": 10},
+        "rewards": {},
         "system_msg": "Gua tersembunyi berhasil dieksplorasi — ada sesuatu di kedalamannya."
       },
-      "next": [{"quest": "quest_a02_c04_008"}]
+      "next": [
+        {
+          "quest": "quest_a02_c04_008"
+        }
+      ]
     },
     {
       "id": "quest_a02_c04_008",
@@ -143,13 +225,25 @@
       "on_complete": {
         "memory_unlock": "memory_a02_m01",
         "effects": [
-          {"type": "flag", "key": "flag_memory_lin_yue_elder_seen", "value": true},
-          {"type": "item", "id": "artefak_pertama", "count": 1}
+          {
+            "type": "flag",
+            "key": "flag_memory_lin_yue_elder_seen",
+            "value": true
+          },
+          {
+            "type": "item",
+            "id": "artefak_pertama",
+            "count": 1
+          }
         ],
-        "rewards": {"exp": 15},
+        "rewards": {},
         "system_msg": "Artefak bereaksi. Kilasan ingatan: suara Lin Yue versi tua — 'Kalau kau melakukan ini, kau tidak akan kembali.'"
       },
-      "next": [{"quest": "quest_a02_c04_009"}]
+      "next": [
+        {
+          "quest": "quest_a02_c04_009"
+        }
+      ]
     },
     {
       "id": "quest_a02_c04_009",
@@ -162,12 +256,22 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_arc2_complete", "value": true}
+          {
+            "type": "flag",
+            "key": "flag_arc2_complete",
+            "value": true
+          }
         ],
-        "rewards": {"exp": 15, "gold": 20},
+        "rewards": {
+          "gold": 20
+        },
         "system_msg": "Arc II selesai — artefak dan pertanyaan baru dibawa menuju babak berikutnya."
       },
-      "next": [{"quest": "quest_a03_c01_001"}]
+      "next": [
+        {
+          "quest": "quest_a03_c01_001"
+        }
+      ]
     }
   ]
 }

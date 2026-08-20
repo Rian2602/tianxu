@@ -501,6 +501,8 @@ def test_companion_fights_in_battle(tmp_path):
                                 "base_attack": 7, "base_defense": 2, "base_speed": 5}],
                    config_extra={"world": {"hunts": []}})
     s.state.companion = {"id": "c1", "active": True, "hp": 20}
+    s.state.companions = [{"id": "c1", "active": True, "hp": 20}]
+    s.state.active_companion = "c1"
     s.battle.start([reg.enemy("e1")], "hunt")
     b = s.state.pending_battle
     foes_before = b["foes"][0]["hp"]

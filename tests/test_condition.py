@@ -83,8 +83,8 @@ def test_memory_condition(registry, session):
 
 
 def test_realm_min_condition(registry, session):
-    # pemain di realm_awal (order 1); butuh realm_awal → True; butuh lebih tinggi → False
-    assert _eval(session, {"realm_min": "realm_awal"}) is True
+    # pemain di realm_chuji (order 1); butuh realm_chuji → True; butuh lebih tinggi → False
+    assert _eval(session, {"realm_min": "realm_chuji"}) is True
 
 
 def test_quest_active_condition(registry, session):

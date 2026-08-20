@@ -28,14 +28,19 @@
    "id": "npc_lin_yue",
    "name": "Lin Yue",
    "location": "loc_training_hall",
-    "dialog_routes": {
+    "avatar": "/static/assets/img/lin_yue.jpg",
+    "combat": {
+     "hp": 25, "attack": 8, "defense": 4, "speed": 7, "element": "angin"
+    },
+     "dialog_routes": {
      "general": "dlg_a01_d003",
-     "main": {
+    "main": {
       "quest_a01_c02_003b": "dlg_a01_d003",
+      "quest_a01_c04_005b": "dlg_a01_d011",
       "quest_a02_c03_006": "dlg_a02_d013",
       "quest_a03_c04_004": "dlg_a03_d04",
       "quest_a05_c03_003": "dlg_a05_d03"
-     },
+    },
     "side": {
      "quest_char_lin_yue_001": {
       "offer": "dlg_lin_yue_char_001_low",
@@ -66,8 +71,12 @@
    "id": "npc_shen_luo",
    "name": "Shen Luo",
    "location": "loc_training_hall",
-    "dialog_routes": {
-     "general": "dlg_a01_d004",
+    "avatar": "/static/assets/img/shen_luo.jpg",
+    "combat": {
+     "hp": 30, "attack": 9, "defense": 5, "speed": 5, "element": "api"
+    },
+     "dialog_routes": {
+      "general": "dlg_a01_d004",
      "main": {
       "quest_a01_c02_003c": "dlg_a01_d004"
      },
@@ -166,8 +175,12 @@
    "id": "npc_gu_han",
    "name": "Gu Han",
    "location": "loc_training_hall",
-    "dialog_routes": {
-     "general": "dlg_a01_d006",
+    "avatar": "/static/assets/img/gu_han.jpg",
+    "combat": {
+     "hp": 32, "attack": 10, "defense": 6, "speed": 4, "element": "tanah"
+    },
+     "dialog_routes": {
+      "general": "dlg_a01_d006",
      "main": {
       "quest_a01_c02_003d": "dlg_a01_d006"
      },
@@ -279,11 +292,12 @@
    "name": "Xu Zhiyuan",
    "location": "loc_training_hall",
    "can_spar": true,
+   "spar_require": {"realm_min": "realm_xuanshi"},
    "combat": {
-    "hp": 40,
-    "attack": 6,
-    "defense": 3,
-    "exp_reward": 10
+    "hp": 150,
+    "attack": 20,
+    "defense": 14,
+    "exp_reward": 30
    },
     "dialog_routes": {
      "general": "dlg_a02_d011",
@@ -304,8 +318,8 @@
     "faction": "Tian Xu Orthodox",
     "bio": "Guru pengawas ujian yang ketat tapi adil. Percaya bahwa ujian sejati bukan di lapangan, tapi di hati.",
     "companion": null,
-    "hp_max": 40,
-    "qi_max": 30
+    "hp_max": 150,
+    "qi_max": 80
    }
   },
   {

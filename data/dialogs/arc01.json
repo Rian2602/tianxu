@@ -242,6 +242,40 @@
       }
     },
     {
+      "id": "dlg_a01_d011",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau juga merasakannya? Formasi ini... ada sesuatu yang familiar. Seperti mimpi yang belum selesai.",
+          "choices": [
+            {"label": "Kilasan tadi — formasi yang sama, tapi hancur.", "next": "n2"},
+            {"label": "Aku tidak yakin apa yang kurasa.", "next": "n3"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau melihatnya juga? Formasi ini bukan sekadar batu dan cahaya — ia menyimpan sesuatu. Tapi untuk membuktikannya, kau harus menunjukkan bahwa kau layak.",
+          "choices": [
+            {"label": "Aku siap. Apa yang harus kulakukan?", "next": "n4"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Itu normal. Formasi bereaksi hanya pada mereka yang memiliki potensi. Tapi potensi saja tidak cukup — kau harus membuktikan kekuatanmu.",
+          "choices": [
+            {"label": "Bagaimana cara membuktikannya?", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Hutan di dekat sini dipenuhi binatang buas yang terpengaruh formasi. Kalahkan dua dari mereka — itu adalah ujian pertamamu. Aku akan menunggu di sini.",
+          "choices": []
+        }
+      }
+    },
+    {
       "id": "dlg_a01_d003_proctor",
       "npc": "npc_proctor",
       "start": "n1",

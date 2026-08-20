@@ -70,8 +70,13 @@ def _through_arc1_2_3(registry, branch_idx: int = 1) -> GameSession:
     _talk(s, "npc_proctor")
     s.apply_action({"type": "choose", "option": "pavilion_jianxin"})
     _reach(s, "loc_outer_region")
+    _talk(s, "npc_lin_yue")
+    s.quest.notify_battle_won(["binatang_hutan", "binatang_hutan"])
+    _reach(s, "loc_hutan_akademi")
+    _reach(s, "loc_outer_region")
     _reach(s, "loc_training_hall")
     _reach(s, "loc_protagonist_room")
+    s.quest.notify_rest()
     # Arc II
     _reach(s, "loc_training_hall")
     _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")

@@ -227,6 +227,24 @@ def test_npc_spar_without_combat(data_dir):
     _expect_error(dst, "can_spar=true", "combat")
 
 
+def test_spar_debuff_rejects_unknown_key(data_dir):
+    dst = data_dir
+    data = _load(dst, "quests/minimal.json")
+    data["quests"][0]["objective"]["kind"] = "spar"
+    data["quests"][0]["objective"]["spar_debuff"] = {"hp_mult": 0.6, "crit_mult": 2}
+    _dump(dst, "quests/minimal.json", data)
+    _expect_error(dst, "spar_debuff", "crit_mult")
+
+
+def test_spar_allies_require_known_combat_npcs(data_dir):
+    dst = data_dir
+    data = _load(dst, "quests/minimal.json")
+    data["quests"][0]["objective"]["kind"] = "spar"
+    data["quests"][0]["objective"]["allies"] = ["npc_ghost"]
+    _dump(dst, "quests/minimal.json", data)
+    _expect_error(dst, "allies", "npc_ghost")
+
+
 def test_no_safe_location(data_dir):
     dst = data_dir
     data = _load(dst, "locations.json")

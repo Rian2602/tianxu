@@ -2,7 +2,7 @@
 
 Aksi (ENGINE_ARCHITECTURE §12.3):
 talk, dialog_choice, move, advance_time, choose, battle_action, use_item,
-equip, grounding, spar, hunt, search, shop_buy, shop_sell, craft, rest, save.
+equip, meditate, spar, hunt, search, shop_buy, shop_sell, craft, rest, save.
 
 Gate: saat battle aktif, hanya aksi `battle_action` yang diterima.
 """
@@ -15,7 +15,7 @@ from pathlib import Path
 
 from ..loader import DataRegistry
 from .battle import BattleEngine, companion_stats, player_combat
-from .cultivation import gain_exp
+from .cultivation import gain_exp, meditate, tick_status_effects
 from .dialog import DialogEngine
 from .effects import apply as apply_effects
 from .events import add_log
@@ -142,7 +142,7 @@ class GameSession:
             "use_item": self._use_item,
             "use_key_item": self._use_key_item,
             "equip": self._equip,
-            "grounding": self._grounding,
+            "meditate": self._meditate,
             "spar": self._spar,
             "hunt": self._hunt,
             "search": self._search,
@@ -152,6 +152,7 @@ class GameSession:
             "craft": self._craft,
             "upgrade_technique": self._upgrade_technique,
             "switch_companion": self._switch_companion,
+            "mine": self._mine,
             "save": self._save,
         }
         fn = handler.get(t)
@@ -392,11 +393,41 @@ class GameSession:
         self.quest.notify_dialog_ended(npc_id or "", getattr(self.dialog, "last_nodes", None))
         # objektif spar: mulai battle melawan NPC
         q = self.quest.current_main()
-        if q and q.get("objective", {}).get("kind") == "spar" and q["objective"].get("npc") == npc_id:
+        obj = q.get("objective", {}) if q else {}
+        if q and obj.get("kind") == "spar" and obj.get("npc") == npc_id:
             npc = self.reg.npc(npc_id or "")
             if npc and npc.get("combat"):
                 foe = dict(npc["combat"], name=npc["name"], id=npc["id"])
-                self.battle.start([foe], "spar")
+                # Debuff hanya berlaku untuk salinan battle quest ini.
+                debuff = obj.get("spar_debuff")
+                if debuff:
+                    foe["hp"] = max(1, round(int(foe["hp"]) * debuff.get("hp_mult", 1)))
+                    foe["hp_max"] = foe["hp"]
+                    foe["attack"] = max(1, round(int(foe["attack"]) * debuff.get("atk_mult", 1)))
+                    foe["defense"] = max(0, round(int(foe["defense"]) * debuff.get("def_mult", 1)))
+                allies = []
+                quest_allies = obj.get("allies", [])
+                if obj.get("context") == "spar_team":
+                    for nid in quest_allies:
+                        ally_npc = self.reg.npc(nid)
+                        if ally_npc and ally_npc.get("combat"):
+                            c = ally_npc["combat"]
+                            allies.append({
+                                "id": nid,
+                                "name": ally_npc["name"],
+                                "element": c.get("element"),
+                                "hp": int(c["hp"]),
+                                "hp_max": int(c["hp"]),
+                                "attack": int(c["attack"]),
+                                "defense": int(c["defense"]),
+                                "speed": int(c.get("speed", 5)),
+                            })
+                    if not allies:
+                        add_log(self.state, "system", "Quest spar tim terkendala: data sekutu NPC tidak lengkap.")
+                        return
+                ctx = "spar_team" if obj.get("context") == "spar_team" else "spar"
+                self.battle.start([foe], ctx, allies=allies or None,
+                                  use_companion=ctx != "spar_team")
                 self.state.pending_battle["spar_npc"] = npc_id
                 return
             add_log(self.state, "system",
@@ -451,14 +482,44 @@ class GameSession:
         while self.state.hour >= 24:
             self.state.hour -= 24
             self.state.day += 1
-            self.state.grounding_hours_today = 0  # hari baru
-            self.state.exp_grind_today = 0
+            # fatigue: jika tidak istirahat hari ini, naikkan fatigue
+            if not self.state.rested_today:
+                self.state.fatigue_days += 1
+                rest_cfg = self.reg.config.get("rest") or {}
+                hp_pen = int(rest_cfg.get("hp_penalty_per_day", 2))
+                max_pen = int(rest_cfg.get("max_hp_penalty", 20))
+                cur_penalty = min(self.state.fatigue_days * hp_pen, max_pen)
+                add_log(self.state, "system",
+                        f"[Sistem] Kau tidak beristirahat. Fatigue naik (+{hp_pen} HP penalty, total -{cur_penalty} HP max). "
+                        f"Istirahatlah di kamarmu untuk memulihkan tenaga.")
+                if cur_penalty >= max_pen:
+                    add_log(self.state, "system",
+                            "[Sistem] ⚠ Kau kelelahan total! Stat secara permanen menyusut. Segera istirahat!")
+            self.state.rested_today = False
+            expired = tick_status_effects(self.state)
+            for etype in expired:
+                add_log(self.state, "system", f"[Sistem] Efek sementara habis: {etype}.")
             self.state.daily_spar_counts = {}
+            # reset weekly meditation counter
+            if self.state.day - self.state.meditate_week_start >= 7:
+                self.state.meditate_week_count = 0
+                self.state.meditate_week_start = self.state.day
         self.quest.notify_move()
         self.quest.advance_time_target_met()
-        self.quest.check_timeouts()  # G3-T1: quest ber-deadline gagal saat batas terlampaui
+        self.quest.check_timeouts()
         self._maybe_start_branch_dialog()
 
+    def _time_cost(self, action_type: str) -> int:
+        """Jam yang dibutuhkan aksi dari config. Default 0 (instant)."""
+        costs = self.reg.config.get("cultivation", {}).get("time_costs", {})
+        return int(costs.get(action_type, 0))
+
+    def _check_time_budget(self, cost: int) -> str | None:
+        """Cek sisa waktu cukup. Return error msg atau None."""
+        remaining = 24 - self.state.hour
+        if remaining < cost:
+            return f"Waktu tidak cukup. Sisa {remaining} jam, butuh {cost} jam."
+        return None
     def _choose(self, action: dict) -> dict:
         if self.state.pending_battle or self.state.pending_dialog:
             return self.view()
@@ -494,11 +555,33 @@ class GameSession:
         self.state.inventory[iid] -= 1
         if self.state.inventory[iid] <= 0:
             del self.state.inventory[iid]
+        # pil_sukses/pil_aman: set flags, don't consume normally
+        if iid == "pil_sukses":
+            self.state.pil_sukses_active = True
+            add_log(self.state, "narration", f"Memakai {it['name']}. Peluang meditasi +30%!")
+            self.quest.notify_gather()
+            return self.view()
+        if iid == "pil_aman":
+            self.state.pil_aman_active = True
+            add_log(self.state, "narration", f"Memakai {it['name']}. Gagal meditasi tanpa debuff!")
+            self.quest.notify_gather()
+            return self.view()
         hp = int(it.get("hp_restore", 0))
         qi = int(it.get("qi_restore", 0))
+        exp_val = int(it.get("exp_value") or 0)
         self.state.player.hp = min(self.state.max_hp(self.reg), self.state.player.hp + hp)
         self.state.player.qi = min(self.state.max_qi(self.reg), self.state.player.qi + qi)
-        add_log(self.state, "narration", f"Memakai {it['name']} (+{hp} HP, +{qi} Qi).")
+        if exp_val > 0:
+            gain_exp(self.state, self.reg, exp_val)
+        parts = []
+        if hp > 0:
+            parts.append(f"+{hp} HP")
+        if qi > 0:
+            parts.append(f"+{qi} Qi")
+        if exp_val > 0:
+            parts.append(f"+{exp_val} dantian exp")
+        desc = ", ".join(parts) if parts else "dikonsumsi"
+        add_log(self.state, "narration", f"Memakai {it['name']} ({desc}).")
         self.quest.notify_gather()
         return self.view()
 
@@ -526,27 +609,27 @@ class GameSession:
         self.quest.notify_gather()
         return self.view()
 
-    def _grounding(self, action: dict) -> dict:
+    def _meditate(self, action: dict) -> dict:
         loc = self.reg.location(self.state.location)
         if not loc or not loc.get("is_safe"):
-            msg = "Berkultivasi hanya bisa dilakukan di lokasi aman."
+            msg = "Meditasi hanya bisa dilakukan di lokasi aman."
             add_log(self.state, "system", msg)
             res = self.view()
             res["error"] = msg
             return res
-        hours = max(1, int(action.get("hours", 1)))
-        cfg = self.reg.config.get("cultivation", {})
-        allowed = cfg.get("grounding_max_hours_per_day", 8) - self.state.grounding_hours_today
-        if allowed <= 0:
-            add_log(self.state, "system", "Kau sudah berkultivasi maksimal hari ini.")
-            return self.view()
-        hours = min(hours, allowed)
-        exp = hours * cfg.get("grounding_exp_per_hour", 4)
-        self.state.grounding_hours_today += hours
-        self._pass_time(hours)
-        add_log(self.state, "narration", f"Kau bermeditasi selama {hours} jam... (+{exp} exp, Qi pulih pelan.)")
-        gain_exp(self.state, self.reg, exp)
-        self.state.player.qi = min(self.state.max_qi(self.reg), self.state.player.qi + hours * 2)
+        weekly_limit = self.reg.config.get("cultivation", {}).get("meditate_weekly_limit", 3)
+        if self.state.meditate_week_count >= weekly_limit:
+            msg = f"Sudah meditasi {weekly_limit} kali minggu ini. Tunggu minggu depan."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
+        result = meditate(self.state, self.reg)
+        self.state.meditate_week_count += 1
+        if self.state.meditate_week_start == 0:
+            self.state.meditate_week_start = self.state.day
+        self.state.pil_sukses_active = False
+        self.state.pil_aman_active = False
         return self.view()
 
     def can_spar(self, npc: dict) -> bool:
@@ -586,6 +669,13 @@ class GameSession:
         if not zones:
             add_log(self.state, "system", "Berburu belum tersedia di sini.")
             return self.view()
+        cost = self._time_cost("hunt")
+        err = self._check_time_budget(cost)
+        if err:
+            add_log(self.state, "system", err)
+            res = self.view()
+            res["error"] = err
+            return res
         # pilih zona (explicit id atau default pertama)
         hunt_id = action.get("hunt")
         hunt = None
@@ -625,6 +715,7 @@ class GameSession:
             add_log(self.state, "system", f"Wilayah masih sepi. Monster baru muncul kembali dalam {remaining} jam.")
             return self.view()
         self.state.last_hunt_time[hunt["id"]] = now_abs_hours
+        self._pass_time(cost)
         self.battle.start([foe], "hunt")
         return self.view()
 
@@ -633,34 +724,89 @@ class GameSession:
         if not zones:
             add_log(self.state, "system", "Mencari belum tersedia di sini.")
             return self.view()
-        hunt = zones[0]  # default search uses first zone
-        item_id = hunt.get("search_item")
-        if not item_id:
-            add_log(self.state, "system", "Tidak ada yang bisa dicari di sini.")
-            return self.view()
-        if random.random() < 0.6:
-            self.state.inventory[item_id] = self.state.inventory.get(item_id, 0) + 1
-            it = self.reg.item(item_id)
-            nama = it.get("name", item_id) if it else item_id
-            add_log(self.state, "narration", f"Kau menemukan 1 {nama} di antara semak.")
+        cost = self._time_cost("search")
+        err = self._check_time_budget(cost)
+        if err:
+            add_log(self.state, "system", err)
+            res = self.view()
+            res["error"] = err
+            return res
+        hunt = zones[0]
+        search_items = hunt.get("search_items")
+        if not search_items:
+            # backward compat: old search_item string
+            old_item = hunt.get("search_item")
+            if old_item:
+                search_items = [{"item": old_item, "chance": 0.6, "min": 1, "max": 1}]
+            else:
+                add_log(self.state, "system", "Tidak ada yang bisa dicari di sini.")
+                return self.view()
+        found = []
+        for si in search_items:
+            if random.random() < float(si.get("chance", 0.5)):
+                count = random.randint(int(si.get("min", 1)), int(si.get("max", 1)))
+                iid = si["item"]
+                self.state.inventory[iid] = self.state.inventory.get(iid, 0) + count
+                it = self.reg.item(iid)
+                nama = it.get("name", iid) if it else iid
+                found.append(f"{count}× {nama}")
+        if found:
+            add_log(self.state, "narration", f"Kau menemukan: {', '.join(found)}.")
             self.quest.notify_gather()
         else:
-            add_log(self.state, "narration", "Kau mencari-cari, tapi tidak menemukan herba.")
+            add_log(self.state, "narration", "Kau mencari-cari, tapi tidak menemukan apa pun.")
+        self._pass_time(cost)
+        return self.view()
+
+    def _mine(self, action: dict) -> dict:
+        mines = self.reg.mines_for_location(self.state.location)
+        if not mines:
+            add_log(self.state, "system", "Menambang belum tersedia di sini.")
+            return self.view()
+        cost = self._time_cost("mine")
+        err = self._check_time_budget(cost)
+        if err:
+            add_log(self.state, "system", err)
+            res = self.view()
+            res["error"] = err
+            return res
+        mine = mines[0]
+        pool = mine.get("pool", [])
+        if not pool:
+            add_log(self.state, "system", "Tidak ada mineral di sini.")
+            return self.view()
+        found = []
+        for entry in pool:
+            if random.random() < float(entry.get("chance", 0.5)):
+                count = random.randint(int(entry.get("min", 1)), int(entry.get("max", 1)))
+                iid = entry["item"]
+                self.state.inventory[iid] = self.state.inventory.get(iid, 0) + count
+                it = self.reg.item(iid)
+                nama = it.get("name", iid) if it else iid
+                found.append(f"{count}× {nama}")
+        if found:
+            add_log(self.state, "narration", f"Kau menambang: {', '.join(found)}.")
+            self.quest.notify_gather()
+        else:
+            add_log(self.state, "narration", "Kau menambang, tapi tidak menemukan mineral yang berguna.")
+        self._pass_time(cost)
         return self.view()
 
     def _rest(self, action: dict) -> dict:
-        loc = self.reg.location(self.state.location)
-        if not loc or not loc.get("is_safe"):
-            msg = "Istirahat hanya bisa dilakukan di titik aman."
+        rest_loc = (self.reg.config.get("rest") or {}).get("rest_location", "loc_protagonist_room")
+        if self.state.location != rest_loc:
+            msg = "Istirahat hanya bisa dilakukan di kamarmu."
             add_log(self.state, "system", msg)
             res = self.view()
             res["error"] = msg
             return res
-        hours = max(1, int(action.get("hours", 8)))
+        hours = max(1, int((self.reg.config.get("rest") or {}).get("rest_hours", 8)))
+        self.state.rested_today = True
+        self.state.fatigue_days = 0
         self._pass_time(hours)
         self.state.player.hp = self.state.max_hp(self.reg)
         self.state.player.qi = self.state.max_qi(self.reg)
-        # kompanion KO bangkit kembali di titik aman (§9.4)
+        # kompanion KO bangkit kembali (§9.4)
         revived = False
         comp_name = None
         for c in self.state.companions:
@@ -674,17 +820,17 @@ class GameSession:
                     c["hp"] = hp_max
                     revived = True
                     comp_name = comp["name"]
-                    break  # only log first revival
-        # backward compat sync
+                    break
         if self.state.companions:
             active_id = self.state.active_companion
             active_entry = next((c for c in self.state.companions if c.get("id") == active_id), None)
             if active_entry:
                 self.state.companion = active_entry
-        msg = f"Kau beristirahat selama {hours} jam. HP & Qi pulih penuh."
+        msg = f"Kau beristirahat selama {hours} jam di kamarmu. HP & Qi pulih penuh. Kekuatanmu kembali."
         if revived and comp_name:
             msg += f" {comp_name} bangkit kembali."
         add_log(self.state, "narration", msg)
+        self.quest.notify_rest()
         return self.view()
 
     def _switch_companion(self, action: dict) -> dict:
@@ -767,10 +913,22 @@ class GameSession:
             res = self.view()
             res["error"] = msg
             return res
+        cost = self._time_cost("craft")
+        err = self._check_time_budget(cost)
+        if err:
+            add_log(self.state, "system", err)
+            res = self.view()
+            res["error"] = err
+            return res
         rid = action.get("recipe")
         recipe = next((r for r in self.reg.recipes if r["id"] == rid), None)
         if not recipe:
             add_log(self.state, "system", "Resep tidak dikenal.")
+            return self.view()
+        # check recipe_item (key_item) is owned
+        recipe_item_id = recipe.get("recipe_item")
+        if recipe_item_id and self.state.inventory.get(recipe_item_id, 0) < 1:
+            add_log(self.state, "system", "Kau belum memiliki resep ini.")
             return self.view()
         for ing in recipe.get("ingredients", []):
             if self.state.inventory.get(ing["item"], 0) < ing["count"]:
@@ -785,6 +943,7 @@ class GameSession:
         it = self.reg.item(result)
         add_log(self.state, "narration", f"Meracik {recipe.get('count', 1)}× {it['name']}!")
         self.quest.notify_gather()
+        self._pass_time(cost)
         return self.view()
 
     def _upgrade_technique(self, action: dict) -> dict:
@@ -930,8 +1089,8 @@ class GameSession:
                 "name": s.player.name,
                 "realm": realm["name_pinyin"],
                 "realm_level": s.player.realm_level,
-                "exp": s.player.exp,
-                "exp_next": s.exp_next(self.reg),
+                "dantian_exp": s.player.dantian_exp,
+                "dantian_capacity": int(realm.get("dantian_capacity", 20)),
                 "hp": pc["hp"], "hp_max": pc["hp_max"],
                 "qi": pc["qi"], "qi_max": pc["qi_max"],
                 "gold": s.player.gold,
@@ -939,6 +1098,17 @@ class GameSession:
                 "academy": s.player.academy,
                 "morality": s.player.morality,
                 "equipment": s.player.equipment,
+                "realms_unlocked": s.realms_unlocked,
+                "status_effects": [
+                    {"type": e.get("type", "unknown"), "days_left": e.get("days_left", 0)}
+                    for e in s.status_effects
+                ],
+                "meditate_week_count": s.meditate_week_count,
+                "pil_sukses_active": s.pil_sukses_active,
+                "pil_aman_active": s.pil_aman_active,
+                "fatigue_days": s.fatigue_days,
+                "rested_today": s.rested_today,
+                "is_rest_location": s.location == (self.reg.config.get("rest") or {}).get("rest_location", "loc_protagonist_room"),
             },
             "current_quest": {"id": q["id"], "title": q["title"], "objective": self.quest.objective_text(q)} if q else None,
             "side_quests": [
@@ -974,6 +1144,14 @@ class GameSession:
                 for c in s.companions
             ],
             "active_companion": s.active_companion,
+            "recipes": [
+                {"id": r["id"], "name": r.get("name", r["id"]),
+                 "ingredients": [{"item": ing["item"], "count": ing["count"]}
+                                 for ing in r.get("ingredients", [])],
+                 "result": r.get("result", ""), "count": r.get("count", 1)}
+                for r in self.reg.recipes
+                if s.inventory.get(r.get("recipe_item", ""), 0) > 0
+            ],
             "mode": self._mode(),
             "dialog": self.dialog.view() if s.pending_dialog else None,
             "battle": self.battle.view() if s.pending_battle else None,

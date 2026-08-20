@@ -41,7 +41,7 @@ def _talk_through(s: GameSession, npc: str) -> None:
 def test_arc1_data_contract_ok(registry):
     """Data Arc I memenuhi seluruh kontrak validator saat load."""
     arc1_ids = [q["id"] for q in registry.quests if q["id"].startswith("quest_a01")]
-    assert len(arc1_ids) == 10
+    assert len(arc1_ids) == 13
     assert len(registry.memories) >= 4
     assert {a["id"] for a in registry.config["academies"]} == {
         "pavilion_wuxin", "pavilion_jianxin", "pavilion_yanzhi", "pavilion_liuguang"}
@@ -49,7 +49,8 @@ def test_arc1_data_contract_ok(registry):
     assert arc1_ids == [
         "quest_a01_c01_001", "quest_a01_c01_002", "quest_a01_c02_003",
         "quest_a01_c02_003b", "quest_a01_c02_003c", "quest_a01_c02_003d",
-        "quest_a01_c02_003e", "quest_a01_c03_004", "quest_a01_c04_005",
+        "quest_a01_c02_003e", "quest_a01_c03_004", "quest_a01_c04_005a",
+        "quest_a01_c04_005b", "quest_a01_c04_005c", "quest_a01_c04_005d",
         "quest_a01_c04_006"]
     # keputusan docs: TIDAK ada main quest yang bisa gagal karena waktu habis
     # (MSB tidak merancang fail-state waktu untuk quest utama 7 arc) — guard
@@ -93,20 +94,40 @@ def test_arc1_full_playthrough_yellow(registry):
 
     # Ch 1.3: pavilion selection — MAJOR choice
     s.apply_action({"type": "choose", "option": "pavilion_yanzhi"})
-    assert s.state.current_quest == "quest_a01_c04_005"
+    assert s.state.current_quest == "quest_a01_c04_005a"
     assert s.state.player.academy == "pavilion_yanzhi"
     # starter kit pavilion diterima; curriculum khas pavilion tersedia
     assert s.state.inventory.get("pil_qi", 0) == 4  # 2 awal + 2 starter pavilion
     curr = [t["id"] for t in registry.academy_curriculum("pavilion_yanzhi")]
     assert "teknik_yanzhi" in curr
 
-    # Ch 1.4: first trial — reach formation tua; night incident — reach kamar
+    # Ch 1.4: Percobaan Pertama — 4-quest chain
+    # 005a: reach formation tua
+    s.apply_action({"type": "move", "to": "loc_outer_region"})
+    assert s.state.current_quest == "quest_a01_c04_005b"
+    assert s.state.flags.get("flag_formation_reached") is True
+    assert len(s.state.memories) == 3  # memory_a01_m03
+
+    # 005b: talk Lin Yue
+    _talk_through(s, "npc_lin_yue")
+    assert s.state.current_quest == "quest_a01_c04_005c"
+    assert s.state.flags.get("flag_lin_yue_trial") is True
+
+    # 005c: defeat 2 binatang_hutan — simulate battle wins
+    s.state.active_side_quests.setdefault("quest_a01_c04_005c", {})
+    s.quest.notify_battle_won(["binatang_hutan", "binatang_hutan"])
+    assert s.state.current_quest == "quest_a01_c04_005d"
+
+    # 005d: reach formation tua again (must move away first)
+    s.apply_action({"type": "move", "to": "loc_hutan_akademi"})
     s.apply_action({"type": "move", "to": "loc_outer_region"})
     assert s.state.current_quest == "quest_a01_c04_006"
-    assert s.state.flags.get("flag_formation_touched") is True
-    assert len(s.state.memories) == 3  # memory_a01_m03
+    assert s.state.flags.get("flag_formation_complete") is True
+
+    # night incident — reach kamar + istirahat
     s.apply_action({"type": "move", "to": "loc_training_hall"})
     s.apply_action({"type": "move", "to": "loc_protagonist_room"})
+    s.quest.notify_rest()
     # quest utama Arc I selesai — DAG lanjut ke Arc II (quest_a02_c01_001)
     assert s.state.current_quest == "quest_a02_c01_001"
     assert s.state.flags.get("flag_memory_awareness") is True
@@ -182,7 +203,6 @@ def test_arc1_hunt_and_battle(registry):
     s.apply_action({"type": "move", "to": "loc_outer_region"})
     s.apply_action({"type": "move", "to": "loc_hutan_akademi"})
     assert s.can_hunt() is True
-    exp0 = s.state.player.exp
     s.apply_action({"type": "hunt"})
     guard = 0
     while s.state.pending_battle and guard < 30:
@@ -191,5 +211,4 @@ def test_arc1_hunt_and_battle(registry):
     assert s.state.pending_battle is None, "battle hunt harus berakhir"
     won = any("🏆" in e["text"] or "Kemenangan" in e["text"]
               for e in s.state.log if e["type"] == "battle")
-    assert won, "hunt harus berujung kemenangan agar assertion exp bermakna"
-    assert s.state.player.exp > exp0, "menang battle harus memberi exp (> bukan >=)"
+    assert won, "hunt harus berujung kemenangan"

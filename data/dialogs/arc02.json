@@ -7,17 +7,27 @@
    "nodes": {
     "n1": {
      "speaker": "npc:npc_proctor",
-     "text": "Ujian tengah semester dimulai. Perlihatkan apa yang telah kau pelajari — satu ronde, aturan standar.",
+     "text": "Ujian tengah semester dimulai. Ini ujian satu lawan satu — aturan standar, tidak ada pengecualian.",
      "choices": [
       {
-       "label": "Aku siap.",
+       "label": "Aku siap, Guru.",
        "next": "n2"
       }
      ]
     },
     "n2": {
      "speaker": "npc:npc_proctor",
-     "text": "Bagus. Mulai!",
+     "text": "Perlihatkan apa yang telah kau pelajari. Jangan mengecewakan Paviliunmu.",
+     "choices": [
+      {
+       "label": "Aku tidak akan mengecewakan.",
+       "next": "n3"
+      }
+     ]
+    },
+    "n3": {
+     "speaker": "npc:npc_proctor",
+     "text": "Bagus. Sikapmu benar. Mulai!",
      "choices": []
     }
    }
@@ -29,15 +39,25 @@
    "nodes": {
     "n1": {
      "speaker": "npc:npc_proctor",
-     "text": "Ujian kelompok — bukan soal siapa terkuat, tapi bagaimana kalian bertarung bersama. Aku akan menguji kalian.",
+     "text": "Ujian kelompok. Lin Yue, Shen Luo — maju. Kalian bertiga akan menghadapiku bersama.",
      "choices": [
       {
-       "label": "Kami siap bersama.",
+       "label": "Kami siap bertarung bersama.",
        "next": "n2"
       }
      ]
     },
     "n2": {
+     "speaker": "npc:npc_proctor",
+     "text": "Bukan soal siapa terkuat. Aku menguji kalian — bagaimana kalian bertarung sebagai satu tim. Koordinasi, kepercayaan, adaptasi.",
+     "choices": [
+      {
+       "label": "Kami mengerti.",
+       "next": "n3"
+      }
+     ]
+    },
+    "n3": {
      "speaker": "npc:npc_proctor",
      "text": "Tunjukkan kerja samamu. Mulai!",
      "choices": []

@@ -1,0 +1,51 @@
+{
+ "recipes": [
+  {
+   "id": "recipe_pil_kultivasi_chuji",
+   "name": "Resep Pil Kultivasi Chu Ji",
+   "recipe_item": "resep_pil_chuji",
+   "ingredients": [
+    {"item": "herba_qi", "count": 2},
+    {"item": "batu_qi", "count": 1}
+   ],
+   "result": "pil_kultivasi_chuji",
+   "count": 1,
+   "description": "Herba Qi + Batu Qi = Pil Kultivasi Chu Ji"
+  },
+  {
+   "id": "recipe_pil_pemulihan",
+   "name": "Resep Pil Pemulihan",
+   "recipe_item": "resep_pil_pemulihan",
+   "ingredients": [
+    {"item": "herba_darah", "count": 2}
+   ],
+   "result": "pil_pemulihan",
+   "count": 1,
+   "description": "Herba Darah = Pil Pemulihan"
+  },
+  {
+   "id": "recipe_pil_sukses",
+   "name": "Resep Pil Sukses",
+   "recipe_item": "resep_pil_sukses",
+   "ingredients": [
+    {"item": "herba_matahari", "count": 1},
+    {"item": "jade_suci", "count": 1}
+   ],
+   "result": "pil_sukses",
+   "count": 1,
+   "description": "Herba Matahari + Jade Suci = Pil Sukses (+30% peluang meditasi)"
+  },
+  {
+   "id": "recipe_pil_aman",
+   "name": "Resep Pil Aman",
+   "recipe_item": "resep_pil_aman",
+   "ingredients": [
+    {"item": "herba_rohani", "count": 2},
+    {"item": "bintang_stone", "count": 1}
+   ],
+   "result": "pil_aman",
+   "count": 1,
+   "description": "Herba Rohani + Batu Bintang = Pil Aman (gagal meditasi tanpa debuff)"
+  }
+ ]
+}

@@ -1,2 +1,2 @@
-id,order,levels,base_hp,hp_per_level,base_qi,qi_per_level,name_pinyin,name
-realm_awal,1,10,50,5,30,3,Ranah Awal,Ranah Awal
+id,order,tiers,base_hp,base_qi,hp_per_tier,qi_per_tier,name_pinyin,name,dantian_capacity,meditation_success_rate
+realm_chuji,1,10,50,30,5,3,Chu Ji,Chu Ji,20,1.0

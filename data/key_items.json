@@ -23,6 +23,30 @@
       "use_effects": [
         {"type": "flag", "key": "artefak_pertama_aktif", "value": true}
       ]
+    },
+    {
+      "id": "gulung_teknik_pedang",
+      "description": "Gulung-gulung kuno bertuliskan aksara pedang. Saat kau membacanya, tanganmu tahu cara mengayunkan pedang dengan cara yang berbeda.",
+      "consumed": true,
+      "use_effects": [
+        {"type": "technique", "id": "teknik_jianxin"}
+      ]
+    },
+    {
+      "id": "gulung_teknik_pemulihan",
+      "description": "Gulung berisi mantra pemulihan. Aksaranya memudar saat kau membacanya — seolah isinya meresap ke dalam tubuhmu.",
+      "consumed": true,
+      "use_effects": [
+        {"type": "technique", "id": "teknik_yanzhi"}
+      ]
+    },
+    {
+      "id": "gulung_teknik_pertahanan",
+      "description": "Gulung berisi prinsip pertahanan. Simbol-simbol di atasnya bersinar sejenak lalu padam — ilmu sudah menjadi milikmu.",
+      "consumed": true,
+      "use_effects": [
+        {"type": "technique", "id": "teknik_liuguang"}
+      ]
     }
   ]
 }

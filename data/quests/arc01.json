@@ -13,12 +13,20 @@
       "on_complete": {
         "memory_unlock": "memory_a01_m01",
         "effects": [
-          {"type": "flag", "key": "flag_dream_a01_01_seen", "value": true}
+          {
+            "type": "flag",
+            "key": "flag_dream_a01_01_seen",
+            "value": true
+          }
         ],
-        "rewards": {"exp": 5},
+        "rewards": {},
         "system_msg": "Kau mengikuti pemeriksaan aptitude — hasilnya biasa saja, tidak menonjol."
       },
-      "next": [{"quest": "quest_a01_c01_002"}]
+      "next": [
+        {
+          "quest": "quest_a01_c01_002"
+        }
+      ]
     },
     {
       "id": "quest_a01_c01_002",
@@ -32,12 +40,22 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "state_murid_status", "value": "registered"}
+          {
+            "type": "flag",
+            "key": "state_murid_status",
+            "value": "registered"
+          }
         ],
-        "rewards": {"gold": 10},
+        "rewards": {
+          "gold": 10
+        },
         "system_msg": "Kau resmi menjadi murid Tian Xu."
       },
-      "next": [{"quest": "quest_a01_c02_003"}]
+      "next": [
+        {
+          "quest": "quest_a01_c02_003"
+        }
+      ]
     },
     {
       "id": "quest_a01_c02_003",
@@ -50,9 +68,13 @@
         "hint": "Ikuti pelajaran pertama dari Xu Zhiyuan di ruang latihan."
       },
       "on_complete": {
-        "rewards": {"exp": 3}
+        "rewards": {}
       },
-      "next": [{"quest": "quest_a01_c02_003b"}]
+      "next": [
+        {
+          "quest": "quest_a01_c02_003b"
+        }
+      ]
     },
     {
       "id": "quest_a01_c02_003b",
@@ -66,10 +88,18 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "relation", "npc": "npc_lin_yue", "value": 1}
+          {
+            "type": "relation",
+            "npc": "npc_lin_yue",
+            "value": 1
+          }
         ]
       },
-      "next": [{"quest": "quest_a01_c02_003c"}]
+      "next": [
+        {
+          "quest": "quest_a01_c02_003c"
+        }
+      ]
     },
     {
       "id": "quest_a01_c02_003c",
@@ -83,10 +113,18 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "relation", "npc": "npc_shen_luo", "value": 1}
+          {
+            "type": "relation",
+            "npc": "npc_shen_luo",
+            "value": 1
+          }
         ]
       },
-      "next": [{"quest": "quest_a01_c02_003d"}]
+      "next": [
+        {
+          "quest": "quest_a01_c02_003d"
+        }
+      ]
     },
     {
       "id": "quest_a01_c02_003d",
@@ -100,10 +138,18 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "relation", "npc": "npc_gu_han", "value": 1}
+          {
+            "type": "relation",
+            "npc": "npc_gu_han",
+            "value": 1
+          }
         ]
       },
-      "next": [{"quest": "quest_a01_c02_003e"}]
+      "next": [
+        {
+          "quest": "quest_a01_c02_003e"
+        }
+      ]
     },
     {
       "id": "quest_a01_c02_003e",
@@ -118,13 +164,25 @@
       "on_complete": {
         "memory_unlock": "memory_a01_m02",
         "effects": [
-          {"type": "relation", "npc": "npc_lin_yue", "value": 1},
-          {"type": "flag", "key": "flag_first_lesson_done", "value": true}
+          {
+            "type": "relation",
+            "npc": "npc_lin_yue",
+            "value": 1
+          },
+          {
+            "type": "flag",
+            "key": "flag_first_lesson_done",
+            "value": true
+          }
         ],
-        "rewards": {"exp": 5},
+        "rewards": {},
         "system_msg": "Gerakan dasar terasa anehnya familiar — seolah tanganmu pernah melakukannya."
       },
-      "next": [{"quest": "quest_a01_c03_004"}]
+      "next": [
+        {
+          "quest": "quest_a01_c03_004"
+        }
+      ]
     },
     {
       "id": "quest_a01_c03_004",
@@ -134,22 +192,50 @@
         "kind": "choose",
         "hint": "Pilih pavilion yang sesuai dengan cara hidupmu. Pilihan ini permanen.",
         "options": [
-          {"value": "pavilion_wuxin", "label": "Pavilion Wuxin — lepaskan keterikatan", "set": {"academy": "pavilion_wuxin"}},
-          {"value": "pavilion_jianxin", "label": "Pavilion Jianxin — disiplin dan ketepatan", "set": {"academy": "pavilion_jianxin"}},
-          {"value": "pavilion_yanzhi", "label": "Pavilion Yanzhi — pahami prinsip", "set": {"academy": "pavilion_yanzhi"}},
-          {"value": "pavilion_liuguang", "label": "Pavilion Liuguang — beradaptasi", "set": {"academy": "pavilion_liuguang"}}
+          {
+            "value": "pavilion_wuxin",
+            "label": "Pavilion Wuxin — lepaskan keterikatan",
+            "set": {
+              "academy": "pavilion_wuxin"
+            }
+          },
+          {
+            "value": "pavilion_jianxin",
+            "label": "Pavilion Jianxin — disiplin dan ketepatan",
+            "set": {
+              "academy": "pavilion_jianxin"
+            }
+          },
+          {
+            "value": "pavilion_yanzhi",
+            "label": "Pavilion Yanzhi — pahami prinsip",
+            "set": {
+              "academy": "pavilion_yanzhi"
+            }
+          },
+          {
+            "value": "pavilion_liuguang",
+            "label": "Pavilion Liuguang — beradaptasi",
+            "set": {
+              "academy": "pavilion_liuguang"
+            }
+          }
         ]
       },
       "on_complete": {
-        "rewards": {"exp": 6},
+        "rewards": {},
         "system_msg": "Pavilion dipilih. Jalanmu kini terbentuk."
       },
-      "next": [{"quest": "quest_a01_c04_005"}]
+      "next": [
+        {
+          "quest": "quest_a01_c04_005a"
+        }
+      ]
     },
     {
-      "id": "quest_a01_c04_005",
+      "id": "quest_a01_c04_005a",
       "kind": "main",
-      "title": "Percobaan Pertama",
+      "title": "Formasi Tua",
       "objective": {
         "kind": "reach",
         "location": "loc_outer_region",
@@ -158,34 +244,150 @@
       "on_complete": {
         "memory_unlock": "memory_a01_m03",
         "effects": [
-          {"type": "flag", "key": "flag_formation_touched", "value": true},
-          {"type": "relation", "npc": "npc_lin_yue", "value": 1},
-          {"type": "relation", "npc": "npc_gu_han", "value": 1}
+          {
+            "type": "flag",
+            "key": "flag_formation_reached",
+            "value": true
+          },
+          {
+            "type": "npc_state",
+            "npc": "npc_lin_yue",
+            "location": "loc_outer_region"
+          }
         ],
-        "rewards": {"exp": 12},
-        "system_msg": "Saat kau menyentuh formasi tua, kilasan citra menyerbu: formasi yang sama, hancur."
+        "rewards": {},
+        "system_msg": "Saat kau menyentuh formasi tua, kilasan citra menyerbu: formasi yang sama, hancur. Lin Yue muncul dari balik bebatuan — wajahnya serius."
       },
-      "next": [{"quest": "quest_a01_c04_006"}]
+      "next": [
+        {
+          "quest": "quest_a01_c04_005b"
+        }
+      ]
+    },
+    {
+      "id": "quest_a01_c04_005b",
+      "kind": "main",
+      "title": "Percobaan Lin Yue",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "hint": "Bicaralah dengan Lin Yue di formation tua."
+      },
+      "on_complete": {
+        "effects": [
+          {
+            "type": "flag",
+            "key": "flag_lin_yue_trial",
+            "value": true
+          },
+          {
+            "type": "npc_state",
+            "npc": "npc_lin_yue",
+            "location": "loc_training_hall"
+          }
+        ],
+        "rewards": {},
+        "system_msg": "Lin Yue menjelaskan ujian pertama: kalahkan binatang buas di hutan yang terpengaruh formasi. Ia kembali ke ruang latihan."
+      },
+      "next": [
+        {
+          "quest": "quest_a01_c04_005c"
+        }
+      ]
+    },
+    {
+      "id": "quest_a01_c04_005c",
+      "kind": "main",
+      "title": "Uji Hutan",
+      "objective": {
+        "kind": "defeat",
+        "enemies": ["binatang_hutan"],
+        "target": 2,
+        "hint": "Kalahkan 2 binatang hutan di Hutan Akademi."
+      },
+      "on_complete": {
+        "effects": [
+          {
+            "type": "flag",
+            "key": "flag_forest_cleared",
+            "value": true
+          },
+          {
+            "type": "relation",
+            "npc": "npc_lin_yue",
+            "value": 1
+          },
+          {
+            "type": "relation",
+            "npc": "npc_gu_han",
+            "value": 1
+          }
+        ],
+        "rewards": {},
+        "system_msg": "Dua binatang hutan tumbang. Kau membuktikan bahwa kau bisa bertahan — setidaknya untuk saat ini."
+      },
+      "next": [
+        {
+          "quest": "quest_a01_c04_005d"
+        }
+      ]
+    },
+    {
+      "id": "quest_a01_c04_005d",
+      "kind": "main",
+      "title": "Kembali ke Formasi",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_outer_region",
+        "hint": "Kembalilah ke formation tua dengan pengalaman baru."
+      },
+      "on_complete": {
+        "effects": [
+          {
+            "type": "flag",
+            "key": "flag_formation_complete",
+            "value": true
+          }
+        ],
+        "rewards": {},
+        "system_msg": "Formasi bereaksi saat kau kembali — cahayanya berdenyut, seolah mengakui kemenanganmu."
+      },
+      "next": [
+        {
+          "quest": "quest_a01_c04_006"
+        }
+      ]
     },
     {
       "id": "quest_a01_c04_006",
       "kind": "main",
       "title": "Insiden Malam",
       "objective": {
-        "kind": "reach",
-        "location": "loc_protagonist_room",
+        "kind": "rest",
         "hint": "Kembalilah ke kamarmu dan beristirahat."
       },
       "on_complete": {
         "memory_unlock": "memory_a01_m04",
         "effects": [
-          {"type": "flag", "key": "flag_memory_awareness", "value": true},
-          {"type": "item", "id": "simbol_kuno", "count": 1}
+          {
+            "type": "flag",
+            "key": "flag_memory_awareness",
+            "value": true
+          },
+          {
+            "type": "item",
+            "id": "simbol_kuno",
+            "count": 1
+          }
         ],
-        "rewards": {"exp": 15},
+        "rewards": {},
         "system_msg": "Kau terbangun dari mimpi. Di meja kamarmu, sebuah simbol kuno — dan tanganmu tahu cara menggambarnya."
       },
-      "next": [{"quest": "quest_a02_c01_001"}]
+      "next": [
+        {
+          "quest": "quest_a02_c01_001"
+        }
+      ]
     },
     {
       "id": "quest_side_pedagang_herbs",
@@ -199,13 +401,23 @@
         "report_to": "npc_pedagang_jalanan",
         "hint": "Kumpulkan Herba Qi dari hutan dekat jalan pendakian, lalu laporkan ke pedagang."
       },
-      "available_from": {"day": 1, "hour": 0},
+      "available_from": {
+        "day": 1,
+        "hour": 0
+      },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_merchant_herbs_delivered", "value": true},
-          {"type": "gold", "value": 15}
+          {
+            "type": "flag",
+            "key": "flag_merchant_herbs_delivered",
+            "value": true
+          },
+          {
+            "type": "gold",
+            "value": 15
+          }
         ],
-        "rewards": {"exp": 5},
+        "rewards": {},
         "system_msg": "Pedagang menerima herba dengan ekspresi lega. 'Terima kasih. Ini... lebih berarti dari yang kau kira.'"
       }
     },
@@ -223,14 +435,26 @@
       "available_from": {
         "day": 1,
         "hour": 0,
-        "requires_flags": ["flag_merchant_herbs_delivered"]
+        "requires_flags": [
+          "flag_merchant_herbs_delivered"
+        ]
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_merchant_letter_delivered", "value": true},
-          {"type": "relation", "npc": "npc_lin_yue", "value": 1}
+          {
+            "type": "flag",
+            "key": "flag_merchant_letter_delivered",
+            "value": true
+          },
+          {
+            "type": "relation",
+            "npc": "npc_lin_yue",
+            "value": 1
+          }
         ],
-        "rewards": {"gold": 20, "exp": 8},
+        "rewards": {
+          "gold": 20
+        },
         "system_msg": "Lin Yue membaca surat, lalu menatapmu dengan tatapan berbeda. 'Ternyata pedagang itu... aku tahu siapa dia.'"
       }
     },
@@ -241,20 +465,30 @@
       "description": "Binatang liar mulai mengganggu jalanan. Pedagang minta bantuan.",
       "objective": {
         "kind": "defeat",
-        "enemies": ["binatang_hutan"],
+        "enemies": [
+          "binatang_hutan"
+        ],
         "target": 2,
         "hint": "Kalahkan binatang hutan di hutan akademi."
       },
       "available_from": {
         "day": 1,
         "hour": 0,
-        "requires_flags": ["flag_merchant_letter_delivered"]
+        "requires_flags": [
+          "flag_merchant_letter_delivered"
+        ]
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_merchant_arc_complete", "value": true}
+          {
+            "type": "flag",
+            "key": "flag_merchant_arc_complete",
+            "value": true
+          }
         ],
-        "rewards": {"gold": 25, "exp": 10},
+        "rewards": {
+          "gold": 25
+        },
         "system_msg": "Pedagang menatapmu lama. 'Kau mengingatkan aku pada diriku sendiri... dulu. Aku pernah menjadi murid Tian Xu — tapi aku memilih pergi. Sekarang kau tahu.'"
       }
     }

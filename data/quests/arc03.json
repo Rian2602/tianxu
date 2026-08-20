@@ -11,13 +11,25 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_mural_analyzed", "value": true},
-          {"type": "relation", "npc": "npc_mei_ruo", "value": 3}
+          {
+            "type": "flag",
+            "key": "flag_mural_analyzed",
+            "value": true
+          },
+          {
+            "type": "relation",
+            "npc": "npc_mei_ruo",
+            "value": 3
+          }
         ],
-        "rewards": {"exp": 10},
+        "rewards": {},
         "system_msg": "Bersama Mei Ruo, kau memeriksa mural kuno yang menutupi dinding ruangan tersembunyi. Sebagian besarnya hancur — bukan karena waktu. 'Seseorang sengaja menghapusnya,' kata Mei Ruo pelan."
       },
-      "next": [{"quest": "quest_a03_c02_002"}]
+      "next": [
+        {
+          "quest": "quest_a03_c02_002"
+        }
+      ]
     },
     {
       "id": "quest_a03_c02_002",
@@ -31,14 +43,30 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_name_jiang_yan_known", "value": true},
-          {"type": "flag", "key": "flag_mo_chen_met", "value": true},
-          {"type": "npc_state", "npc": "npc_mo_chen", "available": false}
+          {
+            "type": "flag",
+            "key": "flag_name_jiang_yan_known",
+            "value": true
+          },
+          {
+            "type": "flag",
+            "key": "flag_mo_chen_met",
+            "value": true
+          },
+          {
+            "type": "npc_state",
+            "npc": "npc_mo_chen",
+            "available": false
+          }
         ],
-        "rewards": {"exp": 12},
+        "rewards": {},
         "system_msg": "Sebelum kau sempat bertanya lebih jauh, orang asing itu menghilang ke dalam bayangan koridor. Satu nama menggema di kepalamu: Jiang Yan."
       },
-      "next": [{"quest": "quest_a03_c03_003"}]
+      "next": [
+        {
+          "quest": "quest_a03_c03_003"
+        }
+      ]
     },
     {
       "id": "quest_a03_c03_003",
@@ -52,12 +80,20 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_jiang_yan_deceased_confirmed", "value": true}
+          {
+            "type": "flag",
+            "key": "flag_jiang_yan_deceased_confirmed",
+            "value": true
+          }
         ],
-        "rewards": {"exp": 10},
+        "rewards": {},
         "system_msg": "Dokumen tua itu bergetar di tanganmu. 'Jiang Yan. Tanggal: lebih dari dua puluh tahun sebelum kau lahir. Status: DECEASED.' Kau membaca kata itu berulang kali — dan jantungmu tidak mau mempercayainya."
       },
-      "next": [{"quest": "quest_a03_c04_004"}]
+      "next": [
+        {
+          "quest": "quest_a03_c04_004"
+        }
+      ]
     },
     {
       "id": "quest_a03_c04_004",
@@ -73,9 +109,21 @@
         "system_msg": "Keluargamu berkumpul. Mereka menunggumu memutuskan: siapa dirimu sekarang?"
       },
       "next": [
-        {"quest": "quest_a03_c05_005", "option": "deny", "choice_id": "dlg_a03_branch"},
-        {"quest": "quest_a03_c05_005", "option": "accept_cautious", "choice_id": "dlg_a03_branch"},
-        {"quest": "quest_a03_c05_005", "option": "seek_truth", "choice_id": "dlg_a03_branch"}
+        {
+          "quest": "quest_a03_c05_005",
+          "option": "deny",
+          "choice_id": "dlg_a03_branch"
+        },
+        {
+          "quest": "quest_a03_c05_005",
+          "option": "accept_cautious",
+          "choice_id": "dlg_a03_branch"
+        },
+        {
+          "quest": "quest_a03_c05_005",
+          "option": "seek_truth",
+          "choice_id": "dlg_a03_branch"
+        }
       ]
     },
     {
@@ -90,13 +138,27 @@
       "on_complete": {
         "memory_unlock": "memory_a03_m01",
         "effects": [
-          {"type": "flag", "key": "flag_memory_gate_a03_seen", "value": true},
-          {"type": "flag", "key": "belief_protagonist_may_be_cause", "value": true}
+          {
+            "type": "flag",
+            "key": "flag_memory_gate_a03_seen",
+            "value": true
+          },
+          {
+            "type": "flag",
+            "key": "belief_protagonist_may_be_cause",
+            "value": true
+          }
         ],
-        "rewards": {"exp": 20, "gold": 10},
+        "rewards": {
+          "gold": 10
+        },
         "system_msg": "Mural itu menyala. Kau melihat dirimu — kehidupan pertamamu — berdiri di depan gerbang. 'Kalau dunia harus membenciku, biarkan.' Lalu gerbang terbuka. Dan kau tidak melihat apa yang terjadi setelahnya."
       },
-      "next": [{"quest": "quest_a04_c01_001"}]
+      "next": [
+        {
+          "quest": "quest_a04_c01_001"
+        }
+      ]
     }
   ]
 }

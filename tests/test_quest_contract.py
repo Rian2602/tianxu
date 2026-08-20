@@ -126,7 +126,7 @@ def test_side_advance_time_completes(tmp_path):
     reg = DataRegistry(dst)
     sess = GameSession.new(reg)
     sess.quest.start_side("q_side_tunggu")
-    sess.apply_action({"type": "rest", "hours": 8})  # gerbang aman
+    sess.apply_action({"type": "advance_time", "hours": 8})
     assert "q_side_tunggu" in sess.state.completed_quests
 
 

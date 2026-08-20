@@ -142,9 +142,20 @@ def test_web_arc1_playthrough_summary_tianyuan(web_app):
     _talk_through_http(base, "npc_proctor")
     r = _post(base, "/api/action", {"action": {"type": "choose", "option": "pavilion_jianxin"}})
     assert r["ok"] is True
+    # 005a: reach formation
     r = _post(base, "/api/action", {"action": {"type": "move", "to": "loc_outer_region"}})
+    # 005b: talk Lin Yue
+    _talk_through_http(base, "npc_lin_yue")
+    # 005c: defeat 2 binatang_hutan — simulate battle wins via session
+    import web.app as _app
+    _app.session.quest.notify_battle_won(["binatang_hutan", "binatang_hutan"])
+    # 005d: return to formation (move away first, then back)
+    _post(base, "/api/action", {"action": {"type": "move", "to": "loc_hutan_akademi"}})
+    r = _post(base, "/api/action", {"action": {"type": "move", "to": "loc_outer_region"}})
+    # Insiden Malam
     r = _post(base, "/api/action", {"action": {"type": "move", "to": "loc_training_hall"}})
     r = _post(base, "/api/action", {"action": {"type": "move", "to": "loc_protagonist_room"}})
+    r = _post(base, "/api/action", {"action": {"type": "rest"}})
     assert r["ok"] is True
     v = r["view"]
     assert v["current_quest"]["id"] == "quest_a02_c01_001"  # transisi ke Arc II

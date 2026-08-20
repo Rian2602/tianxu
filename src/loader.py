@@ -121,6 +121,12 @@ class DataRegistry:
             legacy["id"] = "legacy"
             self.hunts = [legacy]
 
+        # mining zones — world.mines[]
+        self.mines: list[dict] = []
+        mines_list = world_cfg.get("mines")
+        if isinstance(mines_list, list):
+            self.mines = list(mines_list)
+
         from .validate import validate
         validate(self)
 
@@ -165,6 +171,9 @@ class DataRegistry:
 
     def hunts_for_location(self, location_id: str) -> list[dict]:
         return [h for h in self.hunts if h.get("location") == location_id]
+
+    def mines_for_location(self, location_id: str) -> list[dict]:
+        return [m for m in self.mines if m.get("location") == location_id]
 
     def academy_curriculum(self, academy: str) -> list[dict]:
         """Daftar teknik kurikulum untuk suatu akademi/paviliun (berurutan)."""

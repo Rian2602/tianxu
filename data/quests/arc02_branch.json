@@ -13,13 +13,25 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_obey_reported", "value": true},
-          {"type": "relation", "npc": "npc_proctor", "value": 3}
+          {
+            "type": "flag",
+            "key": "flag_obey_reported",
+            "value": true
+          },
+          {
+            "type": "relation",
+            "npc": "npc_proctor",
+            "value": 3
+          }
         ],
-        "rewards": {"exp": 5},
+        "rewards": {},
         "system_msg": "Guru pengawas menerima buktimu. 'Kau murid yang bertanggung jawab. Kami akan menangani ini.'"
       },
-      "next": [{"quest": "quest_a02_c04_007"}]
+      "next": [
+        {
+          "quest": "quest_a02_c04_007"
+        }
+      ]
     },
     {
       "id": "quest_a02_c04_007b",
@@ -33,13 +45,25 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_investigate_solo", "value": true},
-          {"type": "relation", "npc": "npc_mei_ruo", "value": 2}
+          {
+            "type": "flag",
+            "key": "flag_investigate_solo",
+            "value": true
+          },
+          {
+            "type": "relation",
+            "npc": "npc_mei_ruo",
+            "value": 2
+          }
         ],
-        "rewards": {"exp": 8},
+        "rewards": {},
         "system_msg": "Kau menemukan catatan tambahan yang mengonfirmasi kecurigaanmu — tapi tidak ada yang tahu kau melakukan ini."
       },
-      "next": [{"quest": "quest_a02_c04_007"}]
+      "next": [
+        {
+          "quest": "quest_a02_c04_007"
+        }
+      ]
     },
     {
       "id": "quest_a02_c04_007c",
@@ -54,13 +78,25 @@
       },
       "on_complete": {
         "effects": [
-          {"type": "flag", "key": "flag_confront_public", "value": true},
-          {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -3}
+          {
+            "type": "flag",
+            "key": "flag_confront_public",
+            "value": true
+          },
+          {
+            "type": "reputation",
+            "faksi": "faction_tianxu_orthodox",
+            "value": -3
+          }
         ],
-        "rewards": {"exp": 10},
+        "rewards": {},
         "system_msg": "Grandmaster mendengarmu dalam diam. 'Kau berani. Tapi keberanian tanpa pemahaman bisa merusak.'"
       },
-      "next": [{"quest": "quest_a02_c04_007"}]
+      "next": [
+        {
+          "quest": "quest_a02_c04_007"
+        }
+      ]
     }
   ]
 }

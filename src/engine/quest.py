@@ -13,13 +13,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field as dc_field
 
 from ..loader import DataRegistry
-from .cultivation import gain_exp, gain_grind_exp
 from .effects import apply as apply_effects
 from .events import add_log
 from .memory import unlock as unlock_memory
 from .state import GameState
 
-OBJECTIVE_KINDS = {"talk", "defeat", "gather", "reach", "choose", "spar", "advance_time"}
+OBJECTIVE_KINDS = {"talk", "defeat", "gather", "reach", "choose", "spar", "advance_time", "rest"}
 
 # Dispatch table — validate.py derives OBJECTIVE_KINDS from this.
 # ponytail: keys-only dict, actual handlers are in _check_objective.
@@ -37,6 +36,7 @@ OBJECTIVE_HANDLERS: dict[str, ObjectiveSpec] = {
     "choose": ObjectiveSpec(text="Pilih opsi", required_fields={"options"}),
     "spar": ObjectiveSpec(text="Sparing dengan NPC", on_dialog_end="Selesai sparing", required_fields={"npc"}),
     "advance_time": ObjectiveSpec(text="Tunggu waktu", required_fields={"hour"}),
+    "rest": ObjectiveSpec(text="Istirahat", required_fields=set()),
 }
 
 # Field yang sah di `options[].set` untuk objektif `choose`.
@@ -257,6 +257,18 @@ class QuestEngine:
                 continue
             self._complete_side(qid)
 
+    def notify_rest(self) -> None:
+        """Pemain menekan tombol istirahat — selesaikan quest rest."""
+        q = self.current_main()
+        if q and q.get("objective", {}).get("kind") == "rest":
+            self._complete_main(q["id"])
+        for qid in list(self.state.active_side_quests):
+            sq = self.reg.quest(qid)
+            obj = (sq or {}).get("objective", {})
+            if sq.get("kind") != "side" or obj.get("kind") != "rest":
+                continue
+            self._complete_side(qid)
+
     def notify_battle_won(self, defeated_enemy_ids: list[str]) -> None:
         """Pembunuhan musuh (berburu) — progres objektif defeat.
 
@@ -278,7 +290,7 @@ class QuestEngine:
         for qid in list(self.state.active_side_quests):
             sq = self.reg.quest(qid)
             obj = sq.get("objective", {})
-            if obj.get("kind") != "defeat":
+            if sq.get("kind") != "side" or obj.get("kind") != "defeat":
                 continue
             # BUG-9: tanpa `enemies` → musuh apa pun memenuhi (handler `not allowed or ...`)
             allowed = obj.get("enemies", [])
@@ -387,11 +399,21 @@ class QuestEngine:
                 break
         if not cid:
             return
+        if any(c.get("id") == cid for c in self.state.companions):
+            return  # sudah dimiliki
         comp = next((c for c in self.reg.companions if c.get("id") == cid), None)
         if not comp:
             return
+        max_c = self.reg.config.get("max_companions", 3)
+        if len(self.state.companions) >= max_c:
+            add_log(self.state, "system", "Kawan penuh. Tidak bisa menerima binatang roh baru.")
+            return
         scale = self.reg.config.get("companion", {})
         hp_max = int(comp.get("base_hp", 10)) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
+        self.state.companions.append({"id": cid, "hp": hp_max, "active": True})
+        if not self.state.active_companion:
+            self.state.active_companion = cid
+        # backward compat
         self.state.companion = {"id": cid, "hp": hp_max, "active": True}
         add_log(self.state, "narration", f"{comp['name']} mendekat dan menempel padamu — binatang roh akademimu.")
 
@@ -434,7 +456,6 @@ class QuestEngine:
         apply_effects(self.state, self.reg, oc.get("effects"))
         unlock_memory(self.state, self.reg, oc.get("memory_unlock"))
         rewards = oc.get("rewards", {})
-        gain_exp(self.state, self.reg, rewards.get("exp", 0))
         self.state.player.gold += rewards.get("gold", 0)
         if oc.get("system_msg"):
             add_log(self.state, "system", oc["system_msg"])
@@ -624,7 +645,6 @@ class QuestEngine:
         oc = q.get("on_complete", {})
         apply_effects(self.state, self.reg, oc.get("effects"))
         rewards = oc.get("rewards", {})
-        gain_grind_exp(self.state, self.reg, rewards.get("exp", 0))  # A2: cap grind harian
         self.state.player.gold += rewards.get("gold", 0)
         if oc.get("system_msg"):
             add_log(self.state, "system", oc["system_msg"])

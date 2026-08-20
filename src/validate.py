@@ -283,6 +283,48 @@ def _validate_config(registry, errors) -> None:
     if isinstance(world_cfg.get("hunt"), dict):
         _check_hunt(world_cfg["hunt"], "world.hunt", require_id=False)
 
+    # mining zones — world.mines[]
+    mines = world_cfg.get("mines")
+    if mines is not None:
+        if not isinstance(mines, list):
+            _add(errors, src, "world.mines", "'world.mines' harus list zona tambang.")
+        else:
+            mine_ids = set()
+            for i, m in enumerate(mines):
+                ctx = f"world.mines[{i}]"
+                if not isinstance(m, dict):
+                    _add(errors, src, ctx, "zona tambang harus objek.")
+                    continue
+                mid = m.get("id")
+                if not mid:
+                    _add(errors, src, f"{ctx}.id", "zona tambang wajib punya 'id'.")
+                elif mid in mine_ids:
+                    _add(errors, src, f"{ctx}.id", f"id zona tambang duplikat: '{mid}'.")
+                mine_ids.add(mid)
+                loc_id = m.get("location")
+                if not loc_id:
+                    _add(errors, src, f"{ctx}.location", "zona tambang wajib punya 'location'.")
+                elif loc_id not in registry.location_by_id:
+                    _add(errors, src, f"{ctx}.location", f"lokasi tak dikenal: '{loc_id}'.")
+                for entry in m.get("pool", []) or []:
+                    iid = entry.get("item") if isinstance(entry, dict) else None
+                    if iid and iid not in registry.items:
+                        _add(errors, src, f"{ctx}.pool[].item", f"item tak dikenal: '{iid}'.")
+
+    # search_items per hunt zone
+    for i, h in enumerate(hunts or []):
+        if not isinstance(h, dict):
+            continue
+        search_items = h.get("search_items")
+        if search_items is not None:
+            if not isinstance(search_items, list):
+                _add(errors, src, f"world.hunts[{i}].search_items", "harus list.")
+            else:
+                for j, si in enumerate(search_items):
+                    if isinstance(si, dict) and si.get("item") and si["item"] not in registry.items:
+                        _add(errors, src, f"world.hunts[{i}].search_items[{j}].item",
+                             f"item tak dikenal: '{si['item']}'.")
+
     # aturan #4: status.kind dari config.battle.statuses
     for sid, sc in ((cfg.get("battle") or {}).get("statuses") or {}).items():
         kind = sc.get("kind") if isinstance(sc, dict) else None
@@ -398,9 +440,41 @@ def _validate_quests(registry, errors) -> None:
                                 root_ids = {t.get("id") for t in registry.config.get("roots", {}).get("tiers", []) or []}
                                 if val not in root_ids:
                                     _add(errors, src, fctx,
-                                         f"akar tak dikenal pada opsi choose: '{val}' — "
-                                         "tidak ada di config.roots.tiers.",
-                                         sorted(root_ids))
+                                     f"akar tak dikenal pada opsi choose: '{val}' — "
+                                     "tidak ada di config.roots.tiers.",
+                                     sorted(root_ids))
+
+        if kind == "spar":
+            debuff = obj.get("spar_debuff")
+            if debuff is not None:
+                if not isinstance(debuff, dict):
+                    _add(errors, src, f"{ctx}.objective.spar_debuff",
+                         "spar_debuff harus objek.")
+                else:
+                    allowed = {"hp_mult", "atk_mult", "def_mult"}
+                    for field, val in debuff.items():
+                        fctx = f"{ctx}.objective.spar_debuff.{field}"
+                        if field not in allowed:
+                            _add(errors, src, fctx,
+                                 f"field spar_debuff tak dikenal: '{field}'.",
+                                 allowed)
+                        elif isinstance(val, bool) or not isinstance(val, (int, float)) or val <= 0:
+                            _add(errors, src, fctx,
+                                 "nilai spar_debuff harus angka lebih besar dari 0.")
+            allies = obj.get("allies")
+            if allies is not None:
+                if not isinstance(allies, list) or not allies:
+                    _add(errors, src, f"{ctx}.objective.allies",
+                         "allies harus list NPC non-kosong.")
+                else:
+                    for i, npc_id in enumerate(allies):
+                        ally = registry.npc_by_id.get(npc_id)
+                        if not ally:
+                            _add(errors, src, f"{ctx}.objective.allies[{i}]",
+                                 f"NPC tak dikenal: '{npc_id}'.")
+                        elif not isinstance(ally.get("combat"), dict):
+                            _add(errors, src, f"{ctx}.objective.allies[{i}]",
+                                 f"NPC sekutu wajib punya combat: '{npc_id}'.")
 
         # aturan #3: referensi silang objektif
         if kind in ("talk", "spar") and obj.get("npc") not in registry.npc_by_id:
@@ -649,6 +723,10 @@ def _validate_recipes(registry, errors) -> None:
         if r.get("result") and r["result"] not in registry.items:
             _add(errors, src, f"recipe '{rid}'.result",
                  f"item tak dikenal: '{r['result']}'.")
+        recipe_item = r.get("recipe_item")
+        if recipe_item and recipe_item not in registry.items:
+            _add(errors, src, f"recipe '{rid}'.recipe_item",
+                 f"item tak dikenal: '{recipe_item}'.")
         for ing in r.get("ingredients", []) or []:
             if ing.get("item") not in registry.items:
                 _add(errors, src, f"recipe '{rid}'.ingredients[].item",

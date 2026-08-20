@@ -4,7 +4,7 @@
       "name": "Chen Xu",
       "hp": 50,
       "qi": 30,
-      "realm": "realm_awal",
+      "realm": "realm_chuji",
       "realm_level": 1,
       "gold": 50,
       "roots": "akar_biasa",
@@ -18,6 +18,7 @@
     ],
     "flags": {}
   },
+  "max_companions": 3,
   "time": {
     "start_day": 1,
     "start_hour": 8,
@@ -52,7 +53,14 @@
     "spar_win_exp": 5,
     "spar_loss_exp": 2,
     "grounding_max_hours_per_day": 8,
-    "grounding_exp_per_hour": 4
+    "grounding_exp_per_hour": 4,
+    "time_costs": {
+      "hunt": 2,
+      "search": 1,
+      "mine": 2,
+      "craft": 1
+    },
+    "meditate_weekly_limit": 3
   },
   "battle": {
     "statuses": {

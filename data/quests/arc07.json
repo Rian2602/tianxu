@@ -1,91 +1,85 @@
 {
- "quests": [
-  {
-   "id": "quest_a07_c01_001",
-   "kind": "main",
-   "title": "Malam Terakhir",
-   "objective": {
-    "kind": "talk",
-    "npc": "npc_lin_yue",
-    "target": 1,
-    "hint": "Temui Lin Yue — formasi mulai gagal dan seluruh Tian Xu bersiap menghadapi malam terakhir."
-   },
-   "on_complete": {
-    "effects": [
-     {
-      "type": "flag",
-      "key": "flag_last_night_complete",
-      "value": true
-     },
-     {
-      "type": "flag",
-      "key": "world_event_a07_the_last_night",
-      "value": "triggered"
-     }
-    ],
-    "rewards": {
-     "exp": 25
-    },
-    "system_msg": "Lin Yue menatapmu lama. 'Kita tidak tahu apa yang ada di bawah sana. Tapi apa pun itu — malam ini, seluruh Tian Xu menunggumu kembali.' Formasi di ruang terdalam mulai bergetar. Tidak ada lagi yang tersisa untuk dipersiapkan."
-   },
-   "next": [
+  "quests": [
     {
-     "quest": "quest_a07_c02_002"
-    }
-   ]
-  },
-  {
-   "id": "quest_a07_c02_002",
-   "kind": "main",
-   "title": "Aku Bukan Kau",
-   "objective": {
-    "kind": "talk",
-    "npc": "npc_jiang_yan_imprint",
-    "target": 1,
-    "hint": "Turunlah ke ruang di bawah ruang terdalam — di sana menunggu sesuatu yang pernah menjadi dirimu."
-   },
-   "on_complete": {
-    "effects": [
-     {
-      "type": "flag",
-      "key": "flag_i_am_not_you_said",
-      "value": true
-     },
-     {
-      "type": "flag",
-      "key": "flag_entity_truth_known",
-      "value": true
-     }
-    ],
-    "rewards": {
-     "exp": 30
+      "id": "quest_a07_c01_001",
+      "kind": "main",
+      "title": "Malam Terakhir",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_lin_yue",
+        "target": 1,
+        "hint": "Temui Lin Yue — formasi mulai gagal dan seluruh Tian Xu bersiap menghadapi malam terakhir."
+      },
+      "on_complete": {
+        "effects": [
+          {
+            "type": "flag",
+            "key": "flag_last_night_complete",
+            "value": true
+          },
+          {
+            "type": "flag",
+            "key": "world_event_a07_the_last_night",
+            "value": "triggered"
+          }
+        ],
+        "rewards": {},
+        "system_msg": "Lin Yue menatapmu lama. 'Kita tidak tahu apa yang ada di bawah sana. Tapi apa pun itu — malam ini, seluruh Tian Xu menunggumu kembali.' Formasi di ruang terdalam mulai bergetar. Tidak ada lagi yang tersisa untuk dipersiapkan."
+      },
+      "next": [
+        {
+          "quest": "quest_a07_c02_002"
+        }
+      ]
     },
-    "system_msg": "'Aku membuatmu untuk menyelesaikan apa yang gagal kuselesaikan.' — 'Tidak. Aku bukan kau.' Imprint Jiang Yan mengakui: kau bukan kelanjutannya, bukan pula penggantinya. Kau adalah dirimu sendiri. Dan untuk pertama kalinya, Entity berbicara tanpa suara — bukan kebencian, bukan permintaan. Kebenaran."
-   },
-   "next": [
     {
-     "quest": "quest_a07_c03_003"
-    }
-   ]
-  },
-  {
-   "id": "quest_a07_c03_003",
-   "kind": "main",
-   "title": "Second Life",
-   "objective": {
-    "kind": "talk",
-    "npc": "npc_jiang_yan_imprint",
-    "target": 1,
-    "hint": "Satu keputusan terakhir. Pertahankan, hancurkan, ubah, korbankan — atau temukan jalan yang tak pernah ditulis siapa pun."
-   },
-   "on_complete": {
-    "effects": [],
-    "rewards": {
-     "exp": 50
+      "id": "quest_a07_c02_002",
+      "kind": "main",
+      "title": "Aku Bukan Kau",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_jiang_yan_imprint",
+        "target": 1,
+        "hint": "Turunlah ke ruang di bawah ruang terdalam — di sana menunggu sesuatu yang pernah menjadi dirimu."
+      },
+      "on_complete": {
+        "effects": [
+          {
+            "type": "flag",
+            "key": "flag_i_am_not_you_said",
+            "value": true
+          },
+          {
+            "type": "flag",
+            "key": "flag_entity_truth_known",
+            "value": true
+          }
+        ],
+        "rewards": {},
+        "system_msg": "'Aku membuatmu untuk menyelesaikan apa yang gagal kuselesaikan.' — 'Tidak. Aku bukan kau.' Imprint Jiang Yan mengakui: kau bukan kelanjutannya, bukan pula penggantinya. Kau adalah dirimu sendiri. Dan untuk pertama kalinya, Entity berbicara tanpa suara — bukan kebencian, bukan permintaan. Kebenaran."
+      },
+      "next": [
+        {
+          "quest": "quest_a07_c03_003"
+        }
+      ]
     },
-    "system_msg": "Keputusan telah kau buat. Dunia akan mengingat malam ini — dengan satu nama, atau tanpa nama sama sekali."
-   },
-   "next": null
-  }
- ]
+    {
+      "id": "quest_a07_c03_003",
+      "kind": "main",
+      "title": "Second Life",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_jiang_yan_imprint",
+        "target": 1,
+        "hint": "Satu keputusan terakhir. Pertahankan, hancurkan, ubah, korbankan — atau temukan jalan yang tak pernah ditulis siapa pun."
+      },
+      "on_complete": {
+        "effects": [],
+        "rewards": {},
+        "system_msg": "Keputusan telah kau buat. Dunia akan mengingat malam ini — dengan satu nama, atau tanpa nama sama sekali."
+      },
+      "next": null
+    }
+  ]
 }

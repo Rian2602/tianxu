@@ -76,8 +76,9 @@ def _context() -> dict:
         }
     loc = session.state.location
     npcs = [
-        {"id": n["id"], "name": n["name"], "can_spar": session.can_spar(n), "shop": bool(n.get("shop"))}
-        for n in registry.npcs if n.get("location") == loc and session._is_npc_available(n)
+        {"id": n["id"], "name": n["name"], "can_spar": session.can_spar(n), "shop": bool(n.get("shop")),
+         "avatar": n.get("avatar", "")}
+        for n in registry.npcs if session.npc_location(n) == loc and session._is_npc_available(n)
     ]
     techniques = registry.player_techniques(
         session.state.player.academy or "", session.state.player.realm,
@@ -160,7 +161,16 @@ def _context() -> dict:
         "merchant_shop": merchant_shop,
         "recipes": recipes,
         "npc_names": {n["id"]: n["name"] for n in registry.npcs},
+        "npc_avatars": {n["id"]: n.get("avatar", "") for n in registry.npcs if n.get("avatar")},
         "relations": dict(session.state.relations),
+        "npc_profiles": {
+            n["id"]: {
+                "name": n["name"],
+                "profile": n.get("profile", {}),
+                "relation": session.state.relations.get(n["id"], 0),
+            }
+            for n in registry.npcs
+        },
         "techniques": [
             {"id": t["id"], "name": t["name"], "qi_cost": int(t.get("qi_cost", 0)),
              "kind": t.get("kind"), "description": t.get("description", ""),
@@ -175,11 +185,12 @@ def _context() -> dict:
         # defense: id/location opsional di data → fallback aman (validator
         # mewajibkannya, tapi web tidak boleh crash pada data lama/parsial)
         "hunts": [{"id": h.get("id", "?"), "name": h.get("name", h.get("id", "?")),
-                    "location": h.get("location", ""),
-                    # label cari data-driven (nama item hasil cari, mis. herba)
-                    "search_item_name": (registry.item(h["search_item"]).get("name", "")
-                                          if h.get("search_item") else "")}
-                   for h in registry.hunts if h.get("location") == loc],
+                     "location": h.get("location", ""),
+                     "search_item_name": (registry.item(h["search_item"]).get("name", "")
+                                           if h.get("search_item") else
+                                           ", ".join((registry.item(si["item"]) or {}).get("name", si["item"])
+                                                     for si in (h.get("search_items") or [])[:2]))}
+                    for h in registry.hunts if h.get("location") == loc],
         # status karakter (docs 04: Family Crisis status per anggota) —
         # data-driven: flag `state_{npc}_status` (npc id tanpa prefix `npc_`,
         # mis. npc_lin_yue → state_lin_yue_status) → nilai (loyal/separated/…)

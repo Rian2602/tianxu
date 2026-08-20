@@ -67,9 +67,19 @@ def _through_arc1(registry) -> GameSession:
     _talk(s, "npc_gu_han")
     _talk(s, "npc_proctor")
     s.apply_action({"type": "choose", "option": "pavilion_jianxin"})
+    # 005a: reach formation
     _reach(s, "loc_outer_region")
+    # 005b: talk Lin Yue
+    _talk(s, "npc_lin_yue")
+    # 005c: defeat 2 binatang_hutan — simulate battle wins
+    s.quest.notify_battle_won(["binatang_hutan", "binatang_hutan"])
+    # 005d: return to formation
+    _reach(s, "loc_hutan_akademi")
+    _reach(s, "loc_outer_region")
+    # 005e: Insiden Malam
     _reach(s, "loc_training_hall")
     _reach(s, "loc_protagonist_room")
+    s.quest.notify_rest()
     assert s.state.current_quest == "quest_a02_c01_001", s.state.current_quest
     return s
 
@@ -80,7 +90,8 @@ def test_arc2_data_contract_ok(registry):
     assert ids == [
         "quest_a01_c01_001", "quest_a01_c01_002", "quest_a01_c02_003",
         "quest_a01_c02_003b", "quest_a01_c02_003c", "quest_a01_c02_003d",
-        "quest_a01_c02_003e", "quest_a01_c03_004", "quest_a01_c04_005",
+        "quest_a01_c02_003e", "quest_a01_c03_004", "quest_a01_c04_005a",
+        "quest_a01_c04_005b", "quest_a01_c04_005c", "quest_a01_c04_005d",
         "quest_a01_c04_006",
         "quest_side_pedagang_herbs", "quest_side_pedagang_letter",
         "quest_side_pedagang_threat",
@@ -119,6 +130,53 @@ def test_arc2_data_contract_ok(registry):
     assert "npc_proctor" in registry.npc_by_id
     assert "catatan_siklus" in registry.key_items
     assert "artefak_pertama" in registry.key_items
+
+
+def test_arc2_spar_options_live_on_objective(registry):
+    """Knob spar quest berada di objective agar kontraknya jelas."""
+    q_solo = registry.quest("quest_a02_c01_001")
+    q_team = registry.quest("quest_a02_c01_002")
+    assert q_solo["objective"]["spar_debuff"] == {
+        "hp_mult": 0.6,
+        "atk_mult": 0.6,
+        "def_mult": 0.6,
+    }
+    assert "spar_debuff" not in q_solo
+    assert q_team["objective"]["allies"] == [
+        "npc_lin_yue",
+        "npc_shen_luo",
+        "npc_gu_han",
+    ]
+    assert "allies" not in q_team
+
+
+def test_arc2_midterm_spar_debuff_is_battle_local(registry):
+    """Ujian solo melemahkan salinan battle saja; data NPC tetap penuh."""
+    s = _through_arc1(registry)
+    _reach(s, "loc_training_hall")
+    _talk(s, "npc_proctor")
+    foe = s.state.pending_battle["foes"][0]
+    assert (foe["hp"], foe["hp_max"], foe["attack"], foe["defense"]) == (90, 90, 12, 8)
+    assert registry.npc("npc_proctor")["combat"]["hp"] == 150
+
+
+def test_arc2_team_spar_uses_npc_allies_without_companion(registry):
+    """Ujian kelompok memakai rekan NPC, bukan Serigala aktif."""
+    s = _through_arc1(registry)
+    s.state.current_quest = "quest_a02_c01_002"
+    _reach(s, "loc_training_hall")
+    _talk(s, "npc_proctor")
+    battle = s.state.pending_battle
+    assert battle["context"] == "spar_team"
+    assert [a["id"] for a in battle["allies"]] == [
+        "npc_lin_yue",
+        "npc_shen_luo",
+        "npc_gu_han",
+    ]
+    assert battle["use_companion"] is False
+    view = s.battle.view()
+    assert view["companion"] is None
+    assert view["active_ally_index"] == 0
 
 
 def test_arc2_trials_and_investigation(registry):

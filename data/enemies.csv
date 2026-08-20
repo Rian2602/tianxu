@@ -1,3 +1,6 @@
 id,name,hp,attack,defense,exp_reward,speed,drop_item,drop_chance
-penjaga_formation,Penjaga Formasi Tua,30,6,3,12,4,,
-binatang_hutan,Binatang Hutan,12,3,1,4,6,,
+penjaga_formation,Penjaga Formasi Tua,30,6,3,12,4,beast_core_xuanshi,0.3
+binatang_hutan,Binatang Hutan,12,3,1,4,6,beast_core_chuji,0.4
+serigala_bayangan,Serigala Bayangan,18,5,3,8,5,beast_core_chuji,0.5
+golem_batu,Golem Batu,35,8,6,15,2,beast_core_xuanshi,0.35
+guard_spirit,Guard Spirit,50,10,8,25,3,beast_core_dishi,0.25

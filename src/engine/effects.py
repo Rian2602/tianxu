@@ -1,8 +1,12 @@
 """Penerapan efek — format type-based (ENGINE_ARCHITECTURE §5.2).
 
-Jenis efek: morality, relation, reputation, flag, item, gold, start_quest, technique.
+Jenis efek: morality, relation, reputation, flag, item, gold, start_quest,
+technique, npc_state, grant_companion, exp, unlock_realm_bonus, status_effect.
 `start_quest` hanya valid di konteks dialog (mengaktifkan side quest).
 `technique` (C1) memberi teknik baru ke pemain (reward quest/dialog).
+`exp` menambah exp ke dantian pemain.
+`unlock_realm_bonus` membuka bonus ranah (dari item kultivasi).
+`status_effect` menambah efek sementara (debuff/buff).
 """
 
 from __future__ import annotations
@@ -21,12 +25,16 @@ EFFECT_REQUIRED_FIELDS: dict[str, set[str]] = {
     "technique": {"id"},
     "start_quest": {"quest"},
     "npc_state": {"npc"},
+    "grant_companion": {"id"},
+    "exp": {"value"},
+    "unlock_realm_bonus": {"realm"},
+    "status_effect": {"effect_type", "days"},
 }
 
-# Semua jenis efek yang dikenal engine.
 EFFECT_TYPES = {
     "morality", "relation", "reputation", "flag", "item", "gold",
-    "technique", "start_quest", "npc_state",
+    "technique", "start_quest", "npc_state", "grant_companion",
+    "exp", "unlock_realm_bonus", "status_effect",
 }
 
 
@@ -73,5 +81,45 @@ def apply(state: GameState, registry: DataRegistry, effects: list | None) -> Non
                     ov["location"] = fx["location"]
                 if "available" in fx:
                     ov["available"] = fx["available"]
+        elif t == "grant_companion":
+            cid = fx.get("id")
+            if cid and not any(c.get("id") == cid for c in state.companions):
+                comp = next((x for x in registry.companions if x.get("id") == cid), None)
+                if comp:
+                    scale = registry.config.get("companion", {})
+                    hp_max = int(comp.get("base_hp", 10)) + state.player.realm_level * int(scale.get("hp_per_level", 12))
+                    state.companions.append({"id": cid, "hp": hp_max, "active": True})
+                    if not state.active_companion:
+                        state.active_companion = cid
+                    add_log(state, "narration", f"{comp['name']} mendekat dan menempel padamu.")
+        elif t == "exp":
+            val = int(fx.get("value", 0))
+            state.player.dantian_exp += val
+            r = registry.realm_by_id(state.player.realm)
+            cap = int(r["dantian_capacity"]) if r and r.get("dantian_capacity") else 20
+            if state.player.dantian_exp > cap:
+                state.player.dantian_exp = cap
+            add_log(state, "system", f"[Sistem] +{val} exp dantian.")
+        elif t == "unlock_realm_bonus":
+            realm_id = fx.get("realm")
+            if realm_id and realm_id not in state.realms_unlocked:
+                state.realms_unlocked.append(realm_id)
+                r = registry.realm_by_id(realm_id)
+                name = r["name"] if r and r.get("name") else realm_id
+                add_log(state, "system", f"[Sistem] Bonus ranah terbuka: {name}!")
+        elif t == "status_effect":
+            eff_type = fx.get("effect_type", "")
+            days = int(fx.get("days", 1))
+            hp_mult = fx.get("hp_mult")
+            atk_mult = fx.get("atk_mult")
+            qi_mult = fx.get("qi_mult")
+            state.status_effects.append({
+                "type": eff_type,
+                "days_left": days,
+                **({"hp_mult": hp_mult} if hp_mult is not None else {}),
+                **({"atk_mult": atk_mult} if atk_mult is not None else {}),
+                **({"qi_mult": qi_mult} if qi_mult is not None else {}),
+            })
+            add_log(state, "system", f"[Sistem] Efek sementara: {eff_type} ({days} hari).")
         else:
             add_log(state, "system", f"[Sistem] Efek tak dikenal: {t}.")
