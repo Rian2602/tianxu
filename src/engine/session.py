@@ -152,6 +152,7 @@ class GameSession:
             "craft": self._craft,
             "upgrade_technique": self._upgrade_technique,
             "unlock_technique": self._unlock_technique,
+            "fuse_technique": self._fuse_technique,
             "switch_companion": self._switch_companion,
             "mine": self._mine,
             "save": self._save,
@@ -1031,6 +1032,68 @@ class GameSession:
         self.state.player.technique_levels[tid] = min(base_level, max_lvl)
         add_log(self.state, "narration",
                 f"{tek['name']} menggantikan {evolves_from} — evolusi teknik!")
+        return self.view()
+
+    def _fuse_technique(self, action: dict) -> dict:
+        """Fusion: combine 2 techniques into 1 stronger technique.
+        Progression chain: jianxin + badai_api → pedang_api_membara → pamungkas_wuxing.
+        
+        Action: {"type": "fuse_technique", "fusion_id": "fusion_xxx"}
+        """
+        fusion_id = action.get("fusion_id")
+        recipe = next((f for f in self.reg.fusions if f.get("id") == fusion_id), None)
+        if not recipe:
+            add_log(self.state, "system", "Resep fusion tidak dikenal.")
+            return self.view()
+        # Check realm requirement
+        req_realm = recipe.get("realm_required", "")
+        if req_realm:
+            cur_realm = self.reg.realm_by_id(self.state.player.realm)
+            req_realm_data = self.reg.realm_by_id(req_realm)
+            cur_order = int(cur_realm.get("order", 0)) if cur_realm else 0
+            req_order = int(req_realm_data.get("order", 0)) if req_realm_data else 0
+            if cur_order < req_order:
+                add_log(self.state, "system",
+                        f"Fusion ini membutuhkan ranah {req_realm} atau lebih tinggi.")
+                return self.view()
+        # Check all required techniques are owned
+        requires = recipe.get("requires", [])
+        owned = set(self.state.player.techniques)
+        missing = [r for r in requires if r not in owned]
+        if missing:
+            add_log(self.state, "system",
+                    f"Kau belum menguasai: {', '.join(missing)}.")
+            return self.view()
+        # Check technique levels
+        req_level = int(recipe.get("requires_level", 1))
+        for r in requires:
+            lvl = int(self.state.player.technique_levels.get(r, 1))
+            if lvl < req_level:
+                tek = self.reg.technique(r)
+                name = tek.get("name", r) if tek else r
+                add_log(self.state, "system",
+                        f"{name} butuh Lv.{req_level} untuk fusion (saat ini Lv.{lvl}).")
+                return self.view()
+        # Check result technique exists
+        result_id = recipe.get("result", "")
+        result_tek = self.reg.technique(result_id)
+        if not result_tek:
+            add_log(self.state, "system",
+                    f"Teknik hasil fusion '{result_id}' tidak ditemukan.")
+            return self.view()
+        # FUSION: remove requirements, add result
+        for r in requires:
+            self.state.player.techniques.remove(r)
+            self.state.player.technique_levels.pop(r, None)
+        self.state.player.techniques.append(result_id)
+        # Result level = 2 (fusion techniques start at Lv.2), capped at realm max
+        realm = self.reg.realm_by_id(self.state.player.realm)
+        max_lvl = (int(realm.get("order", 1)) + 1) if realm else 2
+        min_level = min(int(self.state.player.technique_levels.get(r, 1)) for r in requires) if requires else 1
+        # For fusion, we already removed the levels, so use a default
+        self.state.player.technique_levels[result_id] = min(2, max_lvl)
+        add_log(self.state, "narration",
+                f"Fusion berhasil! {result_tek.get('name', result_id)} lahir dari gabungan teknik.")
         return self.view()
 
     def _merchant_here(self) -> dict | None:

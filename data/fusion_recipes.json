@@ -1,0 +1,22 @@
+{
+  "fusions": [
+    {
+      "id": "fusion_pedang_api",
+      "name": "Pedang Api Membara",
+      "description": "Fusi Tebasan Pedang Jantung dengan Badai Api Membara — pedang yang menyala dengan api spiritual.",
+      "requires": ["teknik_jianxin", "teknik_badai_api"],
+      "requires_level": 2,
+      "result": "teknik_pedang_api_membara",
+      "realm_required": "realm_dishi"
+    },
+    {
+      "id": "fusion_wuxing",
+      "name": "Siklus Wuxing Sempurna",
+      "description": "Fusi puncak — menguasai siklima unsur. Pedang Api Membara digabung dengan Naga Hijau Bangkit.",
+      "requires": ["teknik_pedang_api_membara", "teknik_naga_kayu"],
+      "requires_level": 3,
+      "result": "teknik_pamungkas_wuxing",
+      "realm_required": "realm_shenwu"
+    }
+  ]
+}

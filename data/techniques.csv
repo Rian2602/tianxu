@@ -23,3 +23,5 @@ teknik_yanzhi_dalam,Prinsip: Dalam,heal,8,5,realm_dishi,kayu,,heal,,,,,,branch_y
 teknik_yanzhi_celup,Prinsip: Celup,heal,5,4,realm_dishi,kayu,,"heal,cleanse",,,,,,branch_yanzhi,teknik_yanzhi
 teknik_liuguang_arus,Adaptasi: Arus,defend,2,6,realm_tianshi,air,50,"defensive,qi_restore",,,,,,branch_liuguang,teknik_liuguang
 teknik_liuguang_pantul,Adaptasi: Pantul,defend,2,6,realm_tianshi,air,35,"defensive,reflect",,,,,,branch_liuguang,teknik_liuguang
+teknik_pedang_api_membara,Pedang Api Membara,attack,25,10,realm_dishi,api,,"pedang,offensive,combo_finisher",burn,50,3,,,,
+teknik_pamungkas_wuxing,Siklus Wuxing Sempurna,attack,45,14,realm_shenwu,,,"offensive,combo_finisher",,,,,,,
