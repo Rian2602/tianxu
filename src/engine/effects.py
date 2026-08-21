@@ -34,7 +34,7 @@ EFFECT_REQUIRED_FIELDS: dict[str, set[str]] = {
 EFFECT_TYPES = {
     "morality", "relation", "reputation", "flag", "item", "gold",
     "technique", "start_quest", "npc_state", "grant_companion",
-    "exp", "unlock_realm_bonus", "status_effect",
+    "exp", "unlock_realm_bonus", "status_effect", "dialog",
 }
 
 
@@ -121,5 +121,9 @@ def apply(state: GameState, registry: DataRegistry, effects: list | None) -> Non
                 **({"qi_mult": qi_mult} if qi_mult is not None else {}),
             })
             add_log(state, "system", f"[Sistem] Efek sementara: {eff_type} ({days} hari).")
+        elif t == "dialog":
+            dialog_id = fx.get("id")
+            if dialog_id:
+                state.pending_dialog = dialog_id
         else:
             add_log(state, "system", f"[Sistem] Efek tak dikenal: {t}.")

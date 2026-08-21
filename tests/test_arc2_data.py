@@ -26,7 +26,10 @@ def registry() -> DataRegistry:
 
 
 def _new_session(registry: DataRegistry) -> GameSession:
-    return GameSession.new(registry)
+    from tests.conftest import skip_intro
+    s = GameSession.new(registry)
+    skip_intro(s)
+    return s
 
 
 def _talk(s: GameSession, npc: str, *, close: bool = True) -> None:
@@ -67,6 +70,9 @@ def _through_arc1(registry) -> GameSession:
     _talk(s, "npc_gu_han")
     _talk(s, "npc_proctor")
     s.apply_action({"type": "choose", "option": "pavilion_jianxin"})
+    # Advance through pavilion explanation dialog
+    while s.state.pending_dialog:
+        s.apply_action({"type": "dialog_choice", "choice_index": -1})
     # 005a: reach formation
     _reach(s, "loc_outer_region")
     # 005b: talk Lin Yue

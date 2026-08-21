@@ -77,12 +77,21 @@ def _talk_through_http(base: str, npc: str) -> None:
 
 
 def test_web_new_game_real_data(web_app):
-    """POST /api/new → mode explore, quest Arc I aktif, NPC di lokasi gerbang."""
+    """POST /api/new → mode dialog (intro narrative) atau explore, quest Arc I aktif."""
     base = web_app
     r = _post(base, "/api/new")
     assert r["ok"] is True
     v, c = r["view"], r["context"]
-    assert v["mode"] == "explore"
+    # Intro narrative bisa aktif (mode dialog) atau langsung explore
+    assert v["mode"] in ("explore", "dialog")
+    # Jika intro dialog aktif, selesaikan dulu
+    if v["mode"] == "dialog":
+        guard = 0
+        while v["mode"] == "dialog" and guard < 20:
+            r = _post(base, "/api/action", {"action": {"type": "dialog_choice", "choice_index": -1}})
+            assert r["ok"] is True
+            v = r["view"]
+            guard += 1
     assert v["current_quest"]["id"] == "quest_a01_c01_001"
     assert v["location"]["id"] == "loc_tianxu_gate"
     assert "factions" in v  # key view selalu ada (bisa kosong di awal)
@@ -124,11 +133,25 @@ def test_web_character_status_from_flags(web_server, monkeypatch):
     assert by_id["npc_lin_yue"] == "Lin Yue"
 
 
+def _skip_intro_dialog(base: str) -> None:
+    """Selesaikan intro narrative jika aktif."""
+    r = _get(base, "/api/state")
+    v = r.get("view")
+    if v and v.get("mode") == "dialog":
+        guard = 0
+        while v.get("mode") == "dialog" and guard < 20:
+            r = _post(base, "/api/action", {"action": {"type": "dialog_choice", "choice_index": -1}})
+            assert r["ok"] is True
+            v = r.get("view", {})
+            guard += 1
+
+
 def test_web_arc1_playthrough_summary_tianyuan(web_app):
     """Arc I penuh via HTTP: arc_summary branch paviliun + ending, panel
     Tianyuan menampilkan keandalan ingatan dari data (docs 06)."""
     base = web_app
     _post(base, "/api/new")
+    _skip_intro_dialog(base)
 
     _talk_through_http(base, "npc_aptitude_examiner")
     _talk_through_http(base, "npc_aptitude_examiner")
@@ -142,6 +165,11 @@ def test_web_arc1_playthrough_summary_tianyuan(web_app):
     _talk_through_http(base, "npc_proctor")
     r = _post(base, "/api/action", {"action": {"type": "choose", "option": "pavilion_jianxin"}})
     assert r["ok"] is True
+    # Advance through pavilion explanation dialog if triggered
+    if r["view"]["mode"] == "dialog":
+        while r["view"]["mode"] == "dialog":
+            r = _post(base, "/api/action", {"action": {"type": "dialog_choice", "choice_index": -1}})
+            assert r["ok"] is True
     # 005a: reach formation
     r = _post(base, "/api/action", {"action": {"type": "move", "to": "loc_outer_region"}})
     # 005b: talk Lin Yue

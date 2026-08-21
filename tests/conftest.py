@@ -20,6 +20,12 @@ if str(ROOT) not in sys.path:
 FIXTURES_DIR = ROOT / "tests" / "fixtures" / "minimal_data"
 
 
+def skip_intro(session) -> None:
+    """Skip intro narrative dialog jika aktif."""
+    while session.state.pending_dialog:
+        session.apply_action({"type": "dialog_choice", "choice_index": -1})
+
+
 @pytest.fixture
 def data_dir(tmp_path: Path) -> Path:
     """Salinan dataset minimal ke direktori sementara."""

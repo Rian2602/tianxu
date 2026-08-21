@@ -94,6 +94,10 @@ class GameSession:
         loc = registry.location(state.location)
         if loc and loc.get("is_safe"):
             state.last_safe_location = state.location
+        # Intro narrative: mulai dialog pengantar saat game baru dimulai
+        intro_dialog = registry.config.get("intro_dialog")
+        if intro_dialog:
+            state.pending_dialog = intro_dialog
         return cls(registry, state)
 
     @classmethod

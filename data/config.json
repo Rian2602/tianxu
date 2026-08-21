@@ -26,6 +26,7 @@
     ],
     "flags": {}
   },
+  "intro_dialog": "dlg_intro_narrative",
   "max_companions": 3,
   "time": {
     "start_day": 1,

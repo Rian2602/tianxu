@@ -8,7 +8,7 @@
         "kind": "talk",
         "npc": "npc_aptitude_examiner",
         "target": 1,
-        "hint": "Bicaralah dengan pemeriksa aptitude di gerbang."
+        "hint": "Bicaralah dengan Xu Ming di gerbang untuk memeriksa aptitude."
       },
       "on_complete": {
         "memory_unlock": "memory_a01_m01",
@@ -223,6 +223,12 @@
         ]
       },
       "on_complete": {
+        "effects": [
+          {
+            "type": "dialog",
+            "id": "dlg_proctor_pavilion_explain"
+          }
+        ],
         "rewards": {},
         "system_msg": "Pavilion dipilih. Jalanmu kini terbentuk."
       },

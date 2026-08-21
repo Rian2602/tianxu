@@ -925,13 +925,18 @@ function renderExplore(v, c, box) {
 
   // lokasi aman
   if (loc.is_safe) {
-    html += `<div class="action-row"><span class="action-label">Meditasi:</span>` +
-            `<button class="btn" onclick='act({type:"meditate"})'>Meditasi</button>`;
-    // istirahat hanya di kamar pemain
-    if (v.player.is_rest_location) {
-      html += `<button class="btn" onclick='act({type:"rest"})'>Istirahat</button>`;
+    // meditasi hanya setelah pelajaran pertama selesai
+    const flags = (ctx && ctx.flags) || {};
+    const canMeditate = flags.flag_first_lesson_done === true;
+    if (canMeditate) {
+      html += `<div class="action-row"><span class="action-label">Meditasi:</span>` +
+              `<button class="btn" onclick='act({type:"meditate"})'>Meditasi</button>`;
+      // istirahat hanya di kamar pemain
+      if (v.player.is_rest_location) {
+        html += `<button class="btn" onclick='act({type:"rest"})'>Istirahat</button>`;
+      }
+      html += `</div>`;
     }
-    html += `</div>`;
     // meracik (crafting)
     const ownedRecipes = v.recipes || [];
     if (ownedRecipes.length) {

@@ -42,7 +42,7 @@ def test_validator_kind_sets_match_registry_keys():
     assert EFFECT_TYPES == {"morality", "relation", "reputation", "flag",
                             "item", "gold", "technique", "start_quest", "npc_state",
                             "grant_companion", "exp", "unlock_realm_bonus",
-                            "status_effect"}
+                            "status_effect", "dialog"}
     assert set(OBJECTIVE_HANDLERS) == {"talk", "defeat", "gather", "reach", "choose",
                                        "spar", "advance_time", "rest"}
     assert TECHNIQUE_KINDS == {"attack", "defend", "heal"}

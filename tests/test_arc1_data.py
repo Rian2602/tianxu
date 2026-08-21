@@ -25,7 +25,10 @@ def registry() -> DataRegistry:
 
 
 def _new_session(registry: DataRegistry) -> GameSession:
-    return GameSession.new(registry)
+    from tests.conftest import skip_intro
+    s = GameSession.new(registry)
+    skip_intro(s)
+    return s
 
 
 def _talk_through(s: GameSession, npc: str) -> None:
@@ -94,6 +97,9 @@ def test_arc1_full_playthrough_yellow(registry):
 
     # Ch 1.3: pavilion selection — MAJOR choice
     s.apply_action({"type": "choose", "option": "pavilion_yanzhi"})
+    # Advance through pavilion explanation dialog if triggered
+    while s.state.pending_dialog:
+        s.apply_action({"type": "dialog_choice", "choice_index": -1})
     assert s.state.current_quest == "quest_a01_c04_005a"
     assert s.state.player.academy == "pavilion_yanzhi"
     # starter kit pavilion diterima; curriculum khas pavilion tersedia

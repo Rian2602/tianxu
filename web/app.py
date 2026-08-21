@@ -191,6 +191,8 @@ def _context() -> dict:
                                            ", ".join((registry.item(si["item"]) or {}).get("name", si["item"])
                                                      for si in (h.get("search_items") or [])[:2]))}
                     for h in registry.hunts if h.get("location") == loc],
+        # flags untuk frontend gating (meditasi, dll)
+        "flags": dict(session.state.flags),
         # status karakter (docs 04: Family Crisis status per anggota) —
         # data-driven: flag `state_{npc}_status` (npc id tanpa prefix `npc_`,
         # mis. npc_lin_yue → state_lin_yue_status) → nilai (loyal/separated/…)

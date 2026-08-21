@@ -1,6 +1,38 @@
 {
   "dialogs": [
     {
+      "id": "dlg_intro_narrative",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "narration",
+          "text": "Di tengah kabut pagi yang menyelimuti jalan pendakian, seorang pemuda berjalan sendiri menuju gerbang Tian Xu — akademi kultivasi tertua di seluruh negeri.",
+          "choices": [
+            {"label": "(Melanjutkan)", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "narration",
+          "text": "Chen Xu — namamu terukir dalam catatan keluarga yang sudah pudar. Tidak ada yang istimewa dari dirimu: akar cultivation biasa, bakat yang tidak menonjol, dan satu-satunya bekal adalah tekad untuk memahami formasi kuno yang muncul dalam mimpimu.",
+          "choices": [
+            {"label": "(Mimpi yang sama berulang setiap malam...)", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "narration",
+          "text": "Formasi yang sama — lingkaran cahaya yang hancur, suara yang memanggil namamu, dan tangan yang tahu cara menggambarnya tanpa pernah diajari. Inilah yang membawamu ke sini.",
+          "choices": [
+            {"label": "(Mendekati gerbang Tian Xu)", "next": "n4"}
+          ]
+        },
+        "n4": {
+          "speaker": "narration",
+          "text": "Gerbang batu besar dengan ukiran naga menjulang di hadapanmu. Di depannya, seorang pemeriksa aptitude sudah menunggu. Pemeriksaan akan menentukan masa depanmu di akademi ini.",
+          "choices": []
+        }
+      }
+    },
+    {
       "id": "dlg_a01_d001",
       "npc": "npc_aptitude_examiner",
       "start": "n1",
@@ -330,6 +362,32 @@
         "n1": {
           "speaker": "npc:npc_proctor",
           "text": "Kau sudah bicara dengan semua orang? Bagus. Kekuatan seorang kultivator bukan hanya qi — tapi juga hubungan dengan orang lain. Ingat itu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_proctor_pavilion_explain",
+      "npc": "npc_proctor",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "npc:npc_proctor",
+          "text": "Pilihanmu sudah dibuat. Sekarang kau menjadi bagian dari pavilion yang kau pilih. Setiap pavilion memiliki filosofi, teknik, dan companion khas yang akan menemanimu dalam perjalanan kultivasi.",
+          "choices": [
+            {"label": "Apa yang harus kulakukan sekarang?", "next": "n2"}
+          ]
+        },
+        "n2": {
+          "speaker": "npc:npc_proctor",
+          "text": "Pertama, kenali pavilionmu. Pergilah ke sana dan bicara dengan gurumu. Mereka akan mengajarkan teknik dasar pavilion dan memberikan companion yang sesuai dengan jalan kultivasimu.",
+          "choices": [
+            {"label": "Mengerti. Terima kasih, Guru.", "next": "n3"}
+          ]
+        },
+        "n3": {
+          "speaker": "npc:npc_proctor",
+          "text": "Ingat: setiap pavilion memiliki kekuatan unik. Wuxin mengajarkan pelepasan keterikatan, Jianxin disiplin pedang, Yanzhi pemahaman prinsip, dan Liuguang adaptasi. Pilihlah dengan bijak — ini adalah jalanmu.",
           "choices": []
         }
       }

@@ -28,7 +28,10 @@ def registry() -> DataRegistry:
 
 
 def _new_session(registry: DataRegistry) -> GameSession:
-    return GameSession.new(registry)
+    from tests.conftest import skip_intro
+    s = GameSession.new(registry)
+    skip_intro(s)
+    return s
 
 
 def _talk(s: GameSession, npc: str, *, close: bool = True) -> None:
@@ -76,6 +79,8 @@ def _through_arc1_2_3_4(registry, branch_idx: int = 1, stance_idx: int = 2) -> G
     _talk(s, "npc_gu_han")
     _talk(s, "npc_proctor")
     s.apply_action({"type": "choose", "option": "pavilion_jianxin"})
+    while s.state.pending_dialog:
+        s.apply_action({"type": "dialog_choice", "choice_index": -1})
     _reach(s, "loc_outer_region")
     _talk(s, "npc_lin_yue")
     s.quest.notify_battle_won(["binatang_hutan", "binatang_hutan"])
