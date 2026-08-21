@@ -1,6 +1,17 @@
-id,name,kind,power,qi_cost,realm_required,element,guard_pct,tags
-teknik_dasar,Teknik Dasar,attack,5,3,realm_chuji,,,"offensive"
-teknik_wuxin,Teknik Pelepasan,defend,3,2,realm_chuji,tanah,30,"defensive"
-teknik_jianxin,Tebasan Pedang Jantung,attack,7,4,realm_chuji,logam,,"pedang,offensive"
-teknik_yanzhi,Analisa Prinsip,heal,4,3,realm_chuji,kayu,,"heal"
-teknik_liuguang,Teknik Adaptasi,defend,4,2,realm_chuji,air,40,"defensive"
+id,name,kind,power,qi_cost,realm_required,element,guard_pct,tags,apply_status,status_chance,status_duration
+teknik_dasar,Teknik Dasar,attack,5,3,realm_chuji,,,"offensive,combo_starter",,,
+teknik_wuxin,Teknik Pelepasan,defend,3,2,realm_chuji,tanah,30,"defensive",,,
+teknik_jianxin,Tebasan Pedang Jantung,attack,7,4,realm_chuji,logam,,"pedang,offensive,combo_finisher",,,
+teknik_yanzhi,Analisa Prinsip,heal,4,3,realm_chuji,kayu,,"heal",,,
+teknik_liuguang,Teknik Adaptasi,defend,4,2,realm_chuji,air,40,"defensive",,,
+teknik_langkah_bayangan,Langkah Bayangan,defend,2,2,realm_chuji,air,25,"defensive,evasion",,,
+teknik_gelombang_qi,Gelombang Qi,attack,6,3,realm_chuji,air,,"offensive,combo_starter",,,
+teknik_pedang_logam,Pedang Sembilan Logam,attack,12,5,realm_xuanshi,logam,,"pedang,offensive,combo_finisher",,,
+teknik_perisai_tanah,Perisai Gunung,defend,2,3,realm_xuanshi,tanah,35,"defensive",,,
+teknik_pemulihan_kayu,Nafas Hutan,heal,9,5,realm_xuanshi,kayu,,"heal",regen,50,2
+teknik_badai_api,Badai Api Membara,attack,16,7,realm_dishi,api,,"offensive,combo_starter",burn,40,2
+teknik_aliran_air,Aliran Kehidupan,heal,14,6,realm_dishi,air,,"heal",,,
+teknik_benteng_logam,Benteng Baja Sejati,defend,2,5,realm_dishi,logam,50,"defensive",,,
+teknik_naga_kayu,Naga Hijau Bangkit,attack,22,9,realm_tianshi,kayu,,"offensive,combo_finisher",,,
+teknik_inti_bumi,Inti Bumi Abadi,heal,20,8,realm_tianshi,tanah,,"heal",,,
+teknik_tirai_air,Tirai Air Seribu Lapis,defend,2,7,realm_tianshi,air,60,"defensive",,,

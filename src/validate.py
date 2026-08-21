@@ -788,7 +788,7 @@ def _validate_csv(registry, errors) -> None:
                      f"guard_pct harus 0-80, ditemukan: {gpct_val}.")
         apply_st = tek.get("apply_status", "")
         if apply_st:
-            statuses_keys = set(((cfg.get("battle") or {}).get("statuses") or {}).keys())
+            statuses_keys = set(((registry.config.get("battle") or {}).get("statuses") or {}).keys())
             if apply_st not in statuses_keys:
                 _add(errors, "techniques.csv", f"technique '{tid}'.apply_status",
                      f"status tak dikenal: '{apply_st}'.", sorted(statuses_keys))
