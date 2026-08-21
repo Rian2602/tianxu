@@ -13,6 +13,14 @@
             {"label": "Aku akan mempertahankan Tian Xu.", "next": "n_end"}
           ]
         },
+        "n_reformist_ally": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau datang. Aku tahu kau sudah bergabung dengan Shen Luo — Kaum Reformis. Kau mengumpulkan bukti, menyelidiki arsip. Tapi malam ini, bukan waktunya untuk berdebat tentang sistem. Malam ini, kita harus bertahan — atau kita semua akan kalah.",
+          "condition": {"faction_min": {"faksi": "faction_reformists", "value": 3}},
+          "choices": [
+            {"label": "Aku mengerti. Kita harus bersatu malam ini.", "next": "n_end"}
+          ]
+        },
         "n_reform_stance": {
           "speaker": "npc:npc_grandmaster",
           "text": "Kau datang. Aku tahu kau punya pandangan berbeda tentang masa depan Tian Xu. Tapi malam ini, bukan waktunya untuk berdebat. Malam ini, kita harus bersatu — atau kita semua akan kalah.",
@@ -81,6 +89,30 @@
           "condition": {"flag": {"key": "flag_memory_a03_m01_investigated", "value": true}},
           "choices": [
             {"label": "Aku siap. Terima kasih atas bantuanmu.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_corridor": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelidiki Koridor Terbakar bersamaku — dan kau percaya ada yang ditutupi. Malam ini, kau akan menemukan apakah kepercayaanmu itu benar. Aku harap kau siap menghadapi jawabannya.",
+          "condition": {"flag": {"key": "state_memory_a01_m01_reinterpretation", "value": "coverup"}},
+          "choices": [
+            {"label": "Aku siap. Terima kasih, Mei Ruo.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_hands": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelidiki Tangan yang Mengingat — dan kau percaya kau pernah menjadi kultivator kuat. Malam ini, kau akan mengetahui siapa dirimu sebenarnya. Persiapkan dirimu.",
+          "condition": {"flag": {"key": "state_memory_a01_m02_reinterpretation", "value": "past_life"}},
+          "choices": [
+            {"label": "Aku sudah siap.", "next": "n_end"}
+          ]
+        },
+        "n_connected_lin_yue": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelidiki hubunganmu dengan Lin Yue — dan kau percaya kalian terhubung lintas kehidupan. Malam ini, kau akan mengetahui apakah itu benar. Dan apakah artinya.",
+          "condition": {"flag": {"key": "state_memory_a02_m01_reinterpretation", "value": "connected"}},
+          "choices": [
+            {"label": "Aku akan menemukan jawabannya.", "next": "n_end"}
           ]
         },
         "n1": {

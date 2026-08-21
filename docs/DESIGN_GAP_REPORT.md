@@ -145,25 +145,22 @@ After completing Phases 0-7, the game has:
 
 #### GAP-B3: Reactive World Events Only 1 Prototype
 
-**Current State:**
-- Only Spiritual Collapse has reactive dialogue
-- The Last Night has no reactive elements
-- World events don't change based on player history
+**Status: ✅ RESOLVED**
+
+**Resolution:**
+- Added 4 reactive dialog conditions to The Last Night (Arc VII):
+  1. `dlg_a07_reactive_mei_ruo`: Reacts to memory investigation reinterpretation flags:
+     - `state_memory_a01_m01_reinterpretation = coverup` → "Kau sudah menyelidiki Koridor Terbakar..."
+     - `state_memory_a01_m02_reinterpretation = past_life` → "Kau sudah menyelidiki Tangan yang Mengingat..."
+     - `state_memory_a02_m01_reinterpretation = connected` → "Kau sudah menyelidiki hubunganmu dengan Lin Yue..."
+  2. `dlg_a07_reactive_grandmaster`: Reacts to Reformists faction reputation ≥ 3
+- Total reactive conditions in The Last Night: 8 (up from 3)
+- All 287 tests pass
 
 **Impact:**
-- World feels static despite player actions
-- Consequences of player choices are limited
-- World reactivity is underutilized
-
-**Design Decision Needed:**
-- Which world events should be reactive?
-- How should player history affect world events?
-- Should world events have multiple outcomes?
-
-**Recommendation:**
-- Add reactive elements to The Last Night
-- Keep reactive scope small (1-2 conditions per event)
-- Focus on quality of reactivity over quantity
+- Player investigation choices are acknowledged in The Last Night
+- Faction reputation affects Grandmaster's dialogue
+- World reactivity is more utilized across arcs
 
 ---
 
@@ -276,7 +273,7 @@ After completing Phases 0-7, the game has:
 | ~~A3: Branching Shallow~~ | ~~MEDIUM~~ | ~~HIGH~~ | ~~MEDIUM~~ | ✅ RESOLVED |
 | ~~B1: Memory Investigation~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ✅ RESOLVED |
 | ~~B2: Faction System~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ✅ RESOLVED |
-| B3: Reactive World | MEDIUM | LOW | MEDIUM | Add to The Last Night |
+| ~~B3: Reactive World~~ | ~~MEDIUM~~ | ~~LOW~~ | ~~MEDIUM~~ | ✅ RESOLVED |
 | B4: Dead Flags | LOW | LOW | LOW | Keep for potential use |
 | C1: Quest Linearity | LOW | HIGH | LOW | Acceptable for testing |
 | C2: Dialogue Conditions | LOW | MEDIUM | LOW | Add 5-10 more |
