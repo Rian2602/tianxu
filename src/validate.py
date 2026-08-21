@@ -326,11 +326,23 @@ def _validate_config(registry, errors) -> None:
                              f"item tak dikenal: '{si['item']}'.")
 
     # aturan #4: status.kind dari config.battle.statuses
-    for sid, sc in ((cfg.get("battle") or {}).get("statuses") or {}).items():
-        kind = sc.get("kind") if isinstance(sc, dict) else None
+    statuses_cfg = ((cfg.get("battle") or {}).get("statuses") or {})
+    for sid, sc in statuses_cfg.items():
+        if not isinstance(sc, dict):
+            _add(errors, src, f"battle.statuses[{sid}]",
+                 f"status config harus dict, ditemukan: {type(sc).__name__}.")
+            continue
+        kind = sc.get("kind")
         if kind not in STATUS_KINDS:
             _add(errors, src, f"battle.statuses[{sid}].kind",
                  f"jenis status tak dikenal: '{kind}'.", STATUS_KINDS)
+        max_dur = sc.get("max_duration")
+        if max_dur is None:
+            _add(errors, src, f"battle.statuses[{sid}].max_duration",
+                 f"max_duration wajib ada dan > 0.")
+        elif int(max_dur) <= 0:
+            _add(errors, src, f"battle.statuses[{sid}].max_duration",
+                 f"max_duration harus > 0, ditemukan: {max_dur}.")
 
     # aturan #3 (tambahan): arcs[].endings[].condition → kunci kondisi valid
     for arc in cfg.get("arcs", []) or []:
@@ -774,6 +786,12 @@ def _validate_csv(registry, errors) -> None:
             if gpct_val < 0 or gpct_val > 80:
                 _add(errors, "techniques.csv", f"technique '{tid}'.guard_pct",
                      f"guard_pct harus 0-80, ditemukan: {gpct_val}.")
+        apply_st = tek.get("apply_status", "")
+        if apply_st:
+            statuses_keys = set(((cfg.get("battle") or {}).get("statuses") or {}).keys())
+            if apply_st not in statuses_keys:
+                _add(errors, "techniques.csv", f"technique '{tid}'.apply_status",
+                     f"status tak dikenal: '{apply_st}'.", sorted(statuses_keys))
 
 
 def _validate_key_items(registry, errors) -> None:

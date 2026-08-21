@@ -21,8 +21,13 @@ from .state import GameState
 # Jenis teknik yang didukung engine — satu sumber kebenaran untuk validator.
 TECHNIQUE_KINDS = frozenset({"attack", "defend", "heal"})
 
-# Jenis status effect yang didukung engine.
-STATUS_KINDS = frozenset({"dot", "stun"})
+# Jenis status effect yang didukung engine — satu sumber kebenaran untuk validator.
+# dot = damage per turn, stun = skip turn, debuff = kurangi stat,
+# hot = heal per turn, buff = tambah stat/damage reduction.
+STATUS_KINDS = frozenset({"dot", "stun", "debuff", "hot", "buff"})
+
+# Batas atas damage reduction (guard_pct + guard buff + passive) — mencegah invulnerability.
+MAX_DAMAGE_REDUCTION = 75
 
 # Himpunan elemen yang didukung engine — satu sumber kebenaran untuk validator.
 SUPPORTED_ELEMENTS = frozenset({"logam", "kayu", "tanah", "air", "api", "angin", "petir", "kosong"})
@@ -221,6 +226,9 @@ class BattleEngine:
         foe_speed = max((f.get("speed", 0) for f in b["foes"] if f["hp"] > 0), default=0)
         foe_first = speed_order and foe_speed > pc["speed"]
         if foe_first:
+            for foe in b["foes"]:
+                if foe["hp"] > 0:
+                    self._apply_foe_statuses(foe, b)
             self._enemy_turn(pc, b)
             if pc["hp"] <= 0:
                 self._regen_foes(b)
@@ -252,6 +260,9 @@ class BattleEngine:
         if not b["over"] and self._all_dead(b):
             return self._victory(b, pc)
         if not b["over"] and not foe_first:
+            for foe in b["foes"]:
+                if foe["hp"] > 0:
+                    self._apply_foe_statuses(foe, b)
             self._enemy_turn(pc, b)
         self._regen_foes(b)
         if not b["over"] and pc["hp"] <= 0:
@@ -308,9 +319,29 @@ class BattleEngine:
         growth = float(self.reg.config.get("cultivation", {}).get("technique_power_growth_per_level", 0.0))
         power = int(int(tek["power"]) * (1 + (lvl - 1) * growth))
         if kind == "attack":
-            dmg, crit = self._calc_damage(pc["attack"] + power, b["foes"][0]["defense"], tek.get("element"), b["foes"][0].get("element"))
+            # Apply weaken debuff to attack
+            atk = pc["attack"] + power
+            pst = b.get("player_statuses", {})
+            cfg = self._status_config()
+            if "weaken" in pst:
+                weaken_cfg = cfg.get("weaken", {})
+                atk = max(1, int(atk * float(weaken_cfg.get("atk_mult", 1.0))))
+            # Apply focus buff to power
+            if "focus" in pst:
+                focus_cfg = cfg.get("focus", {})
+                atk = int(atk * float(focus_cfg.get("power_mult", 1.0)))
+                del pst["focus"]  # consumed
+                add_log(self.state, "battle", "Fokus terpakai!")
+            # Apply expose debuff to foe defense
+            foe_def = b["foes"][0]["defense"]
+            if "expose" in b.get("foe_statuses", {}):
+                expose_cfg = cfg.get("expose", {})
+                foe_def = max(0, int(foe_def * float(expose_cfg.get("def_mult", 1.0))))
+            dmg, crit = self._calc_damage(atk, foe_def, tek.get("element"), b["foes"][0].get("element"))
             b["foes"][0]["hp"] -= dmg
-            add_log(self.state, "battle", f"{tek['name']}! {b['foes'][0]['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
+            add_log(self.state, "battle", f"{tek['name']}! {b["foes"][0]["name"]} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
+            # Secondary effect: apply status dari data teknik
+            self._apply_technique_status(b, b["foes"][0], tek)
         elif kind == "defend":
             # guard_pct dibaca langsung dari data — TIDAK scale dengan level.
             # Alasan: guard_pct=55 × 1.15^4 = 88% → near invulnerability.
@@ -322,6 +353,63 @@ class BattleEngine:
             heal = min(power, pc["hp_max"] - pc["hp"])
             pc["hp"] += heal
             add_log(self.state, "battle", f"{tek['name']} memulihkan {heal} HP.")
+            # Secondary effect: apply status dari data teknik (regen, dst)
+            self._apply_technique_status(b, pc, tek, target_is_player=True)
+
+    def _apply_technique_status(self, b: dict, target: dict, tek: dict,
+                                 target_is_player: bool = False) -> None:
+        """Apply secondary effect dari teknik (apply_status field di CSV).
+        Stacking rules: tidak stack magnitude; reapply → refresh duration."""
+        sid = tek.get("apply_status", "")
+        if not sid:
+            return
+        chance = float(tek.get("status_chance", 0) or 0)
+        if chance > 0 and random.random() * 100 >= chance:
+            return
+        sc = self._status_config().get(sid)
+        if not sc:
+            return
+        duration = int(tek.get("status_duration", 0) or sc.get("max_duration", 1))
+        max_dur = int(sc.get("max_duration", duration))
+        duration = min(duration, max_dur)
+        # Stacking: refresh duration (tidak stack magnitude)
+        if target_is_player:
+            st = b.setdefault("player_statuses", {})
+        else:
+            st = b.setdefault("foe_statuses", {})
+        if sid in st:
+            st[sid] = max(st[sid], duration)  # refresh ke max
+        else:
+            st[sid] = duration
+        add_log(self.state, "battle", f"{target.get('name', 'Target')} terkena {sc.get('name', sid)}!")
+
+    def _apply_foe_statuses(self, foe: dict, b: dict) -> None:
+        """Proses status aktif di awal giliran musuh. Tick durasi + apply effects."""
+        st = b.get("foe_statuses", {})
+        if not st:
+            return
+        cfg = self._status_config()
+        for sid in list(st.keys()):
+            sc = cfg.get(sid)
+            if not sc:
+                continue
+            kind = sc.get("kind")
+            if kind not in STATUS_KINDS:
+                del st[sid]
+                continue
+            if kind == "dot":
+                dmg = int(sc.get("power", 0))
+                foe["hp"] -= dmg
+                add_log(self.state, "battle", f"{foe['name']} Terbakar! Kehilangan {dmg} HP.")
+            elif kind == "hot":
+                heal_pct = float(sc.get("heal_pct", 0))
+                heal = max(1, int(foe.get("hp_max", foe["hp"]) * heal_pct / 100))
+                foe["hp"] = min(foe.get("hp_max", foe["hp"]), foe["hp"] + heal)
+                add_log(self.state, "battle", f"{foe['name']} Regenerasi! Memulihkan {heal} HP.")
+            # Tick durasi
+            st[sid] -= 1
+            if st[sid] <= 0:
+                del st[sid]
 
     def _use_item(self, pc: dict, b: dict, iid: str | None) -> None:
         if not iid or self.state.inventory.get(iid, 0) < 1:
@@ -352,22 +440,30 @@ class BattleEngine:
         return self.reg.config.get("battle", {}).get("statuses", {}) or {}
 
     def _apply_player_statuses(self, pc: dict, b: dict) -> bool:
-        """Proses status aktif di awal giliran pemain. Return True bila terpana (stun)."""
+        """Proses status aktif di awal giliran pemain. Return True bila terpana (stun).
+
+        Stacking rules (Fase 1):
+        - DoT (dot): tidak stack damage; reapply → duration diperpanjang; max = max_duration
+        - Debuff: tidak stack magnitude; reapply → refresh duration ke max
+        - Stun: tidak stack; refresh duration
+        - Buff: tidak stack magnitude; reapply → refresh duration
+        - Duration tick: kurangi 1 setiap turn, hapus saat <= 0
+        """
         st = b.get("player_statuses", {})
         if not st:
             return False
         cfg = self._status_config()
         stunned = False
-        for sid, _dur in list(st.items()):
+        for sid in list(st.keys()):
             sc = cfg.get(sid)
             if not sc:
                 continue
             kind = sc.get("kind")
-            # Fix audit v3 §1.5: status kind tak dikenal dilaporkan + diabaikan,
-            # tidak menempel-inert (tanpa efek diam-diam).
+            # Fix audit v3 §1.5: status kind tak dikenal dilaporkan + diabaikan.
             if kind not in STATUS_KINDS:
                 add_log(self.state, "battle",
                         f"Efek '{sc.get('name', sid)}' (kind '{kind}') tak dikenal — diabaikan.")
+                del st[sid]
                 continue
             if kind == "dot":
                 dmg = int(sc.get("power", 0))
@@ -375,10 +471,18 @@ class BattleEngine:
                 add_log(self.state, "battle", f"{sc.get('name', sid)}! Kehilangan {dmg} HP.")
             elif kind == "stun":
                 stunned = True
+            elif kind == "hot":
+                heal_pct = float(sc.get("heal_pct", 0))
+                heal = max(1, int(pc["hp_max"] * heal_pct / 100))
+                pc["hp"] = min(pc["hp_max"], pc["hp"] + heal)
+                add_log(self.state, "battle", f"{sc.get('name', sid)}! Memulihkan {heal} HP.")
+            # debuff/buff: efek diterapkan saat damage calculation, bukan di sini
         return stunned
 
     def _tick_player_statuses(self, b: dict, pre_round: set) -> None:
-        """Kurangi durasi status yang sudah aktif SEBELUM giliran ini; hapus yang habis."""
+        """Kurangi durasi status yang sudah aktif SEBELUM giliran ini; hapus yang habis.
+        Hanya tick status yang sudah ada sebelum giliran ini (pre_round).
+        Status baru (dari serangan musuh di giliran ini) menunggu giliran berikutnya."""
         st = b.get("player_statuses")
         if not st:
             return
@@ -390,7 +494,8 @@ class BattleEngine:
                 add_log(self.state, "battle", f"Efek {sc.get('name', sid) if sc else sid} hilang.")
 
     def _maybe_apply_status(self, b: dict, foe: dict) -> None:
-        """Serangan musuh yang kena ke pemain berpeluang menerapkan status (data-driven)."""
+        """Serangan musuh yang kena ke pemain berpeluang menerapkan status (data-driven).
+        Stacking rules: tidak stack magnitude; reapply → refresh duration."""
         sid = foe.get("status")
         chance = float(foe.get("status_chance", 0) or 0)
         if not sid or random.random() >= chance:
@@ -398,8 +503,15 @@ class BattleEngine:
         sc = self._status_config().get(sid)
         if not sc:
             return
+        duration = int(sc.get("duration", 1))
+        max_dur = int(sc.get("max_duration", duration))
+        duration = min(duration, max_dur)
         st = b.setdefault("player_statuses", {})
-        st[sid] = int(sc.get("duration", 1))  # replace (tidak menumpuk)
+        # Stacking: refresh duration (tidak stack magnitude)
+        if sid in st:
+            st[sid] = max(st[sid], duration)
+        else:
+            st[sid] = duration
         add_log(self.state, "battle", f"Kau terkena {sc.get('name', sid)}!")
 
     # ---------- giliran musuh ----------
@@ -418,9 +530,27 @@ class BattleEngine:
                 continue
             target = random.choice(targets)
             if target == "player":
-                dmg, crit = self._calc_damage(foe["attack"], pc["defense"], foe.get("element"), None)
+                # Hitung defense dengan debuff (expose)
+                pc_def = pc["defense"]
+                pst = b.get("player_statuses", {})
+                cfg = self._status_config()
+                if "expose" in pst:
+                    expose_cfg = cfg.get("expose", {})
+                    pc_def = max(0, int(pc_def * float(expose_cfg.get("def_mult", 1.0))))
+                dmg, crit = self._calc_damage(foe["attack"], pc_def, foe.get("element"), None)
+                # Mitigation: multiplicative stacking (guard_pct + guard buff + passive)
+                reductions = []
                 if b["player_guard"]:
-                    dmg = max(1, int(dmg * (100 - b["player_guard"]) / 100))
+                    reductions.append(b["player_guard"] / 100)
+                if "guard" in pst:
+                    guard_cfg = cfg.get("guard", {})
+                    reductions.append(float(guard_cfg.get("dmg_reduction", 0)) / 100)
+                if reductions:
+                    total_reduction = 1.0
+                    for r in reductions:
+                        total_reduction *= (1 - r)
+                    total_reduction = max(1 - MAX_DAMAGE_REDUCTION / 100, total_reduction)
+                    dmg = max(1, int(dmg * total_reduction))
                 pc["hp"] -= dmg
                 add_log(self.state, "battle", f"{foe['name']} menyerang! Kau kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
                 self._maybe_apply_status(b, foe)

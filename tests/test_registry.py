@@ -46,7 +46,7 @@ def test_validator_kind_sets_match_registry_keys():
     assert set(OBJECTIVE_HANDLERS) == {"talk", "defeat", "gather", "reach", "choose",
                                        "spar", "advance_time", "rest"}
     assert TECHNIQUE_KINDS == {"attack", "defend", "heal"}
-    assert STATUS_KINDS == {"dot", "stun"}
+    assert STATUS_KINDS == {"dot", "stun", "debuff", "hot", "buff"}
     assert CONDITION_KEYS == set(CONDITION_CHECKERS)
     # validator memakai set yang sama (bukan salinan) — cek via import langsung
     from src.validate import (
@@ -162,13 +162,13 @@ def test_technique_unknown_kind_does_not_waste_qi(session, registry):
 
 def test_unknown_status_kind_reported_not_inert(session, registry):
     """Fix temuan audit v3 §1.5: status kind tak dikenal dilaporkan, tidak menempel-inert."""
-    registry.config.setdefault("battle", {})["statuses"]["st_buff"] = {
-        "name": "Aura Misterius", "kind": "buff", "duration": 3,
+    registry.config.setdefault("battle", {})["statuses"]["st_mystery"] = {
+        "name": "Aura Misterius", "kind": "mystery", "duration": 3,
     }
     session.apply_action({"type": "move", "to": registry.hunts[0]["location"]})
     session.apply_action({"type": "hunt"})
     b = session.state.pending_battle
-    b["player_statuses"] = {"st_buff": 2}
+    b["player_statuses"] = {"st_mystery": 2}
     pc = player_combat(session.state, registry)
     hp_before = pc["hp"]
 
@@ -177,7 +177,7 @@ def test_unknown_status_kind_reported_not_inert(session, registry):
     assert stunned is False, "status tak dikenal tidak boleh stun"
     assert pc["hp"] == hp_before, "status tak dikenal tidak boleh menimbulkan efek"
     msgs = "\n".join(e["text"] for e in session.state.log)
-    assert "Aura Misterius" in msgs and "buff" in msgs and "tak dikenal" in msgs
+    assert "Aura Misterius" in msgs and "mystery" in msgs and "tak dikenal" in msgs
 
 
 # ---------- 4. field wajib efek — ditolak validator ----------

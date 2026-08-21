@@ -54,7 +54,7 @@ def test_battle_item_heal_defend_stun_flee(tmp_path, monkeypatch):
     reg, s = _sess(tmp_path, quests=[Q()], npcs=[], techniques=teks,
                    items=[{"id": "i1", "name": "I1", "type": "consumable", "hp_restore": 10}],
                    enemies=[{"id": "e1", "name": "E1", "hp": 100, "attack": 0, "defense": 0}],
-                   config_extra={"battle": {"statuses": {"stun1": {"name": "Pana", "kind": "stun", "duration": 2}}}})
+                   config_extra={"battle": {"statuses": {"stun1": {"name": "Pana", "kind": "stun", "duration": 2, "max_duration": 5}}}})
     s.state.player.techniques.extend(["t_heal", "t_def"])
     s.state.inventory["i1"] = 3
     s.state.player.hp = 30
