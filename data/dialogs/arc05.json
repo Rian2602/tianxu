@@ -82,6 +82,14 @@
           ],
           "condition": {"flag": {"key": "state_memory_a02_m01_reinterpretation", "value": "connected"}}
         },
+        "n_investigated_corridor": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau kembali. Aku dengar kau sudah menyelidiki Koridor Terbakar — bahwa ada yang ditutupi. Aku... aku juga pernah merasakan sesuatu yang aneh tentang koridor itu. Mungkin kita berdua melihat hal yang sama.",
+          "choices": [
+            {"label": "Kita harus mencari tahu bersama.", "next": "n2"}
+          ],
+          "condition": {"flag": {"key": "state_memory_a01_m01_reinterpretation", "value": "coverup"}}
+        },
         "n_spread": {
           "speaker": "npc:npc_lin_yue",
           "text": "Kau kembali. Tapi situasinya berubah — beberapa murid sudah tahu tentang kebenaran yang kau bagikan. Ada yang marah, ada yang ketakutan. Grandmaster tidak senang. Apa yang kau lakukan, kau lakukan tanpa meminta izin siapa pun.",
@@ -131,6 +139,106 @@
       "id": "dlg_a05_branch_family",
       "start": "n1",
       "nodes": {
+        "n_lin_yue_close": {
+          "speaker": "narration",
+          "text": "Lin Yue menatapmu — matanya penuh kepercayaan yang sudah kau bangun sejak hari pertama. Kau tahu persis apa artinya baginya jika kau memilih melindungi murid-murid. Tapi kau juga tahu apa artinya jika kau memilih jalan lain.",
+          "condition": {"relation_min": {"npc": "npc_lin_yue", "value": 6}},
+          "choices": [
+            {
+              "label": "Lindungi murid-murid — pertahankan Tian Xu dari dalam (Lin Yue).",
+              "option": "protect",
+              "effects": [
+                {"type": "flag", "key": "state_lin_yue_status", "value": "loyal"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "separated"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 3}
+              ]
+            },
+            {
+              "label": "Hancurkan sistem — Tian Xu layak runtuh (Shen Luo).",
+              "option": "destroy",
+              "effects": [
+                {"type": "flag", "key": "state_shen_luo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "loyal"},
+                {"type": "flag", "key": "state_lin_yue_status", "value": "separated"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_shen_luo", "value": 3}
+              ]
+            },
+            {
+              "label": "Cari kebenaran penuh — apa pun harganya (Mei Ruo).",
+              "option": "truth",
+              "effects": [
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_lin_yue_status", "value": "loyal"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "separated"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 3}
+              ]
+            },
+            {
+              "label": "Aku tidak tahu lagi — aku hanya tidak mau kehilangan kalian.",
+              "option": "despair",
+              "effects": [
+                {"type": "flag", "key": "state_lin_yue_status", "value": "separated"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "separated"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "disillusioned"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "disillusioned"}
+              ]
+            }
+          ]
+        },
+        "n_shen_luo_close": {
+          "speaker": "narration",
+          "text": "Shen Luo menatapmu — matanya penuh harapan yang sudah lama ia sembunyikan. Kau tahu persis apa artinya baginya jika kau memilih menghancurkan sistem. Tapi kau juga tahu apa artinya jika kau memilih jalan lain.",
+          "condition": {"relation_min": {"npc": "npc_shen_luo", "value": 6}},
+          "choices": [
+            {
+              "label": "Hancurkan sistem — Tian Xu layak runtuh (Shen Luo).",
+              "option": "destroy",
+              "effects": [
+                {"type": "flag", "key": "state_shen_luo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "loyal"},
+                {"type": "flag", "key": "state_lin_yue_status", "value": "separated"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_shen_luo", "value": 3}
+              ]
+            },
+            {
+              "label": "Lindungi murid-murid — pertahankan Tian Xu dari dalam (Lin Yue).",
+              "option": "protect",
+              "effects": [
+                {"type": "flag", "key": "state_lin_yue_status", "value": "loyal"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "separated"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_lin_yue", "value": 3}
+              ]
+            },
+            {
+              "label": "Cari kebenaran penuh — apa pun harganya (Mei Ruo).",
+              "option": "truth",
+              "effects": [
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "loyal"},
+                {"type": "flag", "key": "state_lin_yue_status", "value": "loyal"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "separated"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "disillusioned"},
+                {"type": "relation", "npc": "npc_mei_ruo", "value": 3}
+              ]
+            },
+            {
+              "label": "Aku tidak tahu lagi — aku hanya tidak mau kehilangan kalian.",
+              "option": "despair",
+              "effects": [
+                {"type": "flag", "key": "state_lin_yue_status", "value": "separated"},
+                {"type": "flag", "key": "state_shen_luo_status", "value": "separated"},
+                {"type": "flag", "key": "state_mei_ruo_status", "value": "disillusioned"},
+                {"type": "flag", "key": "state_gu_han_status", "value": "disillusioned"}
+              ]
+            }
+          ]
+        },
         "n1": {
           "speaker": "narration",
           "text": "Krisis ini memaksa kalian memilih. Bukan satu pilihan benar — hanya pilihan yang menentukan siapa yang tetap berdiri di sisimu.",

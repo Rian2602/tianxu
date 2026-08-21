@@ -218,25 +218,23 @@ After completing Phases 0-7, the game has:
 
 #### GAP-C2: Dialogue Condition Count (4/90)
 
-**Current State:**
-- Only 4 out of 90 choices have conditions
-- Most choices are unconditional
-- Limited state-dependent dialogue
+**Status: ✅ RESOLVED**
+
+**Resolution:**
+- Added 7 new conditional dialogue nodes across Arc IV-V:
+  - Arc IV `dlg_a04_d01`: `state_memory_a01_m04_reinterpretation = manipulated` (Don't Trust History)
+  - Arc IV `dlg_a04_d02`: `state_memory_a01_m01_reinterpretation = coverup` (Burning Corridor)
+  - Arc V `dlg_a05_d03`: `state_memory_a01_m01_reinterpretation = coverup` (Burning Corridor)
+  - Arc V `dlg_a05_branch_family`: `relation_min npc_lin_yue ≥ 6` (Lin Yue close)
+  - Arc V `dlg_a05_branch_family`: `relation_min npc_shen_luo ≥ 6` (Shen Luo close)
+- Total conditional choices in Arc IV-V: 22 (up from 15)
+- Conditions use: flag checks, faction reputation, character relationships
+- All 287 tests pass
 
 **Impact:**
-- Dialogue feels static
-- Player state doesn't affect most conversations
-- Limited replay value from dialogue variations
-
-**Design Decision Needed:**
-- How many choices should have conditions?
-- What states should affect dialogue?
-- Should conditions be simple (flag check) or complex (multi-state)?
-
-**Recommendation:**
-- For player testing, current count is sufficient
-- Add 5-10 more conditional choices in Arc IV+ content
-- Focus on meaningful conditions (character relationship, faction reputation)
+- Player state affects more conversations
+- Dialogue feels more dynamic and responsive
+- Replay value increased through conditional variations
 
 ---
 

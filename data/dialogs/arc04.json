@@ -45,6 +45,14 @@
           ],
           "condition": {"flag": {"key": "state_memory_a01_m02_reinterpretation", "value": "past_life"}}
         },
+        "n_investigated_history": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah menyelidiki 'Jangan Percaya Sejarah' — dan kau percaya sejarah Tian Xu memang dimanipulasi. Sekarang aku ingin menunjukkan bukti yang menghubungkan pemahamanmu itu dengan arsip terlarang.",
+          "choices": [
+            {"label": "Aku ingin melihat buktinya.", "next": "n_compare"}
+          ],
+          "condition": {"flag": {"key": "state_memory_a01_m04_reinterpretation", "value": "manipulated"}}
+        },
         "n_default": {
           "speaker": "npc:npc_mei_ruo",
           "text": "Aku menemukan sesuatu di arsip — ruangan yang tidak tercatat. Di bawah arsip publik. Aku tidak berani menyelidikinya sendirian.",
@@ -78,6 +86,14 @@
             {"label": "(Baca catatan pendiri)", "next": "n_v3"}
           ],
           "condition": {"flag": {"key": "state_memory_a01_m02_reinterpretation", "value": "past_life"}}
+        },
+        "n_investigated_corridor": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ada satu lagi — lebih dalam dari yang lain. Kau sudah tahu tentang Koridor Terbakar — bahwa ada yang ditutupi. Catatan pendiri ini mungkin menjelaskan APA yang ditutupi. Aku tidak berani menyentuhnya. Ini milikmu untuk dibaca.",
+          "choices": [
+            {"label": "(Baca catatan pendiri)", "next": "n_v3"}
+          ],
+          "condition": {"flag": {"key": "state_memory_a01_m01_reinterpretation", "value": "coverup"}}
         },
         "n1": {
           "speaker": "npc:npc_mei_ruo",
