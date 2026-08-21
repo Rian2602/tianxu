@@ -319,6 +319,8 @@ class BattleEngine:
                 self._regen_foes(b)
                 return self._ko(b)
         if not stunned:
+            # Reset synergy tracking setiap awal giliran pemain
+            b["last_technique_tags"] = []
             a = action.get("action")
             if a == "attack":
                 self._attack(pc, b, b["foes"][0])
@@ -472,6 +474,7 @@ class BattleEngine:
             # Mastery XP: +1 per penggunaan teknik
             gain_mastery_xp(self.state, tek.get("element", ""))
         # Track tags untuk synergy teknik berikutnya
+        # (reset di awal giliran player — lihat player_action)
         tags_str = tek.get("tags", "") or ""
         b["last_technique_tags"] = [t.strip() for t in tags_str.split(",") if t.strip()]
 

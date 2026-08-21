@@ -1056,6 +1056,12 @@ class GameSession:
                 add_log(self.state, "system",
                         f"Fusion ini membutuhkan ranah {req_realm} atau lebih tinggi.")
                 return self.view()
+        # Check if player already has the result technique
+        result_id = recipe.get("result", "")
+        if result_id in self.state.player.techniques:
+            add_log(self.state, "system",
+                    f"Kau sudah memiliki teknik hasil fusion.")
+            return self.view()
         # Check all required techniques are owned
         requires = recipe.get("requires", [])
         owned = set(self.state.player.techniques)
