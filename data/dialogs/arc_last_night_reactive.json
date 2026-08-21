@@ -36,6 +36,22 @@
             {"label": "Aku mengerti.", "next": "n_end"}
           ]
         },
+        "n_orthodox_arc_done": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau datang. Aku ingat tugas yang pernah kau selesaikan untuk kami — menyelidiki gangguan formasi. Saat itu, kau membuktikan dirimu sebagai orang yang bisa dipercaya. Malam ini, aku butuh kepercayaan itu sekali lagi.",
+          "condition": {"flag": {"key": "flag_orthodox_arc_complete", "value": true}},
+          "choices": [
+            {"label": "Aku akan menyelesaikannya.", "next": "n_end"}
+          ]
+        },
+        "n_reform_arc_done": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau datang. Aku tahu kau sudah menyelesaikan investigasi dengan Shen Luo — kau mengumpulkan bukti, menemukan arsip tersembunyi. Aku tidak setuju dengan metodemu, tapi aku menghargai keberanianmu. Malam ini, gunakan keberanian itu.",
+          "condition": {"flag": {"key": "flag_reform_arc_complete", "value": true}},
+          "choices": [
+            {"label": "Aku akan menggunakannya.", "next": "n_end"}
+          ]
+        },
         "n_end": {
           "speaker": "npc:npc_grandmaster",
           "text": "Pergilah. Dan apa pun yang kau pilih di bawah sana — aku akan menerimanya. Kau sudah membuktikan dirimu.",
@@ -113,6 +129,14 @@
           "condition": {"flag": {"key": "state_memory_a02_m01_reinterpretation", "value": "connected"}},
           "choices": [
             {"label": "Aku akan menemukan jawabannya.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_corridor_done": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelesaikan investigasi Koridor Terbakar bersamaku — langkah awal dari seluruh perjalanan ini. Malam ini, kita akan menemukan kebenaran terakhir. Terima kasih sudah memulainya.",
+          "condition": {"flag": {"key": "flag_memory_a01_m01_investigated", "value": true}},
+          "choices": [
+            {"label": "Terima kasih juga, Mei Ruo.", "next": "n_end"}
           ]
         },
         "n1": {

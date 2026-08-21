@@ -44,6 +44,14 @@
       {
        "label": "Kami siap bertarung bersama.",
        "next": "n2"
+      },
+      {
+       "label": "Aku akan memimpin strategi.",
+       "effects": [
+        {"type": "flag", "key": "state_team_spar_strategy", "value": "leader"},
+        {"type": "relation", "npc": "npc_lin_yue", "value": 1}
+       ],
+       "next": "n2"
       }
      ]
     },
@@ -53,6 +61,14 @@
      "choices": [
       {
        "label": "Kami mengerti.",
+       "next": "n3"
+      },
+      {
+       "label": "Kami sudah latihan bersama. Kami tahu kekuatan masing-masing.",
+       "effects": [
+        {"type": "flag", "key": "state_team_spar_strategy", "value": "coordination"},
+        {"type": "relation", "npc": "npc_shen_luo", "value": 1}
+       ],
        "next": "n3"
       }
      ]

@@ -62,6 +62,15 @@
       "npc": "npc_lin_yue",
       "start": "n1",
       "nodes": {
+        "n_has_quest": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau lagi. Ada sesuatu yang ingin kubicarakan — aku butuh bantuanmu. Tapi kita bisa bicara nanti kalau kau sedang sibuk.",
+          "choices": [
+            {"label": "Aku punya waktu. Apa yang terjadi?", "next": "n1"},
+            {"label": "Nanti saja, aku harus menyelesaikan sesuatu dulu.", "next": "n_end"}
+          ],
+          "condition": {"quest_active": "quest_char_lin_yue_001"}
+        },
         "n1": {
           "speaker": "npc:npc_lin_yue",
           "text": "Kau murid baru juga? Aku Lin Yue. Gerakan dasarmu tadi... anehnya terlihat seperti orang yang sudah pernah berlatih.",
@@ -74,15 +83,20 @@
           "speaker": "npc:npc_lin_yue",
           "text": "Kalau begitu mungkin itu firasat. Di Tian Xu, banyak hal tidak seperti yang terlihat. Sampai jumpa di pelajaran.",
           "choices": []
-        },
-        "n3": {
+        },        "n3": {
           "speaker": "npc:npc_lin_yue",
           "text": "Hmm, mungkin. Tapi hati-hati — 'berbakat' di sini bisa berarti banyak hal, dan tidak semuanya baik.",
+          "choices": []
+        },
+        "n_end": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Baiklah. Kalau kau sudah selesai, temui aku lagi. Aku akan menunggu.",
           "choices": []
         }
       }
     },
     {
+
       "id": "dlg_lin_yue_merchant_letter",
       "npc": "npc_lin_yue",
       "start": "n1",
