@@ -31,7 +31,7 @@ from __future__ import annotations
 
 from collections import Counter
 
-from .engine.battle import STATUS_KINDS, TECHNIQUE_KINDS
+from .engine.battle import STATUS_KINDS, SUPPORTED_ELEMENTS, TECHNIQUE_KINDS
 from .engine.dialog import (
     CONDITION_KEYS,
     CONDITION_NUMERIC_KEYS,
@@ -714,6 +714,10 @@ def _validate_companions(registry, errors) -> None:
             _add(errors, src, ctx, "companion tanpa field 'id'.")
         if not c.get("name"):
             _add(errors, src, ctx, "companion wajib punya 'name'.")
+        elem = c.get("element", "")
+        if elem and elem not in SUPPORTED_ELEMENTS:
+            _add(errors, src, f"{ctx}.element",
+                 f"elemen tak dikenal: '{elem}'.", sorted(SUPPORTED_ELEMENTS))
 
 
 def _validate_recipes(registry, errors) -> None:
@@ -740,13 +744,18 @@ def _validate_csv(registry, errors) -> None:
         if it.get("type") not in ITEM_TYPES:
             _add(errors, "items.csv", f"item '{iid}'.type",
                  f"jenis item tak dikenal: '{it.get('type')}'.", ITEM_TYPES)
-    # enemies.csv — drop_item → item valid
+    # enemies.csv — drop_item → item valid; element wajib
     for en in registry.enemies_raw:
         eid = en.get("id", "?")
         if en.get("drop_item") and en["drop_item"] not in registry.items:
             _add(errors, "enemies.csv", f"enemy '{eid}'.drop_item",
                  f"item tak dikenal: '{en['drop_item']}'.")
-    # techniques.csv — aturan #4: kind tak dikenal; realm_required → ranah valid
+        elem = en.get("element", "")
+        if elem and elem not in SUPPORTED_ELEMENTS:
+            _add(errors, "enemies.csv", f"enemy '{eid}'.element",
+                 f"elemen tak dikenal: '{elem}'.", sorted(SUPPORTED_ELEMENTS))
+    # techniques.csv — aturan #4: kind tak dikenal; realm_required → ranah valid;
+    # element ∈ SUPPORTED_ELEMENTS; guard_pct ∈ [0, 80]
     for tek in registry.techniques_raw:
         tid = tek.get("id", "?")
         if tek.get("kind") not in TECHNIQUE_KINDS:
@@ -755,6 +764,16 @@ def _validate_csv(registry, errors) -> None:
         if tek.get("realm_required") and tek["realm_required"] not in registry.realms:
             _add(errors, "techniques.csv", f"technique '{tid}'.realm_required",
                  f"ranah tak dikenal: '{tek['realm_required']}'.")
+        elem = tek.get("element", "")
+        if elem and elem not in SUPPORTED_ELEMENTS:
+            _add(errors, "techniques.csv", f"technique '{tid}'.element",
+                 f"elemen tak dikenal: '{elem}'.", sorted(SUPPORTED_ELEMENTS))
+        gpct = tek.get("guard_pct", "")
+        if gpct not in ("", "0"):
+            gpct_val = int(gpct)
+            if gpct_val < 0 or gpct_val > 80:
+                _add(errors, "techniques.csv", f"technique '{tid}'.guard_pct",
+                     f"guard_pct harus 0-80, ditemukan: {gpct_val}.")
 
 
 def _validate_key_items(registry, errors) -> None:

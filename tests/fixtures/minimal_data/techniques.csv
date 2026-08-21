@@ -1,3 +1,3 @@
-id,name,kind,power,qi_cost,realm_required,element
-teknik_dasar,Teknik Dasar,attack,5,3,realm_chuji,
-tebasan,Tebasan,attack,6,3,realm_chuji,
+id,name,kind,power,qi_cost,realm_required,element,guard_pct,tags
+teknik_dasar,Teknik Dasar,attack,5,3,realm_chuji,,,"offensive"
+tebasan,Tebasan,attack,6,3,realm_chuji,,,"offensive"

@@ -1,6 +1,6 @@
-id,name,kind,power,qi_cost,realm_required,element
-teknik_dasar,Teknik Dasar,attack,5,3,realm_chuji,
-teknik_wuxin,Teknik Pelepasan,defend,3,2,realm_chuji,
-teknik_jianxin,Tebasan Pedang Jantung,attack,7,4,realm_chuji,
-teknik_yanzhi,Analisa Prinsip,heal,4,3,realm_chuji,
-teknik_liuguang,Teknik Adaptasi,defend,4,2,realm_chuji,
+id,name,kind,power,qi_cost,realm_required,element,guard_pct,tags
+teknik_dasar,Teknik Dasar,attack,5,3,realm_chuji,,,"offensive"
+teknik_wuxin,Teknik Pelepasan,defend,3,2,realm_chuji,tanah,30,"defensive"
+teknik_jianxin,Tebasan Pedang Jantung,attack,7,4,realm_chuji,logam,,"pedang,offensive"
+teknik_yanzhi,Analisa Prinsip,heal,4,3,realm_chuji,kayu,,"heal"
+teknik_liuguang,Teknik Adaptasi,defend,4,2,realm_chuji,air,40,"defensive"

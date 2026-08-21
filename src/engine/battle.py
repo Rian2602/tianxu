@@ -24,6 +24,12 @@ TECHNIQUE_KINDS = frozenset({"attack", "defend", "heal"})
 # Jenis status effect yang didukung engine.
 STATUS_KINDS = frozenset({"dot", "stun"})
 
+# Himpunan elemen yang didukung engine — satu sumber kebenaran untuk validator.
+SUPPORTED_ELEMENTS = frozenset({"logam", "kayu", "tanah", "air", "api", "angin", "petir", "kosong"})
+
+# Elemen netral — tidak counter apapun, tidak dicounter.
+NEUTRAL_ELEMENTS = frozenset({"angin", "petir", "kosong"})
+
 
 
 
@@ -125,6 +131,8 @@ DEFAULT_ELEMENT_ADVANTAGE = {
     "air": "api",
     "api": "logam",
 }
+# Neutral elements: not in advantage map → mult stays 1.0 (handled by _calc_damage)
+
 
 
 def _calc_damage(
@@ -304,8 +312,12 @@ class BattleEngine:
             b["foes"][0]["hp"] -= dmg
             add_log(self.state, "battle", f"{tek['name']}! {b['foes'][0]['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
         elif kind == "defend":
-            b["player_guard"] = power
-            add_log(self.state, "battle", f"{tek['name']} — damage masuk dikurangi {power}%.")
+            # guard_pct dibaca langsung dari data — TIDAK scale dengan level.
+            # Alasan: guard_pct=55 × 1.15^4 = 88% → near invulnerability.
+            pct = int(tek.get("guard_pct", 0)) or power
+            pct = min(pct, 80)  # cap individual guard_pct
+            b["player_guard"] = pct
+            add_log(self.state, "battle", f"{tek['name']} — damage masuk dikurangi {pct}%.")
         elif kind == "heal":
             heal = min(power, pc["hp_max"] - pc["hp"])
             pc["hp"] += heal

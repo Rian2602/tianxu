@@ -3,7 +3,7 @@
     {
       "id": "companion_serigala",
       "name": "Serigala",
-      "element": "earth",
+      "element": "tanah",
       "base_hp": 20,
       "base_attack": 4,
       "base_defense": 3,
@@ -12,7 +12,7 @@
     {
       "id": "companion_bangau",
       "name": "Bangau",
-      "element": "wind",
+      "element": "angin",
       "base_hp": 16,
       "base_attack": 6,
       "base_defense": 2,
@@ -21,7 +21,7 @@
     {
       "id": "companion_fenghuang",
       "name": "Fenghuang",
-      "element": "fire",
+      "element": "api",
       "base_hp": 18,
       "base_attack": 5,
       "base_defense": 3,
@@ -30,7 +30,7 @@
     {
       "id": "companion_ular_air",
       "name": "Ular Air",
-      "element": "water",
+      "element": "air",
       "base_hp": 17,
       "base_attack": 4,
       "base_defense": 2,
@@ -39,7 +39,7 @@
     {
       "id": "companion_baihu",
       "name": "Baihu",
-      "element": "metal",
+      "element": "logam",
       "base_hp": 18,
       "base_attack": 7,
       "base_defense": 2,
@@ -48,7 +48,7 @@
     {
       "id": "companion_qilin",
       "name": "Qilin",
-      "element": "wood",
+      "element": "kayu",
       "base_hp": 20,
       "base_attack": 3,
       "base_defense": 5,
@@ -57,7 +57,7 @@
     {
       "id": "companion_xuanwu",
       "name": "Xuanwu",
-      "element": "water",
+      "element": "air",
       "base_hp": 25,
       "base_attack": 2,
       "base_defense": 6,
@@ -66,7 +66,7 @@
     {
       "id": "companion_hundun",
       "name": "Hundun",
-      "element": "void",
+      "element": "kosong",
       "base_hp": 22,
       "base_attack": 3,
       "base_defense": 4,
@@ -75,7 +75,7 @@
     {
       "id": "companion_shenlong",
       "name": "Shen Long",
-      "element": "lightning",
+      "element": "petir",
       "base_hp": 19,
       "base_attack": 6,
       "base_defense": 3,
