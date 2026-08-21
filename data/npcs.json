@@ -23,7 +23,7 @@
     "hp_max": 35,
     "qi_max": 25
    },
-   "avatar": "/static/assets/img/npc/npc_xu_ming.svg"
+   "avatar": "/static/assets/img/npc_xu_ming.jpg"
   },
   {
    "id": "npc_lin_yue",
@@ -179,7 +179,7 @@
     "hp_max": 20,
     "qi_max": 30
    },
-   "avatar": "/static/assets/img/npc/npc_mei_ruo.svg"
+   "avatar": "/static/assets/img/npc_mei_ruo.jpg"
   },
   {
    "id": "npc_gu_han",
@@ -341,7 +341,7 @@
     "hp_max": 150,
     "qi_max": 80
    },
-   "avatar": "/static/assets/img/npc/npc_xu_zhiyuan.svg"
+   "avatar": "/static/assets/img/npc_xu_zhiyuan.jpg"
   },
   {
    "id": "npc_mo_chen",
