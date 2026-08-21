@@ -361,6 +361,7 @@ class QuestEngine:
             self.state.player.gold = int(oset["gold"])
         self._grant_companion(self.state.player.academy)
         self._grant_starter_kit(self.state.player.academy)
+        self._grant_passive(self.state.player.academy)
         self._complete_main(q["id"])
 
     def _grant_starter_kit(self, academy: str) -> None:
@@ -416,6 +417,21 @@ class QuestEngine:
         # backward compat
         self.state.companion = {"id": cid, "hp": hp_max, "active": True}
         add_log(self.state, "narration", f"{comp['name']} mendekat dan menempel padamu — binatang roh akademimu.")
+
+    def _grant_passive(self, academy: str) -> None:
+        """Akademi dengan passive matching source di passives.json memberi passive skill."""
+        if not self.reg.passives:
+            return
+        passive = next((p for p in self.reg.passives
+                        if p.get("source") == academy), None)
+        if not passive:
+            return
+        pid = passive["id"]
+        if pid in self.state.passives:
+            return  # sudah dimiliki
+        self.state.passives.append(pid)
+        add_log(self.state, "system",
+                f"Passive '{passive.get('name', pid)}' aktif — {passive.get('description', '')}.")
 
     def advance_time_target_met(self) -> None:
         now_abs = self.state.day * 24 + self.state.hour

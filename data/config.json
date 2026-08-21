@@ -46,7 +46,8 @@
           "id": "pil_qi",
           "count": 2
         }
-      ]
+      ],
+      "passive": "passive_flowing_qi"
     },
     {
       "id": "pavilion_jianxin",
@@ -61,7 +62,8 @@
           "id": "pil_qi",
           "count": 1
         }
-      ]
+      ],
+      "passive": "passive_sword_intent"
     },
     {
       "id": "pavilion_yanzhi",
@@ -76,7 +78,8 @@
           "id": "pil_qi",
           "count": 2
         }
-      ]
+      ],
+      "passive": "passive_phoenix_blood"
     },
     {
       "id": "pavilion_liuguang",
@@ -91,7 +94,8 @@
           "id": "pil_qi",
           "count": 1
         }
-      ]
+      ],
+      "passive": "passive_earth_guardian"
     }
   ],
   "cultivation": {

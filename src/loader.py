@@ -58,6 +58,11 @@ class DataRegistry:
             self.companions = self._json("companions.json")["companions"]
         except (FileNotFoundError, KeyError):
             pass
+        self.passives = []
+        try:
+            self.passives = self._json("passives.json")["passives"]
+        except (FileNotFoundError, KeyError):
+            pass
 
         # Key items — separate file for use effects (CSV can't handle nested JSON).
         # PER-INSTANCE (bukan global modul): dua DataRegistry dengan data dir

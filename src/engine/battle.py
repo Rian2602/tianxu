@@ -165,6 +165,60 @@ def gain_mastery_xp(state: GameState, element: str) -> None:
         state.element_mastery[element] += MASTERY_XP_PER_USE
 
 
+def get_player_passives(state: GameState, registry: DataRegistry) -> list[dict]:
+    """Return list of passive dicts yang dimiliki pemain."""
+    passive_ids = set(state.passives)
+    return [p for p in registry.passives if p.get("id") in passive_ids]
+
+
+def has_passive(state: GameState, passive_id: str) -> bool:
+    """Cek apakah pemain memiliki passive tertentu."""
+    return passive_id in state.passives
+
+
+def apply_passive_bonus(state: GameState, registry: DataRegistry, pc: dict, b: dict) -> None:
+    """Apply passive bonuses saat battle dimulai atau saat conditions terpenuhi.
+    Dipanggil di awal battle dan saat HP berubah."""
+    passives = get_player_passives(state, registry)
+    for p in passives:
+        effect = p.get("effect", "")
+        if effect == "qi_on_defend":
+            # +1 Qi saat defend — diterapkan saat _use_technique kind=defend
+            pass  # handled in _use_technique
+        elif effect == "heal_bonus_low_hp":
+            # +10% heal saat HP < 30% — diterapkan saat heal
+            pass  # handled in _use_technique kind=heal
+        elif effect == "damage_reduction_high_hp":
+            # +5% damage reduction saat HP > 70% — diterapkan saat damage
+            pass  # handled in _enemy_turn
+        elif effect == "bonus_damage_tag":
+            # +5% damage untuk teknik bertag — diterapkan saat attack
+            pass  # handled in _use_technique kind=attack
+
+
+def get_passive_bonus(state: GameState, registry: DataRegistry, effect: str, pc: dict = None, tek: dict = None) -> int:
+    """Return passive bonus value untuk effect tertentu."""
+    passives = get_player_passives(state, registry)
+    for p in passives:
+        if p.get("effect") != effect:
+            continue
+        if effect == "bonus_damage_tag" and tek:
+            tags = (tek.get("tags", "") or "").split(",")
+            if p.get("tag") in tags:
+                return int(p.get("value", 0))
+        elif effect == "heal_bonus_low_hp" and pc:
+            threshold = int(p.get("threshold_hp_pct", 30))
+            if pc.get("hp", 0) < pc.get("hp_max", 1) * threshold / 100:
+                return int(p.get("value", 0))
+        elif effect == "damage_reduction_high_hp" and pc:
+            threshold = int(p.get("threshold_hp_pct", 70))
+            if pc.get("hp", 0) > pc.get("hp_max", 1) * threshold / 100:
+                return int(p.get("value", 0))
+        elif effect == "qi_on_defend":
+            return int(p.get("value", 0))
+    return 0
+
+
 def _calc_damage(
     attack: int,
     defense: int,
@@ -366,6 +420,10 @@ class BattleEngine:
             if "expose" in b.get("foe_statuses", {}):
                 expose_cfg = cfg.get("expose", {})
                 foe_def = max(0, int(foe_def * float(expose_cfg.get("def_mult", 1.0))))
+            # Passive bonus: bonus_damage_tag
+            passive_tag_bonus = get_passive_bonus(self.state, self.reg, "bonus_damage_tag", pc, tek)
+            if passive_tag_bonus > 0:
+                atk = int(atk * (1 + passive_tag_bonus / 100))
             # Mastery bonus
             tek_element = tek.get("element", "")
             mastery_xp = self.state.element_mastery.get(tek_element, 0) if tek_element else 0
@@ -385,7 +443,16 @@ class BattleEngine:
             pct = min(pct, 80)  # cap individual guard_pct
             b["player_guard"] = pct
             add_log(self.state, "battle", f"{tek['name']} — damage masuk dikurangi {pct}%.")
+            # Passive bonus: qi_on_defend
+            passive_qi_bonus = get_passive_bonus(self.state, self.reg, "qi_on_defend")
+            if passive_qi_bonus > 0:
+                pc["qi"] = min(pc["qi_max"], pc["qi"] + passive_qi_bonus)
+                add_log(self.state, "battle", f"Flowing Qi! +{passive_qi_bonus} Qi.")
         elif kind == "heal":
+            # Passive bonus: heal_bonus_low_hp
+            passive_heal_bonus = get_passive_bonus(self.state, self.reg, "heal_bonus_low_hp", pc)
+            if passive_heal_bonus > 0:
+                power = int(power * (1 + passive_heal_bonus / 100))
             heal = min(power, pc["hp_max"] - pc["hp"])
             pc["hp"] += heal
             add_log(self.state, "battle", f"{tek['name']} memulihkan {heal} HP.")
@@ -583,6 +650,10 @@ class BattleEngine:
                 if "guard" in pst:
                     guard_cfg = cfg.get("guard", {})
                     reductions.append(float(guard_cfg.get("dmg_reduction", 0)) / 100)
+                # Passive bonus: damage_reduction_high_hp
+                passive_dr_bonus = get_passive_bonus(self.state, self.reg, "damage_reduction_high_hp", pc)
+                if passive_dr_bonus > 0:
+                    reductions.append(passive_dr_bonus / 100)
                 if reductions:
                     total_reduction = 1.0
                     for r in reductions:

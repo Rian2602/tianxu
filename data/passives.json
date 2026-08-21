@@ -1,0 +1,43 @@
+{
+  "passives": [
+    {
+      "id": "passive_sword_intent",
+      "name": "Sword Intent",
+      "description": "+5% damage untuk teknik bertag pedang",
+      "effect": "bonus_damage_tag",
+      "tag": "pedang",
+      "value": 5,
+      "realm_required": "realm_chuji",
+      "source": "pavilion_jianxin"
+    },
+    {
+      "id": "passive_flowing_qi",
+      "name": "Flowing Qi",
+      "description": "+1 Qi saat menggunakan defend",
+      "effect": "qi_on_defend",
+      "value": 1,
+      "realm_required": "realm_chuji",
+      "source": "pavilion_wuxin"
+    },
+    {
+      "id": "passive_phoenix_blood",
+      "name": "Phoenix Blood",
+      "description": "+10% heal effectiveness saat HP < 30%",
+      "effect": "heal_bonus_low_hp",
+      "threshold_hp_pct": 30,
+      "value": 10,
+      "realm_required": "realm_chuji",
+      "source": "pavilion_yanzhi"
+    },
+    {
+      "id": "passive_earth_guardian",
+      "name": "Earth Guardian",
+      "description": "+5% damage reduction saat HP > 70%",
+      "effect": "damage_reduction_high_hp",
+      "threshold_hp_pct": 70,
+      "value": 5,
+      "realm_required": "realm_chuji",
+      "source": "pavilion_liuguang"
+    }
+  ]
+}
