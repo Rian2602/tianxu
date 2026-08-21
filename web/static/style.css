@@ -442,6 +442,55 @@ body.ambience-library #col-center {
   background-size: cover;
 }
 
+body.ambience-outdoor #col-center {
+  background:
+    linear-gradient(rgba(24, 28, 22, 0.90), rgba(20, 20, 28, 0.90)),
+    url("/static/assets/textures/ink-wash.png");
+  background-size: cover;
+}
+
+body.ambience-crisis #col-center {
+  background:
+    linear-gradient(rgba(30, 18, 18, 0.92), rgba(20, 14, 14, 0.94)),
+    url("/static/assets/textures/gold-noise.png");
+  background-size: cover;
+}
+
+body.ambience-deepest #col-center {
+  background:
+    linear-gradient(rgba(15, 10, 25, 0.94), rgba(10, 5, 20, 0.96)),
+    url("/static/assets/textures/cloud-mist.png");
+  background-size: cover;
+}
+
+body.ambience-crisis-main #col-center {
+  background:
+    linear-gradient(rgba(35, 15, 15, 0.93), rgba(25, 10, 10, 0.95)),
+    url("/static/assets/textures/gold-noise.png");
+  background-size: cover;
+}
+
+body.ambience-archive-secret #col-center {
+  background:
+    linear-gradient(rgba(18, 18, 25, 0.94), rgba(12, 12, 18, 0.96)),
+    url("/static/assets/textures/paper-dark.png");
+  background-size: cover;
+}
+
+body.ambience-void #col-center {
+  background:
+    linear-gradient(rgba(5, 5, 10, 0.96), rgba(2, 2, 5, 0.98)),
+    url("/static/assets/textures/cloud-mist.png");
+  background-size: cover;
+}
+
+body.ambience-outdoor-mentor #col-center {
+  background:
+    linear-gradient(rgba(22, 26, 20, 0.91), rgba(18, 22, 16, 0.93)),
+    url("/static/assets/textures/ink-wash.png");
+  background-size: cover;
+}
+
 #log {
   max-height: 46vh;
   overflow-y: auto;

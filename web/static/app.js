@@ -274,7 +274,8 @@ const ICON_CACHE = {};
 async function loadIcons() {
   const names = ["sword", "shield", "book-open", "map-pin", "message-circle", "x",
                  "heart", "backpack", "scroll-text", "target", "sparkles", "landmark",
-                 "trophy"];
+                 "trophy", "ancient-symbol", "cycle-notes", "first-artifact",
+                 "scroll", "flask", "gem", "leaf", "crystal", "pill"];
   await Promise.all(names.map(async (n) => {
     try {
       const r = await fetch(`/static/assets/icons/${n}.svg`);

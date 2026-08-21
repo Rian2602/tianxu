@@ -186,7 +186,7 @@
     "loc_archive_public",
     "loc_tianxu_deepest_chamber"
    ],
-   "ambience": "library"
+   "ambience": "archive-secret"
   },
   {
    "id": "loc_grandmaster_chamber",
@@ -208,7 +208,7 @@
     "loc_below_deepest",
     "loc_tianxu_main_hall"
    ],
-   "ambience": "hall"
+   "ambience": "deepest"
   },
   {
    "id": "loc_jiang_yan_records",
@@ -228,7 +228,7 @@
    "connections": [
     "loc_training_hall"
    ],
-   "ambience": "outdoor"
+   "ambience": "outdoor-mentor"
   },
   {
    "id": "loc_affected_village",
@@ -259,7 +259,7 @@
     "loc_tianxu_gate",
     "loc_tianxu_deepest_chamber"
    ],
-   "ambience": "crisis"
+   "ambience": "crisis-main"
   },
   {
    "id": "loc_below_deepest",
@@ -269,7 +269,7 @@
    "connections": [
     "loc_tianxu_deepest_chamber"
    ],
-   "ambience": "crisis"
+   "ambience": "void"
   }
  ]
 }
