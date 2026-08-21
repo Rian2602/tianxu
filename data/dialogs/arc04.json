@@ -130,6 +130,15 @@
             {"label": "Aku akan mencoba.", "next": "n2"}
           ]
         },
+        "n_reformist_ally": {
+          "speaker": "npc:npc_grandmaster",
+          "text": "Kau sudah bergabung dengan Shen Luo — Kaum Reformis. Aku tahu tentang aktivitasmu. Kau mengumpulkan bukti, menyelidiki arsip, berbicara dengan orang-orang yang tidak setuju. Aku tidak akan menghentikanmu. Tapi aku ingin kau tahu: apa yang kau lakukan bisa menghancurkan banyak hal yang baik bersama yang buruk.",
+          "condition": {"faction_min": {"faksi": "faction_reformists", "value": 3}},
+          "choices": [
+            {"label": "Perubahan memang butuh pengorbanan.", "next": "n2"},
+            {"label": "Aku mencari jalan tengah.", "next": "n2"}
+          ]
+        },
         "n_confront": {
           "speaker": "npc:npc_grandmaster",
           "text": "Kau. Aku tahu kau akan datang — sejak konfrontasimu di forum terbuka. Kau membuat beberapa orang di akademi sangat tidak nyaman. Tapi justru karena itu, aku berbicara terus terang kepadamu.",

@@ -104,6 +104,14 @@
             {"label": "Aku akan memutuskan. Dan aku akan hidup dengan akibatnya.", "next": "n3"}
           ]
         },
+        "n_reformist_ally": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau sudah bergabung dengan Shen Luo — Kaum Reformis. Aku tahu tentang aktivitasmu. Kau mengumpulkan bukti, menyelidiki arsip. Tapi hati-hati — perubahan yang terlalu cepat bisa menghancurkan lebih banyak daripada yang diperbaiki.",
+          "condition": {"faction_min": {"faksi": "faction_reformists", "value": 3}},
+          "choices": [
+            {"label": "Aku mencari jalan yang benar.", "next": "n2"}
+          ]
+        },
         "n_close_gu_han": {
           "speaker": "npc:npc_lin_yue",
           "text": "Gu Han sudah bicara denganku sebelumnya — dia bilang kau satu-satunya yang benar-benar mendengarkan. Mungkin dia benar. Mungkin aku yang terlalu takut untuk menghadapi kenyataan.",

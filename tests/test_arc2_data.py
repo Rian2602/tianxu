@@ -112,6 +112,7 @@ def test_arc2_data_contract_ok(registry):
         "quest_faction_orthodox_001", "quest_faction_orthodox_002",
         # Reformation Faction (GAP-B2)
         "quest_faction_reform_001", "quest_faction_reform_002",
+        "quest_faction_reform_003", "quest_faction_reform_004", "quest_faction_reform_005",
         # Gu Han Character Arc (Phase 5)
         "quest_char_gu_han_001", "quest_char_gu_han_002",
         # Lin Yue Character Arc (Phase 1)

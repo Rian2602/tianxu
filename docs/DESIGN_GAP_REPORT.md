@@ -120,25 +120,26 @@ After completing Phases 0-7, the game has:
 
 #### GAP-B2: Faction System Only 1 Prototype
 
-**Current State:**
-- Only Tian Xu Orthodox has faction questline
-- Other 3 factions (Reformists, Liberation, Hidden Guardians) have no quests
-- Faction reputation only affects dialogue conditions
+**Status: ✅ RESOLVED**
+
+**Resolution:**
+- Expanded Reformists faction from 2 talk-only quests to 5 substantive quests:
+  1. `quest_faction_reform_001` — Talk to Shen Luo (intro)
+  2. `quest_faction_reform_002` — Gather evidence (catatan_siklus from Hutan Akademi)
+  3. `quest_faction_reform_003` — Reach hidden cave (loc_hidden_cave)
+  4. `quest_faction_reform_004` — Defeat golem guardian (golem_batu)
+  5. `quest_faction_reform_005` — Final stance decision with Shen Luo
+- Chained via `requires_flags` (side quests can't use `next`)
+- Added faction reputation conditions to Arc IV/V dialogs:
+  - `dlg_a04_d03`: Grandmaster reacts to Reformists reputation ≥ 3
+  - `dlg_a05_d03`: Lin Yue reacts to Reformists reputation ≥ 3
+- All 287 tests pass
 
 **Impact:**
-- Faction system feels incomplete
-- Players only interact with one faction
-- Political dynamics are underexplored
-
-**Design Decision Needed:**
-- Which other factions should have questlines?
-- How should faction reputation affect gameplay?
-- Should factions have opposing goals?
-
-**Recommendation:**
-- Add 1 more faction questline (Liberation or Reformists)
-- Keep faction effects simple (dialogue variants, access conditions)
-- Focus on faction identity over faction quantity
+- Players now interact with 2 factions (Orthodox + Reformists)
+- Faction reputation affects dialogue in Arc IV and V
+- Reformists questline has varied objectives (talk, gather, reach, defeat)
+- Political dynamics are more exploreable
 
 ---
 
@@ -274,7 +275,7 @@ After completing Phases 0-7, the game has:
 | ~~A2: Missing Characters~~ | ~~HIGH~~ | ~~HIGH~~ | ~~HIGH~~ | ✅ RESOLVED |
 | ~~A3: Branching Shallow~~ | ~~MEDIUM~~ | ~~HIGH~~ | ~~MEDIUM~~ | ✅ RESOLVED |
 | ~~B1: Memory Investigation~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ✅ RESOLVED |
-| B2: Faction System | MEDIUM | MEDIUM | MEDIUM | Add 1 more faction |
+| ~~B2: Faction System~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ✅ RESOLVED |
 | B3: Reactive World | MEDIUM | LOW | MEDIUM | Add to The Last Night |
 | B4: Dead Flags | LOW | LOW | LOW | Keep for potential use |
 | C1: Quest Linearity | LOW | HIGH | LOW | Acceptable for testing |

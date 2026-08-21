@@ -4,7 +4,7 @@
       "id": "quest_faction_reform_001",
       "kind": "side",
       "title": "Permintaan dari Shen Luo",
-      "description": "Shen Luo meminta bantuanmu untuk menyebarkan informasi tentang ketidakadilan di Tian Xu.",
+      "description": "Shen Luo meminta bantuanmu untuk menyelidiki ketidakadilan di Tian Xu.",
       "objective": {
         "kind": "talk",
         "npc": "npc_shen_luo",
@@ -28,6 +28,74 @@
     {
       "id": "quest_faction_reform_002",
       "kind": "side",
+      "title": "Bukti yang Tersembunyi",
+      "description": "Kumpulkan bukti korupsi formasi dari Hutan Akademi — ada catatan yang disembunyikan di sana.",
+      "objective": {
+        "kind": "gather",
+        "item": "catatan_siklus",
+        "target": 1,
+        "hint": "Cari catatan korupsi formasi di Hutan Akademi."
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "requires_flags": ["flag_reform_task_accepted"]
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_reform_evidence_found", "value": true},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 1}
+        ]
+      }
+    },
+    {
+      "id": "quest_faction_reform_003",
+      "kind": "side",
+      "title": "Gua Tersembunyi",
+      "description": "Shen Luo menemukan lokasi tersembunyi yang menyimpan arsip lama. Selidiki dan amankan bukti tambahan.",
+      "objective": {
+        "kind": "reach",
+        "location": "loc_hidden_cave",
+        "hint": "Pergi ke Gua Tersembunyi untuk menemukan arsip lama."
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "requires_flags": ["flag_reform_evidence_found"]
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_reform_archive_found", "value": true},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+        ]
+      }
+    },
+    {
+      "id": "quest_faction_reform_004",
+      "kind": "side",
+      "title": "Penjaga yang Menolak",
+      "description": "Monster spiritual menjaga gua itu. Kalahkan untuk mengamankan arsip.",
+      "objective": {
+        "kind": "defeat",
+        "enemies": ["golem_batu"],
+        "target": 1,
+        "hint": "Kalahkan penjaga gua untuk mengamankan arsip."
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "requires_flags": ["flag_reform_archive_found"]
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_reform_archive_secured", "value": true},
+          {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+        ]
+      }
+    },
+    {
+      "id": "quest_faction_reform_005",
+      "kind": "side",
       "title": "Pilihan Reformis",
       "description": "Shen Luo meminta pendapatmu tentang masa depan pergerakan reformasi.",
       "objective": {
@@ -38,10 +106,7 @@
       "available_from": {
         "day": 1,
         "hour": 0,
-        "relation_min": {
-          "npc": "npc_shen_luo",
-          "value": 4
-        }
+        "requires_flags": ["flag_reform_archive_secured"]
       },
       "on_complete": {
         "effects": [
