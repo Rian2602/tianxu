@@ -783,9 +783,14 @@ def _validate_csv(registry, errors) -> None:
         gpct = tek.get("guard_pct", "")
         if gpct not in ("", "0"):
             gpct_val = int(gpct)
-            if gpct_val < 0 or gpct_val > 80:
+            if gpct_val < 0 or gpct_val > 75:
                 _add(errors, "techniques.csv", f"technique '{tid}'.guard_pct",
-                     f"guard_pct harus 0-80, ditemukan: {gpct_val}.")
+                     f"guard_pct harus 0-75, ditemukan: {gpct_val}.")
+        # evolves_from harus valid technique id
+        evolves = tek.get("evolves_from", "")
+        if evolves and evolves not in registry.techniques:
+            _add(errors, "techniques.csv", f"technique '{tid}'.evolves_from",
+                 f"teknik tak dikenal: '{evolves}'.")
         apply_st = tek.get("apply_status", "")
         if apply_st:
             statuses_keys = set(((registry.config.get("battle") or {}).get("statuses") or {}).keys())
@@ -810,6 +815,46 @@ def _validate_key_items(registry, errors) -> None:
             _check_effects(errors, effects, src, ctx + ".use_effects", registry, allow_start_quest=False)
 
 
+def _validate_passives(registry, errors) -> None:
+    """Validasi passives.json — source academy valid, tag valid."""
+    src = "passives.json"
+    academy_ids = {a.get("id") for a in registry.config.get("academies", []) or []}
+    all_tags = set()
+    for tek in registry.techniques.values():
+        for t in (tek.get("tags") or "").split(","):
+            t = t.strip()
+            if t:
+                all_tags.add(t)
+    for p in registry.passives:
+        pid = p.get("id", "?")
+        ctx = f"passive '{pid}'"
+        source = p.get("source", "")
+        if source.startswith("pavilion_") and source not in academy_ids:
+            _add(errors, src, ctx,
+                 f"academy tak dikenal: '{source}'.")
+        if p.get("effect") == "bonus_damage_tag":
+            tag = p.get("tag", "")
+            if tag not in all_tags:
+                _add(errors, src, ctx,
+                     f"tag tak pernah dipakai teknik manapun: '{tag}'.")
+
+
+def _validate_fusions(registry, errors) -> None:
+    """Validasi fusion_recipes.json — requires/result technique id valid."""
+    src = "fusion_recipes.json"
+    for f in registry.fusions:
+        fid = f.get("id", "?")
+        ctx = f"fusion '{fid}'"
+        for r in f.get("requires", []):
+            if r not in registry.techniques:
+                _add(errors, src, f"{ctx}.requires[]",
+                     f"teknik tak dikenal: '{r}'.")
+        result = f.get("result")
+        if result and result not in registry.techniques:
+            _add(errors, src, f"{ctx}.result",
+                 f"teknik tak dikenal: '{result}'.")
+
+
 def _validate_duplicates(registry, errors) -> None:
     """Aturan #2: duplikat id — deteksi dari LIST mentah (dict index menimpa)."""
     groups = [
@@ -825,6 +870,8 @@ def _validate_duplicates(registry, errors) -> None:
         ("enemy", registry.enemies_raw, "enemies.csv"),
         ("realm", registry.realms_raw, "realms.csv"),
         ("technique", registry.techniques_raw, "techniques.csv"),
+        ("passive", registry.passives, "passives.json"),
+        ("fusion", registry.fusions, "fusion_recipes.json"),
     ]
     for kind, items, src in groups:
         ids = [it.get("id") for it in items if isinstance(it, dict) and it.get("id")]
@@ -849,6 +896,8 @@ def validate(registry) -> None:
     _validate_recipes(registry, errors)
     _validate_csv(registry, errors)
     _validate_key_items(registry, errors)
+    _validate_passives(registry, errors)
+    _validate_fusions(registry, errors)
     if errors:
         head = f"{len(errors)} pelanggaran kontrak data ditemukan saat load:"
         raise DataContractError("\n".join([head] + [f"  {e}" for e in errors]))

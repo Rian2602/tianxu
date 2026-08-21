@@ -453,7 +453,7 @@ class BattleEngine:
             # guard_pct dibaca langsung dari data — TIDAK scale dengan level.
             # Alasan: guard_pct=55 × 1.15^4 = 88% → near invulnerability.
             pct = int(tek.get("guard_pct", 0)) or power
-            pct = min(pct, 80)  # cap individual guard_pct
+            pct = min(pct, 75)  # cap individual guard_pct (align dengan MAX_DAMAGE_REDUCTION)
             b["player_guard"] = pct
             add_log(self.state, "battle", f"{tek['name']} — damage masuk dikurangi {pct}%.")
             # Passive bonus: qi_on_defend

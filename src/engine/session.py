@@ -1087,17 +1087,17 @@ class GameSession:
             add_log(self.state, "system",
                     f"Teknik hasil fusion '{result_id}' tidak ditemukan.")
             return self.view()
+        # Hitung level MINIMUM dari teknik yang di-fuse SEBELUM pop
+        min_level = min(int(self.state.player.technique_levels.get(r, 1)) for r in requires) if requires else 1
         # FUSION: remove requirements, add result
         for r in requires:
             self.state.player.techniques.remove(r)
             self.state.player.technique_levels.pop(r, None)
         self.state.player.techniques.append(result_id)
-        # Result level = 2 (fusion techniques start at Lv.2), capped at realm max
+        # Result level = max(2, min_level), capped at realm max
         realm = self.reg.realm_by_id(self.state.player.realm)
         max_lvl = (int(realm.get("order", 1)) + 1) if realm else 2
-        min_level = min(int(self.state.player.technique_levels.get(r, 1)) for r in requires) if requires else 1
-        # For fusion, we already removed the levels, so use a default
-        self.state.player.technique_levels[result_id] = min(2, max_lvl)
+        self.state.player.technique_levels[result_id] = min(max(2, min_level), max_lvl)
         add_log(self.state, "narration",
                 f"Fusion berhasil! {result_tek.get('name', result_id)} lahir dari gabungan teknik.")
         return self.view()
