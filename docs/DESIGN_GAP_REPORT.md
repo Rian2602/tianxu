@@ -9,17 +9,17 @@
 ## Executive Summary
 
 After completing Phases 0-7, the game has:
-- 47 quests (36 main, 11 side)
-- 46 dialogs
+- 51 quests (36 main, 15 side)
+- 50+ dialogs
 - 66 written states, 32 alive
 - 4 character arcs (Lin Yue, Shen Luo, Mei Ruo, Gu Han)
-- 1 memory investigation prototype
-- 1 faction prototype (Tian Xu Orthodox)
-- 1 reactive world event prototype
+- 4 memory investigations (up from 1)
+- 2 faction questlines (Orthodox + Reformists)
+- 8 reactive conditions in The Last Night (up from 3)
 - 287 tests passing
 - 0 critical issues
 
-**Remaining gaps are DESIGN decisions, not bugs.** They require narrative/design input before implementation.
+**All CRITICAL and IMPORTANT gaps are RESOLVED.** Remaining gaps are LOW priority design decisions.
 
 ---
 
@@ -283,33 +283,31 @@ After completing Phases 0-7, the game has:
 
 ## Recommendations for Next Phase
 
-### Immediate (Before Player Testing)
-1. **GAP-A1**: Add 2 more realms for cultivation progression ✅
-2. **GAP-B1**: Expand memory investigation to 2 more memories ✅
+### Completed ✅
+1. **GAP-A1**: Realm progression — 3 realms, 15 levels ✅
+2. **GAP-A2**: Character arcs integrated into main quests ✅
+3. **GAP-A3**: Branching content deepened (Obey/Investigate/Confront) ✅
+4. **GAP-B1**: Memory investigation expanded to 4 memories ✅
+5. **GAP-B2**: Reformists faction questline (5 quests) ✅
+6. **GAP-B3**: Reactive elements in The Last Night (8 conditions) ✅
 
-### Short-term (During Player Testing)
-3. **GAP-B2**: Add 1 more faction questline (Liberation)
-4. **GAP-B3**: Add reactive elements to The Last Night
-
-### Medium-term (After Player Testing)
-5. **GAP-A2**: Integrate character development into main quests
-6. **GAP-A3**: Add 1-2 meaningful branches with unique content
-
-### Long-term (Full Release)
-7. **GAP-C1-C3**: Address minor gaps based on player feedback
+### Remaining (LOW priority)
+7. **GAP-B4**: Dead flags — keep for potential future use
+8. **GAP-C1-C3**: Minor gaps — address based on player feedback
 
 ---
 
 ## Conclusion
 
-The game is **READY for player testing** with current gaps. All critical systems are functional:
-- Character arcs work
-- Memory investigation works
-- Faction system works
-- World reactivity works
-- Branch consequences work
+The game is **READY for player testing**. All CRITICAL and IMPORTANT gaps are resolved:
+- ✅ Realm progression (3 realms, 15 levels)
+- ✅ Character arcs integrated
+- ✅ Branching content deepened
+- ✅ Memory investigations (4 memories)
+- ✅ Faction system (2 factions)
+- ✅ Reactive world events (8 conditions)
 
-Remaining gaps are **design decisions** that require narrative input, not technical fixes. They should be addressed based on player feedback and testing results.
+Remaining gaps are LOW priority design decisions that should be addressed based on player feedback.
 
 ---
 
