@@ -140,6 +140,31 @@ DEFAULT_ELEMENT_ADVANTAGE = {
 
 
 
+# Mastery XP per penggunaan teknik
+MASTERY_XP_PER_USE = 1
+
+# Mastery level thresholds
+MASTERY_THRESHOLDS = [(100, 1), (300, 2), (600, 3)]  # (xp, level)
+
+# Mastery bonus per level (+5% per level, max +15%)
+MASTERY_BONUS_PER_LEVEL = 0.05
+
+
+def get_mastery_level(mastery_xp: int) -> int:
+    """Return mastery level (0-3) berdasarkan XP."""
+    level = 0
+    for threshold, lvl in MASTERY_THRESHOLDS:
+        if mastery_xp >= threshold:
+            level = lvl
+    return level
+
+
+def gain_mastery_xp(state: GameState, element: str) -> None:
+    """Tambah mastery XP untuk elemen tertentu."""
+    if element and element in state.element_mastery:
+        state.element_mastery[element] += MASTERY_XP_PER_USE
+
+
 def _calc_damage(
     attack: int,
     defense: int,
@@ -147,6 +172,7 @@ def _calc_damage(
     elem_def: str | None = None,
     registry: DataRegistry | None = None,
     config: dict | None = None,
+    attacker_mastery: int = 0,
 ) -> tuple[int, bool]:
     cfg = config if config is not None else (registry.config.get("battle", {}) if registry else {})
     mult = 1.0
@@ -156,6 +182,9 @@ def _calc_damage(
             mult = 1.5
         elif adv.get(elem_def) == elem_att:
             mult = 0.67
+    # Mastery bonus: +5% per level, max +15%
+    if attacker_mastery > 0:
+        mult *= (1 + attacker_mastery * MASTERY_BONUS_PER_LEVEL)
     base = attack * (100 / (100 + defense)) * mult
     base *= random.uniform(0.8, 1.2)
     crit = random.random() < cfg.get("crit_chance", 0.08)
@@ -337,11 +366,18 @@ class BattleEngine:
             if "expose" in b.get("foe_statuses", {}):
                 expose_cfg = cfg.get("expose", {})
                 foe_def = max(0, int(foe_def * float(expose_cfg.get("def_mult", 1.0))))
-            dmg, crit = self._calc_damage(atk, foe_def, tek.get("element"), b["foes"][0].get("element"))
+            # Mastery bonus
+            tek_element = tek.get("element", "")
+            mastery_xp = self.state.element_mastery.get(tek_element, 0) if tek_element else 0
+            mastery_lvl = get_mastery_level(mastery_xp)
+            dmg, crit = self._calc_damage(atk, foe_def, tek.get("element"), b["foes"][0].get("element"),
+                                          attacker_mastery=mastery_lvl)
             b["foes"][0]["hp"] -= dmg
             add_log(self.state, "battle", f"{tek['name']}! {b["foes"][0]["name"]} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
             # Secondary effect: apply status dari data teknik
             self._apply_technique_status(b, b["foes"][0], tek)
+            # Mastery XP: +1 per penggunaan teknik
+            gain_mastery_xp(self.state, tek_element)
         elif kind == "defend":
             # guard_pct dibaca langsung dari data — TIDAK scale dengan level.
             # Alasan: guard_pct=55 × 1.15^4 = 88% → near invulnerability.
@@ -355,6 +391,8 @@ class BattleEngine:
             add_log(self.state, "battle", f"{tek['name']} memulihkan {heal} HP.")
             # Secondary effect: apply status dari data teknik (regen, dst)
             self._apply_technique_status(b, pc, tek, target_is_player=True)
+            # Mastery XP: +1 per penggunaan teknik
+            gain_mastery_xp(self.state, tek.get("element", ""))
 
     def _apply_technique_status(self, b: dict, target: dict, tek: dict,
                                  target_is_player: bool = False) -> None:
@@ -635,8 +673,10 @@ class BattleEngine:
 
     # ---------- perhitungan damage ----------
 
-    def _calc_damage(self, attack: int, defense: int, elem_att, elem_def) -> tuple[int, bool]:
-        return _calc_damage(attack, defense, elem_att, elem_def, registry=self.reg)
+    def _calc_damage(self, attack: int, defense: int, elem_att, elem_def,
+                      attacker_mastery: int = 0) -> tuple[int, bool]:
+        return _calc_damage(attack, defense, elem_att, elem_def,
+                           registry=self.reg, attacker_mastery=attacker_mastery)
 
 
 

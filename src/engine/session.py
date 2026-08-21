@@ -1108,6 +1108,7 @@ class GameSession:
                 "pil_aman_active": s.pil_aman_active,
                 "fatigue_days": s.fatigue_days,
                 "rested_today": s.rested_today,
+                "element_mastery": dict(s.element_mastery),
                 "is_rest_location": s.location == (self.reg.config.get("rest") or {}).get("rest_location", "loc_protagonist_room"),
             },
             "current_quest": {"id": q["id"], "title": q["title"], "objective": self.quest.objective_text(q)} if q else None,

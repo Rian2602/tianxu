@@ -163,7 +163,7 @@ def test_legacy_world_hunt_wrapped_as_legacy_zone(tmp_path):
 # ---------- save: v1 → v2 migrasi ----------
 
 def test_schema_version_bumped():
-    assert SCHEMA_VERSION == 7
+    assert SCHEMA_VERSION == 8
 
 
 def test_save_v1_last_hunt_time_int_migrates():

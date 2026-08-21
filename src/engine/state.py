@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 # tetap dihormati oleh zona legacy.
 #
 # v2 → v3: factions dari flags (rep_*) + memories string → dict{reliability}
-SCHEMA_VERSION = 7
+SCHEMA_VERSION = 8
 
 
 @dataclass
@@ -147,6 +147,7 @@ class GameState:
     pil_aman_active: bool = False  # batalkan debuff gagal meditasi
     fatigue_days: int = 0  # hari berturut-turut tanpa istirahat
     rested_today: bool = False  # apakah sudah istirahat hari ini
+    element_mastery: dict = field(default_factory=lambda: {"logam": 0, "kayu": 0, "tanah": 0, "air": 0, "api": 0})
     _ui_proxy: UIState | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -289,6 +290,7 @@ class GameState:
             "pil_aman_active": self.pil_aman_active,
             "fatigue_days": self.fatigue_days,
             "rested_today": self.rested_today,
+            "element_mastery": copy.deepcopy(self.element_mastery),
         }
 
     @classmethod
@@ -402,4 +404,5 @@ class GameState:
             pil_aman_active=d.get("pil_aman_active", False),
             fatigue_days=d.get("fatigue_days", 0),
             rested_today=d.get("rested_today", False),
+            element_mastery=copy.deepcopy(d.get("element_mastery", {"logam": 0, "kayu": 0, "tanah": 0, "air": 0, "api": 0})),
         )
