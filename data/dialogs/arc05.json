@@ -73,6 +73,15 @@
       "npc": "npc_lin_yue",
       "start": "n1",
       "nodes": {
+        "n_investigated_lin_yue": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau kembali. Dan aku... aku merasakan sesuatu yang berbeda tentangmu. Sejak kau menyelidiki ingatan tentang aku versi tua — tentang hubungan kita lintas kehidupan. Aku tidak tahu harus percaya atau tidak. Tapi aku merasa... lebih dekat kepadamu dari yang seharusnya.",
+          "choices": [
+            {"label": "Aku juga merasakannya. Kita terhubung — entah bagaimana.", "next": "n2"},
+            {"label": "Mungkin itu hanya kebetulan.", "next": "n2"}
+          ],
+          "condition": {"flag": {"key": "state_memory_a02_m01_reinterpretation", "value": "connected"}}
+        },
         "n_spread": {
           "speaker": "npc:npc_lin_yue",
           "text": "Kau kembali. Tapi situasinya berubah — beberapa murid sudah tahu tentang kebenaran yang kau bagikan. Ada yang marah, ada yang ketakutan. Grandmaster tidak senang. Apa yang kau lakukan, kau lakukan tanpa meminta izin siapa pun.",

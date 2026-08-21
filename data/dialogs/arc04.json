@@ -29,6 +29,22 @@
           ],
           "condition": {"faction_max": {"faksi": "faction_tianxu_orthodox", "value": -3}}
         },
+        "n_investigated_corridor": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah menyelidiki Koridor Terbakar bersamaku — dan kau memilih percaya ada yang ditutupi. Sekarang aku ingin menunjukkan sesuatu yang menghubungkan semuanya. Ruangan di bawah arsip — ada catatan yang tidak tercatat.",
+          "choices": [
+            {"label": "Aku sudah siap melihat hubungannya.", "next": "n_compare"}
+          ],
+          "condition": {"flag": {"key": "state_memory_a01_m01_reinterpretation", "value": "coverup"}}
+        },
+        "n_investigated_hands": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau sudah menyelidiki Tangan yang Mengingat — dan kau percaya kau pernah menjadi kultivator kuat. Sekarang aku ingin menunjukkan bukti yang mungkin menghubungkan pemahamanmu itu dengan sejarah Tian Xu.",
+          "choices": [
+            {"label": "Tunjukkan padaku.", "next": "n_compare"}
+          ],
+          "condition": {"flag": {"key": "state_memory_a01_m02_reinterpretation", "value": "past_life"}}
+        },
         "n_default": {
           "speaker": "npc:npc_mei_ruo",
           "text": "Aku menemukan sesuatu di arsip — ruangan yang tidak tercatat. Di bawah arsip publik. Aku tidak berani menyelidikinya sendirian.",
@@ -55,6 +71,14 @@
       "npc": "npc_mei_ruo",
       "start": "n1",
       "nodes": {
+        "n_investigated_hands": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Ada satu lagi — lebih dalam dari yang lain. Kau sudah tahu tentang Tangan yang Mengingat. Catatan pendiri ini mungkin menjelaskan MENGAPA tubuhmu ingat. Aku tidak berani menyentuhnya. Ini milikmu untuk dibaca.",
+          "choices": [
+            {"label": "(Baca catatan pendiri)", "next": "n_v3"}
+          ],
+          "condition": {"flag": {"key": "state_memory_a01_m02_reinterpretation", "value": "past_life"}}
+        },
         "n1": {
           "speaker": "npc:npc_mei_ruo",
           "text": "Ada satu lagi — lebih dalam dari yang lain. Catatan pribadi pendiri, tersembunyi di balik dinding palsu. Aku tidak berani menyentuhnya. Ini milikmu untuk dibaca.",

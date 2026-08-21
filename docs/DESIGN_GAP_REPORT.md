@@ -98,25 +98,23 @@ After completing Phases 0-7, the game has:
 
 #### GAP-B1: Memory Investigation Only 1 Prototype
 
-**Current State:**
-- Only `memory_a03_m01` has investigation system
-- Other 7 memories are still linear unlock
-- No investigation for later arc memories
+**Status: ✅ RESOLVED**
+
+**Resolution:**
+- Added investigation system for 3 more memories: `memory_a01_m01` (Koridor Terbakar), `memory_a01_m02` (Tangan yang Mengingat), `memory_a01_m04` (Jangan Percaya Sejarah), `memory_a02_m01` (Apa yang Tidak Akan Kau Kembali)
+- Each investigation has offer + report dialogs with Mei Ruo
+- Reinterpretation flags affect Arc IV and V dialogs:
+  - `state_memory_a01_m01_reinterpretation = coverup` → special Arc IV entry dialog
+  - `state_memory_a01_m02_reinterpretation = past_life` → special Arc IV entry + Version III dialog
+  - `state_memory_a02_m01_reinterpretation = connected` → special Arc V Lin Yue dialogue
+- Investigation quests available via `has_memory` condition (optional, reward: relation + reinterpretation)
+- All 287 tests pass
 
 **Impact:**
-- Memory system feels incomplete
-- Players only experience investigation once
-- Mystery mechanic is underutilized
-
-**Design Decision Needed:**
-- Which other memories should have investigation?
-- How complex should investigation be (simple vs multi-step)?
-- Should investigation be required or optional?
-
-**Recommendation:**
-- Expand to 2-3 more memories for player testing
-- Keep investigation simple (question → evidence → reinterpretation)
-- Make investigation optional but rewarding
+- Players experience memory investigation 4 times (up from 1)
+- Investigation choices affect later story content
+- Mystery mechanic fully utilized across arcs
+- Optional but rewarding (relation bonus with Mei Ruo)
 
 ---
 
@@ -275,7 +273,7 @@ After completing Phases 0-7, the game has:
 | ~~A1: Realm Progression~~ | ~~HIGH~~ | ~~HIGH~~ | ~~HIGH~~ | ✅ RESOLVED |
 | ~~A2: Missing Characters~~ | ~~HIGH~~ | ~~HIGH~~ | ~~HIGH~~ | ✅ RESOLVED |
 | ~~A3: Branching Shallow~~ | ~~MEDIUM~~ | ~~HIGH~~ | ~~MEDIUM~~ | ✅ RESOLVED |
-| B1: Memory Investigation | MEDIUM | MEDIUM | MEDIUM | Add 2 more prototypes |
+| ~~B1: Memory Investigation~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ~~MEDIUM~~ | ✅ RESOLVED |
 | B2: Faction System | MEDIUM | MEDIUM | MEDIUM | Add 1 more faction |
 | B3: Reactive World | MEDIUM | LOW | MEDIUM | Add to The Last Night |
 | B4: Dead Flags | LOW | LOW | LOW | Keep for potential use |
@@ -288,8 +286,8 @@ After completing Phases 0-7, the game has:
 ## Recommendations for Next Phase
 
 ### Immediate (Before Player Testing)
-1. **GAP-A1**: Add 2 more realms for cultivation progression
-2. **GAP-B1**: Expand memory investigation to 2 more memories
+1. **GAP-A1**: Add 2 more realms for cultivation progression ✅
+2. **GAP-B1**: Expand memory investigation to 2 more memories ✅
 
 ### Short-term (During Player Testing)
 3. **GAP-B2**: Add 1 more faction questline (Liberation)
