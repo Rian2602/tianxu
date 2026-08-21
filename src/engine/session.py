@@ -151,6 +151,7 @@ class GameSession:
             "shop_sell": self._shop_sell,
             "craft": self._craft,
             "upgrade_technique": self._upgrade_technique,
+            "unlock_technique": self._unlock_technique,
             "switch_companion": self._switch_companion,
             "mine": self._mine,
             "save": self._save,
@@ -986,6 +987,50 @@ class GameSession:
         self.state.player.gold -= cost
         self.state.player.technique_levels[tid] = cur + 1
         add_log(self.state, "narration", f"{tek['name']} naik ke Lv.{cur + 1} (−{cost} koin).")
+        return self.view()
+
+    def _unlock_technique(self, action: dict) -> dict:
+        """Unlock technique evolution — REPLACE semantics.
+        Base technique is REMOVED, variant takes its place.
+        Only 1 variant per branch_group allowed.
+        
+        Action: {"type": "unlock_technique", "technique": "teknik_xxx"}
+        """
+        tid = action.get("technique")
+        tek = self.reg.technique(tid)
+        if not tek:
+            add_log(self.state, "system", "Teknik tidak dikenal.")
+            return self.view()
+        # Must have evolves_from (this is an evolution technique)
+        evolves_from = tek.get("evolves_from", "")
+        if not evolves_from:
+            add_log(self.state, "system", f"{tek['name']} bukan teknik evolusi.")
+            return self.view()
+        # Must own the base technique
+        if evolves_from not in self.state.player.techniques:
+            add_log(self.state, "system", f"Kau belum menguasai {evolves_from}.")
+            return self.view()
+        # Check branch_group: only 1 variant per group
+        branch_group = tek.get("branch_group", "")
+        if branch_group:
+            existing_variants = [
+                t for t in self.state.player.techniques
+                if self.reg.technique(t) and self.reg.technique(t).get("branch_group") == branch_group
+            ]
+            if existing_variants:
+                add_log(self.state, "system",
+                        f"Kau sudah memilih evolusi lain di branch '{branch_group}'.")
+                return self.view()
+        # REPLACE: remove base, add variant
+        self.state.player.techniques.remove(evolves_from)
+        self.state.player.techniques.append(tid)
+        # Carry over technique level (min of base level, max for new realm)
+        base_level = int(self.state.player.technique_levels.pop(evolves_from, 1))
+        realm = self.reg.realm_by_id(self.state.player.realm)
+        max_lvl = (int(realm.get("order", 1)) + 1) if realm else 2
+        self.state.player.technique_levels[tid] = min(base_level, max_lvl)
+        add_log(self.state, "narration",
+                f"{tek['name']} menggantikan {evolves_from} — evolusi teknik!")
         return self.view()
 
     def _merchant_here(self) -> dict | None:

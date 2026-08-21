@@ -1,3 +1,3 @@
-id,name,kind,power,qi_cost,realm_required,element,guard_pct,tags,apply_status,status_chance,status_duration,combo_with_tag,combo_bonus_pct
-teknik_dasar,Teknik Dasar,attack,5,3,realm_chuji,,,"offensive",,,,,
-tebasan,Tebasan,attack,6,3,realm_chuji,,,"offensive",,,,,
+id,name,kind,power,qi_cost,realm_required,element,guard_pct,tags,apply_status,status_chance,status_duration,combo_with_tag,combo_bonus_pct,branch_group,evolves_from
+teknik_dasar,Teknik Dasar,attack,5,3,realm_chuji,,,offensive,,,,,,,
+tebasan,Tebasan,attack,6,3,realm_chuji,,,offensive,,,,,,,
