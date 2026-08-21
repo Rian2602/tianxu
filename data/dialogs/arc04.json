@@ -62,14 +62,14 @@
         },
         "n_compare": {
           "speaker": "npc:npc_mei_ruo",
-          "text": "Ini dia. Dua versi sejarah Tian Xu. Version I — yang diajarkan ke semua murid. Version II — yang disimpan rapat. Bandingkan sendiri: keduanya tidak mungkin benar bersamaan.",
+          "text": "Ini dia. Dua versi sejarah Tian Xu. Versi I — yang diajarkan ke semua murid. Versi II — yang disimpan rapat. Bandingkan sendiri: keduanya tidak mungkin benar bersamaan.",
           "choices": [
             {"label": "(Bandingkan kedua dokumen)", "next": "n_v1v2"}
           ]
         },
         "n_v1v2": {
           "speaker": "narration",
-          "text": "Version I menyebut Tian Xu penjaga segel sejak awal. Version II menyebut segel itu baru dibuat — jauh setelah akademi berdiri. Seseorang menulis ulang sejarahnya sendiri.",
+          "text": "Versi I menyebut Tian Xu penjaga segel sejak awal. Versi II menyebut segel itu baru dibuat — jauh setelah akademi berdiri. Seseorang menulis ulang sejarahnya sendiri.",
           "choices": []
         }
       }
