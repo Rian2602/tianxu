@@ -272,6 +272,8 @@ class BattleEngine:
             "allies": allies or [],
             "ally_turn_index": 0,
             "use_companion": use_companion,
+            "last_technique_tags": [],  # tags dari teknik terakhir (untuk synergy)
+            "synergy_used_this_technique": False,  # cap: max 1 synergy per technique use
         }
         self.state.pending_battle = b
         for f in b["foes"]:
@@ -401,6 +403,15 @@ class BattleEngine:
         lvl = int(self.state.player.technique_levels.get(tid, 1))
         growth = float(self.reg.config.get("cultivation", {}).get("technique_power_growth_per_level", 0.0))
         power = int(int(tek["power"]) * (1 + (lvl - 1) * growth))
+        # Synergy: bonus jika tags teknik sebelumnya match combo_with_tag
+        b["synergy_used_this_technique"] = False  # reset cap
+        combo_tag = tek.get("combo_with_tag", "")
+        if combo_tag and combo_tag in b.get("last_technique_tags", []):
+            bonus_pct = int(tek.get("combo_bonus_pct", 0))
+            if bonus_pct > 0 and not b["synergy_used_this_technique"]:
+                power = int(power * (1 + bonus_pct / 100))
+                b["synergy_used_this_technique"] = True
+                add_log(self.state, "battle", f"Synergy! +{bonus_pct}% power.")
         if kind == "attack":
             # Apply weaken debuff to attack
             atk = pc["attack"] + power
@@ -460,6 +471,9 @@ class BattleEngine:
             self._apply_technique_status(b, pc, tek, target_is_player=True)
             # Mastery XP: +1 per penggunaan teknik
             gain_mastery_xp(self.state, tek.get("element", ""))
+        # Track tags untuk synergy teknik berikutnya
+        tags_str = tek.get("tags", "") or ""
+        b["last_technique_tags"] = [t.strip() for t in tags_str.split(",") if t.strip()]
 
     def _apply_technique_status(self, b: dict, target: dict, tek: dict,
                                  target_is_player: bool = False) -> None:
