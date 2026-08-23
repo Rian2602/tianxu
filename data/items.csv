@@ -1,38 +1,38 @@
-id,name,type,hp_restore,qi_restore,power,exp_value
-pil_qi,Pil Qi,consumable,20,10,,
-herba_qi,Herba Qi,consumable,10,,,,2
-herba_darah,Herba Darah,consumable,10,,8,3
-herba_rohani,Herba Rohani,consumable,15,12,,6
-herba_matahari,Herba Matahari,consumable,20,15,,10
-batu_qi,Batu Qi,consumable,5,5,,2
-besi_spirit,Besi Spirit,consumable,,10,,5
-jade_suci,Jade Suci,consumable,20,20,,10
-bintang_stone,Batu Bintang,consumable,30,25,,18
-pedang_kayu,Pedang Kayu,weapon,,,3,
-pedang_besi,Pedang Besi,weapon,,,5,
-pedang_spirit,Pedang Roh,weapon,,,8,
-jubah_latih,Jubah Latih,weapon,,,2,
-pil_pemulihan,Pil Pemulihan,consumable,30,,,,
-pil_qi_besar,Pil Qi Besar,consumable,,25,,
-serpihan_batu,Serpihan Batu,consumable,5,5,,
-pil_kultivasi_chuji,Pil Kultivasi Chu Ji,consumable,10,5,,5
-pil_kultivasi_xuanshi,Pil Kultivasi Xuan Shi,consumable,20,10,,12
-pil_kultivasi_dishi,Pil Kultivasi Di Shi,consumable,30,15,,25
-pil_kultivasi_tianshi,Pil Kultivasi Tian Shi,consumable,50,25,,50
-pil_sukses,Pil Sukses,consumable,,,,
-pil_aman,Pil Aman,consumable,,,,
-beast_core_chuji,Beast Core Chu Ji,consumable,5,3,,3
-beast_core_xuanshi,Beast Core Xuan Shi,consumable,10,8,,8
-beast_core_dishi,Beast Core Di Shi,consumable,20,15,,20
-beast_core_tianshi,Beast Core Tian Shi,consumable,40,30,,40
-simbol_kuno,Simbol Kuno,key_item,,,
-catatan_siklus,Catatan Siklus,key_item,,,
-catatan_korupsi_formasi,Catatan Korupsi Formasi,key_item,,,
-artefak_pertama,Artefak Pertama,key_item,,,
-gulung_teknik_pedang,Gulung Teknik Pedang,key_item,,,
-gulung_teknik_pemulihan,Gulung Teknik Pemulihan,key_item,,,
-gulung_teknik_pertahanan,Gulung Teknik Pertahanan,key_item,,,
-resep_pil_chuji,Resep Pil Kultivasi Chu Ji,key_item,,,
-resep_pil_pemulihan,Resep Pil Pemulihan,key_item,,,
-resep_pil_sukses,Resep Pil Sukses,key_item,,,
-resep_pil_aman,Resep Pil Aman,key_item,,,
+id,name,type,hp_restore,qi_restore,power,exp_value,description
+pil_qi,Pil Qi,consumable,20,10,,,Pil kecil yang bergizi. Memulihkan HP dan Qi.
+herba_qi,Herba Qi,consumable,10,,,,Tanaman herbal yang mengandung Qi rendah. Bahan dasar resep pil.
+herba_darah,Herba Darah,consumable,10,,8,3,Herba merah yang tumbuh di tempat yang keras. Mengandung energi pemulihan.
+herba_rohani,Herba Rohani,consumable,15,12,,6,Herba langka yang tumbuh di gua-gua gelap. Bahan untuk resep lanjutan.
+herba_matahari,Herba Matahari,consumable,20,15,,10,Bunga besar yang menghadap matahari. Energi sangat tinggi.
+batu_qi,Batu Qi,consumable,5,5,,2,Batu bekas penyimpan Qi. Bahan penting untuk kalukida.
+besi_spirit,Besi Spirit,consumable,,10,,5,Besi yang mengandung sisa energi roh. Digunakan dalam penguatan senjata.
+jade_suci,Jade Suci,consumable,20,20,,10,Batuan langka yang dipuji di gua suci. Mengandung Qi murni.
+bintang_stone,Batu Bintang,consumable,30,25,,18,Batuan langit yang jatuh. Sumber energi kosmik yang sangat langka.
+pedang_kayu,Pedang Kayu,weapon,,,3,,Senjata dasar dari kayu. Cocok untuk murid pemula.
+pedang_besi,Pedang Besi,weapon,,,5,,Senjata dari besi. Lebih kuat dari pedang kayu.
+pedang_spirit,Pedang Roh,weapon,,,8,,Senjata yang mengandung energi roh. Serangan memotong.
+jubah_latih,Jubah Latih,weapon,,,2,,Jubah ringan untuk latihan. Memberikan perlindungan dasar.
+pil_pemulihan,Pil Pemulihan,consumable,30,,,,Pil yang mempercepat pemulihan celah. Memulihkan HP penuh.
+pil_qi_besar,Pil Qi Besar,consumable,,25,,,Versi besar dari Pil Qi. Memulihkan banyak Qi.
+serpihan_batu,Serpihan Batu,consumable,5,5,,,Pecahan batu biasa. Berguna sebagai bahan campuran.
+pil_kultivasi_chuji,Pil Kultivasi Chu Ji,consumable,10,5,,5,Pil kultivasi untuk Chu Ji. Meningkatkan dantian perlahan.
+pil_kultivasi_xuanshi,Pil Kultivasi Xuan Shi,consumable,20,10,,12,Pil kultivasi untuk Xuan Shi. Meningkatkan dantian secara signifikan.
+pil_kultivasi_dishi,Pil Kultivasi Di Shi,consumable,30,15,,25,Pil kultivasi untuk Di Shi. Energi yang sangat konsentrasi.
+pil_kultivasi_tianshi,Pil Kultivasi Tian Shi,consumable,50,25,,50,Pil kultivasi untuk Tian Shi. Sumber energi yang sangat langka.
+pil_sukses,Pil Sukses,consumable,,,,,Meningkatkan peluang meditasi +30%. Gunakan sebelum meditasi.
+pil_aman,Pil Aman,consumable,,,,,Mencegah debuff jika meditasi gagal. Penting untuk upacara berbahaya.
+beast_core_chuji,Beast Core Chu Ji,consumable,5,3,,3,Inti binatang Chu Ji. Mengandung Qi alami untuk dantian.
+beast_core_xuanshi,Beast Core Xuan Shi,consumable,10,8,,8,Inti binatang Xuan Shi. Lebih mengandung Qi dibanding Chu Ji.
+beast_core_dishi,Beast Core Di Shi,consumable,20,15,,20,Inti binatang Di Shi. Kekuatan Qi yang sangat tinggi.
+beast_core_tianshi,Beast Core Tian Shi,consumable,40,30,,40,Inti binatang Tian Shi. Kekuatan luar biasa untuk breakthrough.
+simbol_kuno,Simbol Kuno,key_item,,,,,Simbol geometris kuno yang ditemukan di kamar. Terkait dengan formasi.
+catatan_siklus,Catatan Siklus,key_item,,,,,Catatan tentang siklus formasi yang berulang. Menunjukkan pola waktu.
+catatan_korupsi_formasi,Catatan Korupsi Formasi,key_item,,,,,Dokumen rahasia tentang korupsi di dalam akademi. Berbahaya untuk dibaca.
+artefak_pertama,Artefak Pertama,key_item,,,,,Artefak pertama dari formasi. Bisa menjadi kunci untuk memahami misteri Tian Xu.
+gulung_teknik_pedang,Gulung Teknik Pedang,key_item,,,,,Berisi teknik pedang dasar. Bisa dipelajari di akademi.
+gulung_teknik_pemulihan,Gulung Teknik Pemulihan,key_item,,,,,Berisi teknik pemulihan Qi. Berguna untuk tim pengawal.
+gulung_teknik_pertahanan,Gulung Teknik Pertahanan,key_item,,,,,Berisi teknik pertahanan. Membantu bertahan dalam pertarungan.
+resep_pil_chuji,Resep Pil Kultivasi Chu Ji,key_item,,,,,Resep untuk membuat Pil Kultivasi Chu Ji. Dibeli dari pedagang.
+resep_pil_pemulihan,Resep Pil Pemulihan,key_item,,,,,Resep untuk membuat Pil Pemulihan. Memulihkan HP maksimal.
+resep_pil_sukses,Resep Pil Sukses,key_item,,,,,Resep untuk membuat Pil Sukses. Meningkatkan peluang meditasi.
+resep_pil_aman,Resep Pil Aman,key_item,,,,,Resep untuk membuat Pil Aman. Melindungi dari kegagalan meditasi.
