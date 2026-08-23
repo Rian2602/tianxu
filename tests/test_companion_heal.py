@@ -74,3 +74,19 @@ def test_companion_heal_caps_at_max_hp(session, registry):
 
     assert session.state.companion["hp"] <= max_hp, \
         f"HP tidak boleh melebihi max {max_hp}, got {session.state.companion['hp']}"
+
+
+def test_companion_heal_rejects_ko_companion(session, registry):
+    """Heal companion yang sudah KO harus ditolak."""
+    _setup_companion(session, registry)
+    session.state.companion["hp"] = 0
+    session.state.companion["active"] = False
+    original_qi = session.state.player.qi
+
+    session.apply_action({"type": "companion_heal"})
+
+    assert session.state.companion["hp"] == 0, "HP KO companion tidak boleh berubah"
+    assert session.state.player.qi == original_qi, "Qi tidak boleh berkurang"
+    logs = [e.get("text", "") for e in session.state.log if e.get("type") == "system"]
+    assert any("tidak ada" in log.lower() or "bisa di-heal" in log.lower() for log in logs), \
+        f"harus ada pesan error: {logs[-3:]}"
