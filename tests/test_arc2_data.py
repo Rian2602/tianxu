@@ -222,9 +222,9 @@ def test_arc2_trials_and_investigation(registry):
     _spar_win(s, "npc_proctor")
     assert s.state.current_quest == "quest_a02_c02_003"
     assert s.state.flags.get("flag_team_recognized") is True
-    # 3. outer region
+    # 3. outer region — reach auto-completes (player at loc_outer_region)
     _reach(s, "loc_outer_region")
-    assert s.state.current_quest == "quest_a02_c02_004"
+    assert s.state.current_quest == "quest_a02_c02_005"
     assert s.state.flags.get("flag_outer_region_unlocked") is True
     # 4-5. disturbance & murid hilang — reach_safe menembus gerbang otomatis
     # (q004 selesai di tengah rute → gua terbuka) — playtest #6
@@ -286,9 +286,9 @@ def test_arc2_convergence_to_ending(registry):
     # 6b. obey branch quest: talk to proctor
     _talk(s, "npc_proctor")
     assert s.state.current_quest == "quest_a02_c04_007", f"after obey branch, should converge"
-    # 7. hidden cave
+    # 7. hidden cave — reach auto-completes (player at loc_hidden_cave)
     _reach(s, "loc_training_hall"); _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
-    assert s.state.current_quest == "quest_a02_c04_008"
+    assert s.state.current_quest == "quest_a02_c04_009"
     assert s.state.flags.get("flag_hidden_cave_explored") is True
     # 8. artifact
     _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")

@@ -122,11 +122,7 @@ def test_arc1_full_playthrough_yellow(registry):
     # 005c: defeat 2 binatang_hutan — simulate battle wins
     s.state.active_side_quests.setdefault("quest_a01_c04_005c", {})
     s.quest.notify_battle_won(["binatang_hutan", "binatang_hutan"])
-    assert s.state.current_quest == "quest_a01_c04_005d"
-
-    # 005d: reach formation tua again (must move away first)
-    s.apply_action({"type": "move", "to": "loc_hutan_akademi"})
-    s.apply_action({"type": "move", "to": "loc_outer_region"})
+    # 005d: reach auto-completes (player still at loc_outer_region)
     assert s.state.current_quest == "quest_a01_c04_006"
     assert s.state.flags.get("flag_formation_complete") is True
 

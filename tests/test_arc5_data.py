@@ -273,12 +273,9 @@ def test_arc5_entity_and_memory_to_ending(registry):
     _reach(s, "loc_training_hall"); _reach(s, "loc_archive_public")
     _reach(s, "loc_forbidden_archive"); _reach(s, "loc_tianxu_deepest_chamber")
     _talk(s, "npc_entity")
-    assert s.state.current_quest == "quest_a05_c05_005"
-    assert s.state.flags.get("flag_entity_first_contact") is True
-    # Q5: memory besar (reach ulang ruang terdalam)
-    _reach(s, "loc_forbidden_archive")
-    _reach(s, "loc_tianxu_deepest_chamber")
-    assert s.state.current_quest == "quest_a06_c01_001"  # DAG lanjut ke Arc VI
+    # Q5: reach auto-completes (player already at loc_tianxu_deepest_chamber)
+    assert s.state.current_quest == "quest_a06_c01_001"
+    assert s.state.flags.get("flag_entity_first_contact") is True  # DAG lanjut ke Arc VI
     assert s.state.flags.get("flag_memory_kill_attempt_seen") is True
     assert s.state.flags.get("flag_cycle_formation_known_partial") is True
     assert s.state.flags.get("belief_protagonist_may_be_cause") is False

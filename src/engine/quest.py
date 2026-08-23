@@ -508,6 +508,13 @@ class QuestEngine:
         q = self.reg.quest(qid)
         if q:
             apply_effects(self.state, self.reg, q.get("on_start", {}).get("effects"))
+        # Playtest: reach quest selesai langsung bila pemain sudah di lokasi target
+        if q and q.get("objective", {}).get("kind") == "reach":
+            obj = q["objective"]
+            if obj.get("location") == self.state.location:
+                tw = obj.get("time_window")
+                if not tw or self._in_window(tw):
+                    self._complete_main(qid)
 
     def select_branch(self, option: str) -> None:
         """Setelah dialog percabangan selesai — pilih cabang berdasarkan opsi.
