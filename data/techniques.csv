@@ -26,3 +26,6 @@ teknik_liuguang_pantul,Adaptasi: Pantul,defend,2,6,realm_tianshi,air,35,"defensi
 teknik_pedang_api_membara,Pedang Api Membara,attack,25,10,realm_dishi,api,,"pedang,offensive,combo_finisher",burn,50,3,,,,
 teknik_pamungkas_wuxing,Siklus Wuxing Sempurna,attack,45,14,realm_shenwu,,,"offensive,combo_finisher",,,,,,,
 teknik_gempa_tanah,Gempa Tanah,attack,10,4,realm_xuanshi,tanah,,"offensive,combo_starter",,,,,,,
+teknik_aliran_qi_sejati,Aliran Qi Sejati,attack,17,6,realm_dishi,air,,offensive,,,,,,,
+teknik_nafas_hutan_suci,Nafas Hutan Suci,heal,16,6,realm_dishi,kayu,,heal,regen,60,3,,,,
+teknik_arus_laut_dalam,Arus Laut Dalam,defend,2,6,realm_dishi,air,55,"defensive,qi_restore",,,,,,,

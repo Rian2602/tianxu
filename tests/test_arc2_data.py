@@ -13,6 +13,7 @@ import pytest
 
 from src.loader import DataRegistry, DATA_DIR
 from src.engine.session import GameSession
+from tests.conftest import reach_safe
 
 pytestmark = pytest.mark.skipif(
     not (DATA_DIR / "quests" / "arc02.json").exists(),
@@ -88,6 +89,25 @@ def _through_arc1(registry) -> GameSession:
     s.quest.notify_rest()
     assert s.state.current_quest == "quest_a02_c01_001", s.state.current_quest
     return s
+
+
+def test_formation_tua_intro_narration_on_start(registry):
+    """Playtest #5: quest Formasi Tua membuka narasi urgensi saat dimulai."""
+    s = _new_session(registry)
+    _talk(s, "npc_aptitude_examiner")
+    _talk(s, "npc_aptitude_examiner")
+    _reach(s, "loc_training_hall")
+    for npc in ("npc_proctor", "npc_lin_yue", "npc_shen_luo", "npc_gu_han", "npc_proctor"):
+        _talk(s, npc)
+    s.apply_action({"type": "choose", "option": "pavilion_jianxin"})
+    # dialog penjelasan pavilion dulu (on_complete 004); intro formasi mengantre
+    assert s.state.pending_dialog == "dlg_proctor_pavilion_explain"
+    assert s.state.pending_dialog_next == "dlg_formation_tua_intro"
+    # habiskan penjelasan → intro urgensi formasi dipromosikan
+    while s.state.pending_dialog != "dlg_formation_tua_intro":
+        s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    assert s.state.current_quest == "quest_a01_c04_005a"
+    assert s.state.pending_dialog == "dlg_formation_tua_intro"
 
 
 def test_arc2_data_contract_ok(registry):
@@ -167,8 +187,9 @@ def test_arc2_midterm_spar_debuff_is_battle_local(registry):
     assert registry.npc("npc_proctor")["combat"]["hp"] == 150
 
 
-def test_arc2_team_spar_uses_npc_allies_without_companion(registry):
-    """Ujian kelompok memakai rekan NPC, bukan Serigala aktif."""
+def test_arc2_team_spar_sequential_turns(registry):
+    """Ujian kelompok: rekan NPC + companion dalam giliran berurutan
+    yang dikendalikan pemain (playtest #7)."""
     s = _through_arc1(registry)
     s.state.current_quest = "quest_a02_c01_002"
     _reach(s, "loc_training_hall")
@@ -180,10 +201,11 @@ def test_arc2_team_spar_uses_npc_allies_without_companion(registry):
         "npc_shen_luo",
         "npc_gu_han",
     ]
-    assert battle["use_companion"] is False
+    assert battle["turn_queue"] == [
+        "player", "ally:0", "ally:1", "ally:2", "companion",
+    ]
     view = s.battle.view()
-    assert view["companion"] is None
-    assert view["active_ally_index"] == 0
+    assert view["active_actor"] == {"type": "player", "name": "Kau"}
 
 
 def test_arc2_trials_and_investigation(registry):
@@ -204,14 +226,11 @@ def test_arc2_trials_and_investigation(registry):
     _reach(s, "loc_outer_region")
     assert s.state.current_quest == "quest_a02_c02_004"
     assert s.state.flags.get("flag_outer_region_unlocked") is True
-    # 4. disturbance — docs 03: di wilayah luar (loc_outer_region)
-    _reach(s, "loc_hidden_cave")  # q004 butuh outer — belum selesai
-    _reach(s, "loc_outer_region")  # q004 selesai
-    assert s.state.current_quest == "quest_a02_c02_005"
-    assert s.state.flags.get("flag_disturbance_investigated") is True
-    # 5. missing disciple — tempat persembunyian di gua
-    _reach(s, "loc_hidden_cave")
+    # 4-5. disturbance & murid hilang — reach_safe menembus gerbang otomatis
+    # (q004 selesai di tengah rute → gua terbuka) — playtest #6
+    reach_safe(s, "loc_hidden_cave")
     assert s.state.current_quest == "quest_a02_c03_006"
+    assert s.state.flags.get("flag_disturbance_investigated") is True
     assert s.state.flags.get("flag_evidence_missing_disciple") is True
     assert s.state.inventory.get("catatan_siklus") == 1
 
@@ -223,8 +242,8 @@ def _to_accusation_branch(registry: DataRegistry) -> GameSession:
     _reach(s, "loc_training_hall")
     _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
     _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
+    # gerbang ditangani otomatis (playtest #6): q003→q004→q005 tuntas di rute
+    reach_safe(s, "loc_hidden_cave")
     _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
     _talk(s, "npc_lin_yue", close=False)
     s.apply_action({"type": "dialog_choice", "choice_index": -1})

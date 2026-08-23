@@ -32,7 +32,7 @@
       "description": "Kumpulkan bukti korupsi formasi dari Hutan Akademi — ada catatan yang disembunyikan di sana.",
       "objective": {
         "kind": "gather",
-        "item": "catatan_siklus",
+        "item": "catatan_korupsi_formasi",
         "target": 1,
         "hint": "Cari catatan korupsi formasi di Hutan Akademi."
       },
@@ -61,7 +61,7 @@
       "available_from": {
         "day": 1,
         "hour": 0,
-        "requires_flags": ["flag_reform_evidence_found"]
+        "requires_flags": ["flag_reform_evidence_found", "flag_disturbance_investigated"]
       },
       "on_complete": {
         "effects": [

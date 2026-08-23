@@ -612,6 +612,22 @@
      {
       "item": "gulung_teknik_pertahanan",
       "price": 25
+     },
+     {
+      "item": "resep_pil_chuji",
+      "price": 15
+     },
+     {
+      "item": "resep_pil_pemulihan",
+      "price": 20
+     },
+     {
+      "item": "resep_pil_sukses",
+      "price": 25
+     },
+     {
+      "item": "resep_pil_aman",
+      "price": 20
      }
     ],
     "sell": [

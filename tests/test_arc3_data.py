@@ -14,6 +14,7 @@ import pytest
 
 from src.loader import DataRegistry, DATA_DIR
 from src.engine.session import GameSession
+from tests.conftest import reach_safe
 
 pytestmark = pytest.mark.skipif(
     not (DATA_DIR / "quests" / "arc03.json").exists(),
@@ -85,8 +86,8 @@ def _through_arc1_2(registry) -> GameSession:
     _reach(s, "loc_training_hall")
     _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
     _talk(s, "npc_proctor"); _spar_win(s, "npc_proctor")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
-    _reach(s, "loc_outer_region"); _reach(s, "loc_hidden_cave")
+    # gerbang ditangani otomatis (playtest #6): q003→q004→q005 tuntas di rute
+    reach_safe(s, "loc_hidden_cave")
     _reach(s, "loc_outer_region"); _reach(s, "loc_training_hall")
     _talk(s, "npc_lin_yue", close=False)
     s.apply_action({"type": "dialog_choice", "choice_index": -1})

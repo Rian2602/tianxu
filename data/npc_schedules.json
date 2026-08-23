@@ -1,24 +1,18 @@
 {
  "schedules": {
   "npc_lin_yue": [
-   {
-    "location": "loc_training_hall",
-    "hour_start": 6,
-    "hour_end": 12,
-    "note": "Latihan pagi di aula pelatihan"
-   },
-   {
-    "location": "loc_pavilion_linlan",
-    "hour_start": 12,
-    "hour_end": 18,
-    "note": "Istirahat di paviliun Linlan"
-   },
-   {
-    "location": "loc_tianxu_gate",
-    "hour_start": 18,
-    "hour_end": 22,
-    "note": "Berjaga di gerbang Tian Xu"
-   }
+  {
+   "location": "loc_training_hall",
+   "hour_start": 6,
+   "hour_end": 12,
+   "note": "Latihan pagi di aula pelatihan"
+  },
+  {
+   "location": "loc_tianxu_gate",
+   "hour_start": 18,
+   "hour_end": 22,
+   "note": "Berjaga di gerbang Tian Xu"
+  }
   ],
   "npc_shen_luo": [
    {
@@ -47,12 +41,12 @@
     "hour_end": 15,
     "note": "Meramu di paviliun Yanzhi"
    },
-   {
-    "location": "loc_library",
-    "hour_start": 15,
-    "hour_end": 21,
-    "note": "Membaca di perpustakaan"
-   }
+  {
+   "location": "loc_pavilion_yanzhi",
+   "hour_start": 15,
+   "hour_end": 21,
+   "note": "Membaca di perpustakaan paviliun"
+  }
   ],
   "npc_gu_han": [
     {

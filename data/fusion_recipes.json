@@ -33,7 +33,7 @@
         "teknik_gelombang_qi"
       ],
       "requires_level": 2,
-      "result": "teknik_pedang_api_membara",
+      "result": "teknik_aliran_qi_sejati",
       "realm_required": "realm_dishi"
     },
     {
@@ -45,7 +45,7 @@
         "teknik_pemulihan_kayu"
       ],
       "requires_level": 2,
-      "result": "teknik_pedang_api_membara",
+      "result": "teknik_nafas_hutan_suci",
       "realm_required": "realm_dishi"
     },
     {
@@ -57,7 +57,7 @@
         "teknik_aliran_air"
       ],
       "requires_level": 2,
-      "result": "teknik_pedang_api_membara",
+      "result": "teknik_arus_laut_dalam",
       "realm_required": "realm_dishi"
     }
   ]
