@@ -43,20 +43,43 @@ class ApiClient:
         return self._req("POST", "/api/action", {"action": action})
 
 
-def build_graph(data_dir: Path) -> dict[str, list[str]]:
+def build_graph(data_dir: Path) -> tuple[dict[str, list[str]], dict[str, dict[str, str]]]:
+    """Build location graph + connection gates map.
+
+    Returns (graph, gates) where:
+    - graph: {loc_id: [connected_loc_ids]}
+    - gates: {loc_id: {target_loc: required_flag}}
+    """
     locs = json.load(open(data_dir / "locations.json"))["locations"]
-    return {loc["id"]: list(loc.get("connections", [])) for loc in locs}
+    graph = {}
+    gates = {}
+    for loc in locs:
+        lid = loc["id"]
+        graph[lid] = list(loc.get("connections", []))
+        gates[lid] = dict(loc.get("connection_gates") or {})
+    return graph, gates
 
 
-def bfs_path(graph, start, goal):
+def bfs_path(graph, start, goal, gates=None, flags=None):
+    """BFS pathfinding with connection_gates support.
+
+    gates: {loc_id: {target_loc: required_flag}}
+    flags: set of flags the player currently has
+    """
     if start == goal:
         return []
+    gates = gates or {}
+    flags = flags or set()
     seen = {start}
     q = deque([(start, [])])
     while q:
         cur, path = q.popleft()
         for nxt in graph.get(cur, []):
             if nxt in seen:
+                continue
+            # Check connection gate
+            required_flag = (gates.get(cur) or {}).get(nxt)
+            if required_flag and required_flag not in flags:
                 continue
             p = path + [nxt]
             if nxt == goal:
@@ -67,9 +90,10 @@ def bfs_path(graph, start, goal):
 
 
 class Runner:
-    def __init__(self, client, graph, verbose=True):
+    def __init__(self, client, graph, gates=None, verbose=True):
         self.c = client
         self.g = graph
+        self.gates = gates or {}
         self.v = verbose
         self.fails = []
 
@@ -101,7 +125,9 @@ class Runner:
         cur = self._view().get("location", {}).get("id")
         if cur == target:
             return True
-        path = bfs_path(self.g, cur, target)
+        # Collect current flags from game state for gate checking
+        flags = set(self._flags().keys())
+        path = bfs_path(self.g, cur, target, self.gates, flags)
         if not path:
             self.log(f"    [SKIP] no path {cur} → {target}")
             return False
@@ -259,8 +285,8 @@ def main():
     args = ap.parse_args()
 
     client = ApiClient(args.base_url)
-    graph = build_graph(Path(args.data))
-    runner = Runner(client, graph)
+    graph, gates = build_graph(Path(args.data))
+    runner = Runner(client, graph, gates)
 
     overall = True
     for p in args.plan:
