@@ -17,6 +17,11 @@
       ]
     },
     {
+      "id": "catatan_korupsi_formasi",
+      "description": "Gulungan catatan yang disembunyikan di Hutan Akademi — rekaman ketidaksesuaian aliran energi formasi yang diabaikan akademi.",
+      "consumed": false
+    },
+    {
       "id": "artefak_pertama",
       "description": "Artefak kuno yang bereaksi saat kau sentuh — memancarkan cahaya samar dan kilasan ingatan.",
       "consumed": false,

@@ -9,7 +9,7 @@
       "gold": 20,
       "roots": "akar_biasa",
       "equipment": {
-        "weapon": null
+        "weapon": "pedang_kayu"
       }
     },
     "location": "loc_tianxu_gate",
@@ -48,7 +48,8 @@
           "count": 2
         }
       ],
-      "passive": "passive_flowing_qi"
+      "passive": "passive_flowing_qi",
+      "location": "loc_pavilion_wuxin"
     },
     {
       "id": "pavilion_jianxin",
@@ -64,7 +65,8 @@
           "count": 1
         }
       ],
-      "passive": "passive_sword_intent"
+      "passive": "passive_sword_intent",
+      "location": "loc_pavilion_jianxin"
     },
     {
       "id": "pavilion_yanzhi",
@@ -80,7 +82,8 @@
           "count": 2
         }
       ],
-      "passive": "passive_phoenix_blood"
+      "passive": "passive_phoenix_blood",
+      "location": "loc_pavilion_yanzhi"
     },
     {
       "id": "pavilion_liuguang",
@@ -96,7 +99,8 @@
           "count": 1
         }
       ],
-      "passive": "passive_earth_guardian"
+      "passive": "passive_earth_guardian",
+      "location": "loc_pavilion_liuguang"
     }
   ],
   "cultivation": {
@@ -187,6 +191,12 @@
           {
             "item": "herba_darah",
             "chance": 0.25,
+            "min": 1,
+            "max": 1
+          },
+          {
+            "item": "catatan_korupsi_formasi",
+            "chance": 0.35,
             "min": 1,
             "max": 1
           }

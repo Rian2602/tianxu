@@ -8,26 +8,35 @@
           "speaker": "narration",
           "text": "Di tengah kabut pagi yang menyelimuti jalan pendakian, seorang pemuda berjalan sendiri menuju gerbang Tian Xu — akademi kultivasi tertua di seluruh negeri.",
           "choices": [
-            {"label": "(Melanjutkan)", "next": "n2"}
+            {
+              "label": "(Melanjutkan)",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
           "speaker": "narration",
           "text": "Chen Xu — namamu terukir dalam catatan keluarga yang sudah pudar. Tidak ada yang istimewa dari dirimu: akar cultivation biasa, bakat yang tidak menonjol, dan satu-satunya bekal adalah tekad untuk memahami formasi kuno yang muncul dalam mimpimu.",
           "choices": [
-            {"label": "(Mimpi yang sama berulang setiap malam...)", "next": "n3"}
+            {
+              "label": "(Mimpi yang sama berulang setiap malam...)",
+              "next": "n3"
+            }
           ]
         },
         "n3": {
           "speaker": "narration",
           "text": "Formasi yang sama — lingkaran cahaya yang hancur, suara yang memanggil namamu, dan tangan yang tahu cara menggambarnya tanpa pernah diajari. Inilah yang membawamu ke sini.",
           "choices": [
-            {"label": "(Mendekati gerbang Tian Xu)", "next": "n4"}
+            {
+              "label": "(Mendekati gerbang Tian Xu)",
+              "next": "n4"
+            }
           ]
         },
         "n4": {
           "speaker": "narration",
-          "text": "Gerbang batu besar dengan ukiran naga menjulang di hadapanmu. Di depannya, seorang pemeriksa aptitude sudah menunggu. Pemeriksaan akan menentukan masa depanmu di akademi ini.",
+          "text": "Gerbang batu besar dengan ukiran naga menjulang di hadapanmu. Di depannya, Xu Ming, pemeriksa aptitude akademi, sudah menunggu. Pemeriksaan akan menentukan masa depanmu di akademi ini.",
           "choices": []
         }
       }
@@ -41,14 +50,20 @@
           "speaker": "npc:npc_aptitude_examiner",
           "text": "Nama? Tujuan datang ke Tian Xu?",
           "choices": [
-            {"label": "Aku datang untuk belajar cultivation.", "next": "n2"}
+            {
+              "label": "Aku datang untuk belajar cultivation.",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
           "speaker": "npc:npc_aptitude_examiner",
           "text": "Tempatkan tanganmu di atas batu pemeriksa. Tenang — hasilnya hanya penentu kelas, bukan nilaimu.",
           "choices": [
-            {"label": "(Mematuhi)", "next": "n3"}
+            {
+              "label": "(Mematuhi)",
+              "next": "n3"
+            }
           ]
         },
         "n3": {
@@ -67,7 +82,10 @@
           "speaker": "npc:npc_aptitude_examiner",
           "text": "Tanda tangan di sini. Kamu terhitung murid tahun ini — pavilion akan dipilih setelah pelajaran pertama.",
           "choices": [
-            {"label": "(Menandatangani)", "next": "n2"}
+            {
+              "label": "(Menandatangani)",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
@@ -98,24 +116,39 @@
           "speaker": "npc:npc_lin_yue",
           "text": "Kau lagi. Ada sesuatu yang ingin kubicarakan — aku butuh bantuanmu. Tapi kita bisa bicara nanti kalau kau sedang sibuk.",
           "choices": [
-            {"label": "Aku punya waktu. Apa yang terjadi?", "next": "n1"},
-            {"label": "Nanti saja, aku harus menyelesaikan sesuatu dulu.", "next": "n_end"}
+            {
+              "label": "Aku punya waktu. Apa yang terjadi?",
+              "next": "n1"
+            },
+            {
+              "label": "Nanti saja, aku harus menyelesaikan sesuatu dulu.",
+              "next": "n_end"
+            }
           ],
-          "condition": {"quest_active": "quest_char_lin_yue_001"}
+          "condition": {
+            "quest_active": "quest_char_lin_yue_001"
+          }
         },
         "n1": {
           "speaker": "npc:npc_lin_yue",
           "text": "Kau murid baru juga? Aku Lin Yue. Gerakan dasarmu tadi... anehnya terlihat seperti orang yang sudah pernah berlatih.",
           "choices": [
-            {"label": "Aku baru pertama kali mencoba.", "next": "n2"},
-            {"label": "Mungkin aku memang berbakat?", "next": "n3"}
+            {
+              "label": "Aku baru pertama kali mencoba.",
+              "next": "n2"
+            },
+            {
+              "label": "Mungkin aku memang berbakat?",
+              "next": "n3"
+            }
           ]
         },
         "n2": {
           "speaker": "npc:npc_lin_yue",
           "text": "Kalau begitu mungkin itu firasat. Di Tian Xu, banyak hal tidak seperti yang terlihat. Sampai jumpa di pelajaran.",
           "choices": []
-        },        "n3": {
+        },
+        "n3": {
           "speaker": "npc:npc_lin_yue",
           "text": "Hmm, mungkin. Tapi hati-hati — 'berbakat' di sini bisa berarti banyak hal, dan tidak semuanya baik.",
           "choices": []
@@ -128,7 +161,6 @@
       }
     },
     {
-
       "id": "dlg_lin_yue_merchant_letter",
       "npc": "npc_lin_yue",
       "start": "n1",
@@ -137,14 +169,20 @@
           "speaker": "npc:npc_lin_yue",
           "text": "Ada surat untukku? Dari siapa?",
           "choices": [
-            {"label": "(Menyerahkan surat tertutup)", "next": "n2"}
+            {
+              "label": "(Menyerahkan surat tertutup)",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
           "speaker": "npc:npc_lin_yue",
           "text": "... Tulisan tangan ini. Aku mengenalinya. Dia... masih ingat aku?",
           "choices": [
-            {"label": "Pedagang itu bilang 'seseorang yang pernah berjalan di jalan yang sama'.", "next": "n3"}
+            {
+              "label": "Pedagang itu bilang 'seseorang yang pernah berjalan di jalan yang sama'.",
+              "next": "n3"
+            }
           ]
         },
         "n3": {
@@ -163,7 +201,10 @@
           "speaker": "npc:npc_shen_luo",
           "text": "Shen Luo. Aku tidak suka basa-basi. Yang lemah tertinggal, yang kuat maju — itulah Tian Xu.",
           "choices": [
-            {"label": "Lalu di mana posisiku menurutmu?", "next": "n2"}
+            {
+              "label": "Lalu di mana posisiku menurutmu?",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
@@ -182,7 +223,10 @@
           "speaker": "npc:npc_mei_ruo",
           "text": "Oh, kau! Mei Ruo. Aku sedang mencatat sejarah pavilion. Kalau kau penasaran soal akademi ini, tanyakan padaku.",
           "choices": [
-            {"label": "Sejarah apa yang kau catat?", "next": "n2"}
+            {
+              "label": "Sejarah apa yang kau catat?",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
@@ -201,7 +245,10 @@
           "speaker": "npc:npc_gu_han",
           "text": "Gu Han. Aku tidak percaya apa pun yang tidak bisa kubuktikan sendiri. Termasuk reputasi akademi ini.",
           "choices": [
-            {"label": "Kau terdengar seperti tidak percaya pada Tian Xu.", "next": "n2"}
+            {
+              "label": "Kau terdengar seperti tidak percaya pada Tian Xu.",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
@@ -220,7 +267,10 @@
           "speaker": "npc:npc_teacher_wuxin",
           "text": "Pavilion Wuxin mengajarkan bahwa kekuatan tumbuh saat kau melepaskan — bukan saat kau menggenggam erat.",
           "choices": [
-            {"label": "(Mendengarkan filosofi Wuxin)", "next": "n2"}
+            {
+              "label": "(Mendengarkan filosofi Wuxin)",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
@@ -239,7 +289,10 @@
           "speaker": "npc:npc_teacher_jianxin",
           "text": "Jianxin: satu pedang, satu disiplin, satu tujuan. Tidak ada jalan pintas menuju ketepatan.",
           "choices": [
-            {"label": "(Mendengarkan filosofi Jianxin)", "next": "n2"}
+            {
+              "label": "(Mendengarkan filosofi Jianxin)",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
@@ -258,7 +311,10 @@
           "speaker": "npc:npc_teacher_yanzhi",
           "text": "Yanzhi percaya: pahami prinsip di balik gerakan, dan gerakan itu menjadi milikmu selamanya.",
           "choices": [
-            {"label": "(Mendengarkan filosofi Yanzhi)", "next": "n2"}
+            {
+              "label": "(Mendengarkan filosofi Yanzhi)",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
@@ -277,7 +333,10 @@
           "speaker": "npc:npc_teacher_liuguang",
           "text": "Liuguang: air mengalir tidak memaksa jalannya — ia menyesuaikan. Begitu pula cultivation.",
           "choices": [
-            {"label": "(Mendengarkan filosofi Liuguang)", "next": "n2"}
+            {
+              "label": "(Mendengarkan filosofi Liuguang)",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
@@ -296,22 +355,34 @@
           "speaker": "npc:npc_lin_yue",
           "text": "Kau juga merasakannya? Formasi ini... ada sesuatu yang familiar. Seperti mimpi yang belum selesai.",
           "choices": [
-            {"label": "Kilasan tadi — formasi yang sama, tapi hancur.", "next": "n2"},
-            {"label": "Aku tidak yakin apa yang kurasa.", "next": "n3"}
+            {
+              "label": "Kilasan tadi — formasi yang sama, tapi hancur.",
+              "next": "n2"
+            },
+            {
+              "label": "Aku tidak yakin apa yang kurasa.",
+              "next": "n3"
+            }
           ]
         },
         "n2": {
           "speaker": "npc:npc_lin_yue",
           "text": "Kau melihatnya juga? Formasi ini bukan sekadar batu dan cahaya — ia menyimpan sesuatu. Tapi untuk membuktikannya, kau harus menunjukkan bahwa kau layak.",
           "choices": [
-            {"label": "Aku siap. Apa yang harus kulakukan?", "next": "n4"}
+            {
+              "label": "Aku siap. Apa yang harus kulakukan?",
+              "next": "n4"
+            }
           ]
         },
         "n3": {
           "speaker": "npc:npc_lin_yue",
           "text": "Itu normal. Formasi bereaksi hanya pada mereka yang memiliki potensi. Tapi potensi saja tidak cukup — kau harus membuktikan kekuatanmu.",
           "choices": [
-            {"label": "Bagaimana cara membuktikannya?", "next": "n4"}
+            {
+              "label": "Bagaimana cara membuktikannya?",
+              "next": "n4"
+            }
           ]
         },
         "n4": {
@@ -330,21 +401,30 @@
           "speaker": "npc:npc_proctor",
           "text": "Aku Xu Zhiyuan — mentor kalian. Selamat datang di Tian Xu. Hari ini kau akan belajar dasar qi dan combat. Dengarkan baik-baik.",
           "choices": [
-            {"label": "Baik, aku siap belajar.", "next": "n2"}
+            {
+              "label": "Baik, aku siap belajar.",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
           "speaker": "npc:npc_proctor",
           "text": "Qi adalah energi kehidupan. Kau bisa mengalirkannya ke anggota tubuh untuk memperkuat serangan, bertahan, atau berlari lebih cepat. Atau ke senjata — membuatnya lebih tajam atau memantulkan serangan.",
           "choices": [
-            {"label": "Bagaimana cara mengalirkannya?", "next": "n3"}
+            {
+              "label": "Bagaimana cara mengalirkannya?",
+              "next": "n3"
+            }
           ]
         },
         "n3": {
           "speaker": "npc:npc_proctor",
           "text": "Fokus. Rasakan qi di丹田mu — perut bawah. Tarik ke atas, alirkan ke tangan atau kaki. Untuk senjata, alirkan dari tangan ke ujung bilah. Latihan ini butuh waktu, tapi kau akan terbiasa.",
           "choices": [
-            {"label": "Aku akan berlatih.", "next": "n4"}
+            {
+              "label": "Aku akan berlatih.",
+              "next": "n4"
+            }
           ]
         },
         "n4": {
@@ -369,25 +449,174 @@
     {
       "id": "dlg_proctor_pavilion_explain",
       "npc": "npc_proctor",
-      "start": "n1",
+      "start": "wx1",
       "nodes": {
+        "wx1": {
+          "speaker": "npc:npc_proctor",
+          "condition": {
+            "academy": "pavilion_wuxin"
+          },
+          "text": "Kau memilih Pavilion Wuxin — Hati Kosong. Didirikan oleh Tetua Bai Yunzhao yang percaya bahwa keterikatan adalah belenggu qi. \"Qi yang tidak terikat akan mengalir tanpa hambatan,\" begitu ajarannya. Selama tiga ratus tahun, murid Wuxin dikenal sebagai kultivator paling tenang di Tian Xu.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "wx2"
+            }
+          ]
+        },
+        "wx2": {
+          "speaker": "npc:npc_proctor",
+          "text": "Warisanmu sebagai murid Wuxin: pasif Flowing Qi — setiap kali kau bertahan dalam pertarungan, qi-mu mengalir kembali (+1 Qi). Kau juga menerima dua Pil Qi sebagai bekal awal dari lumbung pavilion.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "wx3"
+            }
+          ]
+        },
+        "wx3": {
+          "speaker": "npc:npc_proctor",
+          "text": "Companion khas Wuxin adalah Serigala — pemburu setia dari lembah utara yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Teknik Pelepasan: temui gurumu di ruang latihan dan ikuti pelajaran pertama. Latihan itu akan membukamu jalan menuju penguasaan.",
+          "choices": []
+        },
+        "jx1": {
+          "speaker": "npc:npc_proctor",
+          "condition": {
+            "academy": "pavilion_jianxin"
+          },
+          "text": "Kau memilih Pavilion Jianxin — Hati Pedang. Didirikan oleh Pendekar Su Lieyan, pavilion ini mengajarkan bahwa pedang sejati lahir dari hati yang teguh, bukan dari ayunan yang cepat. \"Satu niat, satu tebasan.\" Murid Jianxin dikenal disiplin dan tak tergoyahkan.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "jx2"
+            }
+          ]
+        },
+        "jx2": {
+          "speaker": "npc:npc_proctor",
+          "text": "Warisanmu sebagai murid Jianxin: pasif Sword Intent — semua teknik bertag pedang-mu berdamage +5%. Kau juga menerima satu Pil Qi sebagai bekal awal dari lumbung pavilion.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "jx3"
+            }
+          ]
+        },
+        "jx3": {
+          "speaker": "npc:npc_proctor",
+          "text": "Companion khas Jianxin adalah Bangau — penjaga sayap putih dari puncak salju yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Tebasan Pedang Jantung: temui gurumu di ruang latihan dan ikuti pelajaran pertama. Hati yang tenang, pedang yang tajam.",
+          "choices": []
+        },
+        "yz1": {
+          "speaker": "npc:npc_proctor",
+          "condition": {
+            "academy": "pavilion_yanzhi"
+          },
+          "text": "Kau memilih Pavilion Yanzhi — Hati Tinta. Didirikan oleh Sarjana Mo He, pavilion ini meyakini bahwa memahami prinsip dunia lebih penting daripada kekuatan kasar. \"Tinta menulis takdir sebelum pedang menggoresnya.\" Murid Yanzhi dikenal cerdas dan sulit dibohongi.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "yz2"
+            }
+          ]
+        },
+        "yz2": {
+          "speaker": "npc:npc_proctor",
+          "text": "Warisanmu sebagai murid Yanzhi: pasif Phoenix Blood — saat HP-mu di bawah 30%, efektivitas penyembuhanmu naik +10%. Kau juga menerima dua Pil Qi sebagai bekal awal dari lumbung pavilion.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "yz3"
+            }
+          ]
+        },
+        "yz3": {
+          "speaker": "npc:npc_proctor",
+          "text": "Companion khas Yanzhi adalah Fenghuang — burung api legendaris keturunan phoenix yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Analisa Prinsip: temui gurumu di ruang latihan dan ikuti pelajaran pertama. Yang memahami akar, menguasai dahan.",
+          "choices": []
+        },
+        "lg1": {
+          "speaker": "npc:npc_proctor",
+          "condition": {
+            "academy": "pavilion_liuguang"
+          },
+          "text": "Kau memilih Pavilion Liuguang — Cahaya Mengalir. Didirikan oleh Pertapa Shen Kong di tepi kolam timur, pavilion ini mengajarkan adaptasi: air tidak melawan batu, air mengalirinya. \"Berganti bentuklah, maka kau tak akan pecah.\" Murid Liuguang dikenal luwes di segala medan.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "lg2"
+            }
+          ]
+        },
+        "lg2": {
+          "speaker": "npc:npc_proctor",
+          "text": "Warisanmu sebagai murid Liuguang: pasif Earth Guardian — selama HP-mu di atas 70%, damage yang kau terima berkurang 5%. Kau juga menerima satu Pil Qi sebagai bekal awal dari lumbung pavilion.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "lg3"
+            }
+          ]
+        },
+        "lg3": {
+          "speaker": "npc:npc_proctor",
+          "text": "Companion khas Liuguang adalah Ular Air — penjaga licin dari kolam timur yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Teknik Adaptasi: temui gurumu di ruang latihan dan ikuti pelajaran pertama. Mengalir, menyesuaikan, bertahan.",
+          "choices": []
+        },
         "n1": {
           "speaker": "npc:npc_proctor",
           "text": "Pilihanmu sudah dibuat. Sekarang kau menjadi bagian dari pavilion yang kau pilih. Setiap pavilion memiliki filosofi, teknik, dan companion khas yang akan menemanimu dalam perjalanan kultivasi.",
           "choices": [
-            {"label": "Apa yang harus kulakukan sekarang?", "next": "n2"}
+            {
+              "label": "Apa yang harus kulakukan sekarang?",
+              "next": "n2"
+            }
           ]
         },
         "n2": {
           "speaker": "npc:npc_proctor",
           "text": "Pertama, kenali pavilionmu. Pergilah ke sana dan bicara dengan gurumu. Mereka akan mengajarkan teknik dasar pavilion dan memberikan companion yang sesuai dengan jalan kultivasimu.",
           "choices": [
-            {"label": "Mengerti. Terima kasih, Guru.", "next": "n3"}
+            {
+              "label": "Mengerti. Terima kasih, Guru.",
+              "next": "n3"
+            }
           ]
         },
         "n3": {
           "speaker": "npc:npc_proctor",
           "text": "Ingat: setiap pavilion memiliki kekuatan unik. Wuxin mengajarkan pelepasan keterikatan, Jianxin disiplin pedang, Yanzhi pemahaman prinsip, dan Liuguang adaptasi. Pilihlah dengan bijak — ini adalah jalanmu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_formation_tua_intro",
+      "start": "n1",
+      "nodes": {
+        "n1": {
+          "speaker": "narration",
+          "text": "Malam ini, cahaya Formasi Tua di tepi wilayah luar berkedip tidak karuan. Biasanya biru tenang, kini samar-samar merah — tanda intinya mulai melemah.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "n2"
+            }
+          ]
+        },
+        "n2": {
+          "speaker": "narration",
+          "text": "Penjaga gerbang bergumam: binatang liar dari Hutan Akademi semakin berani mendekati tembok setiap kali formasi itu meredup. Jika formasi padam sebelum diperbaiki, tidak ada yang menahan mereka di malam gelap.",
+          "choices": [
+            {
+              "label": "(Melanjutkan)",
+              "next": "n3"
+            }
+          ]
+        },
+        "n3": {
+          "speaker": "narration",
+          "text": "Xu Zhiyuan memanggilmu sebelum fajar: \"Periksa formasi itu hari ini juga. Jangan sampai ia padam lebih dulu.\" Waktumu terbatas.",
           "choices": []
         }
       }

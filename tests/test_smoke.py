@@ -113,11 +113,19 @@ def test_key_item_not_usable_or_equippable(registry, session):
 
 
 def test_grounding_and_rest(registry, session):
-    # meditasi di lokasi aman (default 4 jam, tapi dibatasi max per hari)
+    # meditasi ditolak saat dantian belum penuh — kuota mingguan tidak terpakai
+    before = session.state.meditate_week_count
+    session.apply_action({"type": "meditate"})
+    assert session.state.meditate_week_count == before, \
+        "kuota meditasi tidak boleh terpakai saat dantian belum penuh"
+
+    # isi dantian → meditasi jalan dan kuota terpakai
+    from src.engine.cultivation import gain_exp
+    gain_exp(session.state, registry, session.state.exp_next(registry))
     session.apply_action({"type": "meditate"})
     v = session.view()
     assert v["mode"] == "explore"
-    assert session.state.player.dantian_exp >= 0, "meditasi harus jalan"
+    assert session.state.meditate_week_count == before + 1
 
     session.apply_action({"type": "move", "to": "loc_training_hall"})
     session.apply_action({"type": "move", "to": "loc_protagonist_room"})

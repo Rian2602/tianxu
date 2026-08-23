@@ -54,7 +54,10 @@ def test_appjs_hunt_data_driven():
 
 
 def test_appjs_academy_label_generic():
-    """F1.4: label 'Paviliun' diganti 'Akademi' (istilah config), semua kemunculan."""
+    """Playtest lanjutan: data paviliun terpilih ditampilkan berlabel
+    'Paviliun' — sidebar & ringkasan arc (membalik F1.4). Istilah institusi
+    ('Lulusan Akademi') tetap sah."""
     text = (WEB_STATIC / "app.js").read_text(encoding="utf-8")
-    assert "Paviliun" not in text
-    assert "Akademi" in text
+    assert 'statRow(icon("landmark") + "Paviliun"' in text  # sidebar
+    assert 'statRow("Paviliun"' in text                     # ringkasan arc
+    assert 'statRow("Akademi"' not in text

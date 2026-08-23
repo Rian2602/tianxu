@@ -268,7 +268,15 @@
         {
           "quest": "quest_a01_c04_005b"
         }
-      ]
+      ],
+      "on_start": {
+        "effects": [
+          {
+            "type": "dialog",
+            "id": "dlg_formation_tua_intro"
+          }
+        ]
+      }
     },
     {
       "id": "quest_a01_c04_005b",
@@ -307,7 +315,9 @@
       "title": "Uji Hutan",
       "objective": {
         "kind": "defeat",
-        "enemies": ["binatang_hutan"],
+        "enemies": [
+          "binatang_hutan"
+        ],
         "target": 2,
         "hint": "Kalahkan 2 binatang hutan di Hutan Akademi."
       },

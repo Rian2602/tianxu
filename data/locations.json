@@ -1,275 +1,292 @@
 {
- "locations": [
-  {
-   "id": "loc_tianxu_approach_road",
-   "name": "Jalan Pendakian Tian Xu",
-   "description": "Jalan batu berkelok menanjak menuju gerbang akademi. Pagi berkabut, dan jauh di atas sana gerbang Tian Xu mulai terlihat.",
-   "is_safe": true,
-   "connections": [
-    "loc_tianxu_gate"
-   ],
-   "ambience": "forest"
-  },
-  {
-   "id": "loc_tianxu_gate",
-   "name": "Gerbang Utama Tian Xu",
-   "description": "Gerbang batu besar dengan ukiran naga. Murid-murid baru berbaris menunggu pemeriksaan aptitude.",
-   "is_safe": true,
-   "connections": [
-    "loc_tianxu_approach_road",
-    "loc_training_hall",
-    "loc_tianxu_main_hall"
-   ],
-   "connection_gates": {
-    "loc_training_hall": "state_murid_status",
-    "loc_tianxu_main_hall": "state_final_principle"
-   },
-   "ambience": "academy"
-  },
-  {
-   "id": "loc_training_hall",
-   "name": "Ruang Latihan Umum",
-   "description": "Lapangan luas tempat murid-murid berlatih gerakan dasar. Empat murid baru tampak sedang menunggu giliran.",
-   "is_safe": true,
-   "connections": [
-    "loc_tianxu_gate",
-    "loc_pavilion_wuxin",
-    "loc_pavilion_jianxin",
-    "loc_pavilion_yanzhi",
-    "loc_pavilion_liuguang",
-    "loc_protagonist_room",
-    "loc_outer_region",
-    "loc_mo_chen_meeting",
-    "loc_archive_public",
-    "loc_grandmaster_chamber",
-    "loc_mentor_ground"
-   ],
-   "connection_gates": {
-    "loc_pavilion_wuxin": "flag_first_lesson_done",
-    "loc_pavilion_jianxin": "flag_first_lesson_done",
-    "loc_pavilion_yanzhi": "flag_first_lesson_done",
-    "loc_pavilion_liuguang": "flag_first_lesson_done",
-    "loc_outer_region": "flag_first_lesson_done",
-    "loc_mo_chen_meeting": "flag_arc2_complete",
-    "loc_archive_public": "flag_evidence_missing_disciple",
-    "loc_grandmaster_chamber": "flag_evidence_missing_disciple",
-    "loc_mentor_ground": "flag_entity_first_contact"
-   },
-   "ambience": "hall"
-  },
-  {
-   "id": "loc_pavilion_wuxin",
-   "name": "Pavilion Wuxin",
-   "description": "Pavilion dengan kolam tenang. Filosofinya: kekuatan lahir dari melepaskan keterikatan.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall"
-   ],
-   "ambience": "hall"
-  },
-  {
-   "id": "loc_pavilion_jianxin",
-   "name": "Pavilion Jianxin",
-   "description": "Pavilion berbau besi, penuh pedang latihan. Filosofinya: kekuatan adalah disiplin dan ketepatan.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall"
-   ],
-   "ambience": "hall"
-  },
-  {
-   "id": "loc_pavilion_yanzhi",
-   "name": "Pavilion Yanzhi",
-   "description": "Pavilion berlantai perpustakaan, gulungan memenuhi rak hingga langit-langit. Filosofinya: pahami prinsip sebelum berlatih.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall",
-    "loc_hidden_room_mural"
-   ],
-   "connection_gates": {
-    "loc_hidden_room_mural": "flag_arc2_complete"
-   },
-   "ambience": "library"
-  },
-  {
-   "id": "loc_pavilion_liuguang",
-   "name": "Pavilion Liuguang",
-   "description": "Pavilion terbuka, cahaya matahari mengalir tanpa halangan. Filosofinya: tidak ada satu jalan — beradaptasi.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall"
-   ],
-   "ambience": "academy"
-  },
-  {
-   "id": "loc_protagonist_room",
-   "name": "Kamarmu",
-   "description": "Kamar asrama sederhana: satu ranjang, satu meja, satu jendela menghadap pegunungan.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall"
-   ],
-   "ambience": "hall"
-  },
-  {
-   "id": "loc_outer_region",
-   "name": "Wilayah Formation Tua",
-   "description": "Di luar tembok akademi, formasi kuno setengah hancur bersinar redup. Sesuatu di sini terasa tidak normal.",
-   "is_safe": false,
-   "connections": [
-    "loc_training_hall",
-    "loc_hutan_akademi",
-    "loc_hidden_cave",
-    "loc_affected_village",
-    "loc_mountain_gate"
-   ],
-   "ambience": "forest"
-  },
-  {
-   "id": "loc_hutan_akademi",
-   "name": "Hutan Akademi",
-   "description": "Hutan lebat di kaki pegunungan, tempat binatang liar berkeliaran.",
-   "is_safe": false,
-   "connections": [
-    "loc_outer_region"
-   ],
-   "ambience": "forest"
-  },
-  {
-   "id": "loc_hidden_cave",
-   "name": "Gua Tersembunyi",
-   "description": "Gua di balik formasi batu di wilayah luar. Cahaya redup menerangi dinding batu yang penuh ukiran kuno.",
-   "is_safe": false,
-   "connections": [
-    "loc_outer_region"
-   ],
-   "ambience": "forest"
-  },
-  {
-   "id": "loc_hidden_room_mural",
-   "name": "Ruang Mural Tersembunyi",
-   "description": "Di balik rak buku pavilion, ruangan yang tidak ada di peta. Mural kuno menutupi dinding — dan sebagian besarnya sengaja dihancurkan.",
-   "is_safe": true,
-   "connections": [
-    "loc_pavilion_yanzhi"
-   ],
-   "ambience": "library"
-  },
-  {
-   "id": "loc_mo_chen_meeting",
-   "name": "Koridor Sunyi",
-   "description": "Koridor sepi di luar jam belajar, antara dua tembok yang tidak menuju ke mana-mana. Sesuatu di udara terasa menunggu.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall"
-   ],
-   "ambience": "hall"
-  },
-  {
-   "id": "loc_archive_public",
-   "name": "Arsip Publik Akademi",
-   "description": "Rak-rak tinggi berisi dokumen dan catatan murid lama. Seorang arsiparis menyambutmu dari balik meja kayu.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall",
-    "loc_forbidden_archive",
-    "loc_jiang_yan_records"
-   ],
-   "ambience": "library"
-  },
-  {
-   "id": "loc_forbidden_archive",
-   "name": "Arsip Terlarang",
-   "description": "Di balik dinding arsip publik, ruangan tanpa jendela. Tiga versi sejarah disimpan di sini — dua di antaranya tidak pernah boleh dibaca.",
-   "is_safe": true,
-   "connections": [
-    "loc_archive_public",
-    "loc_tianxu_deepest_chamber"
-   ],
-   "ambience": "archive-secret"
-  },
-  {
-   "id": "loc_grandmaster_chamber",
-   "name": "Ruang Grandmaster",
-   "description": "Ruang sederhana di area inti kepemimpinan — meja, gulungan, dan satu kursi. Grandmaster menunggumu di balik meja itu.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall"
-   ],
-   "ambience": "hall"
-  },
-  {
-   "id": "loc_tianxu_deepest_chamber",
-   "name": "Ruang Terdalam Tian Xu",
-   "description": "Di bawah Arsip Terlarang, ruang paling dalam akademi. Formation raksasa membentang di lantai, menyala redup — menyerap energi yang mengalir dari seluruh akademi di atasnya.",
-   "is_safe": false,
-   "connections": [
-    "loc_forbidden_archive",
-    "loc_below_deepest",
-    "loc_tianxu_main_hall"
-   ],
-   "ambience": "deepest"
-  },
-  {
-   "id": "loc_jiang_yan_records",
-   "name": "Arsip Catatan Jiang Yan",
-   "description": "Rak khusus di sudut arsip publik, disegel dengan lak merah. Catatan-catatan pribadi dari kehidupan pertama — siapa pun yang menulisnya ingin agar suatu hari dibaca.",
-   "is_safe": true,
-   "connections": [
-    "loc_archive_public"
-   ],
-   "ambience": "library"
-  },
-  {
-   "id": "loc_mentor_ground",
-   "name": "Lapangan Latihan Mentor",
-   "description": "Lapangan pribadi di belakang Ruang Latihan Umum — tempat mentor lamamu biasa mengajar tanpa pengawas. Pagar bambu, tanah berdebu, dan satu pohon tua yang melihat segalanya.",
-   "is_safe": true,
-   "connections": [
-    "loc_training_hall"
-   ],
-   "ambience": "outdoor-mentor"
-  },
-  {
-   "id": "loc_affected_village",
-   "name": "Desa Terdampak",
-   "description": "Desa di kaki pegunungan, tersapu Spiritual Collapse. Tanaman membusuk dalam semalam, formasi pelindung desa retak, dan binatang ternak bermutasi. Warga menatap dengan mata yang tidak lagi percaya.",
-   "is_safe": false,
-   "connections": [
-    "loc_outer_region"
-   ],
-   "ambience": "forest"
-  },
-  {
-   "id": "loc_mountain_gate",
-   "name": "Gerbang Gunung",
-   "description": "Gerbang batu di celah pegunungan, tempat rute konvoi menurun ke lembah. Angin menderu — dan di kejauhan, sesuatu bergerak di balik kabut spiritual yang membiru.",
-   "is_safe": false,
-   "connections": [
-    "loc_outer_region"
-   ],
-   "ambience": "forest"
-  },
-  {
-   "id": "loc_tianxu_main_hall",
-   "name": "Balairung Utama Tian Xu",
-   "description": "Balairung megah tempat seluruh akademi berkumpul. Malam ini bukan malam perayaan — formasi mulai gagal, dan semua orang tahu apa artinya.",
-   "is_safe": true,
-   "connections": [
-    "loc_tianxu_gate",
-    "loc_tianxu_deepest_chamber"
-   ],
-   "ambience": "crisis-main"
-  },
-  {
-   "id": "loc_below_deepest",
-   "name": "Ruang di Bawah Ruang Terdalam",
-   "description": "Di bawah formasi raksasa, di bawah The Gate itu sendiri — ruang yang tidak tercatat di denah mana pun. Sesuatu menunggu di sini.",
-   "is_safe": false,
-   "connections": [
-    "loc_tianxu_deepest_chamber"
-   ],
-   "ambience": "void"
-  }
- ]
+  "locations": [
+    {
+      "id": "loc_tianxu_approach_road",
+      "name": "Jalan Pendakian Tian Xu",
+      "description": "Jalan batu berkelok menanjak menuju gerbang akademi. Pagi berkabut, dan jauh di atas sana gerbang Tian Xu mulai terlihat.",
+      "is_safe": true,
+      "connections": [
+        "loc_tianxu_gate"
+      ],
+      "ambience": "forest"
+    },
+    {
+      "id": "loc_tianxu_gate",
+      "name": "Gerbang Utama Tian Xu",
+      "description": "Gerbang batu besar dengan ukiran naga. Murid-murid baru berbaris menunggu giliran dipemeriksa Xu Ming.",
+      "is_safe": true,
+      "connections": [
+        "loc_tianxu_approach_road",
+        "loc_training_hall",
+        "loc_tianxu_main_hall"
+      ],
+      "connection_gates": {
+        "loc_training_hall": "state_murid_status",
+        "loc_tianxu_main_hall": "state_final_principle"
+      },
+      "ambience": "academy"
+    },
+    {
+      "id": "loc_training_hall",
+      "name": "Ruang Latihan Umum",
+      "description": "Lapangan luas tempat murid-murid berlatih gerakan dasar. Empat murid baru tampak sedang menunggu giliran.",
+      "is_safe": true,
+      "connections": [
+        "loc_tianxu_gate",
+        "loc_pavilion_wuxin",
+        "loc_pavilion_jianxin",
+        "loc_pavilion_yanzhi",
+        "loc_pavilion_liuguang",
+        "loc_protagonist_room",
+        "loc_outer_region",
+        "loc_mo_chen_meeting",
+        "loc_archive_public",
+        "loc_grandmaster_chamber",
+        "loc_mentor_ground"
+      ],
+      "connection_gates": {
+        "loc_pavilion_wuxin": "flag_first_lesson_done",
+        "loc_pavilion_jianxin": "flag_first_lesson_done",
+        "loc_pavilion_yanzhi": "flag_first_lesson_done",
+        "loc_pavilion_liuguang": "flag_first_lesson_done",
+        "loc_outer_region": "flag_first_lesson_done",
+        "loc_mo_chen_meeting": "flag_arc2_complete",
+        "loc_archive_public": "flag_evidence_missing_disciple",
+        "loc_grandmaster_chamber": "flag_evidence_missing_disciple",
+        "loc_mentor_ground": "flag_entity_first_contact"
+      },
+      "ambience": "hall"
+    },
+    {
+      "id": "loc_pavilion_wuxin",
+      "name": "Pavilion Wuxin",
+      "description": "Pavilion dengan kolam tenang. Filosofinya: kekuatan lahir dari melepaskan keterikatan.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall"
+      ],
+      "ambience": "hall"
+    },
+    {
+      "id": "loc_pavilion_jianxin",
+      "name": "Pavilion Jianxin",
+      "description": "Pavilion berbau besi, penuh pedang latihan. Filosofinya: kekuatan adalah disiplin dan ketepatan.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall"
+      ],
+      "ambience": "hall"
+    },
+    {
+      "id": "loc_pavilion_yanzhi",
+      "name": "Pavilion Yanzhi",
+      "description": "Pavilion berlantai perpustakaan, gulungan memenuhi rak hingga langit-langit. Filosofinya: pahami prinsip sebelum berlatih.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall",
+        "loc_hidden_room_mural"
+      ],
+      "connection_gates": {
+        "loc_hidden_room_mural": "flag_arc2_complete"
+      },
+      "ambience": "library"
+    },
+    {
+      "id": "loc_pavilion_liuguang",
+      "name": "Pavilion Liuguang",
+      "description": "Pavilion terbuka, cahaya matahari mengalir tanpa halangan. Filosofinya: tidak ada satu jalan — beradaptasi.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall"
+      ],
+      "ambience": "academy"
+    },
+    {
+      "id": "loc_protagonist_room",
+      "name": "Kamarmu",
+      "description": "Kamar asrama sederhana: satu ranjang, satu meja, satu jendela menghadap pegunungan.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall"
+      ],
+      "ambience": "hall"
+    },
+    {
+      "id": "loc_outer_region",
+      "name": "Wilayah Formation Tua",
+      "description": "Di luar tembok akademi, formasi kuno setengah hancur bersinar redup. Sesuatu di sini terasa tidak normal.",
+      "is_safe": false,
+      "connections": [
+        "loc_training_hall",
+        "loc_hutan_akademi",
+        "loc_hidden_cave",
+        "loc_affected_village",
+        "loc_mountain_gate"
+      ],
+      "connection_gates": {
+        "loc_hutan_akademi": "flag_lin_yue_trial",
+        "loc_hidden_cave": "flag_disturbance_investigated",
+        "loc_affected_village": "flag_arc4_complete",
+        "loc_mountain_gate": "flag_arc4_complete"
+      },
+      "ambience": "forest"
+    },
+    {
+      "id": "loc_hutan_akademi",
+      "name": "Hutan Akademi",
+      "description": "Hutan lebat di kaki pegunungan, tempat binatang liar berkeliaran.",
+      "is_safe": false,
+      "connections": [
+        "loc_outer_region"
+      ],
+      "ambience": "forest"
+    },
+    {
+      "id": "loc_hidden_cave",
+      "name": "Gua Tersembunyi",
+      "description": "Gua di balik formasi batu di wilayah luar. Cahaya redup menerangi dinding batu yang penuh ukiran kuno.",
+      "is_safe": false,
+      "connections": [
+        "loc_outer_region"
+      ],
+      "ambience": "forest"
+    },
+    {
+      "id": "loc_hidden_room_mural",
+      "name": "Ruang Mural Tersembunyi",
+      "description": "Di balik rak buku pavilion, ruangan yang tidak ada di peta. Mural kuno menutupi dinding — dan sebagian besarnya sengaja dihancurkan.",
+      "is_safe": true,
+      "connections": [
+        "loc_pavilion_yanzhi"
+      ],
+      "ambience": "library"
+    },
+    {
+      "id": "loc_mo_chen_meeting",
+      "name": "Koridor Sunyi",
+      "description": "Koridor sepi di luar jam belajar, antara dua tembok yang tidak menuju ke mana-mana. Sesuatu di udara terasa menunggu.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall"
+      ],
+      "ambience": "hall"
+    },
+    {
+      "id": "loc_archive_public",
+      "name": "Arsip Publik Akademi",
+      "description": "Rak-rak tinggi berisi dokumen dan catatan murid lama. Seorang arsiparis menyambutmu dari balik meja kayu.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall",
+        "loc_forbidden_archive",
+        "loc_jiang_yan_records"
+      ],
+      "connection_gates": {
+        "loc_forbidden_archive": "flag_version_iii_read",
+        "loc_jiang_yan_records": "flag_name_jiang_yan_known"
+      },
+      "ambience": "library"
+    },
+    {
+      "id": "loc_forbidden_archive",
+      "name": "Arsip Terlarang",
+      "description": "Di balik dinding arsip publik, ruangan tanpa jendela. Tiga versi sejarah disimpan di sini — dua di antaranya tidak pernah boleh dibaca.",
+      "is_safe": true,
+      "connections": [
+        "loc_archive_public",
+        "loc_tianxu_deepest_chamber"
+      ],
+      "connection_gates": {
+        "loc_tianxu_deepest_chamber": "flag_stakes_of_stopping_source_known"
+      },
+      "ambience": "archive-secret"
+    },
+    {
+      "id": "loc_grandmaster_chamber",
+      "name": "Ruang Grandmaster",
+      "description": "Ruang sederhana di area inti kepemimpinan — meja, gulungan, dan satu kursi. Grandmaster menunggumu di balik meja itu.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall"
+      ],
+      "ambience": "hall"
+    },
+    {
+      "id": "loc_tianxu_deepest_chamber",
+      "name": "Ruang Terdalam Tian Xu",
+      "description": "Di bawah Arsip Terlarang, ruang paling dalam akademi. Formation raksasa membentang di lantai, menyala redup — menyerap energi yang mengalir dari seluruh akademi di atasnya.",
+      "is_safe": false,
+      "connections": [
+        "loc_forbidden_archive",
+        "loc_below_deepest",
+        "loc_tianxu_main_hall"
+      ],
+      "connection_gates": {
+        "loc_below_deepest": "flag_last_night_complete",
+        "loc_tianxu_main_hall": "state_final_principle"
+      },
+      "ambience": "deepest"
+    },
+    {
+      "id": "loc_jiang_yan_records",
+      "name": "Arsip Catatan Jiang Yan",
+      "description": "Rak khusus di sudut arsip publik, disegel dengan lak merah. Catatan-catatan pribadi dari kehidupan pertama — siapa pun yang menulisnya ingin agar suatu hari dibaca.",
+      "is_safe": true,
+      "connections": [
+        "loc_archive_public"
+      ],
+      "ambience": "library"
+    },
+    {
+      "id": "loc_mentor_ground",
+      "name": "Lapangan Latihan Mentor",
+      "description": "Lapangan pribadi di belakang Ruang Latihan Umum — tempat mentor lamamu biasa mengajar tanpa pengawas. Pagar bambu, tanah berdebu, dan satu pohon tua yang melihat segalanya.",
+      "is_safe": true,
+      "connections": [
+        "loc_training_hall"
+      ],
+      "ambience": "outdoor-mentor"
+    },
+    {
+      "id": "loc_affected_village",
+      "name": "Desa Terdampak",
+      "description": "Desa di kaki pegunungan, tersapu Spiritual Collapse. Tanaman membusuk dalam semalam, formasi pelindung desa retak, dan binatang ternak bermutasi. Warga menatap dengan mata yang tidak lagi percaya.",
+      "is_safe": false,
+      "connections": [
+        "loc_outer_region"
+      ],
+      "ambience": "forest"
+    },
+    {
+      "id": "loc_mountain_gate",
+      "name": "Gerbang Gunung",
+      "description": "Gerbang batu di celah pegunungan, tempat rute konvoi menurun ke lembah. Angin menderu — dan di kejauhan, sesuatu bergerak di balik kabut spiritual yang membiru.",
+      "is_safe": false,
+      "connections": [
+        "loc_outer_region"
+      ],
+      "ambience": "forest"
+    },
+    {
+      "id": "loc_tianxu_main_hall",
+      "name": "Balairung Utama Tian Xu",
+      "description": "Balairung megah tempat seluruh akademi berkumpul. Malam ini bukan malam perayaan — formasi mulai gagal, dan semua orang tahu apa artinya.",
+      "is_safe": true,
+      "connections": [
+        "loc_tianxu_gate",
+        "loc_tianxu_deepest_chamber"
+      ],
+      "ambience": "crisis-main"
+    },
+    {
+      "id": "loc_below_deepest",
+      "name": "Ruang di Bawah Ruang Terdalam",
+      "description": "Di bawah formasi raksasa, di bawah The Gate itu sendiri — ruang yang tidak tercatat di denah mana pun. Sesuatu menunggu di sini.",
+      "is_safe": false,
+      "connections": [
+        "loc_tianxu_deepest_chamber"
+      ],
+      "ambience": "void"
+    }
+  ]
 }
