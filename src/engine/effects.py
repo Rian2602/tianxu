@@ -29,6 +29,7 @@ EFFECT_REQUIRED_FIELDS: dict[str, set[str]] = {
     "exp": {"value"},
     "unlock_realm_bonus": {"realm"},
     "status_effect": {"effect_type", "days"},
+    "dialog": {"id"},
 }
 
 EFFECT_TYPES = {

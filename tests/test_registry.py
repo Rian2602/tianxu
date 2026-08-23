@@ -226,3 +226,17 @@ def test_effect_missing_required_field_all_kinds(tmp_path):
         assert kind in msg, f"pelanggaran {kind} harus dilaporkan"
     # morality/gold TANPA field wajib — efek tanpa value valid (default 0)
     assert "morality" not in msg and "gold" not in msg
+
+
+def test_dialog_effect_missing_id_rejected(tmp_path):
+    """dialog tanpa id → ditolak validator (silent no-op tanpa id)."""
+    dst = _copy(tmp_path)
+    dlg = json.loads((dst / "dialogs" / "minimal.json").read_text(encoding="utf-8"))
+    dlg["dialogs"][1]["nodes"]["n1"]["choices"][1]["effects"] = [{"type": "dialog"}]
+    (dst / "dialogs" / "minimal.json").write_text(
+        json.dumps(dlg, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    with pytest.raises(DataContractError) as ei:
+        DataRegistry(dst)
+    msg = str(ei.value)
+    assert "dialog" in msg and "id" in msg
