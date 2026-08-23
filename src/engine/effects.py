@@ -1,7 +1,7 @@
 """Penerapan efek — format type-based (ENGINE_ARCHITECTURE §5.2).
 
 Jenis efek: morality, relation, reputation, flag, item, gold, start_quest,
-technique, npc_state, grant_companion, exp, unlock_realm_bonus, status_effect.
+technique, npc_state, grant_companion, exp, unlock_realm_bonus, status_effect, dialog.
 `start_quest` hanya valid di konteks dialog (mengaktifkan side quest).
 `technique` (C1) memberi teknik baru ke pemain (reward quest/dialog).
 `exp` menambah exp ke dantian pemain.
