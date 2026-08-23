@@ -588,6 +588,60 @@ def test_memory_reliability_update(tmp_path):
     assert len(s.state.memories) == 1
 
 
+def test_update_reliability_legacy_string_format(tmp_path):
+    """Memori format string (legacy) → update_reliability mengonversi ke dict + update reliability.
+    
+    Bug lama: match ID tapi skip update karena isinstance(m, dict) gagal → silent no-op.
+    Fix: konversi in-place ke dict lalu update reliability.
+    """
+    from src.engine.memory import unlock, update_reliability
+    from src.loader import DataRegistry
+    from src.engine.session import GameSession
+    
+    reg = DataRegistry("tests/fixtures/minimal_data")
+    s = GameSession.new(reg)
+    
+    # Inject memori format string legacy langsung ke state
+    s.state.memories = ["m_legacy"]  # format string (seperti save v<3)
+    
+    # Sebelum fix: ini silent no-op (reliability tidak berubah, tidak ada log)
+    update_reliability(s.state, "m_legacy", "high")
+    
+    # Setelah fix: memori dikonversi ke dict + reliability ter-update
+    assert len(s.state.memories) == 1
+    mem = s.state.memories[0]
+    assert isinstance(mem, dict)
+    assert mem["id"] == "m_legacy"
+    assert mem["reliability"] == "high"
+
+
+def test_find_memory_helper(tmp_path):
+    """_find_memory mengembalikan referensi item list (bisa dimutasi), handle kedua format."""
+    from src.engine.memory import _find_memory
+    from src.loader import DataRegistry
+    from src.engine.session import GameSession
+    
+    reg = DataRegistry("tests/fixtures/minimal_data")
+    s = GameSession.new(reg)
+    
+    # Test format dict
+    s.state.memories = [{"id": "m1", "reliability": "low"}]
+    item = _find_memory(s.state, "m1")
+    assert item is not None
+    assert item is s.state.memories[0]  # referensi sama
+    item["reliability"] = "high"
+    assert s.state.memories[0]["reliability"] == "high"
+    
+    # Test format string
+    s.state.memories = ["m2"]
+    item = _find_memory(s.state, "m2")
+    assert item is not None
+    assert isinstance(item, str)  # string item (tidak bisa dimutasi langsung)
+    
+    # Test tidak ditemukan
+    assert _find_memory(s.state, "m_ghost") is None
+
+
 def test_search_success_adds_item(tmp_path, monkeypatch):
     """Cari sukses (random < 0.6): item `search_item` zona bertambah & quest
     gather main menerima notify (bukan hanya side)."""

@@ -11,6 +11,18 @@ from .events import add_log
 from .state import GameState
 
 
+def _find_memory(state: GameState, memory_id: str) -> dict | str | None:
+    """Cari item memori by ID — return referensi list item (bisa dimutasi).
+
+    Handle kedua format: dict {'id', 'reliability'} atau string ID.
+    """
+    for m in state.memories:
+        mid = m["id"] if isinstance(m, dict) else m
+        if mid == memory_id:
+            return m
+    return None
+
+
 def _memory_ids(state: GameState) -> set[str]:
     """Return set of memory IDs from state (handles both string and dict formats)."""
     return {
@@ -40,10 +52,13 @@ def unlock(state: GameState, registry: DataRegistry, memory_id: str | None,
 
 def update_reliability(state: GameState, memory_id: str, new_reliability: str) -> None:
     """Update reliability of an existing memory (for correction events)."""
-    for m in state.memories:
-        mid = m["id"] if isinstance(m, dict) else m
-        if mid == memory_id:
-            if isinstance(m, dict):
-                m["reliability"] = new_reliability
-            return
-    add_log(state, "system", f"[Sistem] Ingatan '{memory_id}' tidak ditemukan — reliability tidak diubah.")
+    item = _find_memory(state, memory_id)
+    if item is None:
+        add_log(state, "system", f"[Sistem] Ingatan '{memory_id}' tidak ditemukan — reliability tidak diubah.")
+        return
+    if isinstance(item, str):
+        # Legacy string format → konversi in-place ke dict
+        idx = state.memories.index(item)
+        state.memories[idx] = {"id": item, "reliability": new_reliability}
+    else:
+        item["reliability"] = new_reliability
