@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-287%20passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-377%20passing-brightgreen)]()
 [![Platform](https://img.shields.io/badge/platform-Web-lightgrey)]()
 
 *A data-driven text RPG engine where every choice shapes your destiny across seven arcs of cultivation, mystery, and consequence.*
@@ -22,11 +22,11 @@
 Tian Xu: Second Life is a **single-player xianxia cultivation RPG** built with a **pure Python stdlib engine** — zero external dependencies. The game features:
 
 - **7 narrative arcs** with branching quests and convergence
-- **18 NPCs** with conditional dialog trees and character agency
+- **19 NPCs** with conditional dialog trees and character agency
 - **4 faction system** with reputation-driven content
 - **Memory investigation** mechanics with reliability curves
 - **Turn-based battle** with elemental advantages (五行)
-- **Realm cultivation** progression across 3 realms, 15 levels
+- **Realm cultivation** progression across 5 realms, 25 levels
 - **Data-driven architecture** — add content by editing JSON/CSV, zero code changes
 
 ## Screenshots
@@ -69,7 +69,7 @@ python3 web/app.py
 ### Run Tests
 
 ```bash
-# Full test suite (287 tests, ~3.7s)
+# Full test suite (377 tests, ~8s)
 pytest
 
 # Smoke tests only
@@ -106,7 +106,7 @@ tian-xu-second-life/
 │   ├── memories.json     # Memory fragments
 │   ├── factions.json     # Faction data
 │   └── config.json       # Game configuration
-├── tests/                # 287 pytest tests
+├── tests/                # 377 pytest tests
 ├── docs/                 # Story Production Bible
 └── pyproject.toml        # Build configuration
 ```
@@ -125,8 +125,8 @@ All game content lives in `data/`. To add a new quest, NPC, or dialog:
 
 - **Dispatch Tables**: `CONDITION_CHECKERS`, `OBJECTIVE_HANDLERS`, `EFFECT_HANDLERS` — add new types by adding dict keys
 - **UI-Agnostic**: `session.view()` returns a plain dict; web renders from this data
-- **Save System**: Versioned schema (v3) with forward migration and path traversal protection
-- **Validator**: 7-rule data contract validator that fails fast with all violations
+- **Save System**: Versioned schema (v9) with forward migration and path traversal protection
+- **Validator**: 14-rule data contract validator that fails fast with all violations
 
 ### Story Content
 
@@ -140,7 +140,7 @@ All game content lives in `data/`. To add a new quest, NPC, or dialog:
 | VI | Last Cycle | Preserve / Destroy / Transform / Sacrifice | 4 |
 | VII | Second Life | Hidden Resolution | 1 |
 
-**Total**: 50 quests · 49 dialogs · 18 NPCs · 11 endings
+**Total**: 69 quests · 81 dialogs · 19 NPCs · 5 endings
 
 ### Character System
 
@@ -153,7 +153,7 @@ All game content lives in `data/`. To add a new quest, NPC, or dialog:
 
 - Turn-based with elemental advantages (五行: logam → kayu → tanah → air → api → logam)
 - Status effects (DoT, Stun)
-- Companion system (dormant, data-driven)
+- Companion system (9 companions, max 3 owned, 1 active in battle)
 - Critical hits with configurable rates
 
 ## Documentation
