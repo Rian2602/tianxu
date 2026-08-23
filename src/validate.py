@@ -228,6 +228,20 @@ def _validate_config(registry, errors) -> None:
         if cid and cid not in {c.get("id") for c in registry.companions}:
             _add(errors, src, f"academies[{aid}].companion",
                  f"kompanion tak dikenal: '{cid}'.")
+        # lokasi paviliun (belajar teknik dari guru) → harus lokasi valid
+        aloc = a.get("location")
+        if aloc and aloc not in {l["id"] for l in registry.locations}:
+            _add(errors, src, f"academies[{aid}].location",
+                 f"lokasi tak dikenal: '{aloc}'.")
+        # passive akademi harus pasangan source-nya di passives.json (anti-drift)
+        pid = a.get("passive")
+        if pid:
+            owner = next((p["id"] for p in registry.passives
+                          if p.get("source") == a.get("id")), None)
+            if owner != pid:
+                _add(errors, src, f"academies[{aid}].passive",
+                     f"passive akademi '{aid}' harus '{owner}' (source di "
+                     f"passives.json), bukan '{pid}'.")
         for sk in a.get("starter_kit", []) or []:
             iid = sk.get("id") if isinstance(sk, dict) else sk
             if isinstance(sk, dict) and not sk.get("id"):
@@ -547,6 +561,8 @@ def _validate_quests(registry, errors) -> None:
                        src, f"{ctx}.on_complete.effects", registry, allow_start_quest=False)
         _check_effects(errors, q.get("fail_effects"),
                        src, f"{ctx}.fail_effects", registry, allow_start_quest=False)
+        _check_effects(errors, q.get("on_start", {}).get("effects"),
+                       src, f"{ctx}.on_start.effects", registry, allow_start_quest=False)
 
         # aturan #3: on_complete.memory_unlock → ingatan valid
         mu = q.get("on_complete", {}).get("memory_unlock")
@@ -672,6 +688,10 @@ def _validate_npcs(registry, errors) -> None:
             cond = s.get("condition")
             if cond:
                 _check_condition(errors, cond, src, f"{ctx}.schedule[{i}].condition", registry)
+            loc = s.get("location")
+            if loc and loc not in registry.location_by_id:
+                _add(errors, src, f"{ctx}.schedule[{i}].location",
+                     f"lokasi jadwal tak dikenal: '{loc}'.")
 
         # aturan #3: toko → item valid
         shop = n.get("shop") or {}
@@ -849,6 +869,100 @@ def _validate_passives(registry, errors) -> None:
                      f"tag tak pernah dipakai teknik manapun: '{tag}'.")
 
 
+def _validate_flag_consistency(registry, errors) -> None:
+    """[A] flag dicek tapi tak pernah di-set → dead gate.
+    [B] flag dicek dengan nilai spesifik yang tak pernah di-assign → dead branch."""
+    from collections import defaultdict
+
+    set_flags: dict[str, set] = defaultdict(set)
+    checked_flags: dict[str, set] = defaultdict(set)
+
+    def _scan_effects(effects):
+        for fx in (effects or []):
+            if isinstance(fx, dict) and fx.get("type") == "flag" and fx.get("key"):
+                set_flags[fx["key"]].add(fx.get("value"))
+
+    def _iter_conds(obj):
+        if isinstance(obj, dict):
+            if "condition" in obj and isinstance(obj["condition"], dict):
+                yield obj["condition"]
+            for v in obj.values():
+                yield from _iter_conds(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                yield from _iter_conds(item)
+
+    def _extract(cond):
+        out = []
+        for key in ("flag",):
+            f = cond.get(key)
+            if isinstance(f, dict) and f.get("key"):
+                out.append((f["key"], f.get("value")))
+        for key in ("flag_not", "flags"):
+            items = cond.get(key)
+            if isinstance(items, list):
+                for f in items:
+                    if isinstance(f, dict) and f.get("key"):
+                        out.append((f["key"], f.get("value")))
+        return out
+
+    # collect set flags
+    for q in registry.quests:
+        _scan_effects(q.get("on_complete", {}).get("effects"))
+        _scan_effects(q.get("on_start", {}).get("effects"))
+    for d in registry.dialogs:
+        for node in (d.get("nodes") or {}).values():
+            if not isinstance(node, dict):
+                continue
+            for ch in node.get("choices", []) or []:
+                _scan_effects(ch.get("effects"))
+
+    # collect checked flags
+    for q in registry.quests:
+        for cond in _iter_conds(q):
+            for key, val in _extract(cond):
+                checked_flags[key].add(val)
+    for d in registry.dialogs:
+        for cond in _iter_conds(d):
+            for key, val in _extract(cond):
+                checked_flags[key].add(val)
+    for arc in (registry.config or {}).get("arcs", []) or []:
+        for ending in arc.get("endings", []) or []:
+            cond = ending.get("condition") or {}
+            for key, val in _extract(cond):
+                checked_flags[key].add(val)
+    for loc in registry.locations or []:
+        for gate_val in (loc.get("connection_gates") or {}).values():
+            checked_flags[gate_val].add(True)
+
+    # report [A] never set
+    for key in sorted(checked_flags):
+        if key not in set_flags:
+            _add(errors, "flag_consistency", f"[A] '{key}'",
+                 f"dicek ({checked_flags[key]}) tapi tak pernah di-set.")
+
+    # report [B] value never assigned
+    for key, vals_checked in sorted(checked_flags.items()):
+        if key not in set_flags:
+            continue
+        for v in vals_checked:
+            if v is True or v is None:
+                continue
+            if v not in set_flags[key]:
+                _add(errors, "flag_consistency", f"[B] '{key}'",
+                     f"dicek == {v!r} tapi hanya pernah di-set: {set_flags[key]}.")
+
+
+def _validate_npc_schedules(registry, errors) -> None:
+    """Validasi npc_schedules.json — lokasi slot jadwal harus ada."""
+    for nid, slots in registry.npc_schedules.items():
+        for i, s in enumerate(slots):
+            loc = s.get("location")
+            if loc and loc not in registry.location_by_id:
+                _add(errors, "npc_schedules.json", f"jadwal '{nid}'[{i}].location",
+                     f"lokasi jadwal tak dikenal: '{loc}'.")
+
+
 def _validate_fusions(registry, errors) -> None:
     """Validasi fusion_recipes.json — requires/result technique id valid."""
     src = "fusion_recipes.json"
@@ -863,6 +977,17 @@ def _validate_fusions(registry, errors) -> None:
         if result and result not in registry.techniques:
             _add(errors, src, f"{ctx}.result",
                  f"teknik tak dikenal: '{result}'.")
+    seen = {}
+    for f in registry.fusions:
+        result = f.get("result")
+        if not result:
+            continue
+        if result in seen:
+            _add(errors, src, f"fusion '{f.get('id', '?')}'.result",
+                 f"duplikat result fusion '{result}' — sudah dihasilkan "
+                 f"oleh resep '{seen[result]}'. Tiap resep harus unik.")
+        else:
+            seen[result] = f.get("id", "?")
 
 
 def _validate_duplicates(registry, errors) -> None:
@@ -908,6 +1033,8 @@ def validate(registry) -> None:
     _validate_key_items(registry, errors)
     _validate_passives(registry, errors)
     _validate_fusions(registry, errors)
+    _validate_npc_schedules(registry, errors)
+    _validate_flag_consistency(registry, errors)
     if errors:
         head = f"{len(errors)} pelanggaran kontrak data ditemukan saat load:"
         raise DataContractError("\n".join([head] + [f"  {e}" for e in errors]))

@@ -462,6 +462,18 @@ def test_hunt_without_id_or_location_rejected(data_dir):
         assert f"wajib punya '{target}'" in str(ei.value)
 
 
+def test_academy_location_unknown_rejected(data_dir):
+    """Belajar teknik dari guru: academies[].location wajib menunjuk lokasi
+    valid — salah id membuat tombol Pelajari tak pernah bisa dipakai."""
+    cfg = json.loads((data_dir / "config.json").read_text(encoding="utf-8"))
+    cfg["academies"][0]["location"] = "loc_tidak_ada"
+    (data_dir / "config.json").write_text(json.dumps(cfg), encoding="utf-8")
+    with pytest.raises(DataContractError) as ei:
+        DataRegistry(data_dir=data_dir)
+    assert "academies[" in str(ei.value)
+    assert "lokasi tak dikenal" in str(ei.value)
+
+
 def test_all_violations_collected(data_dir):
     """Bukan berhenti di error pertama — penulis data dapat gambaran lengkap."""
     dst = data_dir
@@ -483,6 +495,55 @@ def test_npc_default_dialog_root_level_validated(data_dir):
     data["npcs"][0]["default_dialog"] = "dlg_ghost_typo"
     _dump(dst, "npcs.json", data)
     _expect_error(dst, "dialog tak dikenal", "dlg_ghost_typo")
+
+
+def test_duplicate_fusion_result_rejected(data_dir):
+    """Dua resep fusion tidak boleh menghasilkan teknik yang sama (bug copy-paste)."""
+    dst = data_dir
+    fusions = {
+        "fusions": [
+            {"id": "fu_a", "name": "F A", "requires": ["teknik_dasar", "tebasan"],
+             "requires_level": 2, "result": "teknik_dasar", "realm_required": "realm_chuji"},
+            {"id": "fu_b", "name": "F B", "requires": ["tebasan"],
+             "requires_level": 2, "result": "teknik_dasar", "realm_required": "realm_chuji"},
+        ]
+    }
+    (dst / "fusion_recipes.json").write_text(
+        json.dumps(fusions, ensure_ascii=False, indent=2), encoding="utf-8")
+    _expect_error(dst, "duplikat result fusion", "teknik_dasar")
+
+
+def test_unknown_schedule_location_rejected(data_dir):
+    """Lokasi slot jadwal NPC (embedded & file terpisah) harus ada di locations.json."""
+    dst = data_dir
+    npcs = _load(dst, "npcs.json")
+    npcs["npcs"][0]["schedule"] = [
+        {"start_hour": 12, "end_hour": 18, "location": "loc_hantu"}]
+    _dump(dst, "npcs.json", npcs)
+    sched = {"schedules": {"npc_guru": [
+        {"start_hour": 20, "end_hour": 23, "location": "loc_hantu"}]}}
+    (dst / "npc_schedules.json").write_text(
+        json.dumps(sched, ensure_ascii=False), encoding="utf-8")
+    err = _expect_error(dst, "loc_hantu")
+    assert err is not None and str(err).count("loc_hantu") >= 2
+
+
+def test_academy_passive_mismatch_rejected(data_dir):
+    """academies[].passive harus pasangan source-nya di passives.json (anti-drift)."""
+    dst = data_dir
+    passives = {"passives": [
+        {"id": "passive_a", "name": "PA", "effect": "qi_on_defend", "value": 1,
+         "realm_required": "realm_chuji", "source": "akademi_bambu"},
+        {"id": "passive_b", "name": "PB", "effect": "bonus_damage_tag", "tag": "pedang",
+         "value": 5, "realm_required": "realm_chuji", "source": "akademi_lain"},
+    ]}
+    (dst / "passives.json").write_text(
+        json.dumps(passives, ensure_ascii=False), encoding="utf-8")
+    cfg = _load(dst, "config.json")
+    cfg["academies"][0]["id"] = "akademi_bambu"
+    cfg["academies"][0]["passive"] = "passive_b"
+    _dump(dst, "config.json", cfg)
+    _expect_error(dst, "akademi_bambu", "passive_b", "passive_a")
 
 
 # ---------- aturan: quest rewards hanya gold ----------
