@@ -562,5 +562,9 @@
         "exp_multiplier": 1.0
       }
     ]
+  },
+  "companion_heal": {
+    "qi_cost": 10,
+    "heal_amount": 15
   }
 }
