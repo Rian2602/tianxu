@@ -470,7 +470,11 @@ class GameSession:
             if flag_key:
                 add_log(self.state, "system", f"Kau harus menyelesaikan urusan di sini dulu sebelum pergi ke {loc['name']}.")
             else:
-                add_log(self.state, "system", f"Kau tidak bisa langsung pergi ke {loc['name']} dari sini.")
+                # UX improvement: tampilkan lokasi yang benar-benar dapat dikunjungi
+                allowed = self._allowed_connections(cur)
+                valid_names = [self.reg.location(c).get("name", c) for c in allowed if self.reg.location(c)]
+                suggestion = f" Lokasi yang dapat kau kunjungi: {', '.join(valid_names[:4])}." if valid_names else ""
+                add_log(self.state, "system", f"Kau tidak bisa langsung pergi ke {loc['name']} dari sini.{suggestion}")
             return self.view()
         self.state.location = to
         add_log(self.state, "narration", f"Kau pindah ke {loc['name']}.")
@@ -529,7 +533,25 @@ class GameSession:
         remaining = 24 - self.state.hour
         if remaining < cost:
             return f"Waktu tidak cukup. Sisa {remaining} jam, butuh {cost} jam."
-        return None
+
+    def _locations_with_activity(self, activity: str) -> list[str]:
+        """Helper: dapatkan daftar nama lokasi yang mendukung aktivitas tertentu.
+        activity: 'hunt' atau 'search'"""
+        result = []
+        for loc in self.reg.locations:
+            zones = self.reg.hunts_for_location(loc.get("id", ""))
+            if zones:
+                for zone in zones:
+                    has_activity = False
+                    if activity == "hunt":
+                        has_activity = bool(zone.get("pool"))
+                    elif activity == "search":
+                        has_activity = bool(zone.get("search_items") or zone.get("search_item"))
+                    if has_activity:
+                        result.append(loc.get("name", loc["id"]))
+                        break
+        return result
+
     def _choose(self, action: dict) -> dict:
         if self.state.pending_battle or self.state.pending_dialog:
             return self.view()
@@ -686,7 +708,10 @@ class GameSession:
     def _hunt(self, action: dict) -> dict:
         zones = self.reg.hunts_for_location(self.state.location)
         if not zones:
-            add_log(self.state, "system", "Berburu belum tersedia di sini.")
+            # UX improvement: beri tahu pemain di mana bisa berburu
+            hunt_locs = self._locations_with_activity("hunt")
+            suggestion = f" Tempat yang bisa berburu: {', '.join(hunt_locs[:4])}." if hunt_locs else ""
+            add_log(self.state, "system", f"Berburu belum tersedia di sini.{suggestion}")
             return self.view()
         cost = self._time_cost("hunt")
         err = self._check_time_budget(cost)
@@ -741,7 +766,10 @@ class GameSession:
     def _search(self, action: dict) -> dict:
         zones = self.reg.hunts_for_location(self.state.location)
         if not zones:
-            add_log(self.state, "system", "Mencari belum tersedia di sini.")
+            # UX improvement: beri tahu pemain di mana bisa mencari
+            hunt_locs = self._locations_with_activity("search")
+            suggestion = f" Tempat yang bisa mencari: {', '.join(hunt_locs[:4])}." if hunt_locs else ""
+            add_log(self.state, "system", f"Mencari belum tersedia di sini.{suggestion}")
             return self.view()
         cost = self._time_cost("search")
         err = self._check_time_budget(cost)
