@@ -20,7 +20,7 @@ from ..loader import DataRegistry
 from .battle import BattleEngine, companion_stats, player_combat
 from .cultivation import gain_exp, meditate, tick_status_effects
 from .dialog import DialogEngine
-from .effects import apply as apply_effects
+from .effects import apply as apply_effects, companion_hp_max
 from .events import add_log
 from .quest import QuestEngine
 from .state import GameState, PlayerState
@@ -834,7 +834,7 @@ class GameSession:
                 comp = next((x for x in self.reg.companions if x.get("id") == cid), None)
                 if comp:
                     scale = self.reg.config.get("companion", {})
-                    hp_max = int(comp.get("base_hp", 10)) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
+                    hp_max = companion_hp_max(comp, self.state.player.realm_level, scale)
                     c["active"] = True
                     c["hp"] = hp_max
                     revived = True
@@ -1338,7 +1338,10 @@ class GameSession:
                 {"id": c["id"],
                  "name": (next((x for x in self.reg.companions if x.get("id") == c["id"]), None) or {}).get("name", c["id"]),
                  "hp": c.get("hp", 0),
-                 "hp_max": int((next((x for x in self.reg.companions if x.get("id") == c["id"]), None) or {}).get("base_hp", 10)) + s.player.realm_level * int((self.reg.config.get("companion") or {}).get("hp_per_level", 12)),
+                 "hp_max": companion_hp_max(
+                     next((x for x in self.reg.companions if x.get("id") == c["id"]), None) or {},
+                     s.player.realm_level,
+                     self.reg.config.get("companion") or {}),
                  "active": c.get("active", True),
                  "selected": c["id"] == s.active_companion}
                 for c in s.companions

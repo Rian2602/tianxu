@@ -13,7 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field as dc_field
 
 from ..loader import DataRegistry
-from .effects import apply as apply_effects
+from .effects import apply as apply_effects, companion_hp_max
 from .events import add_log
 from .memory import unlock as unlock_memory
 from .state import GameState
@@ -409,7 +409,7 @@ class QuestEngine:
             add_log(self.state, "system", "Kawan penuh. Tidak bisa menerima binatang roh baru.")
             return
         scale = self.reg.config.get("companion", {})
-        hp_max = int(comp.get("base_hp", 10)) + self.state.player.realm_level * int(scale.get("hp_per_level", 12))
+        hp_max = companion_hp_max(comp, self.state.player.realm_level, scale)
         self.state.companions.append({"id": cid, "hp": hp_max, "active": True})
         if not self.state.active_companion:
             self.state.active_companion = cid

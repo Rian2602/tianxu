@@ -39,6 +39,11 @@ EFFECT_TYPES = {
 }
 
 
+def companion_hp_max(comp: dict, realm_level: int, scale: dict) -> int:
+    """HP maksimum kompanion — base_hp + realm_level × hp_per_level."""
+    return int(comp.get("base_hp", 10)) + realm_level * int(scale.get("hp_per_level", 12))
+
+
 def apply(state: GameState, registry: DataRegistry, effects: list | None) -> None:
     for fx in effects or []:
         t = fx.get("type")
@@ -88,7 +93,7 @@ def apply(state: GameState, registry: DataRegistry, effects: list | None) -> Non
                 comp = next((x for x in registry.companions if x.get("id") == cid), None)
                 if comp:
                     scale = registry.config.get("companion", {})
-                    hp_max = int(comp.get("base_hp", 10)) + state.player.realm_level * int(scale.get("hp_per_level", 12))
+                    hp_max = companion_hp_max(comp, state.player.realm_level, scale)
                     state.companions.append({"id": cid, "hp": hp_max, "active": True})
                     if not state.active_companion:
                         state.active_companion = cid

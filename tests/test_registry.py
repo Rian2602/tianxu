@@ -240,3 +240,15 @@ def test_dialog_effect_missing_id_rejected(tmp_path):
         DataRegistry(dst)
     msg = str(ei.value)
     assert "dialog" in msg and "id" in msg
+
+
+def test_companion_hp_max_formula():
+    """companion_hp_max menghitung base_hp + realm_level × hp_per_level."""
+    from src.engine.effects import companion_hp_max
+    comp = {"base_hp": "50"}
+    scale = {"hp_per_level": "12"}
+    assert companion_hp_max(comp, 5, scale) == 50 + 5 * 12
+    # default tanpa field
+    assert companion_hp_max({}, 1, {}) == 10 + 1 * 12
+    # hp_per_level string → int
+    assert companion_hp_max({"base_hp": 20}, 3, {"hp_per_level": "8"}) == 20 + 3 * 8

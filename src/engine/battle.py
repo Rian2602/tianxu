@@ -15,6 +15,7 @@ import random
 
 from ..loader import DataRegistry
 from .cultivation import gain_exp
+from .effects import companion_hp_max
 from .events import add_log
 from .state import GameState
 
@@ -54,7 +55,7 @@ def companion_stats(state: GameState, registry: DataRegistry) -> dict | None:
     scale = registry.config.get("companion", {})
     lvl = state.player.realm_level
     # F3 (adaptifitas): kolom opsional → default, jangan KeyError di tengah battle
-    hp_max = int(comp.get("base_hp", 10)) + lvl * int(scale.get("hp_per_level", 12))
+    hp_max = companion_hp_max(comp, lvl, scale)
     return {
         "id": c["id"],
         "name": comp["name"],
@@ -79,7 +80,7 @@ def companion_stats_for(state: GameState, registry: DataRegistry, companion_id: 
         return None
     scale = registry.config.get("companion", {})
     lvl = state.player.realm_level
-    hp_max = int(comp.get("base_hp", 10)) + lvl * int(scale.get("hp_per_level", 12))
+    hp_max = companion_hp_max(comp, lvl, scale)
     return {
         "id": c["id"],
         "name": comp["name"],
