@@ -94,6 +94,7 @@ Session: location, day, hour, current_quest, completed/failed_quests, active_sid
 - **Passives** — `data/passives.json`. Academy choice grants a passive when quest `source` matches (quest.py `_grant_passive`); `get_player_passives()` applies stat modifiers in battle.
 - **Technique fusion** — `data/fusion_recipes.json` (registry `.fusions`). Session action `fuse_technique`: consumes source techniques at required level → grants result technique.
 - **Item types** — consumable (use for HP/Qi/exp), weapon (equip for power), key_item (narrative, may have use_effects).
+- **Item use_effects pattern** — Key items pakai `use_effects[]` generik. Consumable special-cased (pil_sukses, pil_aman) masih hardcoded di session.py `_use_item()`. Refactor ke use_effects saat ada consumable baru yang butuh custom effect.
 - **UX suggestions** — When travel/hunt/search is blocked, session suggests reachable locations or activity zones via `_locations_with_activity()`.
 
 ## Story data (7 arcs)
