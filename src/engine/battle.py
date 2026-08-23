@@ -260,7 +260,7 @@ class BattleEngine:
     def start(self, foes: list[dict], context: str = "hunt", allies: list[dict] | None = None,
               use_companion: bool = True) -> dict:
         """foes = daftar stat musuh (baris enemies.csv atau npc['combat']).
-        allies = stat sekutu quest untuk spar_team — menyerang otomatis."""
+        allies = sekutu quest spar_team — ikut giliran berurutan (turn_queue)."""
         b = {
             "foes": [dict(f) for f in foes],
             "context": context,
@@ -287,6 +287,14 @@ class BattleEngine:
             f["hp_max"] = int(f.get("hp_max") or f["hp"])
             f["qi_max"] = int(f.get("qi_max") or f["qi"])
         add_log(self.state, "battle", f"⚔️  Pertarungan dimulai melawan {self._foe_names(b)}!")
+        if context == "spar_team":
+            # Playtest #7: giliran berurutan dikendalikan pemain —
+            # pemain → sekutu → companion → musuh, satu aktor per aksi.
+            queue = ["player"] + [f"ally:{i}" for i in range(len(b["allies"]))]
+            if b["use_companion"] and companion_stats(self.state, self.reg):
+                queue.append("companion")
+            b["turn_queue"] = queue
+            b["turn_pos"] = 0
         return self.view()
 
     def _foe_names(self, b: dict) -> str:
@@ -298,6 +306,8 @@ class BattleEngine:
         b = self.state.pending_battle
         if not b or b["over"]:
             return self.view()
+        if b.get("turn_queue"):
+            return self._team_turn(action, b)
         pc = player_combat(self.state, self.reg)
         # status effect (Task 1): proses dot & cek stun di awal giliran pemain;
         # status yang ADA sebelum giliran ini yang di-tick (yang baru kena giliran ini
@@ -355,6 +365,97 @@ class BattleEngine:
         if not b["over"] and pc["hp"] <= 0:
             return self._ko(b)
         self._tick_player_statuses(b, pre_round)
+        self._sync_player(pc)
+        return self.view()
+
+    # ---------- giliran tim (spar_team) ----------
+
+    def _team_fighter(self, b: dict, key: str) -> dict | None:
+        """Stat aktor dari kunci turn_queue ("player", "ally:i", "companion").
+        Return None bila aktor sudah gugur."""
+        if key == "player":
+            pc = player_combat(self.state, self.reg)
+            return pc if pc["hp"] > 0 else None
+        if key == "companion":
+            comp = companion_stats(self.state, self.reg)
+            return comp if comp and comp["hp"] > 0 else None
+        if key.startswith("ally:"):
+            ally = b["allies"][int(key.split(":")[1])]
+            return ally if ally["hp"] > 0 else None
+        return None
+
+    def _team_turn(self, action: dict, b: dict) -> dict:
+        """spar_team: satu aksi = satu giliran aktor (playtest #7).
+        Serangan selalu ke musuh — teman tim tidak bisa diserang.
+        Sekutu: serang / bertahan. Companion: menyerang otomatis saat gilirannya."""
+        pc = player_combat(self.state, self.reg)
+        queue = b["turn_queue"]
+        pos = b.get("turn_pos", 0)
+        while pos < len(queue) and not self._team_fighter(b, queue[pos]):
+            pos += 1
+        if pos >= len(queue):
+            pos = 0  # sisa kawan gugur semua → giliran musuh langsung
+        actor = queue[pos]
+        a = action.get("action", "attack")
+        if actor == "player":
+            pre_round = set(b.get("player_statuses", {}))
+            stunned = self._apply_player_statuses(pc, b)
+            if pc["hp"] <= 0:
+                return self._ko(b)
+            if stunned:
+                add_log(self.state, "battle", "Kau terpana — tidak bisa bergerak giliran ini!")
+            elif a == "flee":
+                if self._try_flee(pc, b):
+                    b["over"] = True
+                    b["player_fled"] = True
+                    self.state.pending_battle = None
+                    add_log(self.state, "battle", "Kau berhasil kabur dari pertarungan.")
+                    return self.view()
+                add_log(self.state, "battle", "Kau gagal kabur!")
+            else:
+                b["last_technique_tags"] = []
+                if a == "technique":
+                    self._technique(pc, b, action.get("technique"))
+                elif a == "item":
+                    self._use_item(pc, b, action.get("item"))
+                elif a == "guard":
+                    b["player_guard"] = 50
+                    add_log(self.state, "battle", "Kau bertahan — damage masuk dikurangi setengah.")
+                else:
+                    self._attack(pc, b, b["foes"][0])
+            self._regen(pc, b)
+            self._tick_player_statuses(b, pre_round)
+        else:
+            fighter = self._team_fighter(b, actor)
+            foe = next((f for f in b["foes"] if f["hp"] > 0), None)
+            if foe:
+                if a == "guard" and actor.startswith("ally:"):
+                    fighter["guarding"] = True
+                    add_log(self.state, "battle", f"{fighter['name']} bertahan — damage masuk berkurang.")
+                else:
+                    dmg, crit = self._calc_damage(fighter["attack"], foe["defense"],
+                                                  fighter.get("element"), foe.get("element"))
+                    foe["hp"] -= dmg
+                    add_log(self.state, "battle",
+                            f"{fighter['name']} menyerang! {foe['name']} kehilangan {dmg} HP{' (KRITIS!)' if crit else ''}.")
+        if self._all_dead(b):
+            return self._victory(b, pc)
+        # maju ke aktor hidup berikutnya; habis → giliran musuh menutup ronde
+        pos += 1
+        while pos < len(queue) and not self._team_fighter(b, queue[pos]):
+            pos += 1
+        if pos >= len(queue):
+            self._enemy_turn(pc, b)
+            b["player_guard"] = False
+            self._regen_foes(b)
+            if pc["hp"] <= 0:
+                return self._ko(b)
+            pos = 0
+            while pos < len(queue) and not self._team_fighter(b, queue[pos]):
+                pos += 1
+            if pos >= len(queue):
+                pos = 0
+        b["turn_pos"] = pos
         self._sync_player(pc)
         return self.view()
 
@@ -516,7 +617,11 @@ class BattleEngine:
             if not sc:
                 continue
             kind = sc.get("kind")
+            # Fix audit v3 §1.5 (sisi musuh): kind tak dikenal dilaporkan,
+            # bukan dihapus senyap — paritas dengan sisi pemain (ln 686-690).
             if kind not in STATUS_KINDS:
+                add_log(self.state, "battle",
+                        f"Efek '{sc.get('name', sid)}' (kind '{kind}') tak dikenal — diabaikan.")
                 del st[sid]
                 continue
             if kind == "dot":
@@ -700,6 +805,8 @@ class BattleEngine:
             elif target[0] == "ally":
                 ally = b["allies"][target[1]]
                 dmg, crit = self._calc_damage(foe["attack"], ally["defense"], foe.get("element"), ally.get("element"))
+                if ally.pop("guarding", False):
+                    dmg = max(1, dmg // 2)
                 ally["hp"] -= dmg
                 if ally["hp"] <= 0:
                     ally["hp"] = 0
@@ -885,21 +992,26 @@ class BattleEngine:
                 {"name": a["name"], "hp": a["hp"], "hp_max": a["hp_max"], "element": a.get("element")}
                 for a in b.get("allies", [])
             ],
-            "ally_turn_index": b.get("ally_turn_index", 0),
-            "active_ally_index": self._active_ally_index(b),
+            "active_actor": self._active_actor(b),
             "over": b.get("over", False),
             "won": b.get("won", False),
             "fled": b.get("player_fled", False),
         }
 
-    def _active_ally_index(self, b: dict) -> int | None:
-        allies = b.get("allies", [])
-        if not allies:
+    def _active_actor(self, b: dict) -> dict | None:
+        """Aktor yang gilirannya menunggu input (spar_team); None untuk battle biasa."""
+        queue = b.get("turn_queue")
+        if not queue:
             return None
-        idx = b.get("ally_turn_index", 0)
-        for _ in range(len(allies)):
-            current = idx % len(allies)
-            if allies[current]["hp"] > 0:
-                return current
-            idx += 1
+        pos = b.get("turn_pos", 0)
+        while pos < len(queue):
+            key = queue[pos]
+            f = self._team_fighter(b, key)
+            if f:
+                if key == "player":
+                    return {"type": "player", "name": "Kau"}
+                if key == "companion":
+                    return {"type": "companion", "name": f["name"]}
+                return {"type": "ally", "index": int(key.split(":")[1]), "name": f["name"]}
+            pos += 1
         return None

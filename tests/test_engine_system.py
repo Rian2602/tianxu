@@ -565,3 +565,26 @@ def test_carry_technique_level_caps_at_realm_max(tmp_path):
     assert s._carry_technique_level(5) == 2       # cap di atas
     assert s._carry_technique_level(1) == 1       # floor default 1
     assert s._carry_technique_level(0, floor=2) == 2  # floor 2 naik ke 2
+
+
+def test_foe_status_unknown_kind_logged_not_silent(tmp_path):
+    """Fix audit v3 §1.5 (sisi musuh): kind tak dikenal dilaporkan lalu
+    dihapus — bukan lenyap senyap seperti 'sembuh'.
+
+    Simulasi: config loaded valid, lalu kind berubah (drift dari
+    STATUS_KINDS) — ini skenario real di mana validator tidak jalan."""
+    reg, s = _sess(
+        tmp_path, quests=[Q()], npcs=[],
+        enemies=[{"id": "e1", "name": "E1", "hp": 50, "attack": 0, "defense": 0}],
+        config_extra={"battle": {"statuses": {
+            "aneh": {"name": "Aneh", "kind": "dot", "duration": 2, "max_duration": 5}}}},
+    )
+    # Simulasi drift: setelah load, kind diubah jadi tidak valid
+    reg.config["battle"]["statuses"]["aneh"]["kind"] = "misteri"
+    s.battle.start([dict(reg.enemies["e1"])], "hunt")
+    b = s.state.pending_battle
+    b["foe_statuses"] = {"aneh": 2}
+    foe = b["foes"][0]
+    s.battle._apply_foe_statuses(foe, b)
+    assert "aneh" not in b["foe_statuses"], "status invalid dihapus"
+    assert "tak dikenal" in "\n".join(e["text"] for e in s.state.log), "harus ada log"
