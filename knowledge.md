@@ -21,7 +21,7 @@ Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party dep
 - `web/app.py` — stdlib `ThreadingHTTPServer` JSON API + static files; `context()` exposes character_status, factions, meta (title/subtitle/tagline/panel/avatar/audio)
 - `web/static/app.js` — Vanilla JS frontend; applyMeta() for data-driven title/assets; avatar fallback (initials); faction panel; character status badges
 - `web/static/index.html` + `style.css` — Layout + theme (ink-wash textures, Lucide icons)
-- `tests/` — pytest suite (~364 tests), fixtures in `tests/fixtures/minimal_data/`
+- `tests/` — pytest suite (377 tests), fixtures in `tests/fixtures/minimal_data/`
 - `data/` — **7 arc story data** (JSON/CSV): quests, dialogs, NPCs, locations, items (with description column), enemies, techniques, companions, recipes, factions, key_items, npc_schedules, passives, fusion_recipes
 - `docs/` — Story Production Bible v1.0 (~20 docs incl. DESIGN_GAP_REPORT, ENDING_INTEGRATION + superpowers specs): narrative architecture, quest graphs, character arcs, memory system, dialogue system, ending matrix, consequence matrix, etc.
 
@@ -29,7 +29,7 @@ Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party dep
 
 ```bash
 python3 web/app.py            # Web server on http://127.0.0.1:8000 (port = argv[1])
-pytest                        # Full suite (~364 tests); single test: pytest tests/test_smoke.py -k <name>
+pytest                        # Full suite (377 tests); single test: pytest tests/test_smoke.py -k <name>
 pytest tests/test_smoke.py    # Smoke tests only
 pytest tests/test_arc1_data.py  # Arc 1 playthrough tests
 python3 -c "from src.loader import DataRegistry; DataRegistry('data')"  # Validate data/, no server needed
