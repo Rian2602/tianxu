@@ -1370,8 +1370,9 @@ class GameSession:
     def _pick_ending(self, s, arc: dict) -> dict | None:
         """C3: pilih ending dari `config.arcs[].endings` — ending pertama yang
         kondisinya cocok (first-match, AND — pola `_eval_condition` dipakai ulang
-        apa adanya). Murni data-driven (flag/relation/faksi/memory), TIDAK
-        berbasis skala moralitas. Tanpa `endings` → None (kontrak view lama)."""
+        apa adanya). Kondisi mendukung flag/relation/faksi/memory/morality via
+        `_eval_condition` (data ending saat ini belum memakai morality).
+        Tanpa `endings` → None (kontrak view lama)."""
         for end in arc.get("endings") or []:
             cond = end.get("condition") or {}
             if DialogEngine._eval_condition(s, cond, self.reg):
