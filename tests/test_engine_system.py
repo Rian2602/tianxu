@@ -335,6 +335,12 @@ def test_arc_summary_and_ending_pick_by_condition(tmp_path):
                    quests=[{"id": "q_final", "kind": "main", "title": "Final",
                             "objective": {"kind": "choose",
                                            "options": [{"value": "a", "label": "A"}]}}],
+                   dialogs=[{"id": "dlg_dummy_flags", "start": "n1", "nodes": {"n1": {
+                       "text": "x",
+                       "choices": [{"label": "set", "effects": [
+                           {"type": "flag", "key": "flag_evil", "value": True},
+                           {"type": "flag", "key": "flag_good", "value": True},
+                       ]}]}}}],
                    config_extra={"arcs": [{
                        "id": "arc1", "title": "Arc Satu", "teaser": "t",
                        "final_quest": "q_final", "memories_total": 0,
@@ -398,6 +404,11 @@ def test_arc_summary_ending_none_without_condition_match(tmp_path):
                    quests=[{"id": "q_final", "kind": "main", "title": "Final",
                             "objective": {"kind": "choose",
                                            "options": [{"value": "a", "label": "A"}]}}],
+                   dialogs=[{"id": "dlg_dummy_flags", "start": "n1", "nodes": {"n1": {
+                       "text": "x",
+                       "choices": [{"label": "set", "effects": [
+                           {"type": "flag", "key": "flag_never", "value": True},
+                       ]}]}}}],
                    config_extra={"arcs": [{
                        "id": "arc1", "title": "Arc Satu", "teaser": "t",
                        "final_quest": "q_final", "memories_total": 0,
@@ -522,3 +533,35 @@ def test_search_failure_adds_nothing(tmp_path, monkeypatch):
     monkeypatch.setattr(sess_mod.random, "random", lambda: 0.9)
     s.apply_action({"type": "search"})
     assert "i1" not in s.state.inventory
+
+
+def test_learn_technique_fallback_without_location_field(registry):
+    """Belajar teknik: akademi tanpa field 'location' (data lama/fixture) →
+    sah di titik aman mana pun; ditolak di lokasi tak aman."""
+    s = GameSession.new(registry)
+    while s.state.pending_dialog:
+        s.apply_action({"type": "dialog_choice", "choice_index": -1})
+    s.state.player.academy = "akademi_bambu"
+    s.state.location = "loc_gerbang"  # is_safe — fallback lolos meski bukan paviliun
+    s.apply_action({"type": "learn_technique", "technique": "teknik_dasar"})
+    assert "teknik_dasar" in s.state.player.techniques
+
+    s2 = GameSession.new(registry)
+    while s2.state.pending_dialog:
+        s2.apply_action({"type": "dialog_choice", "choice_index": -1})
+    s2.state.player.academy = "akademi_bambu"
+    s2.state.location = "loc_hutan"  # tidak aman → fallback menolak
+    v = s2.apply_action({"type": "learn_technique", "technique": "teknik_dasar"})
+    assert v.get("error")
+    assert "teknik_dasar" not in s2.state.player.techniques
+
+
+def test_carry_technique_level_caps_at_realm_max(tmp_path):
+    """_carry_technique_level: level di-cap di realm max, floor mengangkat.
+    Shared helper untuk _unlock_technique dan _fuse_technique — satu
+    implementasi, satu sumber kebenaran untuk kalkulasi level teknik."""
+    reg, s = _sess(tmp_path, quests=[Q()], npcs=[])
+    # realm r1 (default fixture) order=1 → max_lvl = 1+1 = 2
+    assert s._carry_technique_level(5) == 2       # cap di atas
+    assert s._carry_technique_level(1) == 1       # floor default 1
+    assert s._carry_technique_level(0, floor=2) == 2  # floor 2 naik ke 2

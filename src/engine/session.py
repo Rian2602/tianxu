@@ -2,9 +2,12 @@
 
 Aksi (ENGINE_ARCHITECTURE §12.3):
 talk, dialog_choice, move, advance_time, choose, battle_action, use_item,
-equip, meditate, spar, hunt, search, shop_buy, shop_sell, craft, rest, save.
+use_key_item, equip, meditate, spar, hunt, search, rest, shop_buy, shop_sell,
+craft, upgrade_technique, learn_technique, unlock_technique, fuse_technique,
+switch_companion, mine, save.
 
 Gate: saat battle aktif, hanya aksi `battle_action` yang diterima.
+Gate: saat dialog aktif, hanya aksi `dialog_choice` yang diterima.
 """
 
 from __future__ import annotations
@@ -155,6 +158,7 @@ class GameSession:
             "shop_sell": self._shop_sell,
             "craft": self._craft,
             "upgrade_technique": self._upgrade_technique,
+            "learn_technique": self._learn_technique,
             "unlock_technique": self._unlock_technique,
             "fuse_technique": self._fuse_technique,
             "switch_companion": self._switch_companion,
@@ -432,8 +436,8 @@ class GameSession:
                         add_log(self.state, "system", "Quest spar tim terkendala: data sekutu NPC tidak lengkap.")
                         return
                 ctx = "spar_team" if obj.get("context") == "spar_team" else "spar"
-                self.battle.start([foe], ctx, allies=allies or None,
-                                  use_companion=ctx != "spar_team")
+                # Playtest #7: companion ikut giliran tim yang dikendalikan pemain
+                self.battle.start([foe], ctx, allies=allies or None)
                 self.state.pending_battle["spar_npc"] = npc_id
                 return
             add_log(self.state, "system",
@@ -626,6 +630,15 @@ class GameSession:
         weekly_limit = self.reg.config.get("cultivation", {}).get("meditate_weekly_limit", 3)
         if self.state.meditate_week_count >= weekly_limit:
             msg = f"Sudah meditasi {weekly_limit} kali minggu ini. Tunggu minggu depan."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
+        # Meditasi hanya untuk breakthrough — jangan buang kuota saat dantian belum penuh
+        cap = self.state.exp_next(self.reg)
+        if self.state.player.dantian_exp < cap:
+            msg = (f"Dantian belum penuh ({self.state.player.dantian_exp}/{cap}). "
+                   f"Kumpulkan qi lewat pil kultivasi atau beast core dulu.")
             add_log(self.state, "system", msg)
             res = self.view()
             res["error"] = msg
@@ -994,6 +1007,78 @@ class GameSession:
         add_log(self.state, "narration", f"{tek['name']} naik ke Lv.{cur + 1} (−{cost} koin).")
         return self.view()
 
+    def _learn_technique(self, action: dict) -> dict:
+        """Belajar teknik kurikulum paviliun dari guru — GRATIS, hanya di
+        paviliun sendiri. Syarat: teknik masih berurutan di kurikulum
+        (pendahulu dikuasai) dan ranah memenuhi `realm_required`."""
+        tid = action.get("technique")
+        tek = self.reg.technique(tid)
+        if not tek:
+            add_log(self.state, "system", "Teknik tidak dikenal.")
+            return self.view()
+        academy = self.state.player.academy
+        if not academy:
+            msg = "Kau belum bergabung dengan paviliun mana pun."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
+        cfg_academy = next(
+            (a for a in self.reg.config.get("academies", []) if a.get("id") == academy), {})
+        curriculum = [t["id"] for t in self.reg.academy_curriculum(academy)]
+        if tid not in curriculum:
+            msg = f"{tek['name']} bukan bagian kurikulum pavilionmu."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
+        if tid in self.state.player.techniques:
+            msg = f"Kau sudah menguasai {tek['name']}."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
+        # lokasi: paviliun sendiri (field 'location' config); data lama tanpa
+        # field → fallback titik aman apa pun
+        want_loc = cfg_academy.get("location")
+        here = self.reg.location(self.state.location)
+        ok_loc = (self.state.location == want_loc) if want_loc else bool(here and here.get("is_safe"))
+        if not ok_loc:
+            name = cfg_academy.get("name", academy)
+            msg = f"Pelajari {tek['name']} bersama gurumu di {name}."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
+        # urutan kurikulum: semua pendahulu wajib dikuasai + ranah cukup
+        for prev_id in curriculum[:curriculum.index(tid)]:
+            if prev_id not in self.state.player.techniques:
+                prev = self.reg.technique(prev_id)
+                msg = f"Kuasai {prev['name'] if prev else prev_id} lebih dulu."
+                add_log(self.state, "system", msg)
+                res = self.view()
+                res["error"] = msg
+                return res
+        realm = self.reg.realms.get(tek.get("realm_required", ""))
+        cur_r = self.reg.realms.get(self.state.player.realm)
+        if realm and cur_r and int(realm["order"]) > int(cur_r["order"]):
+            msg = f"{tek['name']} menuntut ranah {realm.get('name', tek['realm_required'])}."
+            add_log(self.state, "system", msg)
+            res = self.view()
+            res["error"] = msg
+            return res
+        self.state.player.techniques.append(tid)
+        add_log(self.state, "narration",
+                f"Gurumu mengajarkan {tek['name']} — gerak-geriknya tertanam dalam ingatan tubuhmu.")
+        return self.view()
+
+    def _carry_technique_level(self, base_level: int, floor: int = 1) -> int:
+        """Hitung level teknik setelah evolusi/fusion: min(max(floor, base), realm_max).
+        Sumber kebenar tunggal untuk _unlock_technique dan _fuse_technique."""
+        realm = self.reg.realm_by_id(self.state.player.realm)
+        max_lvl = (int(realm.get("order", 1)) + 1) if realm else 2
+        return min(max(floor, base_level), max_lvl)
+
     def _unlock_technique(self, action: dict) -> dict:
         """Unlock technique evolution — REPLACE semantics.
         Base technique is REMOVED, variant takes its place.
@@ -1029,11 +1114,9 @@ class GameSession:
         # REPLACE: remove base, add variant
         self.state.player.techniques.remove(evolves_from)
         self.state.player.techniques.append(tid)
-        # Carry over technique level (min of base level, max for new realm)
+        # Carry over technique level — capped at realm max (floor 1)
         base_level = int(self.state.player.technique_levels.pop(evolves_from, 1))
-        realm = self.reg.realm_by_id(self.state.player.realm)
-        max_lvl = (int(realm.get("order", 1)) + 1) if realm else 2
-        self.state.player.technique_levels[tid] = min(base_level, max_lvl)
+        self.state.player.technique_levels[tid] = self._carry_technique_level(base_level)
         add_log(self.state, "narration",
                 f"{tek['name']} menggantikan {evolves_from} — evolusi teknik!")
         return self.view()
@@ -1098,10 +1181,8 @@ class GameSession:
             self.state.player.techniques.remove(r)
             self.state.player.technique_levels.pop(r, None)
         self.state.player.techniques.append(result_id)
-        # Result level = max(2, min_level), capped at realm max
-        realm = self.reg.realm_by_id(self.state.player.realm)
-        max_lvl = (int(realm.get("order", 1)) + 1) if realm else 2
-        self.state.player.technique_levels[result_id] = min(max(2, min_level), max_lvl)
+        # Result level = max(2, min_level), capped at realm max (floor 2)
+        self.state.player.technique_levels[result_id] = self._carry_technique_level(min_level, floor=2)
         add_log(self.state, "narration",
                 f"Fusion berhasil! {result_tek.get('name', result_id)} lahir dari gabungan teknik.")
         return self.view()
