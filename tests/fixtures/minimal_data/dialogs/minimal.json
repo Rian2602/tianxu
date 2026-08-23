@@ -9,7 +9,7 @@
           "speaker": "npc:npc_guru",
           "text": "Selamat datang di Tian Xu. Kau tampak belum familiar dengan akademi.",
           "choices": [
-            {"label": "Lanjut", "next": "n2"}
+            {"label": "Lanjut", "next": "n2", "effects": [{"type": "flag", "key": "sudah_kenal", "value": true}]}
           ]
         },
         "n2": {

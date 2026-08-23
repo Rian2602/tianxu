@@ -10,6 +10,9 @@
         "target": 1,
         "hint": "Bicara dengan guru di gerbang."
       },
+      "on_complete": {
+        "system_msg": "Guru menyambutmu."
+      },
       "on_complete": {"system_msg": "Guru menyambutmu."},
       "next": [{"quest": "q_min_pilih"}]
     },
