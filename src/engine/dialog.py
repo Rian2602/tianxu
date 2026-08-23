@@ -100,6 +100,15 @@ class DialogEngine:
             return None
         node = self.current["nodes"][self.node_id]
         choices = self._visible_choices(node)
+        # Node tanpa pilihan (murni narasi) — akhiri atau lanjut otomatis.
+        if not choices:
+            nxt = node.get("next")
+            if nxt:
+                self.node_id = nxt
+                self._mark_once()
+                self.visited.add(nxt)
+                return self.view()
+            return self._end()
         if choice_index < 0 or choice_index >= len(choices):
             return self.view()
         ch = choices[choice_index]
