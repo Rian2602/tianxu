@@ -502,6 +502,10 @@ class QuestEngine:
             "start_day": self.state.day,
             "start_hour": self.state.hour,
         }
+        # Playtest #5: narasi pembuka quest (mis. urgensi Formasi Tua)
+        q = self.reg.quest(qid)
+        if q:
+            apply_effects(self.state, self.reg, q.get("on_start", {}).get("effects"))
 
     def select_branch(self, option: str) -> None:
         """Setelah dialog percabangan selesai — pilih cabang berdasarkan opsi.
