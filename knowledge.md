@@ -5,7 +5,7 @@ Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party dep
 ## Key code
 
 - `src/engine/` — Core engine; `GameSession` (session.py) is the orchestrator.
-  - `session.py` — action dispatch, view(), save/load, dialog routing, hunt/search/shop/craft/meditate/mine
+  - `session.py` — action dispatch, view(), save/load, dialog routing, hunt/search/shop/craft/meditate/mine; UX helpers `_locations_with_activity()`, travel suggestions
   - `quest.py` — DAG main quests + side quests, branch/convergence, timeout; `OBJECTIVE_HANDLERS` dispatch
   - `dialog.py` — conditional dialog trees, once-entries, eval_condition; `CONDITION_CHECKERS` dispatch
   - `battle.py` — turn-based combat, element advantage, status effects (`STATUS_KINDS`: dot/stun/debuff/hot/buff), companions, spar_team sequential `turn_queue`, element mastery XP (`MASTERY_XP_PER_USE`); `TECHNIQUE_KINDS`, `STATUS_KINDS` frozensets
@@ -21,22 +21,22 @@ Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party dep
 - `web/app.py` — stdlib `ThreadingHTTPServer` JSON API + static files; `context()` exposes character_status, factions, meta (title/subtitle/tagline/panel/avatar/audio)
 - `web/static/app.js` — Vanilla JS frontend; applyMeta() for data-driven title/assets; avatar fallback (initials); faction panel; character status badges
 - `web/static/index.html` + `style.css` — Layout + theme (ink-wash textures, Lucide icons)
-- `tests/` — pytest suite, fixtures in `tests/fixtures/minimal_data/`
-- `data/` — **7 arc story data** (JSON/CSV): quests, dialogs, NPCs, locations, items, enemies, techniques, companions, recipes, factions, key_items, npc_schedules, passives, fusion_recipes
+- `tests/` — pytest suite (~364 tests), fixtures in `tests/fixtures/minimal_data/`
+- `data/` — **7 arc story data** (JSON/CSV): quests, dialogs, NPCs, locations, items (with description column), enemies, techniques, companions, recipes, factions, key_items, npc_schedules, passives, fusion_recipes
 - `docs/` — Story Production Bible v1.0 (~20 docs incl. DESIGN_GAP_REPORT, ENDING_INTEGRATION + superpowers specs): narrative architecture, quest graphs, character arcs, memory system, dialogue system, ending matrix, consequence matrix, etc.
 
 ## Commands
 
 ```bash
 python3 web/app.py            # Web server on http://127.0.0.1:8000 (port = argv[1])
-pytest                        # Full suite (~5s); single test: pytest tests/test_smoke.py -k <name>
+pytest                        # Full suite (~364 tests); single test: pytest tests/test_smoke.py -k <name>
 pytest tests/test_smoke.py    # Smoke tests only
 pytest tests/test_arc1_data.py  # Arc 1 playthrough tests
 python3 -c "from src.loader import DataRegistry; DataRegistry('data')"  # Validate data/, no server needed
 node --check web/static/app.js  # JS syntax check
 ```
 
-No lint/typecheck configured — verification = pytest + `node --check`. `pyproject.toml` exists for build config; no `requirements.txt` — stdlib only, no pip install needed. `web/app.py` manually adds the project root to `sys.path`.
+No lint/typecheck configured — verification = pytest + `node --check`. `pyproject.toml` exists for build config; no `requirements.txt` — stdlib only, no pip install needed (`uv.lock` is a leftover tooling lock containing only the root package). `web/app.py` manually adds the project root to `sys.path`.
 
 ## Conventions & constraints
 
@@ -83,7 +83,7 @@ Session: location, day, hour, current_quest, completed/failed_quests, active_sid
 - **Mines** — `world.mines[]` in config.json. Each zone has `pool` with item/chance/min/max.
 - **Hunts** — multi-zone (`world.hunts[]`). Each zone has `pool` (enemies), `search_items` (item/chance/min/max), optional `mini_boss_chance`/`mini_boss`.
 - **Enemy drops** — `enemies.csv` has `drop_item`, `drop_chance` columns.
-- **Items** — `items.csv` has `exp_value` column. 36 items including beast cores, cultivation pills, technique scrolls, reagents.
+- **Items** — `items.csv` has `exp_value` and `description` columns. 36 items including beast cores, cultivation pills, technique scrolls, reagents.
 - **Key items with use_effects** — `data/key_items.json` items can have `consumed: true` + `use_effects[]` (e.g., technique scrolls grant techniques).
 - **NPC state overrides** — `npc_state` effect can change NPC location at runtime. `npc_states` dict on GameState tracks overrides.
 - **NPC schedules** — `data/npc_schedules.json` moves NPCs by time of day.
@@ -94,6 +94,7 @@ Session: location, day, hour, current_quest, completed/failed_quests, active_sid
 - **Passives** — `data/passives.json`. Academy choice grants a passive when quest `source` matches (quest.py `_grant_passive`); `get_player_passives()` applies stat modifiers in battle.
 - **Technique fusion** — `data/fusion_recipes.json` (registry `.fusions`). Session action `fuse_technique`: consumes source techniques at required level → grants result technique.
 - **Item types** — consumable (use for HP/Qi/exp), weapon (equip for power), key_item (narrative, may have use_effects).
+- **UX suggestions** — When travel/hunt/search is blocked, session suggests reachable locations or activity zones via `_locations_with_activity()`.
 
 ## Story data (7 arcs)
 
@@ -116,3 +117,4 @@ Session: location, day, hour, current_quest, completed/failed_quests, active_sid
 - Effects engine casts numeric values to `int()` — string values in JSON are coerced, not crashed.
 - `max_hp()`/`max_qi()` fallback returns sane defaults (50/30), not current HP.
 - Companion system is active — `data/companions.json` has per-pavilion companions. `max_companions: 3`.
+- Old realm IDs (`realm_awal`, `realm_tengah`, `realm_atas`) are migrated to new names (`realm_chuji`, `realm_xuanshi`, `realm_dishi`) in save loader.
