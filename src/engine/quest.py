@@ -16,6 +16,7 @@ from ..loader import DataRegistry
 from .effects import apply as apply_effects, companion_hp_max
 from .events import add_log
 from .memory import unlock as unlock_memory
+from .morality import clamp_morality
 from .state import GameState
 
 OBJECTIVE_KINDS = {"talk", "defeat", "gather", "reach", "choose", "spar", "advance_time", "rest"}
@@ -356,6 +357,7 @@ class QuestEngine:
             self.state.player.roots = oset["roots"]
         if "morality" in oset:
             self.state.player.morality = int(oset["morality"])
+            clamp_morality(self.state, self.reg)
         if "gold" in oset:
             self.state.player.gold = int(oset["gold"])
         self._grant_companion(self.state.player.academy)
