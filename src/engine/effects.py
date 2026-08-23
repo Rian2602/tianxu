@@ -12,6 +12,7 @@ technique, npc_state, grant_companion, exp, unlock_realm_bonus, status_effect, d
 from __future__ import annotations
 
 from ..loader import DataRegistry
+from .cultivation import gain_exp
 from .events import add_log
 from .morality import adjust as adjust_morality
 from .state import GameState
@@ -100,12 +101,7 @@ def apply(state: GameState, registry: DataRegistry, effects: list | None) -> Non
                     add_log(state, "narration", f"{comp['name']} mendekat dan menempel padamu.")
         elif t == "exp":
             val = int(fx.get("value", 0))
-            state.player.dantian_exp += val
-            r = registry.realm_by_id(state.player.realm)
-            cap = int(r["dantian_capacity"]) if r and r.get("dantian_capacity") else 20
-            if state.player.dantian_exp > cap:
-                state.player.dantian_exp = cap
-            add_log(state, "system", f"[Sistem] +{val} exp dantian.")
+            gain_exp(state, registry, val)
         elif t == "unlock_realm_bonus":
             realm_id = fx.get("realm")
             if realm_id and realm_id not in state.realms_unlocked:
