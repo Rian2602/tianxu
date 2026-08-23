@@ -210,6 +210,10 @@ class DialogEngine:
         self.node_id = None
         self.current = None
         self.state.pending_dialog = None
+        # Promosikan antrean 1 slot (mis. intro quest yang menunggu)
+        if self.state.pending_dialog_next:
+            self.state.pending_dialog = self.state.pending_dialog_next
+            self.state.pending_dialog_next = None
         self.resolved_random_texts = {}
         return {"ended": True}
 

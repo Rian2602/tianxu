@@ -130,6 +130,11 @@ def apply(state: GameState, registry: DataRegistry, effects: list | None) -> Non
         elif t == "dialog":
             dialog_id = fx.get("id")
             if dialog_id:
-                state.pending_dialog = dialog_id
+                # Jangan timpa dialog yang sedang tampil — antrekan 1 slot
+                # (mis. on_start quest saat dialog on_complete masih pending).
+                if state.pending_dialog:
+                    state.pending_dialog_next = dialog_id
+                else:
+                    state.pending_dialog = dialog_id
         else:
             add_log(state, "system", f"[Sistem] Efek tak dikenal: {t}.")

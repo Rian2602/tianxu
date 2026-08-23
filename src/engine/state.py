@@ -133,6 +133,8 @@ class GameState:
     branch_quest: str | None = None  # quest id yang memicu branch (bukti eksplisit,
     #                                   hindari pencarian mundur di completed_quests)
     pending_dialog: str | None = None
+    pending_dialog_next: str | None = None  # antrean 1 slot — dialog berikutnya
+    #                                        (mis. on_start quest saat dialog lain aktif)
     pending_battle: dict | None = None  # data battle aktif (dict, lihat battle.py)
     companion: dict | None = None  # {"id", "hp", "active"} — backward compat (v3 save)
     companions: list = field(default_factory=list)  # [{"id", "hp", "active"}] — all owned companions
@@ -277,6 +279,7 @@ class GameState:
             "branch_pending": self.branch_pending,
             "branch_quest": self.branch_quest,
             "pending_dialog": self.pending_dialog,
+            "pending_dialog_next": self.pending_dialog_next,
             "pending_battle": copy.deepcopy(self.pending_battle) if self.pending_battle else None,
             "companion": copy.deepcopy(self.companion) if self.companion else None,
             "companions": copy.deepcopy(self.companions),
@@ -392,6 +395,7 @@ class GameState:
             branch_pending=d.get("branch_pending"),
             branch_quest=d.get("branch_quest"),  # None utk save lama → fallback pencarian
             pending_dialog=d.get("pending_dialog"),
+            pending_dialog_next=d.get("pending_dialog_next"),
             pending_battle=copy.deepcopy(d.get("pending_battle")),
             companion=copy.deepcopy(d.get("companion")),
             companions=companions,
