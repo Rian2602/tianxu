@@ -56,6 +56,8 @@ def _context() -> dict:
         "subtitle": web_cfg.get("subtitle", "TIAN XU: SECOND LIFE"),
         "tagline": web_cfg.get("tagline", "天缘灵 · Tian Xu: Second Life"),
         "panel": web_cfg.get("panel", "Tianyuan Ling"),
+        # Playtest #3: id dialog intro untuk layar sinematik full-screen
+        "intro_dialog": (registry.config.get("intro_dialog") if registry else None),
     }
     if registry is None or session is None:
         return {

@@ -496,7 +496,7 @@ function renderLeft(v) {
   const ic = customIcon;
   html += statRow(ic("gold") + "Koin Emas", p.gold, "gold");
   html += statRow(ic("moral") + "Moral", p.morality, p.morality > 0 ? "green" : (p.morality < 0 ? "red" : ""));
-  html += statRow(icon("landmark") + "Akademi", (ctx && ctx.academy) || "—");
+  html += statRow(icon("landmark") + "Paviliun", (ctx && ctx.academy) || "—");
   html += statRow(ic("sword") + "Senjata", w);
   if (comp) {
     html += `<h3 class="stat-title" style="margin-top:18px">✦ Roh</h3>`;
@@ -558,13 +558,15 @@ function renderRight(v) {
   
   // kurikulum paviliun
   if (ctx && ctx.curriculum && ctx.curriculum.length) {
-    html += `<div class="section"><h3 class="stat-title">${icon("book-open")}Kurikulum Akademi</h3>`;
+    html += `<div class="section"><h3 class="stat-title">${icon("book-open")}Kurikulum Paviliun</h3>`;
     ctx.curriculum.forEach((t) => {
       let badge = "";
       if (t.status === "learned") {
         badge = `<span class="badge badge-learned">Dikuasai${t.level ? ` (Lv.${t.level})` : ""}</span>`;
       } else if (t.status === "available") {
-        badge = `<span class="badge badge-available">Tersedia</span>`;
+        // belajar dari guru paviliun — gratis, lokasi divalidasi engine
+        badge = `<span class="badge badge-available">Tersedia</span> ` +
+                `<button class="btn" onclick='act({type:"learn_technique",technique:"${esc(t.id)}"})'>Pelajari</button>`;
       } else {
         badge = `<span class="badge badge-locked">Terkunci</span>`;
       }
@@ -848,10 +850,19 @@ function renderCenter(v, c) {
   renderLog(v);
 
   const box = $("interact");
-  if (v.mode === "dialog") renderDialog(v, box);
-  else if (v.mode === "battle") renderBattle(v, c, box);
-  else if (v.mode === "choose") renderChoose(v, box);
-  else renderExplore(v, c, box);
+  if (v.mode === "dialog" && v.dialog?.dialog_id === (c?.meta?.intro_dialog || "dlg_intro_narrative")) {
+    // Playtest #3: intro sinematik full-screen terpisah sebelum dashboard
+    renderIntroCinematic(v, box);
+  }
+  else {
+    // Playtest #3: sembukayan overlay saat intro selesai → dashboard teresemblik
+    const cin = $("cinematic");
+    if (cin) cin.classList.add("hidden");
+    if (v.mode === "dialog") renderDialog(v, box);
+    else if (v.mode === "battle") renderBattle(v, c, box);
+    else if (v.mode === "choose") renderChoose(v, box);
+    else renderExplore(v, c, box);
+  }
 }
 
 // B9: indikator loading — tombol sumber dinonaktifkan + label "Memproses…" (tanpa animasi)
@@ -925,17 +936,16 @@ function renderExplore(v, c, box) {
 
   // lokasi aman
   if (loc.is_safe) {
-    // meditasi hanya setelah pelajaran pertama selesai
-    const flags = (ctx && ctx.flags) || {};
-    const canMeditate = flags.flag_first_lesson_done === true;
+    // meditasi hanya saat dantian penuh (untuk breakthrough — jangan buang kuota)
+    const canMeditate = v.player.dantian_exp >= v.player.dantian_capacity;
     if (canMeditate) {
       html += `<div class="action-row"><span class="action-label">Meditasi:</span>` +
-              `<button class="btn" onclick='act({type:"meditate"})'>Meditasi</button>`;
-      // istirahat hanya di kamar pemain
-      if (v.player.is_rest_location) {
-        html += `<button class="btn" onclick='act({type:"rest"})'>Istirahat</button>`;
-      }
-      html += `</div>`;
+              `<button class="btn" onclick='act({type:"meditate"})'>Meditasi</button></div>`;
+    }
+    // istirahat hanya di kamar pemain — TERPISAH dari blok meditasi agar
+    // tetap tampil saat dantian belum penuh (quest Insiden Malam butuh ini)
+    if (v.player.is_rest_location) {
+      html += `<div class="action-row"><button class="btn" onclick='act({type:"rest"})'>Istirahat</button></div>`;
     }
     // meracik (crafting)
     const ownedRecipes = v.recipes || [];
@@ -1014,10 +1024,28 @@ function renderExplore(v, c, box) {
 
 // ---------- dialog ----------
 
+// Playtest #3: intro sinematik full-screen terpisah — pakai #cinematic overlay.
+function renderIntroCinematic(v, box) {
+  const d = v.dialog;
+  const el = $("cinematic");
+  if (!d || !el) { el && el.classList.add("hidden"); box.innerHTML = ""; return; }
+  const hasNext = d.choices && d.choices.length > 0;
+  el.innerHTML =
+    `<div class="cinematic-scene">` +
+    `<div class="cinematic-text" id="cinematic-live"></div>` +
+    (hasNext
+      ? `<button class="cinematic-btn" onclick='act({type:"dialog_choice",choice_index:${d.choices[0].index}})'>(Melanjutkan)</button>`
+      : `<button class="cinematic-btn" onclick='act({type:"dialog_choice",choice_index:-1})'>Lanjut</button>`) +
+    `</div>`;
+  el.classList.remove("hidden");
+  box.innerHTML = "";
+  typewriter($("cinematic-live"), d.text, 22);
+}
+
 function renderDialog(v, box) {
   const d = v.dialog;
   if (!d) { box.innerHTML = ""; return; }
-  const npcNames = (ctx && ctx.npc_names) || {};
+  const npcNames = (ctx && ctx.npc_names) || {};;
   const npcAvatars = (ctx && ctx.npc_avatars) || {};
   let speaker = d.speaker;
   let speakerNpcId = null;
@@ -1057,37 +1085,41 @@ function renderBattle(v, c, box) {
   const b = v.battle;
   if (!b) { box.innerHTML = ""; return; }
   const p = b.player;
+  // Playtest #7: spar_team punya giliran berurutan — aktor aktif dari engine
+  const actor = b.active_actor || null;
+  const isPlayerTurn = !actor || actor.type === "player";
   let html = `<div class="interact-box">`;
-  html += `<div class="dialog-speaker-row"><div class="dialog-speaker">⚔ Pertarungan</div></div>`;
-  
+  html += `<div class="dialog-speaker-row"><div class="dialog-speaker">⚔ Pertarungan` +
+          (actor && !isPlayerTurn ? ` — Giliran: ${esc(actor.name)}` : ``) + `</div></div>`;
+
   const pct = (hp, max) => max > 0 ? Math.max(0, Math.min(100, Math.round((hp / max) * 100))) : 0;
-  
+
   // Player
-  html += `<div class="combatant-card ally">
+  html += `<div class="combatant-card ally${isPlayerTurn ? " ally-active" : ""}">
     <span class="c-name">Kau</span>
     <div class="c-bar"><div class="stat-bar-track"><div class="stat-bar-fill hp" data-target="${pct(p.hp, p.hp_max)}%" style="width:${pct(p.hp, p.hp_max)}%"></div></div></div>
   </div>`;
-  
+
   // Companion
   if (b.companion) {
-    html += `<div class="combatant-card ally">
+    const compActive = actor && actor.type === "companion";
+    html += `<div class="combatant-card ally${compActive ? " ally-active" : ""}">
       <span class="c-name">${esc(b.companion.name)}</span>
       <div class="c-bar"><div class="stat-bar-track"><div class="stat-bar-fill hp" data-target="${pct(b.companion.hp, b.companion.hp_max)}%" style="width:${pct(b.companion.hp, b.companion.hp_max)}%"></div></div></div>
     </div>`;
   }
-  
+
   // Sekutu ujian kelompok
   if (b.allies && b.allies.length) {
-    const allyIdx = b.active_ally_index;
     b.allies.forEach((a, i) => {
-      const activeCls = i === allyIdx ? " ally-active" : "";
+      const activeCls = actor && actor.type === "ally" && actor.index === i ? " ally-active" : "";
       html += `<div class="combatant-card ally${activeCls}">
         <span class="c-name">${esc(a.name)}</span>
         <div class="c-bar"><div class="stat-bar-track"><div class="stat-bar-fill hp" data-target="${pct(a.hp, a.hp_max)}%" style="width:${pct(a.hp, a.hp_max)}%"></div></div></div>
       </div>`;
     });
   }
-  
+
   // Foes
   b.foes.forEach((f) => {
     html += `<div class="combatant-card foe">
@@ -1095,7 +1127,18 @@ function renderBattle(v, c, box) {
       <div class="c-bar"><div class="stat-bar-track"><div class="stat-bar-fill hp" data-target="${pct(f.hp, f.hp_max)}%" style="width:${pct(f.hp, f.hp_max)}%"></div></div></div>
     </div>`;
   });
-  
+
+  if (!isPlayerTurn) {
+    // Giliran sekutu/companion — serang (atau bertahan utk sekutu); serangan selalu ke musuh
+    html += `<div class="action-row" style="margin-top: 15px;"><button class="btn" onclick='act({type:"battle_action",action:"attack"})'>${icon("sword")}Serang (${esc(actor.name)})</button>`;
+    if (actor.type === "ally") {
+      html += `<button class="btn" onclick='act({type:"battle_action",action:"guard"})'>${icon("shield")}Bertahan</button>`;
+    }
+    html += `</div></div>`;
+    box.innerHTML = html;
+    return;
+  }
+
   html += `<div class="action-row" style="margin-top: 15px;"><button class="btn" onclick='act({type:"battle_action",action:"attack"})'>${icon("sword")}Serang</button>` +
           `<button class="btn" onclick='act({type:"battle_action",action:"guard"})'>${icon("shield")}Bertahan</button>` +
           `<button class="btn" onclick='act({type:"battle_action",action:"flee"})'>${icon("x")}Kabur</button></div>`;
@@ -1224,7 +1267,7 @@ function openArcSummaryModal(s) {
   html += `<div style="margin-bottom: 20px;">
     ${statRow("Kultivator", s.player_name)}
     ${statRow("Ranah", `${s.realm} Lv.${s.realm_level}`)}
-    ${statRow("Akademi", s.academy || "—")}
+    ${statRow("Paviliun", s.academy || "—")}
     ${statRow("Moralitas", s.morality)}
     ${statRow("Ingatan Terbuka", s.memories_unlocked)}
     ${statRow("Waktu Berlalu", `Hari ${s.day}`)}

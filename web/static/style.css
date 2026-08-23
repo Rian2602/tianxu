@@ -544,6 +544,19 @@ body.ambience-outdoor-mentor #col-center {
 .dialog-text { font-family: var(--font-body); font-size: 18px; line-height: 1.7; margin-bottom: 16px; color: var(--cream); min-height: 1.7em; white-space: pre-wrap; }
 .dialog-text.npc-dialog { font-style: italic; }
 
+/* Playtest #3: intro sinematik full-screen (layar terpisah sebelum dashboard) */
+#cinematic { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(20, 14, 8, 0.88) 0%, rgba(0, 0, 0, 0.97) 100%);
+  opacity: 0; transition: opacity .4s ease; }
+#cinematic:not(.hidden) { opacity: 1; }
+#cinematic::before { content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(90, 120, 170, 0.18) 0%, transparent 70%); }
+.cinematic-scene { max-width: 760px; padding: 48px 40px; text-align: center; }
+.cinematic-text { font-family: var(--font-body); font-size: 21px; line-height: 1.9; color: var(--cream); white-space: pre-wrap; min-height: 2em; }
+.cinematic-btn { display: block; margin: 28px auto 0; font-family: var(--font-hand); font-weight: 600; color: var(--gold);
+  background: transparent; border: 1px solid var(--gold); padding: 10px 28px; cursor: pointer; border-radius: 4px; }
+.cinematic-btn:hover { background: rgba(212, 175, 55, 0.12); }
+
 @keyframes blink { 50% { opacity: 0; } }
 .tw-cursor { display: inline-block; width: 2px; height: 1em; background: var(--gold); margin-left: 2px; vertical-align: -3px; animation: blink .9s steps(1) infinite; }
 
