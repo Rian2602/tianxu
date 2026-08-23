@@ -76,7 +76,6 @@ class QuestEngine:
             hint = f"{hint} · Sisa: {sisa} jam" if hint else f"Sisa: {sisa} jam"
         kind = obj.get("kind")
         if kind == "talk":
-            npc = self.reg.npc(obj.get("npc", ""))
             return f"{hint} ({self._talk_count(quest)}/{obj.get('target', 1)})"
         if kind == "defeat":
             base = f"{hint} ({self.state.active_side_quests.get(quest['id'], {}).get('defeated', 0)}/{obj.get('target', 1)})"
