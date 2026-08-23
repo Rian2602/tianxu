@@ -554,6 +554,16 @@ def _validate_quests(registry, errors) -> None:
             _add(errors, src, f"{ctx}.on_complete.memory_unlock",
                  f"ingatan tak dikenal: '{mu}'.")
 
+        # rewards hanya gold — engine hanya membaca gold (quest.py:475,668),
+        # key lain di-drop senyap; validasi di trust boundary.
+        rewards = q.get("on_complete", {}).get("rewards")
+        if isinstance(rewards, dict):
+            unknown = set(rewards) - {"gold"}
+            if unknown:
+                _add(errors, src, f"{ctx}.on_complete.rewards",
+                     f"key rewards tak dikenal: {sorted(unknown)}.",
+                     {"gold"})
+
 
 def _validate_dialogs(registry, errors) -> None:
     for i, d in enumerate(registry.dialogs):

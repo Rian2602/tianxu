@@ -483,3 +483,15 @@ def test_npc_default_dialog_root_level_validated(data_dir):
     data["npcs"][0]["default_dialog"] = "dlg_ghost_typo"
     _dump(dst, "npcs.json", data)
     _expect_error(dst, "dialog tak dikenal", "dlg_ghost_typo")
+
+
+# ---------- aturan: quest rewards hanya gold ----------
+
+def test_quest_rewards_unknown_key_rejected(data_dir):
+    """Rewards selain 'gold' ditolak — engine hanya membaca gold (quest.py:475,668),
+    key lain di-drop senyap. Validasi di trust boundary mencegah jebakan penulis konten."""
+    dst = data_dir
+    data = _load(dst, "quests/minimal.json")
+    data["quests"][0]["on_complete"] = {"rewards": {"gold": 10, "exp": 5}}
+    _dump(dst, "quests/minimal.json", data)
+    _expect_error(dst, "rewards", "exp")
