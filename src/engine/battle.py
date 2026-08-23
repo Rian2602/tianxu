@@ -925,9 +925,6 @@ class BattleEngine:
         self.quest_engine.notify_battle_won(killed)
         return self.view()
 
-    def _last_exp(self, b: dict) -> int:
-        return 0
-
     def _ko(self, b: dict) -> dict:
         # Perisai Jiwa: one free KO recovery per battle
         if has_realm_bonus(self.state, "perisai_jiwa") and not b.get("ko_shield_used"):
