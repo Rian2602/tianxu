@@ -102,7 +102,7 @@
         "n_memory_investigated": {
           "speaker": "npc:npc_mei_ruo",
           "text": "Kau datang. Aku tahu kau akan datang. Kita sudah berbicara tentang ingatan — tentang kebenaran yang tersembunyi. Malam ini, kau akan menemukan kebenaran terakhir. Kau siap?",
-          "condition": {"flag": {"key": "flag_memory_a03_m01_investigated", "value": true}},
+          "condition": {"flag": {"key": "flag_memory_a03_m01_questioned", "value": true}},
           "choices": [
             {"label": "Aku siap. Terima kasih atas bantuanmu.", "next": "n_end"}
           ]
