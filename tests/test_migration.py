@@ -158,3 +158,149 @@ def test_v9_save_has_new_fields():
 def test_schema_version_is_9():
     """SCHEMA_VERSION should be 9 after all migrations."""
     assert SCHEMA_VERSION == 9
+
+
+# ---------- v2 → v3: factions dari flags + memories string → dict ----------
+
+def _make_v2_save():
+    """Create a minimal v2 save dict (before factions/memories format change)."""
+    return {
+        "schema_version": 2,
+        "player": {
+            "name": "X", "hp": 50, "qi": 30, "realm": "realm_chuji",
+            "realm_level": 1, "gold": 10, "roots": "akar_biasa",
+        },
+        "location": "loc_start", "day": 1, "hour": 8,
+        "current_quest": None,
+        "flags": {"rep_orthodox": 5, "rep_reformists": -3, "flag_other": True},
+        "memories": ["memory_a", "memory_b"],  # v2: plain strings
+        "factions": {},
+        "last_hunt_time": {},
+    }
+
+
+def test_v3_migration_factions_from_flags():
+    """v2→v3: rep_* flags dipindah ke factions, flag non-rep tetap."""
+    d = _make_v2_save()
+    state = GameState.from_dict(d)
+    assert state.factions == {"orthodox": 5, "reformists": -3}
+    assert "rep_orthodox" not in state.flags
+    assert "rep_reformists" not in state.flags
+    assert state.flags.get("flag_other") is True  # flag non-rep terjaga
+
+
+def test_v3_migration_memories_format():
+    """v2→v3: memories string dibungkus {id, reliability}."""
+    d = _make_v2_save()
+    state = GameState.from_dict(d)
+    assert state.memories == [
+        {"id": "memory_a", "reliability": "unknown"},
+        {"id": "memory_b", "reliability": "unknown"},
+    ]
+
+
+def test_v3_save_with_dict_memories_preserved():
+    """Save v3 (memories sudah dict) tidak boleh double-wrap."""
+    d = _make_v2_save()
+    d["schema_version"] = 3
+    d["memories"] = [{"id": "m1", "reliability": "confirmed"}]
+    state = GameState.from_dict(d)
+    assert state.memories == [{"id": "m1", "reliability": "confirmed"}]
+
+
+# ---------- v3 → v4: companion single → companions list ----------
+
+def _make_v3_companion_save():
+    """Create a minimal v3 save dict (single companion, before list migration)."""
+    return {
+        "schema_version": 3,
+        "player": {
+            "name": "X", "hp": 50, "qi": 30, "realm": "realm_chuji",
+            "realm_level": 1, "gold": 10, "roots": "akar_biasa",
+        },
+        "location": "loc_start", "day": 1, "hour": 8,
+        "factions": {"orthodox": 5},
+        "memories": [{"id": "m1", "reliability": "known"}],
+        "companion": {"id": "serigala", "hp": 20, "active": True},
+        "companions": [],
+        "active_companion": None,
+    }
+
+
+def test_v4_migration_companion_to_list():
+    """v3→v4: companion tunggal dimigrasi ke companions list + jadi aktif."""
+    d = _make_v3_companion_save()
+    state = GameState.from_dict(d)
+    assert len(state.companions) == 1
+    assert state.companions[0]["id"] == "serigala"
+    assert state.active_companion == "serigala"
+
+
+def test_v4_migration_preserves_existing_list():
+    """companions yang sudah terisi TIDAK boleh tertimpa migrasi."""
+    d = _make_v3_companion_save()
+    d["companions"] = [{"id": "bangau", "hp": 15, "active": False}]
+    d["active_companion"] = "bangau"
+    state = GameState.from_dict(d)
+    assert state.companions == [{"id": "bangau", "hp": 15, "active": False}]
+    assert state.active_companion == "bangau"
+
+
+def test_v4_no_companion_stays_empty():
+    """v3 tanpa companion → list tetap kosong, tanpa active."""
+    d = _make_v3_companion_save()
+    d["companion"] = None
+    state = GameState.from_dict(d)
+    assert state.companions == []
+    assert state.active_companion is None
+
+
+# ---------- v4 → v5: realm rename + dantian/realms_unlocked/status_effects ----------
+
+def _make_v4_save():
+    """Create a minimal v4 save dict (old realm IDs, before dantian fields)."""
+    return {
+        "schema_version": 4,
+        "player": {
+            "name": "X", "hp": 50, "qi": 30, "realm": "realm_awal",
+            "realm_level": 1, "gold": 10, "roots": "akar_biasa",
+        },
+        "location": "loc_start", "day": 1, "hour": 8,
+        "factions": {}, "memories": [],
+        "companion": None, "companions": [],
+        "active_companion": None,
+    }
+
+
+def test_v5_migration_realm_rename():
+    """v4→v5: ID ranah lama dipetakan ke nama baru."""
+    d = _make_v4_save()
+    state = GameState.from_dict(d)
+    assert state.player.realm == "realm_chuji"
+
+
+def test_v5_migration_all_old_realms_mapped():
+    """Semua tiga ID lama terpetakan: awal→chuji, tengah→xuanshi, atas→dishi."""
+    mapping = {"realm_tengah": "realm_xuanshi", "realm_atas": "realm_dishi"}
+    for old, new in mapping.items():
+        d = _make_v4_save()
+        d["player"]["realm"] = old
+        state = GameState.from_dict(d)
+        assert state.player.realm == new, f"{old} → {new}"
+
+
+def test_v5_migration_new_realm_id_untouched():
+    """ID ranah yang sudah baru dilewati migrasi tanpa perubahan."""
+    d = _make_v4_save()
+    d["player"]["realm"] = "realm_xuanshi"
+    state = GameState.from_dict(d)
+    assert state.player.realm == "realm_xuanshi"
+
+
+def test_v5_migration_dantian_fields_default():
+    """Save v4 tanpa field dantian → default aman (0 / list kosong)."""
+    d = _make_v4_save()
+    state = GameState.from_dict(d)
+    assert state.player.dantian_exp == 0
+    assert state.realms_unlocked == []
+    assert state.status_effects == []
