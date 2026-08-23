@@ -45,9 +45,6 @@ from .engine.quest import CHOOSE_SET_FIELDS, OBJECTIVE_HANDLERS, SIDE_UNSUPPORTE
 
 # OBJECTIVE_KINDS kini diturunkan dari registry (F2.1c) — satu sumber kebenaran
 OBJECTIVE_KINDS = set(OBJECTIVE_HANDLERS)
-CHOOSE_SET_FIELDS = CHOOSE_SET_FIELDS
-# Field wajib per jenis efek (F2.1a, menutup temuan #3 evaluasi F1)
-EFFECT_REQUIRED_FIELDS = EFFECT_REQUIRED_FIELDS
 
 
 class DataContractError(Exception):
