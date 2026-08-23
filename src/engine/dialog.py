@@ -74,25 +74,7 @@ class DialogEngine:
         salah) jatuh ke slot prioritas berikutnya. Semantik mengikuti
         `_resolve_entry`."""
         dlg = self.reg.dialog(dialog_id)
-        if not dlg:
-            return False
-        nodes = dlg.get("nodes", {})
-        for nid, node in nodes.items():
-            if node.get("once") and self._once_seen(dialog_id, nid):
-                continue
-            cond = node.get("condition")
-            if cond and self._eval(cond):
-                return True
-        start = dlg.get("start", next(iter(nodes), ""))
-        if start and start in nodes:
-            snode = nodes[start]
-            if snode.get("once") and self._once_seen(dialog_id, start):
-                return False
-            sc = snode.get("condition")
-            if sc and not self._eval(sc):
-                return False
-            return True
-        return False
+        return bool(dlg) and bool(self._resolve_entry(dlg))
 
     def has_pending_once_entry(self, dialog_id: str) -> bool:
         """Apakah dialog punya reaksi naratif tertunda — entry yang ter-resolve
@@ -226,8 +208,9 @@ class DialogEngine:
         """Tampilan dialog untuk UI — speaker, text, choices."""
         if not self.current or not self.node_id:
             if self.state.pending_dialog:
-                if self.start(self.state.pending_dialog):
-                    return self.view()
+                started = self.start(self.state.pending_dialog)
+                if started:
+                    return started
                 self.state.pending_dialog = None
             return None
         nodes = self.current.get("nodes", {})

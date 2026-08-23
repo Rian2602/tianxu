@@ -121,3 +121,103 @@ def test_condition_keys_exposed_for_validator(registry):
         "quest_not_active", "month_min", "month_max", "relation_min",
         "relation_max", "memory", "faction_min", "faction_max",
     }
+
+
+# ---------- karakterisasi can_start (mengunci perilaku sebelum refactor) ----------
+
+# Data minimal bersama untuk test can_start
+_CAN_START_LOCATIONS = [
+    {"id": "loc_start", "name": "Start", "is_safe": True, "connections": ["loc_gerbang"]},
+    {"id": "loc_gerbang", "name": "Gerbang", "is_safe": True, "connections": ["loc_start"]},
+]
+_CAN_START_NPCS = [
+    {"id": "npc_test", "name": "Test NPC", "dialog_routes": {"default": "dlg_can_a"}},
+]
+
+
+def test_can_start_conditional_entry(tmp_path):
+    """Kasus A: node kondisional di level atas lolos → True.
+    Salin minimal_data (valid) + tambah dialog test, pakai flag 'sudah_kenal'."""
+    import shutil
+    import json
+    from src.loader import DataRegistry
+    from src.engine.session import GameSession
+
+    # Copy minimal_data (sudah valid, punya sudah_kenal di effects)
+    dst = tmp_path / "data"
+    shutil.copytree("tests/fixtures/minimal_data", dst)
+    # Tambah dialog test ke dialogs/minimal.json
+    story_path = dst / "dialogs" / "minimal.json"
+    data = json.loads(story_path.read_text(encoding="utf-8"))
+    data["dialogs"].append({
+        "id": "dlg_can_a",
+        "npc": "npc_guru",
+        "start": "n0",
+        "nodes": {
+            "n0": {"speaker": "npc:npc_guru", "text": "Start", "choices": []},
+            "n1": {"speaker": "npc:npc_guru", "text": "Conditional", "choices": [], "condition": {"flag": {"key": "sudah_kenal", "value": True}}},
+        },
+    })
+    story_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    reg = DataRegistry(data_dir=dst)
+    sess = GameSession.new(reg)
+    sess.state.flags["sudah_kenal"] = True
+    assert sess.dialog.can_start("dlg_can_a") is True
+
+
+def test_can_start_fallback_start_when_once_seen(tmp_path):
+    """Kasus B: entry kondisional once+sudah dimainkan, start polos → True (fallback)."""
+    import shutil
+    import json
+    from src.loader import DataRegistry
+    from src.engine.session import GameSession
+
+    dst = tmp_path / "data"
+    shutil.copytree("tests/fixtures/minimal_data", dst)
+    story_path = dst / "dialogs" / "minimal.json"
+    data = json.loads(story_path.read_text(encoding="utf-8"))
+    data["dialogs"].append({
+        "id": "dlg_can_b",
+        "npc": "npc_guru",
+        "start": "n0",
+        "nodes": {
+            "n0": {"speaker": "npc:npc_guru", "text": "Start", "choices": []},
+            "n1": {"speaker": "npc:npc_guru", "text": "Once", "choices": [], "once": True, "condition": {"flag": {"key": "sudah_kenal", "value": True}}},
+        },
+    })
+    story_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    reg = DataRegistry(data_dir=dst)
+    sess = GameSession.new(reg)
+    sess.state.flags["sudah_kenal"] = True
+    sess.state.flags["dialog_once:dlg_can_b:n1"] = True
+    assert sess.dialog.can_start("dlg_can_b") is True
+
+
+def test_can_start_failing_start_no_conditional(tmp_path):
+    """Kasus C: start ber-condition gagal, tanpa entry kondisional → False."""
+    import shutil
+    import json
+    from src.loader import DataRegistry
+    from src.engine.session import GameSession
+
+    dst = tmp_path / "data"
+    shutil.copytree("tests/fixtures/minimal_data", dst)
+    story_path = dst / "dialogs" / "minimal.json"
+    data = json.loads(story_path.read_text(encoding="utf-8"))
+    data["dialogs"].append({
+        "id": "dlg_can_c",
+        "npc": "npc_guru",
+        "start": "n0",
+        "nodes": {
+            "n0": {"speaker": "npc:npc_guru", "text": "Start", "choices": [], "condition": {"flag": {"key": "sudah_kenal", "value": True}}},
+            "n1": {"speaker": "npc:npc_guru", "text": "Other", "choices": []},
+        },
+    })
+    story_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    reg = DataRegistry(data_dir=dst)
+    sess = GameSession.new(reg)
+    # flag tidak diset → condition False → start gagal
+    assert sess.dialog.can_start("dlg_can_c") is False
