@@ -342,6 +342,8 @@ class BattleEngine:
             elif a == "guard":
                 b["player_guard"] = 50
                 add_log(self.state, "battle", "Kau bertahan — damage masuk dikurangi setengah.")
+            elif a == "companion_heal":
+                self._companion_heal(pc, b)
             elif a == "flee":
                 if self._try_flee(pc, b):
                     b["over"] = True
@@ -655,6 +657,29 @@ class BattleEngine:
         pc["hp"] = min(pc["hp_max"], pc["hp"] + hp)
         pc["qi"] = min(pc["qi_max"], pc["qi"] + qi)
         add_log(self.state, "battle", f"Memakai {it['name']} (+{hp} HP, +{qi} Qi).")
+
+    def _companion_heal(self, pc: dict, b: dict) -> None:
+        """Heal companion with Qi cost (ponytail: minimal, config-driven)."""
+        comp = companion_stats(self.state, self.reg)
+        if not comp or comp["hp"] <= 0:
+            add_log(self.state, "battle", "Tidak ada companion yang bisa di-heal.")
+            return
+        cfg = self.reg.config.get("companion_heal", {})
+        qi_cost = int(cfg.get("qi_cost", 10))
+        heal = int(cfg.get("heal_amount", 15))
+        if pc["qi"] < qi_cost:
+            add_log(self.state, "battle", f"Qi tidak cukup untuk heal companion (butuh {qi_cost}, sisa {pc['qi']}).")
+            return
+        pc["qi"] -= qi_cost
+        old_hp = comp["hp"]
+        comp["hp"] = min(comp["hp_max"], comp["hp"] + heal)
+        # sync back to state
+        for sc in self.state.companions:
+            if sc.get("id") == comp["id"]:
+                sc["hp"] = comp["hp"]
+                break
+        healed = comp["hp"] - old_hp
+        add_log(self.state, "battle", f"Heal {comp['name']}: +{healed} HP (sisa Qi: {pc['qi']}).")
 
     def _try_flee(self, pc: dict, b: dict) -> bool:
         foe = b["foes"][0]

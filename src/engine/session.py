@@ -162,6 +162,7 @@ class GameSession:
             "unlock_technique": self._unlock_technique,
             "fuse_technique": self._fuse_technique,
             "switch_companion": self._switch_companion,
+            "companion_heal": self._companion_heal,
             "mine": self._mine,
             "save": self._save,
         }
@@ -903,6 +904,31 @@ class GameSession:
         add_log(self.state, "narration", f"{name} menjadi kawan aktifmu.")
         # backward compat
         self.state.companion = entry
+        return self.view()
+
+    def _companion_heal(self, action: dict) -> dict:
+        """Heal companion with Qi cost — works outside battle too (ponytail: minimal)."""
+        from .battle import companion_stats, companion_hp_max
+        comp = companion_stats(self.state, self.reg)
+        if not comp or comp["hp"] <= 0:
+            add_log(self.state, "system", "Tidak ada companion yang bisa di-heal.")
+            return self.view()
+        cfg = self.reg.config.get("companion_heal", {})
+        qi_cost = int(cfg.get("qi_cost", 10))
+        heal = int(cfg.get("heal_amount", 15))
+        if self.state.player.qi < qi_cost:
+            add_log(self.state, "system", f"Qi tidak cukup untuk heal companion (butuh {qi_cost}, sisa {self.state.player.qi}).")
+            return self.view()
+        self.state.player.qi -= qi_cost
+        old_hp = comp["hp"]
+        comp["hp"] = min(comp["hp_max"], comp["hp"] + heal)
+        for sc in self.state.companions:
+            if sc.get("id") == comp["id"]:
+                sc["hp"] = comp["hp"]
+                break
+        self.state.companion = next((c for c in self.state.companions if c.get("active")), None)
+        healed = comp["hp"] - old_hp
+        add_log(self.state, "narration", f"Heal {comp['name']}: +{healed} HP (sisa Qi: {self.state.player.qi}).")
         return self.view()
 
     def _shop_buy(self, action: dict) -> dict:
