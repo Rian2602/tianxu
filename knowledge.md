@@ -119,3 +119,10 @@ Session: location, day, hour, current_quest, completed/failed_quests, active_sid
 - `max_hp()`/`max_qi()` fallback returns sane defaults (50/30), not current HP.
 - Companion system is active — `data/companions.json` has per-pavilion companions. `max_companions: 3`.
 - Old realm IDs (`realm_awal`, `realm_tengah`, `realm_atas`) are migrated to new names (`realm_chuji`, `realm_xuanshi`, `realm_dishi`) in save loader.
+
+## Claude Audit Verified (2026-08-24)
+
+10 files audited. 2 fixed, 1 documented, 7 skipped:
+- **Fixed:** effects.py exp multiplier bypass, quest.py morality clamp bypass
+- **Documented:** session.py `_use_item` hardcoded IDs (design debt)
+- **Skipped:** false positives (battle.py status-kind, quest.py rewards, effects.py dialog field, events.py coercion, state.py log persist, __init__.py trivial)
