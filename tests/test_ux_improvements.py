@@ -21,9 +21,9 @@ def test_location_error_shows_available_connections(session, registry):
     # Ini harus generate error dengan saran lokasi tersedia
     session.apply_action({"type": "move", "to": "loc_gerbang"})
 
-    # Cek log - harus ada daftar lokasi tersedia di error message
+    # Cek SEMUA log system — cari error message yang berisi saran lokasi
     logs = [e.get("text", "") for e in session.state.log if e.get("type") == "system"]
-    error_msg = logs[-1] if logs else ""
+    error_msg = next((msg for msg in reversed(logs) if "tidak bisa" in msg.lower()), "")
 
     # Error message harus menyebut lokasi yang tersedia
     assert "lokasi yang dapat" in error_msg.lower() or "dapat kau kunjungi" in error_msg.lower(), \
