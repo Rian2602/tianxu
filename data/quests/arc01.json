@@ -79,7 +79,7 @@
     {
       "id": "quest_a01_c02_003b",
       "kind": "main",
-      "title": "Kenali Teman Sekelas",
+      "title": "Kenali Lin Yue",
       "objective": {
         "kind": "talk",
         "npc": "npc_lin_yue",
@@ -104,7 +104,7 @@
     {
       "id": "quest_a01_c02_003c",
       "kind": "main",
-      "title": "Kenali Teman Sekelas",
+      "title": "Kenali Shen Luo",
       "objective": {
         "kind": "talk",
         "npc": "npc_shen_luo",
@@ -129,7 +129,7 @@
     {
       "id": "quest_a01_c02_003d",
       "kind": "main",
-      "title": "Kenali Teman Sekelas",
+      "title": "Kenali Gu Han",
       "objective": {
         "kind": "talk",
         "npc": "npc_gu_han",
