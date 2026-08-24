@@ -21,15 +21,15 @@ Xianxia cultivation RPG. Python 3.10+ **stdlib-only** engine (no third-party dep
 - `web/app.py` — stdlib `ThreadingHTTPServer` JSON API + static files; `context()` exposes character_status, factions, meta (title/subtitle/tagline/panel/avatar/audio)
 - `web/static/app.js` — Vanilla JS frontend; applyMeta() for data-driven title/assets; avatar fallback (initials); faction panel; character status badges
 - `web/static/index.html` + `style.css` — Layout + theme (ink-wash textures, Lucide icons)
-- `tests/` — pytest suite (377 tests), fixtures in `tests/fixtures/minimal_data/`
-- `data/` — **7 arc story data** (JSON/CSV): quests, dialogs, NPCs, locations, items (with description column), enemies, techniques, companions, recipes, factions, key_items, npc_schedules, passives, fusion_recipes
+- `tests/` — pytest suite (381 tests), fixtures in `tests/fixtures/minimal_data/`
+- `data/` — **7 arc story data** (JSON/CSV): 69 quests, 81 dialogs, 19 NPCs, 23 locations, 37 items, 5 enemies, 30 techniques, 9 companions, 4 factions, 7 key_items, 4 passives, 5 fusions, 8 memories, recipes, npc_schedules
 - `docs/` — Story Production Bible v1.0 (~20 docs incl. DESIGN_GAP_REPORT, ENDING_INTEGRATION + superpowers specs): narrative architecture, quest graphs, character arcs, memory system, dialogue system, ending matrix, consequence matrix, etc.
 
 ## Commands
 
 ```bash
 python3 web/app.py            # Web server on http://127.0.0.1:8000 (port = argv[1])
-pytest                        # Full suite (377 tests); single test: pytest tests/test_smoke.py -k <name>
+pytest                        # Full suite (381 tests); single test: pytest tests/test_smoke.py -k <name>
 pytest tests/test_smoke.py    # Smoke tests only
 pytest tests/test_arc1_data.py  # Arc 1 playthrough tests
 python3 -c "from src.loader import DataRegistry; DataRegistry('data')"  # Validate data/, no server needed
@@ -83,7 +83,7 @@ Session: location, day, hour, current_quest, completed/failed_quests, active_sid
 - **Mines** — `world.mines[]` in config.json. Each zone has `pool` with item/chance/min/max.
 - **Hunts** — multi-zone (`world.hunts[]`). Each zone has `pool` (enemies), `search_items` (item/chance/min/max), optional `mini_boss_chance`/`mini_boss`.
 - **Enemy drops** — `enemies.csv` has `drop_item`, `drop_chance` columns.
-- **Items** — `items.csv` has `exp_value` and `description` columns. 36 items including beast cores, cultivation pills, technique scrolls, reagents.
+- **Items** — `items.csv` has `exp_value` and `description` columns. 37 items including beast cores, cultivation pills, technique scrolls, reagents.
 - **Key items with use_effects** — `data/key_items.json` items can have `consumed: true` + `use_effects[]` (e.g., technique scrolls grant techniques).
 - **NPC state overrides** — `npc_state` effect can change NPC location at runtime. `npc_states` dict on GameState tracks overrides.
 - **NPC schedules** — `data/npc_schedules.json` moves NPCs by time of day.
@@ -126,3 +126,15 @@ Session: location, day, hour, current_quest, completed/failed_quests, active_sid
 - **Fixed:** effects.py exp multiplier bypass, quest.py morality clamp bypass
 - **Documented:** session.py `_use_item` hardcoded IDs (design debt)
 - **Skipped:** false positives (battle.py status-kind, quest.py rewards, effects.py dialog field, events.py coercion, state.py log persist, __init__.py trivial)
+
+## Playtest Verified (2026-08-24)
+
+Full Arc I-VII playtest: 0 real bugs, 4 false positives (all verified).
+- Game completes in ~54 steps, 44/46 quests (2 branching alternatives not taken)
+- Arc I tutorial battles intentionally easy (1-2 turns with companion)
+- Arc II+ properly challenging (spar: 4 turns, HP drops to 12/50)
+- All systems working: dialog, battle, quest, companion, connection gates
+
+## Cross-File Dependencies (2026-08-25)
+
+`quest_faction_reform_003` requires `flag_disturbance_investigated` from `quest_a02_c02_004` in `arc02.json`. If editing `arc_faction_reformists.json` in isolation, this dependency is invisible. Both flags must be set: `flag_reform_evidence_found` (reform chain) + `flag_disturbance_investigated` (arc02 main quest).

@@ -46,6 +46,22 @@
             {"label": "Aku akan melihat sendiri. Terima kasih.", "next": "n2"}
           ]
         },
+        "n_deny": {
+          "speaker": "npc:npc_mountain_guard",
+          "text": "Konvoi warga terjebak di tengah celah! Kabut spiritual membiru — sesuatu datang dari gerbang. Kau pernah menolak semua ini, kan? Sekarang lihatlah dengan mata kepalamu sendiri apa yang terjadi ketika segel ini mulai gagal.",
+          "condition": {"flag": {"key": "state_identity_stance", "value": "deny"}},
+          "choices": [
+            {"label": "Aku... aku tidak menyangka akan separah ini.", "next": "n2"}
+          ]
+        },
+        "n_accept_cautious": {
+          "speaker": "npc:npc_mountain_guard",
+          "text": "Konvoi warga terjebak di tengah celah! Kabut spiritual membiru — sesuatu datang dari gerbang. Kau sudah menerima kenyataan ini dengan hati-hati, kan? Maka kau tahu betapa seriusnya situasi ini.",
+          "condition": {"flag": {"key": "state_identity_stance", "value": "accept_cautious"}},
+          "choices": [
+            {"label": "Aku tahu. Aku akan membantu.", "next": "n2"}
+          ]
+        },
         "n1": {
           "speaker": "npc:npc_mountain_guard",
           "text": "Konvoi warga terjebak di tengah celah! Kabut spiritual membiru — sesuatu datang dari gerbang, dan kali ini lebih cepat dari catatan mana pun. Kami tidak punya waktu untuk menunggu perintah akademi.",
@@ -56,6 +72,41 @@
         "n2": {
           "speaker": "npc:npc_mountain_guard",
           "text": "Gerbang itu... bergemuruh seperti jantung. Setiap kali ia berdenyut, kabut menelan lebih banyak jalan. Kalau kita tidak bertindak sekarang, konvoi itu hilang — persis seperti yang tercatat dulu.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a05_reactive_family",
+      "npc": "npc_lin_yue",
+      "start": "n1",
+      "nodes": {
+        "n_lin_yue_separated": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau... kau memilih untuk menjaga Mei Ruo. Aku mengerti. Tapi ini menyakitkan — kita seperti orang asing sekarang. Aku harap pilihanmu itu sepadan.",
+          "condition": {"flag": {"key": "state_lin_yue_status", "value": "separated"}},
+          "choices": [
+            {"label": "Maaf. Aku akan memperbaikinya.", "next": "n_end"}
+          ]
+        },
+        "n_lin_yue_loyal": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Kau memilih untuk menjaga aku. Terima kasih. Aku tahu itu tidak mudah — tapi kita masih di sini, bersama. Itu yang terpenting.",
+          "condition": {"flag": {"key": "state_lin_yue_status", "value": "loyal"}},
+          "choices": [
+            {"label": "Kita akan melewati ini bersama.", "next": "n_end"}
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Krisis itu mengubah segalanya. Aku tidak tahu apa yang akan terjadi selanjutnya — tapi setidaknya kita masih di sini.",
+          "choices": [
+            {"label": "Kita akan menemukan jalan.", "next": "n_end"}
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_lin_yue",
+          "text": "Pergilah. Dan ingat: apa pun yang terjadi, kita sudah melalui ini bersama.",
           "choices": []
         }
       }

@@ -25,7 +25,8 @@
       "title": "Garis yang Kita Gambar",
       "available_from": {
         "day": 1,
-        "hour": 0
+        "hour": 0,
+        "relation_min": {"npc": "npc_lin_yue", "value": 3}
       },
       "objective": {
         "kind": "talk",

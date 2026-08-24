@@ -139,6 +139,62 @@
             {"label": "Terima kasih juga, Mei Ruo.", "next": "n_end"}
           ]
         },
+        "n_investigated_hands_done": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelesaikan investigasi Tangan yang Mengingat bersamaku — kau percaya kau pernah menjadi kultivator kuat. Malam ini, kau akan mengetahui siapa dirimu sebenarnya.",
+          "condition": {"flag": {"key": "flag_memory_a01_m02_investigated", "value": true}},
+          "choices": [
+            {"label": "Aku sudah siap mengetahui kebenarannya.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_history_done": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelesaikan investigasi Jangan Percaya Sejarah bersamaku — kau tahu bahwa sejarah bisa ditulis ulang. Malam ini, kau akan melihat apa yang sebenarnya terjadi.",
+          "condition": {"flag": {"key": "flag_memory_a01_m04_investigated", "value": true}},
+          "choices": [
+            {"label": "Aku ingin melihat kebenarannya.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_connection_done": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelesaikan investigasi Apa yang Tidak Akan Kau Kembali bersamaku — kau percaya ada hubungan antara kau dan Lin Yue lintas kehidupan. Malam ini, kau akan mengetahui apakah itu benar.",
+          "condition": {"flag": {"key": "flag_memory_a02_m01_investigated", "value": true}},
+          "choices": [
+            {"label": "Aku akan menemukan jawabannya.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_formation_done": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelidiki Formasi Tua — kau tahu ada yang salah dengan sejarah yang kita kenal. Malam ini, kau akan melihat apa yang sebenarnya terjadi di sana.",
+          "condition": {"flag": {"key": "flag_memory_a01_m03_investigated", "value": true}},
+          "choices": [
+            {"label": "Aku ingin melihat kebenarannya.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_belief_done": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelidiki Pilihan yang Dipercaya — kau tahu bahwa keyakinan bisa menjadi senjata dan kelemahan sekaligus. Malam ini, kau akan menguji keyakinanmu.",
+          "condition": {"flag": {"key": "flag_memory_a03_m01_investigated", "value": true}},
+          "choices": [
+            {"label": "Aku siap menguji keyakinanku.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_world_memory_done": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelidiki Dunia Juga Mengingat — kau tahu bahwa dunia ini memiliki ingatannya sendiri. Malam ini, kau akan mendengar apa yang dunia ini ingin sampaikan.",
+          "condition": {"flag": {"key": "flag_memory_a05_m01_investigated", "value": true}},
+          "choices": [
+            {"label": "Aku akan mendengarnya.", "next": "n_end"}
+          ]
+        },
+        "n_investigated_lookalike_done": {
+          "speaker": "npc:npc_mei_ruo",
+          "text": "Kau datang. Kau sudah menyelidiki Seseorang Sepertimu — kau tahu ada seseorang yang mirip denganmu di masa lalu. Malam ini, kau akan mengetahui siapa dia sebenarnya.",
+          "condition": {"flag": {"key": "flag_memory_a06_m01_investigated", "value": true}},
+          "choices": [
+            {"label": "Aku akan menemukan identitasku.", "next": "n_end"}
+          ]
+        },
         "n1": {
           "speaker": "npc:npc_mei_ruo",
           "text": "Kau datang. Malam ini adalah malam terakhir — dan aku ingin kau tahu: apa pun yang terjadi, kita sudah mencari kebenaran bersama. Itu... itu cukup.",
@@ -149,6 +205,41 @@
         "n_end": {
           "speaker": "npc:npc_mei_ruo",
           "text": "Pergilah. Dan ingat: kebenaran tidak selalu tunggal. Tapi selalu bernilai untuk dicari.",
+          "choices": []
+        }
+      }
+    },
+    {
+      "id": "dlg_a06_reactive_mentor",
+      "npc": "npc_mentor",
+      "start": "n1",
+      "nodes": {
+        "n_gu_han_trust": {
+          "speaker": "npc:npc_mentor",
+          "text": "Kau datang. Gu Han masih percaya padamu — dan itu berarti sesuatu. Dalam dunia ini, kepercayaan adalah mata uang yang paling langka. Jangan sia-siakan.",
+          "condition": {"flag": {"key": "state_gu_han_stance", "value": "trust"}},
+          "choices": [
+            {"label": "Aku akan menjaga kepercayaannya.", "next": "n_end"}
+          ]
+        },
+        "n_shen_luo_reform": {
+          "speaker": "npc:npc_mentor",
+          "text": "Kau datang. Shen Luo ingin mengubah sistem dari dalam. Itu pendekatan yang berbeda dari yang kubayangkan — tapi mungkin justru itu yang dibutuhkan.",
+          "condition": {"flag": {"key": "state_shen_luo_stance", "value": "reform"}},
+          "choices": [
+            {"label": "Perubahan perlu waktu.", "next": "n_end"}
+          ]
+        },
+        "n1": {
+          "speaker": "npc:npc_mentor",
+          "text": "Kau datang. Malam ini adalah malam terakhir — dan aku ingin kau tahu: apa pun yang terjadi di bawah sana, aku bangga padamu.",
+          "choices": [
+            {"label": "Terima kasih, Guru.", "next": "n_end"}
+          ]
+        },
+        "n_end": {
+          "speaker": "npc:npc_mentor",
+          "text": "Pergilah. Dan ingat: ilmu sejati bukan tentang kekuatan — tapi tentang mengetahui kapan harus menggunakan kekuatan itu.",
           "choices": []
         }
       }

@@ -65,6 +65,138 @@
       }
      ]
     },
+    "n_lin_yue_separated": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Aku... aku tidak tahu harus berkata apa. Sejak krisis itu, kita seperti orang asing. Tapi aku tetap di sini — karena ini bukan tentang kita. Ini tentang semua orang.",
+     "condition": {"flag": {"key": "state_lin_yue_status", "value": "separated"}},
+     "choices": [
+      {
+       "label": "Maaf. Aku akan memilih yang terbaik untuk semua.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_gu_han_trust": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Gu Han... dia masih percaya padamu. Katanya kau orang yang tidak akan menghancurkan apa yang kau cintai. Aku harap dia benar.",
+     "condition": {"flag": {"key": "state_gu_han_stance", "value": "trust"}},
+     "choices": [
+      {
+       "label": "Aku tidak akan mengecewakan kepercayaannya.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_gu_han_sacrifice": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Gu Han... dia bilang dia siap berkorban untuk ini. Itu membuatku takut — karena aku tahu apa artinya berkorban dalam dunia ini.",
+     "condition": {"flag": {"key": "state_gu_han_stance", "value": "sacrifice"}},
+     "choices": [
+      {
+       "label": "Kita semua harus siap berkorban.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_gu_han_preserve": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Gu Han... dia ingin mempertahankan apa yang ada. Katanya dunia ini masih layak diselamatkan. Apa kau juga begitu?",
+     "condition": {"flag": {"key": "state_gu_han_stance", "value": "preserve"}},
+     "choices": [
+      {
+       "label": "Setiap dunia layak dipertahankan.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_shen_luo_reform": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Shen Luo... dia bilang kita harus mengubah sistem ini dari dalam. Pendekatannya berbeda dari yang kubayangkan, tapi ada kebenaran di sana.",
+     "condition": {"flag": {"key": "state_shen_luo_stance", "value": "reform"}},
+     "choices": [
+      {
+       "label": "Perubahan perlu dilakukan dengan hati-hati.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_shen_luo_liberation": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Shen Luo... dia bilang kita harus membebaskan semuanya — tanpa kompromi. Itu berisiko, tapi aku mengerti mengapa dia begitu yakin.",
+     "condition": {"flag": {"key": "state_shen_luo_stance", "value": "liberation"}},
+     "choices": [
+      {
+       "label": "Kebebasan selalu memiliki harga.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_shen_luo_stay": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Shen Luo... dia bilang kita harus tetap di sini. Tidak perlu berubah, tidak perlu melarikan diri. Cukup... bertahan.",
+     "condition": {"flag": {"key": "state_shen_luo_stance", "value": "stay"}},
+     "choices": [
+      {
+       "label": "Bertahan juga sebuah pilihan.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_orthodox_questioning": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Grandmaster... dia mulai mempertanyakan segalanya. Itu langka — seorang pemimpin yang berani meragukan jalannya sendiri.",
+     "condition": {"flag": {"key": "state_orthodox_stance", "value": "questioning"}},
+     "choices": [
+      {
+       "label": "Keraguan bisa menjadi kekuatan.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_orthodox_rebel": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Grandmaster... dia memberontak terhadap aturannya sendiri. Itu menunjukkan sesuatu — bahkan mereka yang membuat aturan bisa melampaui batas.",
+     "condition": {"flag": {"key": "state_orthodox_stance", "value": "rebel"}},
+     "choices": [
+      {
+       "label": "Memberontak kadang diperlukan.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_mei_ruo_loyal": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Mei Ruo... dia masih di sisimu. Itu berarti banyak — karena dia biasanya yang paling ragu. Tapi kali ini, dia memilih untuk percaya.",
+     "condition": {"flag": {"key": "state_mei_ruo_status", "value": "loyal"}},
+     "choices": [
+      {
+       "label": "Kita semua memilih untuk percaya.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
+    "n_gu_han_loyal": {
+     "speaker": "npc:npc_lin_yue",
+     "text": "Kau datang. Aku sudah menunggumu. Gu Han... dia memilih untuk tetap di sisimu. Itu tidak mudah baginya — tapi dia bilang kau layak dipercaya.",
+     "condition": {"flag": {"key": "state_gu_han_status", "value": "loyal"}},
+     "choices": [
+      {
+       "label": "Terima kasih atas kepercayaannya.",
+       "next": "n2",
+       "effects": []
+      }
+     ]
+    },
     "n1": {
      "speaker": "npc:npc_lin_yue",
      "text": "Kau datang. Aku sudah menunggumu — dan takut pada momen ini sejak pertama kali kita bertemu di gerbang itu.",
@@ -188,6 +320,190 @@
    "npc": "npc_jiang_yan_imprint",
    "start": "n1",
    "nodes": {
+    "n_preserve_trust": {
+     "speaker": "narration",
+     "text": "Semuanya bermuara pada satu momen. Di bawah Tian Xu, di hadapan segala yang telah kau pelajari, kau harus memilih. Gu Han masih percaya padamu — dan kau memilih untuk mempertahankan dunia yang ia percaya layak diselamatkan.",
+     "condition": {"flag": {"key": "state_gu_han_stance", "value": "trust"}},
+     "choices": [
+      {
+       "label": "Preserve — pertahankan dunia yang ada, perbaiki dari dalam.",
+       "option": "preserve",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "preserve"},
+        {"type": "relation", "npc": "npc_grandmaster", "value": 3},
+        {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": 3}
+       ],
+       "next": "n_ep_preserve"
+      },
+      {
+       "label": "Destroy — sistem ini telah gagal; hancurkan agar dunia baru lahir.",
+       "option": "destroy",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "destroy"},
+        {"type": "relation", "npc": "npc_gu_han", "value": 3},
+        {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -4}
+       ],
+       "next": "n_ep_destroy"
+      },
+      {
+       "label": "Transform — ubah hubungan dunia dengan sumbernya, bukan hancurkan.",
+       "option": "transform",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "transform"},
+        {"type": "relation", "npc": "npc_mei_ruo", "value": 3},
+        {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+       ],
+       "next": "n_ep_transform"
+      },
+      {
+       "label": "Sacrifice — akhiri siklus ini dengan harga terakhir.",
+       "option": "sacrifice",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "sacrifice"},
+        {"type": "relation", "npc": "npc_mentor", "value": 3}
+       ],
+       "next": "n_ep_sacrifice"
+      }
+     ]
+    },
+    "n_destroy_liberation": {
+     "speaker": "narration",
+     "text": "Semuanya bermuara pada satu momen. Di bawah Tian Xu, di hadapan segala yang telah kau pelajari, kau harus memilih. Shen Luo ingin kebebasan — dan kau memilih untuk menghancurkan rantai yang mengikat semua orang.",
+     "condition": {"flag": {"key": "state_shen_luo_stance", "value": "liberation"}},
+     "choices": [
+      {
+       "label": "Preserve — pertahankan dunia yang ada, perbaiki dari dalam.",
+       "option": "preserve",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "preserve"},
+        {"type": "relation", "npc": "npc_grandmaster", "value": 3},
+        {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": 3}
+       ],
+       "next": "n_ep_preserve"
+      },
+      {
+       "label": "Destroy — sistem ini telah gagal; hancurkan agar dunia baru lahir.",
+       "option": "destroy",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "destroy"},
+        {"type": "relation", "npc": "npc_gu_han", "value": 3},
+        {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -4}
+       ],
+       "next": "n_ep_destroy"
+      },
+      {
+       "label": "Transform — ubah hubungan dunia dengan sumbernya, bukan hancurkan.",
+       "option": "transform",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "transform"},
+        {"type": "relation", "npc": "npc_mei_ruo", "value": 3},
+        {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+       ],
+       "next": "n_ep_transform"
+      },
+      {
+       "label": "Sacrifice — akhiri siklus ini dengan harga terakhir.",
+       "option": "sacrifice",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "sacrifice"},
+        {"type": "relation", "npc": "npc_mentor", "value": 3}
+       ],
+       "next": "n_ep_sacrifice"
+      }
+     ]
+    },
+    "n_transform_reform": {
+     "speaker": "narration",
+     "text": "Semuanya bermuara pada satu momen. Di bawah Tian Xu, di hadapan segala yang telah kau pelajari, kau harus memilih. Shen Luo percaya pada reformasi dari dalam — dan kau memilih untuk mengubah hubungan dunia dengan sumbernya.",
+     "condition": {"flag": {"key": "state_shen_luo_stance", "value": "reform"}},
+     "choices": [
+      {
+       "label": "Preserve — pertahankan dunia yang ada, perbaiki dari dalam.",
+       "option": "preserve",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "preserve"},
+        {"type": "relation", "npc": "npc_grandmaster", "value": 3},
+        {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": 3}
+       ],
+       "next": "n_ep_preserve"
+      },
+      {
+       "label": "Destroy — sistem ini telah gagal; hancurkan agar dunia baru lahir.",
+       "option": "destroy",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "destroy"},
+        {"type": "relation", "npc": "npc_gu_han", "value": 3},
+        {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -4}
+       ],
+       "next": "n_ep_destroy"
+      },
+      {
+       "label": "Transform — ubah hubungan dunia dengan sumbernya, bukan hancurkan.",
+       "option": "transform",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "transform"},
+        {"type": "relation", "npc": "npc_mei_ruo", "value": 3},
+        {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+       ],
+       "next": "n_ep_transform"
+      },
+      {
+       "label": "Sacrifice — akhiri siklus ini dengan harga terakhir.",
+       "option": "sacrifice",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "sacrifice"},
+        {"type": "relation", "npc": "npc_mentor", "value": 3}
+       ],
+       "next": "n_ep_sacrifice"
+      }
+     ]
+    },
+    "n_sacrifice_gu_han": {
+     "speaker": "narration",
+     "text": "Semuanya bermuara pada satu momen. Di bawah Tian Xu, di hadapan segala yang telah kau pelajari, kau harus memilih. Gu Han siap berkorban — dan kau memilih untuk mengakhiri siklus ini dengan harga terakhir.",
+     "condition": {"flag": {"key": "state_gu_han_stance", "value": "sacrifice"}},
+     "choices": [
+      {
+       "label": "Preserve — pertahankan dunia yang ada, perbaiki dari dalam.",
+       "option": "preserve",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "preserve"},
+        {"type": "relation", "npc": "npc_grandmaster", "value": 3},
+        {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": 3}
+       ],
+       "next": "n_ep_preserve"
+      },
+      {
+       "label": "Destroy — sistem ini telah gagal; hancurkan agar dunia baru lahir.",
+       "option": "destroy",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "destroy"},
+        {"type": "relation", "npc": "npc_gu_han", "value": 3},
+        {"type": "reputation", "faksi": "faction_tianxu_orthodox", "value": -4}
+       ],
+       "next": "n_ep_destroy"
+      },
+      {
+       "label": "Transform — ubah hubungan dunia dengan sumbernya, bukan hancurkan.",
+       "option": "transform",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "transform"},
+        {"type": "relation", "npc": "npc_mei_ruo", "value": 3},
+        {"type": "relation", "npc": "npc_shen_luo", "value": 2}
+       ],
+       "next": "n_ep_transform"
+      },
+      {
+       "label": "Sacrifice — akhiri siklus ini dengan harga terakhir.",
+       "option": "sacrifice",
+       "effects": [
+        {"type": "flag", "key": "state_ending_achieved", "value": "sacrifice"},
+        {"type": "relation", "npc": "npc_mentor", "value": 3}
+       ],
+       "next": "n_ep_sacrifice"
+      }
+     ]
+    },
     "n1": {
      "speaker": "narration",
      "text": "Semuanya bermuara pada satu momen. Di bawah Tian Xu, di hadapan segala yang telah kau pelajari, kau harus memilih. Dunia akan mengingat malam ini — dengan satu nama, atau tanpa nama sama sekali.",

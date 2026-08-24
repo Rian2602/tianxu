@@ -41,6 +41,90 @@
           {"type": "flag", "key": "flag_memory_a01_m04_investigated", "value": true}
         ]
       }
+    },
+    {
+      "id": "quest_memory_a01_m03_investigate",
+      "kind": "side",
+      "title": "Investigasi: Formasi Tua",
+      "description": "Selidiki ingatan tentang formasi tua yang hancur — apa hubungannya dengan Tian Xu?",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "has_memory": "memory_a01_m03"
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a01_m03_investigated", "value": true}
+        ]
+      }
+    },
+    {
+      "id": "quest_memory_a03_m01_investigate",
+      "kind": "side",
+      "title": "Investigasi: Pilihan yang Dipercaya",
+      "description": "Selidiki ingatan tentang apa yang dipercaya — apakah itu kebenaran atau ilusi?",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "has_memory": "memory_a03_m01"
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a03_m01_investigated", "value": true}
+        ]
+      }
+    },
+    {
+      "id": "quest_memory_a05_m01_investigate",
+      "kind": "side",
+      "title": "Investigasi: Dunia Juga Mengingat",
+      "description": "Selidiki ingatan tentang bagaimana dunia mengingat — apa artinya bagi kita?",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "has_memory": "memory_a05_m01"
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a05_m01_investigated", "value": true}
+        ]
+      }
+    },
+    {
+      "id": "quest_memory_a06_m01_investigate",
+      "kind": "side",
+      "title": "Investigasi: Seseorang Sepertiku",
+      "description": "Selidiki ingatan tentang seseorang yang mirip denganmu — apa hubungannya dengan Jiang Yan?",
+      "objective": {
+        "kind": "talk",
+        "npc": "npc_mei_ruo",
+        "target": 1
+      },
+      "available_from": {
+        "day": 1,
+        "hour": 0,
+        "has_memory": "memory_a06_m01"
+      },
+      "on_complete": {
+        "effects": [
+          {"type": "flag", "key": "flag_memory_a06_m01_investigated", "value": true}
+        ]
+      }
     }
   ]
 }
