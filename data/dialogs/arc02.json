@@ -39,7 +39,7 @@
    "nodes": {
     "n1": {
      "speaker": "npc:npc_proctor",
-     "text": "Ujian kelompok. Lin Yue, Shen Luo — maju. Kalian bertiga akan menghadapiku bersama.",
+     "text": "Ujian kelompok. Lin Yue, Shen Luo, Gu Han — maju. Kalian bertiga akan menghadapiku bersama.",
      "choices": [
       {
        "label": "Kami siap bertarung bersama.",
