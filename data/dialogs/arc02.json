@@ -197,11 +197,6 @@
         },
         {
          "type": "reputation",
-         "faksi": "faction_liberation",
-         "value": 2
-        },
-        {
-         "type": "reputation",
          "faksi": "faction_reformists",
          "value": 1
         }

@@ -240,7 +240,7 @@
     "hp_max": 50,
     "qi_max": 40
    },
-   "avatar": "/static/assets/img/npc/npc_xu_wuxin.svg"
+   "avatar": "/static/assets/img/npc_xu_wuxin.jpg"
   },
   {
    "id": "npc_teacher_jianxin",
@@ -261,7 +261,7 @@
     "hp_max": 45,
     "qi_max": 35
    },
-   "avatar": "/static/assets/img/npc/npc_xu_jianxin.svg"
+   "avatar": "/static/assets/img/npc_xu_jianxin.jpg"
   },
   {
    "id": "npc_teacher_yanzhi",
@@ -282,7 +282,7 @@
     "hp_max": 40,
     "qi_max": 45
    },
-   "avatar": "/static/assets/img/npc/npc_xu_yanzhi.svg"
+   "avatar": "/static/assets/img/npc_xu_yanzhi.jpg"
   },
   {
    "id": "npc_teacher_liuguang",
@@ -303,7 +303,7 @@
     "hp_max": 38,
     "qi_max": 42
    },
-   "avatar": "/static/assets/img/npc/npc_xu_liuguang.svg"
+   "avatar": "/static/assets/img/npc_xu_liuguang.jpg"
   },
   {
    "id": "npc_proctor",
@@ -365,7 +365,7 @@
     "hp_max": 28,
     "qi_max": 22
    },
-   "avatar": "/static/assets/img/npc/npc_mo_chen.svg"
+   "avatar": "/static/assets/img/npc_mo_chen.jpg"
   },
   {
    "id": "npc_archive_clerk",
@@ -389,7 +389,7 @@
     "hp_max": 25,
     "qi_max": 20
    },
-   "avatar": "/static/assets/img/npc/npc_xu_lan.svg"
+   "avatar": "/static/assets/img/npc_xu_lan.jpg"
   },
   {
    "id": "npc_grandmaster",
@@ -427,7 +427,7 @@
     "hp_max": 80,
     "qi_max": 70
    },
-   "avatar": "/static/assets/img/npc/npc_xu_tianming.svg"
+   "avatar": "/static/assets/img/npc_xu_tianming.jpg"
   },
   {
    "id": "npc_villager_elder",
@@ -451,7 +451,7 @@
     "hp_max": 15,
     "qi_max": 8
    },
-   "avatar": "/static/assets/img/npc/npc_chen_bo.svg"
+   "avatar": "/static/assets/img/npc_chen_bo.jpg"
   },
   {
    "id": "npc_mountain_guard",
@@ -475,7 +475,7 @@
     "hp_max": 35,
     "qi_max": 20
    },
-   "avatar": "/static/assets/img/npc/npc_li_feng.svg"
+   "avatar": "/static/assets/img/npc_li_feng.jpg"
   },
   {
    "id": "npc_entity",
@@ -499,7 +499,7 @@
     "hp_max": 100,
     "qi_max": 100
    },
-   "avatar": "/static/assets/img/npc/npc_entity.svg"
+   "avatar": "/static/assets/img/npc_entity.jpg"
   },
   {
    "id": "npc_mentor",
@@ -524,7 +524,7 @@
     "hp_max": 55,
     "qi_max": 50
    },
-   "avatar": "/static/assets/img/npc/npc_xu_yu.svg"
+   "avatar": "/static/assets/img/npc_xu_yu.jpg"
   },
   {
    "id": "npc_jiang_yan_imprint",
@@ -549,7 +549,7 @@
     "hp_max": 90,
     "qi_max": 85
    },
-   "avatar": "/static/assets/img/npc/npc_jiang_yan.svg"
+   "avatar": "/static/assets/img/npc_jiang_yan.jpg"
   },
   {
    "id": "npc_pedagang_jalanan",
@@ -657,7 +657,7 @@
     "hp_max": 20,
     "qi_max": 15
    },
-   "avatar": "/static/assets/img/npc/npc_zhao_wu.svg"
+   "avatar": "/static/assets/img/npc_zhao_wu.jpg"
   }
  ]
 }

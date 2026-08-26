@@ -67,7 +67,6 @@ def _play_arc7(s: GameSession, decision_idx: int) -> None:
     _talk(s, "npc_lin_yue")
     assert s.state.current_quest == "quest_a07_c02_002", s.state.current_quest
     assert s.state.flags.get("flag_last_night_complete") is True
-    assert s.state.flags.get("world_event_a07_the_last_night") == "triggered"
     # Q2 I Am Not You: turun ke loc_below_deepest + konfrontasi imprint
     _reach(s, "loc_archive_public"); _reach(s, "loc_forbidden_archive")
     _reach(s, "loc_tianxu_deepest_chamber"); _reach(s, "loc_below_deepest")
@@ -142,8 +141,6 @@ def test_arc7_last_night_opens_final_confrontation(registry):
     _reach(s, "loc_training_hall")
     _talk(s, "npc_lin_yue")
     assert s.state.current_quest == "quest_a07_c02_002"
-    # world event Arc VII ditulis
-    assert s.state.flags.get("world_event_a07_the_last_night") == "triggered"
     # konfrontasi di bawah ruang terdalam
     _reach(s, "loc_archive_public"); _reach(s, "loc_forbidden_archive")
     _reach(s, "loc_tianxu_deepest_chamber"); _reach(s, "loc_below_deepest")

@@ -118,7 +118,7 @@
           "choices": [
             {
               "label": "Aku punya waktu. Apa yang terjadi?",
-              "next": "n1"
+              "next": "n2"
             },
             {
               "label": "Nanti saja, aku harus menyelesaikan sesuatu dulu.",
@@ -476,7 +476,7 @@
         },
         "wx3": {
           "speaker": "npc:npc_proctor",
-          "text": "Companion khas Wuxin adalah Serigala — pemburu setia dari lembah utara yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Teknik Pelepasan: temui gurumu di ruang latihan dan ikuti pelajaran pertama. Latihan itu akan membukamu jalan menuju penguasaan.",
+          "text": "Companion khas Wuxin adalah Serigala — pemburu setia dari lembah utara yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Teknik Pelepasan: teknik ini bisa dipelajari di pavilionmu. Pelajari melalui kurikulum saat kau kunjungilah pavilionmu. Latihan itu akan membukamu jalan menuju penguasaan.",
           "choices": []
         },
         "jx1": {
@@ -504,7 +504,7 @@
         },
         "jx3": {
           "speaker": "npc:npc_proctor",
-          "text": "Companion khas Jianxin adalah Bangau — penjaga sayap putih dari puncak salju yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Tebasan Pedang Jantung: temui gurumu di ruang latihan dan ikuti pelajaran pertama. Hati yang tenang, pedang yang tajam.",
+          "text": "Companion khas Jianxin adalah Bangau — penjaga sayap putih dari puncak salju yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Tebasan Pedang Jantung: teknik ini bisa dipelajari di pavilionmu. Pelajari melalui kurikulum saat kau kunjungilah pavilionmu. Hati yang tenang, pedang yang tajam.",
           "choices": []
         },
         "yz1": {
@@ -532,7 +532,7 @@
         },
         "yz3": {
           "speaker": "npc:npc_proctor",
-          "text": "Companion khas Yanzhi adalah Fenghuang — burung api legendaris keturunan phoenix yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Analisa Prinsip: temui gurumu di ruang latihan dan ikuti pelajaran pertama. Yang memahami akar, menguasai dahan.",
+          "text": "Companion khas Yanzhi adalah Fenghuang — burung api legendaris keturunan phoenix yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Analisa Prinsip: teknik ini bisa dipelajari di pavilionmu. Pelajari melalui kurikulum saat kau kunjungilah pavilionmu. Yang memahami akar, menguasai dahan.",
           "choices": []
         },
         "lg1": {
@@ -560,7 +560,7 @@
         },
         "lg3": {
           "speaker": "npc:npc_proctor",
-          "text": "Companion khas Liuguang adalah Ular Air — penjaga licin dari kolam timur yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Teknik Adaptasi: temui gurumu di ruang latihan dan ikuti pelajaran pertama. Mengalir, menyesuaikan, bertahan.",
+          "text": "Companion khas Liuguang adalah Ular Air — penjaga licin dari kolam timur yang sudah menunggumu di kandang pavilion. Untuk teknik khas kami, Teknik Adaptasi: teknik ini bisa dipelajari di pavilionmu. Pelajari melalui kurikulum saat kau kunjungilah pavilionmu. Mengalir, menyesuaikan, bertahan.",
           "choices": []
         },
         "n1": {
@@ -575,7 +575,7 @@
         },
         "n2": {
           "speaker": "npc:npc_proctor",
-          "text": "Pertama, kenali pavilionmu. Pergilah ke sana dan bicara dengan gurumu. Mereka akan mengajarkan teknik dasar pavilion dan memberikan companion yang sesuai dengan jalan kultivasimu.",
+          "text": "Teknik dan companion pavilionmu sudah aktif. Teknik khas bisa dipelajari di pavilion melalui kurikulum.",
           "choices": [
             {
               "label": "Mengerti. Terima kasih, Guru.",

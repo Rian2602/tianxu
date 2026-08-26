@@ -13,11 +13,6 @@
       "on_complete": {
         "effects": [
           {
-            "type": "flag",
-            "key": "world_event_a05_spiritual_collapse",
-            "value": "active"
-          },
-          {
             "type": "relation",
             "npc": "npc_lin_yue",
             "value": 1

@@ -230,6 +230,14 @@
             {"label": "Perubahan perlu waktu.", "next": "n_end"}
           ]
         },
+        "n_academic_reputation": {
+          "speaker": "npc:npc_mentor",
+          "text": "Kau datang. Aku tahu kau sudah melewati ujian tengah semester — dan nilai akademismu... tidak mengecewakan. Dalam situasi seperti ini, setiap pengetahuan yang kau kumpulkan akan berguna. Jangan sia-siakan.",
+          "condition": {"flag": {"key": "state_reputation_academic", "value": 1}},
+          "choices": [
+            {"label": "Aku akan memanfaatkan semua yang kupelajari.", "next": "n_end"}
+          ]
+        },
         "n1": {
           "speaker": "npc:npc_mentor",
           "text": "Kau datang. Malam ini adalah malam terakhir — dan aku ingin kau tahu: apa pun yang terjadi di bawah sana, aku bangga padamu.",

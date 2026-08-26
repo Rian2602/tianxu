@@ -16,11 +16,6 @@
             "type": "flag",
             "key": "flag_last_night_complete",
             "value": true
-          },
-          {
-            "type": "flag",
-            "key": "world_event_a07_the_last_night",
-            "value": "triggered"
           }
         ],
         "rewards": {},

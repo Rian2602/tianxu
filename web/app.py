@@ -121,23 +121,22 @@ def _context() -> dict:
                 "level": session.state.player.technique_levels.get(tid, 1) if status == "learned" else None,
             })
     merchant_shop = None
-    for n in registry.npcs:
-        if n.get("shop") and n.get("location") == loc:
-            merchant_shop = {
-                "merchant_id": n["id"],
-                "merchant_name": n["name"],
-                "buy": [
-                    {"item": s["item"], "name": (registry.item(s["item"]) or {}).get("name", s["item"]),
-                     "price": s["price"], "type": (registry.item(s["item"]) or {}).get("type", "")}
-                    for s in n["shop"].get("buy", [])
-                ],
-                "sell": [
-                    {"item": s["item"], "name": (registry.item(s["item"]) or {}).get("name", s["item"]),
-                     "price": s["price"], "type": (registry.item(s["item"]) or {}).get("type", "")}
-                    for s in n["shop"].get("sell", [])
-                ],
-            }
-            break
+    merchant = session._merchant_here()
+    if merchant:
+        merchant_shop = {
+            "merchant_id": merchant["id"],
+            "merchant_name": merchant["name"],
+            "buy": [
+                {"item": s["item"], "name": (registry.item(s["item"]) or {}).get("name", s["item"]),
+                 "price": s["price"], "type": (registry.item(s["item"]) or {}).get("type", "")}
+                for s in merchant["shop"].get("buy", [])
+            ],
+            "sell": [
+                {"item": s["item"], "name": (registry.item(s["item"]) or {}).get("name", s["item"]),
+                 "price": s["price"], "type": (registry.item(s["item"]) or {}).get("type", "")}
+                for s in merchant["shop"].get("sell", [])
+            ],
+        }
 
     recipes = [
         {
@@ -337,6 +336,8 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/api/reload":
             global registry
             registry = DataRegistry()
+            if session is not None:
+                session = GameSession(registry, session.state)
             self._send_json({"ok": True, "message": "Data reloaded."})
         elif self.path == "/api/tianyuan":
             with _session_lock:

@@ -62,6 +62,14 @@
             {"label": "Aku tahu. Aku akan membantu.", "next": "n2"}
           ]
         },
+        "n_registered": {
+          "speaker": "npc:npc_mountain_guard",
+          "text": "Kau sudah terdaftar sebagai murid resmi akademi — aku tahu dari tanda di lenganmu. Sebagai murid terdaftar, kau punya akses ke jalur gunung yang lebih aman. Tapi situasi kali ini... bahkan jalur aman pun tidak menjamin apa-apa.",
+          "condition": {"flag": {"key": "state_murid_status", "value": "registered"}},
+          "choices": [
+            {"label": "Aku siap menghadapi apa pun yang ada di sana.", "next": "n2"}
+          ]
+        },
         "n1": {
           "speaker": "npc:npc_mountain_guard",
           "text": "Konvoi warga terjebak di tengah celah! Kabut spiritual membiru — sesuatu datang dari gerbang, dan kali ini lebih cepat dari catatan mana pun. Kami tidak punya waktu untuk menunggu perintah akademi.",

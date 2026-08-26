@@ -80,7 +80,7 @@
       "objective": {
         "kind": "reach",
         "location": "loc_outer_region",
-        "hint": "Perintahlah ke wilayah luar untuk tugas rutin."
+        "hint": "Pergilah ke wilayah luar untuk tugas rutin."
       },
       "on_complete": {
         "effects": [

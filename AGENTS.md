@@ -22,6 +22,7 @@ No lint/typecheck configured — verification = pytest + `node --check`. `pyproj
 - `web/app.py` — stdlib `ThreadingHTTPServer`, JSON API + static files
 - `web/static/` — Vanilla JS/CSS/HTML (no framework, no build step) + assets (textures, fonts, icons, audio, NPC portraits)
 - `tests/` — pytest suite, fixtures in `tests/fixtures/minimal_data/`
+- `tools/` — Dev utilities: `audit_location_gates.py`, `gen_playtest_plan.py`, `run_playtest_plan.py`
 - `docs/` — Story Production Bible v1.0 (~20 docs incl. DESIGN_GAP_REPORT, ENDING_INTEGRATION + superpowers specs, Indonesian)
 - `data/` — 7 arc story data (JSON/CSV): quests, dialogs, NPCs, locations, items, enemies, techniques, companions, recipes, factions, key_items, npc_schedules, etc.
 - `saves/` — Save file directory
@@ -37,6 +38,38 @@ No lint/typecheck configured — verification = pytest + `node --check`. `pyproj
 - **Session actions dispatch via dict** — handler map at top of `GameSession.handle_action()` (session.py): talk/move/hunt/mine/craft/fuse_technique/etc. New action = new key + `_method`.
 - **No walrus operator** (`:=`) in engine code — project convention is conservative Python style.
 
+## Dispatch table snapshots (source of truth)
+
+```
+EFFECT_TYPES = {morality, relation, reputation, flag, item, gold, technique,
+                start_quest, npc_state, grant_companion, exp, unlock_realm_bonus,
+                status_effect, dialog}
+
+OBJECTIVE_HANDLERS = {talk, defeat, gather, reach, choose, spar, advance_time, rest}
+
+TECHNIQUE_KINDS = {attack, defend, heal}
+
+STATUS_KINDS = {dot, stun, debuff, hot, buff}
+
+ITEM_TYPES = {consumable, weapon, key_item}
+```
+
+## GameState fields (key runtime state)
+
+Player: name, hp, qi, realm, realm_level, gold, roots, academy, equipment, exp, dantian_exp, morality, techniques, technique_levels
+
+Session: location, day, hour, current_quest, completed/failed_quests, active_side_quests, side_quest_cooldowns, inventory, flags, relations, memories, talked_npcs, log, last_safe_location, last_hunt_time, grounding_hours_today, exp_grind_today, daily_spar_counts, branch_pending/branch_quest, pending_dialog, pending_battle, companion/companions/active_companion, npc_states, factions, realms_unlocked, status_effects, meditate_week_count/start, pil_sukses/aman_active, fatigue_days, rested_today, element_mastery, passives
+
+## Story data (7 arcs)
+
+- Arc I: New Life → Pavilion selection → Forest trial → Night incident
+- Arc II: First Artifact → Team spar → Branch (Obey/Investigate/Confront)
+- Arc III: Gate Opened → Branch (Seek Truth/Accept Narrative)
+- Arc IV: False History → no branch quest
+- Arc V: World Remembers → Branch (Mountain Gate + Family Crisis → 4 permanent statuses)
+- Arc VI: Last Cycle → Final Choice (Preserve/Destroy/Transform/Sacrifice)
+- Arc VII: Second Life → Ending (including Hidden Resolution)
+
 ## Game systems
 
 - **Dantian/breakthrough** — `dantian_exp` fills toward `dantian_capacity` (from realm CSV). Breakthrough on full. Replaces old exp-per-level formula.
@@ -51,6 +84,7 @@ No lint/typecheck configured — verification = pytest + `node --check`. `pyproj
 - **Element mastery** — `element_mastery` dict on GameState (per 五行 element). Techniques used in battle grant mastery XP (`MASTERY_XP_PER_USE` in battle.py); levels 0–3 feed combat bonuses.
 - **Passives** — `data/passives.json`. Academy choice grants a passive when quest `source` matches (quest.py); `get_player_passives()` applies stat modifiers in battle.
 - **Technique fusion** — `data/fusion_recipes.json`. Session action `fuse_technique`: consumes source techniques at required level → grants result technique.
+- **Elements** — logam, kayu, tanah, air, api. Advantage cycle: logam→kayu→tanah→air→api→logam.
 - **NPC avatars** — NPC portraits in `web/static/assets/img/`. Fallback to initials.
 
 ## Testing
@@ -75,4 +109,5 @@ All 7 playtest findings are implemented in code — search `Playtest #` comments
 - `max_hp()`/`max_qi()` now apply status effect multipliers and fatigue penalties from config.
 - `exp_next()` reads `dantian_capacity` from realm CSV, not config-level growth formula.
 - Old realm IDs (`realm_awal`, `realm_tengah`, `realm_atas`) are migrated to new names (`realm_chuji`, `realm_xuanshi`, `realm_dishi`) in save loader.
+- **Cross-file dependencies** — `quest_faction_reform_003` requires `flag_disturbance_investigated` from `quest_a02_c02_004` in `arc02.json`. If editing `arc_faction_reformists.json` in isolation, this dependency is invisible. Both flags must be set.
 - `knowledge.md` at repo root has deeper architecture context and has been refreshed to match the code (schema v9, current STATUS_KINDS). Hard numbers in docs (test counts, etc.) can lag behind the code — trust the code first.

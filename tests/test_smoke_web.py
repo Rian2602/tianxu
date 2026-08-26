@@ -160,3 +160,53 @@ def test_web_craft_recipe_real_flow(web_app):
     r = _post(base, "/api/action", {"action": {"type": "craft", "recipe": "r_uji"}})
     assert r["ok"] is True
     assert r["view"]["mode"] == "explore"
+
+
+def test_reload_rebinds_session_registry(data_dir, monkeypatch):
+    """Reload data tidak boleh meninggalkan sesi memakai registry lama."""
+    import web.app as app
+
+    reg1 = DataRegistry(data_dir=data_dir)
+    sess = GameSession.new(reg1)
+    monkeypatch.setattr(app, "registry", reg1)
+    monkeypatch.setattr(app, "session", sess)
+
+    app.registry = DataRegistry(data_dir=data_dir)
+    app.session = GameSession(app.registry, app.session.state)
+
+    payload = app._payload()
+    assert app.session.reg is app.registry
+    assert payload["view"]["location"]["id"] == app.session.state.location
+    assert payload["context"]["loc_names"][app.session.state.location]
+
+
+def test_context_merchant_shop_follows_npc_state_location(tmp_path, monkeypatch):
+    """Merchant yang dipindah via npc_state harus ikut membuka panel toko di web."""
+    import web.app as app
+    from tests.test_adaptivity import build_data
+
+    data_dir = build_data(
+        tmp_path,
+        quests=[{"id": "q1", "kind": "main", "title": "T",
+                 "objective": {"kind": "choose", "options": [{"value": "a", "label": "A"}]}}],
+        npcs=[{
+            "id": "npc_merchant",
+            "name": "Pedagang",
+            "location": "l2",
+            "shop": {
+                "buy": [{"item": "i1", "price": 3}],
+                "sell": [{"item": "i1", "price": 1}],
+            },
+        }],
+    )
+    reg = DataRegistry(data_dir=data_dir)
+    sess = GameSession.new(reg)
+    merchant = next(n for n in reg.npcs if n.get("shop"))
+    sess.state.npc_states[merchant["id"]] = {"location": sess.state.location}
+    monkeypatch.setattr(app, "registry", reg)
+    monkeypatch.setattr(app, "session", sess)
+
+    ctx = app._context()
+    assert any(n["id"] == merchant["id"] for n in ctx["npcs"])
+    assert ctx["merchant_shop"] is not None
+    assert ctx["merchant_shop"]["merchant_id"] == merchant["id"]

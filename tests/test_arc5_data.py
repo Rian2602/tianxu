@@ -182,7 +182,6 @@ def _to_mountain_gate_branch(registry: DataRegistry, branch_idx: int = 1, stance
 def test_arc5_spiritual_collapse_and_mountain_gate(registry):
     """Q1 Spiritual Collapse → Q2 Mountain Gate MAJOR → dialog pilihan 2-cabang."""
     s = _to_mountain_gate_branch(registry)
-    assert s.state.flags.get("world_event_a05_spiritual_collapse") == "active"
     s.apply_action({"type": "dialog_choice", "choice_index": 0})  # changed
     assert s.state.current_quest == "quest_a05_c03_003"
     assert s.state.flags.get("flag_mountain_gate_changed") is True
